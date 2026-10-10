@@ -1,56 +1,114 @@
-// Meta progression that lasts between runs: Gears and card unlocks.
+// Meta progression that lasts between runs: Gears, card unlocks, Workshop upgrades,
+// Head Start and the bench (cards kept out of the shop).
 //
-// Saved in localStorage under "lst.meta.v1" (versioned so later sprints can migrate it).
-// The best wave keeps its own old key ("lst.bestWave") so existing saves never break.
+// Saved in localStorage under "lst.meta" as { v: <schema version>, ... }.
+// Older saves are migrated step by step (see MIGRATIONS) and the old key is kept as a backup.
+// The best wave keeps its own old key ("lst.bestWave") so pre-Gears saves never break.
 //
 //   LST.meta.gearsFor(wave, bossWaves) -> { waves, bosses, mult, total }
-//   LST.meta.isUnlocked(cardId) / LST.meta.unlock(cardId)
-//   LST.meta.recordRun(result) -> adds the run's Gears and saves
+//   LST.meta.isUnlocked(id) / unlock(id)                     cards
+//   LST.meta.level(id) / upgradeCost(id) / buyUpgrade(id)    Workshop upgrades
+//   LST.meta.applyToRun(game)                                stat upgrades at the start of a run
+//   LST.meta.headStartWave(best)                             wave a new run starts after
+//   LST.meta.isBenched(id) / toggleBench(id)
+
+LST.UPGRADES = [
+  { id: "power", name: "Power", color: "#ff4757", icon: '<path d="M12 2l2.6 6.2 6.4-1.6-3.9 5.4 3.9 5.4-6.4-1.6L12 22l-2.6-6.2-6.4 1.6L6.9 12 3 6.6l6.4 1.6z"/>',
+    desc: (n) => `+${Math.round(n * 5)}% damage` },
+  { id: "rapid", name: "Rapid", color: "#ffb020", icon: '<path d="M13.5 2L4 13.5h6.5L9 22l10-12h-6.6z"/>',
+    desc: (n) => `+${Math.round(n * 3)}% fire rate` },
+  { id: "armor", name: "Armor", color: "#5ec8ff", icon: '<path d="M12 2l8 3v6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5z"/>',
+    desc: (n) => `+${Math.round(n * 6)}% max HP` },
+  { id: "bank", name: "Bank", color: "#ffd23f", icon: '<circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M14.8 8.6c-.6-.8-1.6-1.2-2.8-1.2-1.6 0-2.8.9-2.8 2.2 0 3 5.8 1.7 5.8 4.7 0 1.3-1.3 2.3-3 2.3-1.3 0-2.4-.5-3-1.4"/>',
+    desc: (n) => `+${n * 15} starting coins` },
+  { id: "greed", name: "Greed", color: "#3ddc84", icon: '<path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/>',
+    desc: (n) => `+${n * 4}% coins per kill` },
+  { id: "sharpEye", name: "Sharp Eye", color: "#8e6cff", icon: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.4"/>',
+    desc: (n) => `+${n}% crit chance` },
+  { id: "headStart", name: "Head Start", color: "#ff9f43", icon: '<path d="M5 21V3"/><path d="M5 4h12l-2.5 4L17 12H5"/>',
+    desc: (n) => n ? `Start up to wave ${n * 5 + 1}` : "Skip the early waves" },
+];
 
 LST.meta = (function () {
-  const KEY = "lst.meta.v1";
+  const KEY = "lst.meta";
+  const VERSION = 2;
   const storage = LST.utils.storage;
+  const M = () => LST.CONFIG.meta;
 
   function fresh() {
-    return { v: 1, gears: 0, lifetimeGears: 0, unlocked: [], runs: 0, seenWorkshop: false, veteranBonus: 0 };
+    return {
+      v: VERSION, gears: 0, lifetimeGears: 0, runs: 0, seenWorkshop: false, veteranBonus: 0,
+      unlocked: [], upgrades: {}, benched: [], headStartPick: null, // null = use the highest allowed
+    };
   }
 
-  function load() {
-    const s = Object.assign(fresh(), storage.get(KEY, null) || {});
-    if (!Array.isArray(s.unlocked)) s.unlocked = [];
+  // Each step takes a save of version k and returns version k + 1.
+  const MIGRATIONS = {
+    1: (s) => Object.assign(s, { v: 2, upgrades: {}, benched: [], headStartPick: null }),
+  };
+
+  function sanitize(s) {
+    const f = fresh();
+    for (const k of Object.keys(f)) if (s[k] === undefined || typeof s[k] !== typeof f[k] && f[k] !== null) s[k] = f[k];
     s.gears = Math.max(0, Math.floor(+s.gears || 0));
-    // First time we see a save from before Gears existed: pay out the best wave once,
-    // so returning players can unlock Multishot right away.
-    if (!storage.get(KEY, null)) {
-      const best = +storage.get("lst.bestWave", 0) || 0;
-      if (best > 0) {
-        s.veteranBonus = api.gearsFor(best + 1, Math.floor(best / LST.CONFIG.waves.bossEvery)).total;
-        s.gears += s.veteranBonus;
-        s.lifetimeGears += s.veteranBonus;
-      }
+    if (!Array.isArray(s.unlocked)) s.unlocked = [];
+    if (!Array.isArray(s.benched)) s.benched = [];
+    if (!s.upgrades || typeof s.upgrades !== "object") s.upgrades = {};
+    for (const [id, cfg] of Object.entries(M().upgrades)) {
+      const n = Math.floor(+s.upgrades[id] || 0);
+      s.upgrades[id] = Math.max(0, Math.min(cfg.max, n));
     }
+    s.unlocked = s.unlocked.filter((id) => LST.CARDS.some((c) => c.id === id && c.unlockCost));
+    s.benched = s.benched.filter((id) => LST.CARDS.some((c) => c.id === id)).slice(0, M().benchMax);
     return s;
   }
 
+  function load() {
+    let s = storage.get(KEY, null);
+    let migratedFrom = null;
+    if (!s) {
+      const v1 = storage.get("lst.meta.v1", null); // Sprint 1 save
+      if (v1) { s = v1; s.v = 1; migratedFrom = 1; }
+    }
+    if (s && typeof s === "object") {
+      while ((s.v || 1) < VERSION && MIGRATIONS[s.v || 1]) s = MIGRATIONS[s.v || 1](s);
+      return { s: sanitize(s), migratedFrom };
+    }
+    // No save at all: maybe a player from before Gears existed.
+    s = fresh();
+    const best = +storage.get("lst.bestWave", 0) || 0;
+    if (best > 0) {
+      s.veteranBonus = api.gearsFor(best + 1, Math.floor(best / LST.CONFIG.waves.bossEvery)).total;
+      s.gears = s.lifetimeGears = s.veteranBonus;
+    }
+    return { s, migratedFrom };
+  }
+
   const api = {
-    KEY,
+    KEY, VERSION,
     state: null,
+    migratedFrom: null,
 
     save() { storage.set(KEY, this.state); },
 
+    // Erase every bit of lasting progress (settings like sound stay).
+    resetAll() {
+      try { localStorage.removeItem(KEY); localStorage.removeItem("lst.meta.v1"); localStorage.removeItem("lst.bestWave"); } catch (e) { /* ignore */ }
+      this.state = fresh();
+      this.save();
+    },
+
     // Gears = floor((perWave * wave^waveExp + perBoss * bossWavesCleared) * worldMult * (1 + cogBonus * cogs))
-    // worldMult and Cogs arrive in later sprints (Backyard = 1, no Cogs yet).
     gearsFor(wave, bossWaves, worldMult = 1, cogs = 0) {
-      const g = LST.CONFIG.meta.gears;
+      const g = M().gears;
       const waves = g.perWave * Math.pow(Math.max(0, wave), g.waveExp);
       const bosses = g.perBoss * bossWaves;
       const mult = worldMult * (1 + g.cogBonus * cogs);
-      const total = Math.floor((waves + bosses) * mult);
-      return { waves: Math.floor(waves), bosses, mult, total };
+      return { waves: Math.floor(waves), bosses, mult, total: Math.floor((waves + bosses) * mult) };
     },
 
+    // ---------- Cards ----------
     card(id) { return LST.CARDS.find((c) => c.id === id); },
-    // Starter cards (no unlockCost) are always unlocked.
     isUnlocked(id) {
       const c = this.card(id);
       return !!c && (!c.unlockCost || this.state.unlocked.includes(id));
@@ -59,8 +117,6 @@ LST.meta = (function () {
     locked() { return this.lockable().filter((c) => !this.isUnlocked(c.id)); },
     nextUnlock() { return this.locked()[0] || null; },
     canAfford(id) { const c = this.card(id); return !!c && !this.isUnlocked(id) && this.state.gears >= c.unlockCost; },
-    anyAffordable() { return this.locked().some((c) => this.state.gears >= c.unlockCost); },
-
     unlock(id) {
       if (!this.canAfford(id)) return false;
       this.state.gears -= this.card(id).unlockCost;
@@ -68,6 +124,85 @@ LST.meta = (function () {
       this.save();
       return true;
     },
+    // In the shop: unlocked and not benched.
+    inDeck(id) { return this.isUnlocked(id) && !this.isBenched(id); },
+
+    // ---------- Bench ----------
+    isBenched(id) { return this.state.benched.includes(id); },
+    // Returns "" on success, or why it can't be benched.
+    benchBlock(id) {
+      if (this.isBenched(id)) return "";
+      if (this.state.benched.length >= M().benchMax) return `You can bench up to ${M().benchMax} cards.`;
+      const attackLeft = LST.CARDS.filter((c) => c.offense && c.id !== id && this.inDeck(c.id));
+      if (this.card(id).offense && !attackLeft.length) return "Keep at least one attack card.";
+      const left = LST.CARDS.filter((c) => c.id !== id && this.inDeck(c.id));
+      if (left.length < 3) return "Keep at least 3 cards in the deck.";
+      return "";
+    },
+    toggleBench(id) {
+      if (!this.isUnlocked(id)) return false;
+      if (this.isBenched(id)) this.state.benched = this.state.benched.filter((b) => b !== id);
+      else if (this.benchBlock(id)) return false;
+      else this.state.benched.push(id);
+      this.save();
+      return true;
+    },
+
+    // ---------- Workshop upgrades ----------
+    level(id) { return this.state.upgrades[id] || 0; },
+    upgradeCost(id) {
+      const u = M().upgrades[id];
+      const n = this.level(id);
+      return n >= u.max ? Infinity : Math.round(u.base * Math.pow(u.growth, n));
+    },
+    buyUpgrade(id) {
+      const cost = this.upgradeCost(id);
+      if (this.state.gears < cost) return false;
+      this.state.gears -= cost;
+      this.state.upgrades[id] = this.level(id) + 1;
+      if (id === "headStart") this.state.headStartPick = null; // jump to the new max
+      this.save();
+      return true;
+    },
+
+    // Stat upgrades for a fresh run. Returns { coinMult } for kill coins.
+    applyToRun(game) {
+      const u = M().upgrades, t = game.tower, L = (id) => this.level(id);
+      t.damageMult *= 1 + u.power.per * L("power");
+      t.fireRate *= 1 + u.rapid.per * L("rapid");
+      t.maxHp *= 1 + u.armor.per * L("armor");
+      t.hp = t.maxHp;
+      t.critChance += u.sharpEye.per * L("sharpEye");
+      game.coins += u.bank.per * L("bank");
+      game.coinMult = 1 + u.greed.per * L("greed");
+    },
+
+    // Highest Head Start wave allowed: 5 per level, capped at 50% of the best wave (multiple of 5).
+    headStartMax(best) {
+      const per = M().upgrades.headStart.per;
+      const cap = Math.floor((best * M().headStartCap) / per) * per;
+      return Math.max(0, Math.min(per * this.level("headStart"), cap));
+    },
+    // What the next run will skip to (the player can pick lower on the start screen).
+    headStartWave(best) {
+      const max = this.headStartMax(best);
+      const pick = this.state.headStartPick;
+      return pick === null || pick === undefined ? max : Math.max(0, Math.min(max, pick));
+    },
+    cycleHeadStart(best) {
+      const per = M().upgrades.headStart.per, max = this.headStartMax(best);
+      const cur = this.headStartWave(best);
+      this.state.headStartPick = cur >= max ? 0 : cur + per;
+      this.save();
+      return this.headStartWave(best);
+    },
+
+    anyAffordable() {
+      if (this.locked().some((c) => this.state.gears >= c.unlockCost)) return true;
+      return Object.keys(M().upgrades).some((id) => this.state.gears >= this.upgradeCost(id));
+    },
+    cardsAffordable() { return this.locked().some((c) => this.state.gears >= c.unlockCost); },
+    upgradesAffordable() { return Object.keys(M().upgrades).some((id) => this.state.gears >= this.upgradeCost(id)); },
 
     // Runs before Multishot is unlocked get a gentler early HP curve (see CONFIG.meta.starterAssist).
     starterAssist() { return !this.isUnlocked("multishot"); },
@@ -80,7 +215,9 @@ LST.meta = (function () {
     },
   };
 
-  api.state = load();
+  const loaded = load();
+  api.state = loaded.s;
+  api.migratedFrom = loaded.migratedFrom;
   api.save();
   return api;
 })();

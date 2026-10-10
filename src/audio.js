@@ -185,6 +185,23 @@ LST.audio = (function () {
       [60, 67, 72].forEach((n) => tone({ type: "sawtooth", freq: midi(n), start: 0.45, dur: 0.6, vol: 0.035, attack: 0.03, filter: { freq: 2200 } }));
       [96, 100, 103, 108].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: 0.5 + i * 0.06, dur: 0.3, vol: 0.05 }));
     } },
+    upgrade: { throttle: 0.08, priority: true, play(o) {
+      // wrench ratchet + a rising "ding" (pitch climbs with the level)
+      const p = o.pitch || 1;
+      for (let i = 0; i < 3; i++) noise({ start: i * 0.04, dur: 0.03, vol: 0.1, freq: 1800 + i * 500, q: 4 });
+      tone({ type: "triangle", freq: midi(76) * p, start: 0.12, dur: 0.12, vol: 0.16 });
+      tone({ type: "triangle", freq: midi(83) * p, start: 0.19, dur: 0.22, vol: 0.14 });
+    } },
+    bench: { throttle: 0.1, play() {
+      // card slides away: falling whoosh + low thunk
+      noise({ dur: 0.16, vol: 0.12, type: "bandpass", freq: 3000, to: 600, q: 1 });
+      tone({ type: "sine", freq: 300, to: 140, start: 0.1, dur: 0.12, vol: 0.18 });
+    } },
+    unbench: { throttle: 0.1, play() {
+      noise({ dur: 0.14, vol: 0.12, type: "bandpass", freq: 700, to: 3500, q: 1 });
+      tone({ type: "triangle", freq: midi(72), start: 0.08, dur: 0.08, vol: 0.14 });
+      tone({ type: "triangle", freq: midi(79), start: 0.14, dur: 0.14, vol: 0.14 });
+    } },
     deny: { throttle: 0.15, play() {
       tone({ type: "square", freq: 180, to: 140, dur: 0.14, vol: 0.08, filter: { freq: 900 } });
     } },

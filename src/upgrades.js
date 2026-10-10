@@ -16,7 +16,7 @@ LST.CARDS = [
     // Additive (a share of the *base* damage) so free picks can't snowball forever.
     name: "Damage", desc: "+30% base damage",
     apply: (t) => { t.damage += LST.CONFIG.tower.damage * 0.3; },
-    stat: (t) => `${t.damage.toFixed(1)} dmg`,
+    stat: (t) => `${(t.damage * t.damageMult).toFixed(1)} dmg`,
   },
   {
     id: "fireRate", offense: true, rarity: "common", color: "#ffb020",
@@ -125,9 +125,9 @@ LST.shopRules = {
     return Math.round(c.base * Math.pow(c.growth, wave - 1) * Math.pow(c.step, times));
   },
 
-  // Unlocked in the Workshop (or a starter card) and not maxed out.
+  // In the deck (unlocked in the Workshop and not benched) and not maxed out.
   available(card, levels) {
-    if (LST.meta && !LST.meta.isUnlocked(card.id)) return false;
+    if (LST.meta && !LST.meta.inDeck(card.id)) return false;
     const lvl = levels[card.id] || 0;
     return card.maxLevel === undefined || lvl < card.maxLevel;
   },

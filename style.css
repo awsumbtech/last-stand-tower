@@ -444,7 +444,7 @@ a.link:hover { text-decoration: underline; }
 }
 
 /* ---------- "New version available" toast from the service worker ---------- */
-.update-toast {
+.update-toast, .mini-toast {
   position: fixed;
   left: 50%;
   bottom: max(16px, env(safe-area-inset-bottom));
@@ -536,7 +536,6 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
 .ws-starter { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .ws-starter > small { font-size: 12px; color: #7a6a8c; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 #ws-starter { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-#ws-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
 .ws-card {
   --accent: var(--yellow); --rarity: #fff;
   position: relative; display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 8px 6px 7px;
@@ -585,7 +584,6 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
   .badge, .gears-total svg.gear, .ws-card.afford, .ws-card.afford .ws-price, .ws-card.revealed, .ws-card.revealed .icon, .next-unlock.ready { animation: none !important; }
 }
 @media (max-width: 560px) {
-  #ws-grid { grid-template-columns: 1fr; gap: 7px; }
   .ws-card { min-height: 58px; padding: 5px 8px 5px 6px; }
   .ws-card .icon { width: 42px; height: 42px; }
   .ws-card .icon svg { width: 24px; height: 24px; }
@@ -602,7 +600,6 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
   .panel.results .res-buttons { grid-row: 5; }
   .panel.results .title.small { font-size: 28px; }
   .res-wave b { font-size: 32px; }
-  #ws-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .ws-starter { display: none; }
   .ws-card .rar { display: none; }
 }
@@ -663,4 +660,133 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
   .ws-hint { display: none; }
   .ws-card { min-height: 50px; padding-top: 3px; padding-bottom: 3px; }
   .ws-card .icon { width: 38px; height: 38px; }
+}
+
+/* ================= Sprint 2: Workshop tabs, upgrades, deck, Head Start, settings ================= */
+.round.corner {
+  position: fixed; z-index: 5;
+  top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+}
+.round svg { width: 26px; height: 26px; }
+.round.corner svg .fill { fill: #c9d6e3; stroke: var(--ink); stroke-width: 1.6; fill-rule: evenodd; }
+
+.headstart-chip {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: -4px;
+  padding: 5px 14px 6px 10px; border: 3px solid var(--ink); border-radius: 999px;
+  background: #ffe2c4; box-shadow: 0 3px 0 var(--ink); font-size: 16px; font-weight: 600;
+  transition: transform 0.18s var(--bouncy);
+}
+.headstart-chip:active { transform: translateY(2px) scale(1.05, 0.92); }
+.headstart-chip svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.headstart-chip svg .fill { fill: #ff9f43; }
+.headstart-chip b { color: #c2410c; }
+.headstart-chip i { font-style: normal; font-size: 17px; opacity: 0.6; }
+.headstart-chip.off { background: var(--cream); }
+.headstart-chip.off b { color: #7a6a8c; }
+.title .hand { display: inline-block; font-size: 0.62em; padding: 0 10px 2px; border: 3px solid var(--ink); border-radius: 999px; background: #ff9f43; vertical-align: 5px; text-shadow: none; color: var(--ink); }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; width: 100%; max-width: 440px; padding: 4px; border: 3px solid var(--ink); border-radius: 999px; background: #efe7da; }
+.tab { position: relative; flex: 1 1 0; padding: 6px 4px 7px; border-radius: 999px; font-size: 17px; font-weight: 700; color: #6a5a7c; transition: transform 0.18s var(--bouncy), background 0.15s; }
+.tab.active { background: var(--yellow); color: var(--ink); box-shadow: 0 0 0 2.5px var(--ink), 0 3px 0 2.5px var(--ink); }
+.tab:active { transform: scale(1.06, 0.92); }
+.tab .dot { position: absolute; top: 2px; right: 10%; width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid var(--ink); background: var(--red); animation: wiggle 1s ease-in-out infinite; }
+
+/* Lists */
+.ws-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+.ws-list.swap > * { animation: squash-in 0.35s ease-out both; animation-delay: calc(var(--n, 0) * 25ms); }
+.ws-card.upg .icon { background: var(--accent); }
+.ws-card.upg .icon svg { fill: #fff; }
+.ws-card.upg .icon .lvl { position: absolute; right: -8px; bottom: -6px; min-width: 22px; height: 22px; padding: 0 4px; border: 2.5px solid var(--ink); border-radius: 999px; background: #fff; font-style: normal; font-size: 12px; font-weight: 700; line-height: 17px; text-align: center; }
+.ws-card .next-txt { font-size: 12px; color: #2e8f5a; font-weight: 600; line-height: 1.15; }
+.ws-card.upg.owned .next-txt { color: #7a6a8c; }
+.ws-card.bought { animation: squash 0.4s ease-out; }
+.ws-card.bought .icon { animation: squash-in 0.45s ease-out; }
+.ws-card.upg.owned .ws-price { background: var(--yellow); }
+
+/* Deck: small cards you can tap to bench */
+.ws-list.tab-deck { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.deck-card {
+  --accent: var(--yellow);
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 3px 7px;
+  border: 4px solid var(--ink); border-radius: 16px; background: #fff; box-shadow: 0 4px 0 var(--ink);
+  transition: transform 0.2s var(--bouncy), opacity 0.2s;
+}
+.deck-card.rare { background: linear-gradient(#fff 55%, #e5f5ff); }
+.deck-card.epic { background: linear-gradient(#fff 55%, #f1e6ff); }
+.deck-card:active { transform: translateY(3px) scale(1.04, 0.94); }
+.deck-card .icon { position: relative; width: 42px; height: 42px; display: grid; place-items: center; border: 3px solid var(--ink); border-radius: 50%; background: var(--accent); }
+.deck-card .icon svg { width: 24px; height: 24px; fill: #fff; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.deck-card .icon svg.lock { position: absolute; right: -7px; bottom: -6px; width: 20px; height: 20px; padding: 2px; border: 2.5px solid var(--ink); border-radius: 50%; background: var(--yellow); fill: none; stroke-width: 2.6; }
+.deck-card .icon svg.lock rect { fill: var(--ink); }
+.deck-card .name { font-size: 13px; font-weight: 700; line-height: 1.1; }
+.deck-card .state { font-size: 11px; font-weight: 700; padding: 0 7px 1px; border: 2px solid var(--ink); border-radius: 999px; background: var(--green); }
+.deck-card.locked { background: repeating-linear-gradient(-45deg, #f3eee6 0 10px, #ebe4d8 10px 20px); box-shadow: 0 2px 0 var(--ink); cursor: default; }
+.deck-card.locked .icon { background: #c9bfd6; }
+.deck-card.locked .icon svg:not(.lock) { fill: var(--ink); opacity: 0.72; }
+.deck-card.locked .state { background: #e6ded1; color: #7a6a8c; }
+.deck-card.benched { transform: rotate(-4deg) scale(0.94); background: #e9e3da; }
+.deck-card.benched .icon { filter: grayscale(1); opacity: 0.6; }
+.deck-card.benched .state { background: var(--red); color: #fff; }
+.deck-card.benched::after { content: "BENCH"; position: absolute; top: 34%; left: 50%; transform: translate(-50%, -50%) rotate(-16deg); padding: 0 6px; border: 3px solid var(--red); border-radius: 6px; color: var(--red); font-size: 13px; font-weight: 700; background: rgba(255, 255, 255, 0.85); }
+.deck-card.flipped { animation: reveal 0.5s ease-out; }
+
+/* Settings + reset confirm */
+.link.danger { color: #c0392b; font-size: 15px; margin-top: 2px; }
+.btn.danger { background: var(--red); color: #fff; }
+.panel.confirm p { font-size: 16px; }
+.mini-toast { padding: 10px 18px; }
+
+/* Phones: one column of rows */
+@media (max-width: 560px) {
+  .ws-list { grid-template-columns: 1fr; gap: 6px; }
+  .ws-list.tab-deck { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .ws-card .next-txt { font-size: 11.5px; }
+  .tab { font-size: 16px; }
+  .panel.workshop { padding: 16px 12px 18px; }
+  .panel.workshop .title.small { font-size: 34px; }
+}
+@media (max-height: 760px) and (max-width: 560px) {
+  .panel.workshop { gap: 7px; padding-top: 12px; padding-bottom: 14px; }
+  .panel.workshop .title.small { font-size: 30px; }
+  .ws-card { min-height: 48px; padding-top: 3px; padding-bottom: 3px; }
+  .ws-card .icon { width: 36px; height: 36px; }
+  .ws-card .icon svg { width: 21px; height: 21px; }
+  .ws-card .name { font-size: 15px; }
+  .ws-card .next-txt { display: none; }
+  .ws-hint { font-size: 14px !important; }
+  .ws-buttons .btn { padding-top: 8px; padding-bottom: 10px; font-size: 19px; }
+  .deck-card { padding: 5px 2px; }
+  .deck-card .icon { width: 36px; height: 36px; }
+}
+/* Landscape phones: title, tabs and Gears in one row; 3-column lists */
+@media (max-height: 560px) and (orientation: landscape) {
+  .panel.workshop { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px 12px; padding: 10px 14px 12px; width: min(900px, 100%); }
+  .panel.workshop .ws-head { display: contents; }
+  .panel.workshop .ws-head .title { grid-column: 1; grid-row: 1; font-size: 26px; }
+  .panel.workshop .ws-head .pill { grid-column: 3; grid-row: 1; font-size: 16px; padding: 2px 12px; }
+  .panel.workshop .tabs { grid-column: 2; grid-row: 1; justify-self: center; padding: 3px; }
+  .panel.workshop .tab { padding: 3px 4px 4px; font-size: 15px; }
+  .panel.workshop .ws-hint { display: none; }
+  .panel.workshop .ws-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .panel.workshop .ws-list.tab-deck { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .panel.workshop .ws-card { min-height: 0; padding: 4px 6px; gap: 7px; }
+  .panel.workshop .ws-card .icon { width: 34px; height: 34px; }
+  .panel.workshop .ws-card .icon svg { width: 20px; height: 20px; }
+  .panel.workshop .ws-card .name { font-size: 14px; }
+  .panel.workshop .ws-card .desc { font-size: 11.5px; }
+  .panel.workshop .ws-card .next-txt, .panel.workshop .ws-card .rar { display: none; }
+  .panel.workshop .ws-price { font-size: 14px; padding: 1px 6px 2px 4px; }
+  .panel.workshop .ws-buttons { grid-column: 1 / -1; justify-self: center; max-width: 360px; }
+  .panel.workshop .ws-buttons .btn { padding: 6px 10px 8px; font-size: 17px; border-radius: 14px; }
+  .deck-card { padding: 4px 2px; gap: 2px; }
+  .deck-card .icon { width: 32px; height: 32px; }
+  .deck-card .icon svg { width: 19px; height: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab .dot, .ws-list.swap > *, .ws-card.bought, .ws-card.bought .icon, .deck-card.flipped { animation: none !important; }
+}
+@media (max-height: 400px) and (orientation: landscape) {
+  .panel.workshop { row-gap: 5px; padding: 8px 14px 9px; }
+  .panel.workshop .ws-list { gap: 5px; }
 }

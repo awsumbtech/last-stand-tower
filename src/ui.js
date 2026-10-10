@@ -19,6 +19,7 @@ LST.UI = class UI {
         pause: $("screen-pause"),
         results: $("screen-results"),
         workshop: $("screen-workshop"),
+        confirm: $("screen-confirm"),
       },
       startGears: $("start-gears"),
       startBadge: $("start-badge"),
@@ -26,7 +27,9 @@ LST.UI = class UI {
       wsGears: $("ws-gears"),
       wsHint: $("ws-hint"),
       wsGrid: $("ws-grid"),
-      wsStarter: $("ws-starter"),
+      headStart: $("btn-headstart"),
+      headStartLabel: $("headstart-label"),
+      auto: $("btn-auto"),
       startBest: $("start-best"),
       upWave: $("up-wave"),
       upCoins: $("up-coins"),
@@ -46,20 +49,59 @@ LST.UI = class UI {
     $("btn-res-workshop").addEventListener("click", () => game.openWorkshop("results"));
     $("btn-ws-back").addEventListener("click", () => game.closeWorkshop());
     $("btn-ws-play").addEventListener("click", () => game.newGame());
+    // Workshop: one delegated listener for all three tabs.
+    this.wsTab = "cards";
     this.el.wsGrid.addEventListener("click", (ev) => {
-      const card = ev.target.closest("[data-card]");
-      if (!card || card.classList.contains("owned")) return;
-      if (!game.unlockCard(card.dataset.card)) {
-        LST.UI.pop(card, "shake");
-        const c = LST.meta.card(card.dataset.card);
-        this.el.wsHint.innerHTML = `Need <b>${c.unlockCost - LST.meta.state.gears}</b> more Gears for ${c.name}. Play a run!`;
+      const el = ev.target.closest("[data-card],[data-upgrade],[data-bench]");
+      if (!el) return;
+      const m = LST.meta;
+      if (el.dataset.card) {
+        if (el.classList.contains("owned")) return;
+        if (!game.unlockCard(el.dataset.card)) {
+          LST.UI.pop(el, "shake");
+          const c = m.card(el.dataset.card);
+          this.el.wsHint.innerHTML = `Need <b>${c.unlockCost - m.state.gears}</b> more Gears for ${c.name}. Play a run!`;
+        }
+      } else if (el.dataset.upgrade) {
+        const id = el.dataset.upgrade;
+        if (!game.buyUpgrade(id)) {
+          LST.UI.pop(el, "shake");
+          const cost = m.upgradeCost(id);
+          this.el.wsHint.innerHTML = cost === Infinity ? "That one is maxed out!" : `Need <b>${cost - m.state.gears}</b> more Gears.`;
+        }
+      } else if (el.dataset.bench) {
+        const why = m.benchBlock(el.dataset.bench);
+        if (!game.toggleBench(el.dataset.bench)) {
+          LST.UI.pop(el, "shake");
+          this.el.wsHint.textContent = why;
+        }
       }
+    });
+    document.querySelectorAll(".tabs .tab").forEach((t) => t.addEventListener("click", () => {
+      if (this.wsTab === t.dataset.tab) return;
+      this.wsTab = t.dataset.tab;
+      this.renderWorkshop({ tab: true });
+    }));
+    this.el.headStart.addEventListener("click", () => {
+      LST.meta.cycleHeadStart(game.bestWave);
+      LST.UI.pop(this.el.headStart, "bump");
+      this.renderStart();
+    });
+    this.el.auto.addEventListener("click", () => game.autoDraft());
+    // Settings (start screen) reuses the pause panel; reset progress asks first.
+    $("btn-settings").addEventListener("click", () => this.show("pause"));
+    $("btn-reset").addEventListener("click", () => this.show("confirm"));
+    $("btn-confirm-cancel").addEventListener("click", () => this.show("pause"));
+    $("btn-confirm-reset").addEventListener("click", () => {
+      game.resetProgress();
+      LST.audio.play("reroll");
+      this.toast("Progress reset. Fresh start!");
     });
     $("btn-next").addEventListener("click", () => game.leaveShop());
     this.el.reroll.addEventListener("click", () => game.rerollShop());
     this.el.repair.addEventListener("click", () => game.repairTower());
     $("btn-pause").addEventListener("click", () => game.togglePause());
-    $("btn-resume").addEventListener("click", () => game.togglePause());
+    $("btn-resume").addEventListener("click", () => (game.state === "paused" ? game.togglePause() : this.show(game.state === "gameover" ? "results" : "start")));
     $("btn-quit").addEventListener("click", () => game.toMenu());
     this.el.speed.addEventListener("click", () => game.toggleSpeed());
 
@@ -99,6 +141,12 @@ LST.UI = class UI {
     if (this.el.screens[name]) LST.UI.pop(this.el.screens[name].querySelector(".panel"));
     if (name !== "results") this.stopCount();
     if (name === "start") this.renderStart();
+    if (name === "pause") {
+      const inRun = this.game.state === "paused";
+      document.getElementById("pause-title").textContent = inRun ? "Paused" : "Settings";
+      document.getElementById("btn-resume").textContent = inRun ? "Resume" : "Done";
+      document.getElementById("btn-quit").classList.toggle("hidden", !inRun);
+    }
     if (name === "upgrade") this.renderShop({ deal: true });
     if (name === "results") this.renderResults();
     if (name === "workshop") this.renderWorkshop();
@@ -109,6 +157,12 @@ LST.UI = class UI {
     this.el.startBest.textContent = this.game.bestWave;
     this.el.startGears.textContent = LST.utils.formatNumber(m.state.gears);
     this.el.startBadge.classList.toggle("hidden", !m.anyAffordable());
+    // Head Start chip: tap to cycle the start wave (0, 5, 10 ... up to the max allowed).
+    const max = m.headStartMax(this.game.bestWave);
+    this.el.headStart.classList.toggle("hidden", max <= 0);
+    const hs = m.headStartWave(this.game.bestWave);
+    this.el.headStartLabel.innerHTML = hs > 0 ? `Head Start: <b>wave ${hs + 1}</b>` : "Head Start: <b>off</b>";
+    this.el.headStart.classList.toggle("off", hs <= 0);
     // One-time hello for players from before Gears existed.
     const w = this.el.startWelcome;
     if (m.state.veteranBonus && !m.state.seenWorkshop) {
@@ -208,23 +262,37 @@ LST.UI = class UI {
     this.countRaf = 0;
   }
 
-  // ---------- Workshop ----------
-  // opts.unlocked: id of the card just unlocked (plays its reveal animation)
+  // ---------- Workshop: Cards / Upgrades / Deck tabs ----------
+  // opts.unlocked / opts.bought / opts.benched: id that just changed (plays its animation)
   renderWorkshop(opts = {}) {
     const m = LST.meta;
+    const tab = this.wsTab;
     this.el.wsGears.textContent = LST.utils.formatNumber(m.state.gears);
-    if (opts.unlocked) LST.UI.pop(document.getElementById("ws-gears-pill"), "bump");
+    if (opts.unlocked || opts.bought) LST.UI.pop(document.getElementById("ws-gears-pill"), "bump");
+    document.querySelectorAll(".tabs .tab").forEach((t) => {
+      const on = t.dataset.tab === tab;
+      t.classList.toggle("active", on);
+      t.setAttribute("aria-selected", String(on));
+      const dot = t.querySelector(".dot");
+      if (dot) dot.classList.toggle("hidden", t.dataset.tab === "cards" ? !m.cardsAffordable() : !m.upgradesAffordable());
+    });
+    const grid = this.el.wsGrid;
+    grid.className = `ws-list tab-${tab}` + (opts.tab ? " swap" : "");
+    grid.innerHTML = "";
+    if (tab === "cards") this.renderCardsTab(grid, opts);
+    else if (tab === "upgrades") this.renderUpgradesTab(grid, opts);
+    else this.renderDeckTab(grid, opts);
+    [...grid.children].forEach((c, i) => c.style.setProperty("--n", i));
+  }
+
+  renderCardsTab(grid, opts) {
+    const m = LST.meta;
     const next = m.nextUnlock();
     const justName = opts.unlocked && m.card(opts.unlocked).name;
     this.el.wsHint.innerHTML = justName ? `<b>${justName}</b> can now show up in the shop!`
       : !next ? "Every card unlocked. Nice work!"
-      : m.anyAffordable() ? "Tap a glowing card to unlock it!"
+      : m.cardsAffordable() ? "Tap a glowing card to unlock it!"
       : `Earn Gears by playing. Next: <b>${next.name}</b> for ${next.unlockCost}.`;
-
-    this.el.wsStarter.innerHTML = LST.CARDS.filter((c) => !c.unlockCost)
-      .map((c) => `<span class="chip" style="--accent:${c.color}" title="${c.name}: ${c.desc}"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg><em>${c.name}</em></span>`).join("");
-
-    this.el.wsGrid.innerHTML = "";
     for (const c of m.lockable()) {
       const owned = m.isUnlocked(c.id);
       const afford = !owned && m.state.gears >= c.unlockCost;
@@ -240,8 +308,67 @@ LST.UI = class UI {
         <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg>${owned ? "" : LOCK_SVG}</span>
         <span class="ws-body"><span class="name">${c.name} <i class="rar">${rar.label}</i></span><span class="desc">${c.desc}</span></span>
         <span class="ws-price">${owned ? "&#10003;" : `${GEAR_SVG}<b>${c.unlockCost}</b>`}</span>`;
-      this.el.wsGrid.appendChild(el);
+      grid.appendChild(el);
     }
+  }
+
+  renderUpgradesTab(grid, opts) {
+    const m = LST.meta;
+    const cfg = LST.CONFIG.meta.upgrades;
+    const best = this.game.bestWave;
+    this.el.wsHint.innerHTML = opts.bought ? `${LST.UPGRADES.find((u) => u.id === opts.bought).name} upgraded!`
+      : "Lasting upgrades. They apply to every run.";
+    for (const u of LST.UPGRADES) {
+      const lvl = m.level(u.id), max = cfg[u.id].max, cost = m.upgradeCost(u.id);
+      const maxed = cost === Infinity;
+      const afford = !maxed && m.state.gears >= cost;
+      const el = document.createElement("button");
+      el.className = "ws-card upg" + (maxed ? " owned" : afford ? " afford" : "") + (opts.bought === u.id ? " bought" : "");
+      el.dataset.upgrade = u.id;
+      el.style.setProperty("--accent", u.color);
+      let note = lvl ? u.desc(lvl) : "Not built yet";
+      if (u.id === "headStart") {
+        const cap = m.headStartMax(best), want = lvl * cfg.headStart.per;
+        note = lvl ? (cap < want ? `Up to wave ${want + 1} (best ${best} allows ${cap + 1})` : u.desc(lvl)) : "Skip early waves (and replay their shops)";
+      }
+      const nextTxt = maxed ? "Maxed" : `Next: ${u.desc(lvl + 1).replace(/^Start up to /, "")}`;
+      el.setAttribute("aria-label", `${u.name}, level ${lvl} of ${max}. ${note}. ${maxed ? "Maxed" : cost + " Gears"}`);
+      el.innerHTML = `
+        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${u.icon}</svg><i class="lvl">${lvl}</i></span>
+        <span class="ws-body"><span class="name">${u.name} <i class="rar">Lv ${lvl}/${max}</i></span><span class="desc">${note}</span><span class="next-txt">${nextTxt}</span></span>
+        <span class="ws-price">${maxed ? "MAX" : `${GEAR_SVG}<b>${LST.utils.formatNumber(cost)}</b>`}</span>`;
+      grid.appendChild(el);
+    }
+  }
+
+  renderDeckTab(grid, opts) {
+    const m = LST.meta;
+    const n = m.state.benched.length, max = LST.CONFIG.meta.benchMax;
+    this.el.wsHint.innerHTML = opts.benched
+      ? (m.isBenched(opts.benched) ? `<b>${m.card(opts.benched).name}</b> benched. It won't show up in the shop.` : `<b>${m.card(opts.benched).name}</b> is back in the deck.`)
+      : `Tap a card to bench it (${n}/${max}). Benched cards stay out of the shop.`;
+    for (const c of LST.CARDS) {
+      const unlocked = m.isUnlocked(c.id), benched = m.isBenched(c.id);
+      const el = document.createElement("button");
+      el.className = `deck-card ${c.rarity}` + (unlocked ? "" : " locked") + (benched ? " benched" : "") + (opts.benched === c.id ? " flipped" : "");
+      el.style.setProperty("--accent", c.color);
+      if (unlocked) el.dataset.bench = c.id;
+      el.setAttribute("aria-label", `${c.name}: ${unlocked ? (benched ? "benched" : "in deck") : "locked"}`);
+      el.innerHTML = `
+        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg>${unlocked ? "" : LOCK_SVG}</span>
+        <span class="name">${c.name}</span>
+        <span class="state">${!unlocked ? "Locked" : benched ? "Benched" : "In deck"}</span>`;
+      grid.appendChild(el);
+    }
+  }
+
+  // Small floating message at the bottom of the screen.
+  toast(text) {
+    const t = document.createElement("div");
+    t.className = "mini-toast";
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2200);
   }
 
   updateToggles() {
@@ -274,14 +401,19 @@ LST.UI = class UI {
     const s = g.shop;
     if (!s) return;
     if (opts.took !== undefined || opts.repaired || opts.rerolled) LST.UI.pop(document.getElementById("up-coins-pill"), "bump");
-    this.el.upWave.textContent = g.wave;
+    const d = g.draft;
+    document.getElementById("up-title").innerHTML = d ? `Head Start <span class="hand">${d.hand} / ${d.of}</span>` : `Wave <span id="up-wave">${g.wave}</span> cleared!`;
     this.el.upCoins.textContent = LST.utils.formatNumber(g.coins);
 
     const extraPrice = g.shopPrice("extraCard");
     const open = s.cards.filter((c) => !c.taken).length;
-    this.el.shopHint.innerHTML = !s.picked
+    this.el.shopHint.innerHTML = d && !s.picked
+      ? `Wave ${d.hand}'s shop: pick a card, it's <b>free</b>!`
+      : !s.picked
       ? "Pick a card. It's <b>free</b>!"
       : open ? "Want another? Extra cards cost coins." : "All cards taken. Nice haul!";
+    this.el.auto.classList.toggle("hidden", !d || d.hand >= d.of);
+    this.el.reroll.classList.toggle("hidden", !!d && d.hand < d.of);
     this.el.shopHint.classList.toggle("free", !s.picked);
 
     this.el.cardRow.innerHTML = "";
@@ -327,7 +459,7 @@ LST.UI = class UI {
 
     const canGo = g.canLeaveShop();
     this.el.next.disabled = !canGo;
-    this.el.next.innerHTML = canGo ? "Next wave &#9654;" : "Pick a card first";
+    this.el.next.innerHTML = !canGo ? "Pick a card first" : d && d.hand < d.of ? "Next hand &#9654;" : `${d ? "Start wave " + (d.of + 1) : "Next wave"} &#9654;`;
     if (opts.deal) LST.audio.play("deal");
   }
 };

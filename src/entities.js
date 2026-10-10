@@ -16,6 +16,7 @@ LST.Tower = class Tower {
     this.targets = c.targets;
     this.critChance = c.critChance;
     this.critMult = c.critMult;
+    this.damageMult = 1; // Workshop "Power" upgrade
     this.pierce = c.pierce;
     this.slow = c.slow;
     this.slowTime = c.slowTime;
@@ -44,7 +45,7 @@ LST.Tower = class Tower {
     this.angle = Math.atan2(targets[0].y - this.y, targets[0].x - this.x);
     for (const t of targets) {
       const crit = Math.random() < this.critChance;
-      const dmg = this.damage * (crit ? this.critMult : 1);
+      const dmg = this.damage * this.damageMult * (crit ? this.critMult : 1);
       const p = new LST.Projectile(this.x, this.y, t, dmg, this.projectileSpeed, crit);
       p.pierce = this.pierce;
       p.slow = this.slow;

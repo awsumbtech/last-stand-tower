@@ -74,5 +74,17 @@ LST.CONFIG = {
     // Until Multishot is unlocked (normally just the first run), enemy HP grows
     // gentler for the first `untilWave` waves so a commons-only tower doesn't hit a wall at wave 10.
     starterAssist: { untilWave: 10, hpGrowth: 0.2 },
+    // Lasting Workshop upgrades: level n+1 costs round(base * growth^n) Gears.
+    upgrades: {
+      power:     { base: 12, growth: 1.15, max: 60, per: 0.05 }, // +5% damage
+      rapid:     { base: 12, growth: 1.17, max: 30, per: 0.03 }, // +3% fire rate
+      armor:     { base: 10, growth: 1.15, max: 60, per: 0.06 }, // +6% max HP
+      bank:      { base: 15, growth: 1.3,  max: 15, per: 15 },   // +15 starting coins
+      greed:     { base: 20, growth: 1.22, max: 25, per: 0.04 }, // +4% coins per kill
+      sharpEye:  { base: 25, growth: 1.25, max: 15, per: 0.01 }, // +1% crit chance
+      headStart: { base: 30, growth: 1.4,  max: 10, per: 5 },    // start 5 waves later per level...
+    },
+    headStartCap: 0.7, // ...but never past 70% of your best wave (rounded down to a multiple of 5)
+    benchMax: 2,       // cards you can keep out of the shop
   },
 };

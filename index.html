@@ -41,11 +41,13 @@
 
   <!-- Start screen -->
   <div id="screen-start" class="screen start">
+    <button id="btn-settings" class="round corner" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8zM12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z"/></svg></button>
     <div class="panel">
       <img class="logo" src="icons/icon-192.png" alt="" width="104" height="104" />
       <h1 class="title"><span>LAST STAND</span><span class="yellow">TOWER</span></h1>
       <p>Your tower shoots by itself. Survive the waves, grab coins, and power up between rounds!</p>
       <button id="btn-start" class="btn big">Play</button>
+      <button id="btn-headstart" class="headstart-chip hidden" aria-label="Head Start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3"/><path class="fill" d="M5 4h12l-2.5 4L17 12H5"/></svg><span id="headstart-label">Start at wave 1</span><i>&#8635;</i></button>
       <button id="btn-workshop" class="btn secondary workshop-btn"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><span>Workshop</span><i class="badge hidden" id="start-badge">!</i></button>
       <div class="start-pills">
         <div class="pill best">Best wave <b id="start-best">0</b></div>
@@ -60,12 +62,16 @@
   <!-- Shop screen (between waves): pick 1 of 3 cards -->
   <div id="screen-upgrade" class="screen hidden">
     <div class="panel wide shop">
-      <h2 class="title small">Wave <span id="up-wave">1</span> cleared!</h2>
+      <h2 class="title small" id="up-title">Wave <span id="up-wave">1</span> cleared!</h2>
       <div class="pill coins big-pill" id="up-coins-pill"><i class="coin"></i><b id="up-coins">0</b></div>
       <p class="shop-hint" id="shop-hint">Pick a card. It's free!</p>
       <div id="card-row"></div>
       <div class="shop-footer">
       <div class="shop-actions">
+        <button id="btn-auto" class="btn small secondary hidden">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5l8 7-8 7zM12 5l8 7-8 7z"/></svg>
+          <span>Auto-draft</span>
+        </button>
         <button id="btn-reroll" class="btn small secondary">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></svg>
           <span>Reroll</span><span class="price"><i class="coin"></i><b id="reroll-price">0</b></span>
@@ -83,7 +89,7 @@
   <!-- Pause screen -->
   <div id="screen-pause" class="screen hidden">
     <div class="panel">
-      <h2 class="title small">Paused</h2>
+      <h2 class="title small" id="pause-title">Paused</h2>
       <div class="settings">
         <button class="setting toggle" data-setting="sfx"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M3 9h4l5-4v14l-5-4H3z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18"/></svg><span>Sound effects</span><b class="state"></b></button>
         <button class="setting toggle" data-setting="music"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M9 17.5a3 3 0 1 1-2-2.83V5l11-2v11.5a3 3 0 1 1-2-2.83V6.4L9 7.7z"/><path class="slash" d="M3 3l18 18"/></svg><span>Music</span><b class="state"></b></button>
@@ -91,6 +97,19 @@
       </div>
       <button id="btn-resume" class="btn">Resume</button>
       <button id="btn-quit" class="btn secondary">Quit to menu</button>
+      <button id="btn-reset" class="link danger">Reset progress&hellip;</button>
+    </div>
+  </div>
+
+  <!-- Reset progress: confirm -->
+  <div id="screen-confirm" class="screen hidden">
+    <div class="panel confirm">
+      <h2 class="title small red">Reset progress?</h2>
+      <p>This erases your <b>Gears, unlocked cards, Workshop upgrades and best wave</b>. Sound settings stay. This can't be undone.</p>
+      <div class="res-buttons">
+        <button id="btn-confirm-cancel" class="btn secondary">Keep it</button>
+        <button id="btn-confirm-reset" class="btn danger">Reset</button>
+      </div>
     </div>
   </div>
 
@@ -127,9 +146,13 @@
         <h2 class="title small">Workshop</h2>
         <div class="pill gears-pill big-pill" id="ws-gears-pill"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><b id="ws-gears">0</b></div>
       </div>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="cards">Cards<i class="dot hidden"></i></button>
+        <button class="tab" role="tab" data-tab="upgrades">Upgrades<i class="dot hidden"></i></button>
+        <button class="tab" role="tab" data-tab="deck">Deck</button>
+      </div>
       <p class="ws-hint" id="ws-hint">Unlock cards to add them to the shop.</p>
-      <div class="ws-starter"><small>Starter cards</small><div id="ws-starter"></div></div>
-      <div id="ws-grid"></div>
+      <div id="ws-grid" class="ws-list"></div>
       <div class="ws-buttons">
         <button id="btn-ws-back" class="btn secondary">Back</button>
         <button id="btn-ws-play" class="btn">Play &#9654;</button>

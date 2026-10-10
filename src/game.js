@@ -17,6 +17,9 @@ LST.Game = class Game extends LST.World {
   reset() {
     this.resetWorld();
     this.coins = 0;
+    this.coinMult = 1;     // Workshop "Greed"
+    this.headStart = 0;    // waves skipped this run
+    this.draft = null;     // Head Start draft: { hand, of, income[] }
     this.score = 0;
     this.kills = 0;
     this.upgradeLevels = {}; // card id -> times taken this run
@@ -42,7 +45,64 @@ LST.Game = class Game extends LST.World {
   newGame() {
     this.reset();
     LST.audio.startMusic();
-    this.startNextWave();
+    LST.meta.applyToRun(this);
+    const skip = LST.meta.headStartWave(this.bestWave);
+    if (skip > 0) this.beginHeadStart(skip);
+    else this.startNextWave();
+  }
+
+  // Head Start: skip the first `skip` waves. Their shops are replayed as a quick draft:
+  // hand k pays wave k's coins (kills + clear bonus), deals a free pick, and sells
+  // extras at wave-k prices, exactly like playing them. "Auto" finishes the draft for you.
+  beginHeadStart(skip) {
+    const income = [];
+    for (let w = 1; w <= skip; w++) {
+      const m = LST.waves.multipliers(w);
+      let coins = LST.waves.clearBonus(w);
+      for (const ty of LST.waves.build(w).queue) coins += Math.max(1, Math.round(LST.CONFIG.enemies[ty].coins * m.coins * this.coinMult));
+      income.push(coins);
+    }
+    this.headStart = skip;
+    this.bossWavesCleared = Math.floor(skip / LST.CONFIG.waves.bossEvery);
+    this.draft = { hand: 0, of: skip, income };
+    this.state = "upgrade";
+    this.advanceDraft();
+    this.ui.show("upgrade");
+    LST.audio.play("waveClear");
+  }
+
+  // Next draft hand. Returns false when the draft is over.
+  advanceDraft() {
+    const d = this.draft;
+    if (!d || d.hand >= d.of) return false;
+    d.hand += 1;
+    this.wave = d.hand;
+    this.coins += d.income[d.hand - 1];
+    this.coinsEarned += d.income[d.hand - 1];
+    this.openShop();
+    return true;
+  }
+
+  // Auto-draft: free pick (attack cards and fresh cards first) plus up to two extras per
+  // hand while coins allow, for every hand left. Stops on the last hand so you shop it yourself.
+  autoDraft() {
+    if (this.state !== "upgrade" || !this.draft) return;
+    const lvl = (id) => this.upgradeLevels[id] || 0;
+    const takeBest = () => {
+      const open = this.shop.cards.map((c, i) => ({ c, i })).filter((o) => !o.c.taken && LST.shopRules.available(o.c.card, this.upgradeLevels));
+      if (!open.length) return false;
+      open.sort((a, b) => (b.c.card.offense ? 1 : 0) - (a.c.card.offense ? 1 : 0) || lvl(a.c.card.id) - lvl(b.c.card.id));
+      const pick = Math.random() < 0.7 ? open[0] : open[Math.floor(Math.random() * open.length)];
+      return this.takeCard(pick.i, { quiet: true });
+    };
+    while (this.draft.hand < this.draft.of) {
+      if (!this.shop.picked) takeBest();
+      for (let k = 0; k < 2 && this.coins >= this.shopPrice("extraCard"); k++) if (!takeBest()) break;
+      this.advanceDraft();
+    }
+    LST.audio.play("epic");
+    this.ui.renderShop({ deal: true });
+    this.ui.updateHud();
   }
 
   startNextWave() {
@@ -106,7 +166,7 @@ LST.Game = class Game extends LST.World {
   }
 
   // Take card `index`. Returns true if it was taken.
-  takeCard(index) {
+  takeCard(index, opts = {}) {
     const s = this.shop;
     const slot = s && s.cards[index];
     if (this.state !== "upgrade" || !slot || slot.taken) return false;
@@ -121,6 +181,7 @@ LST.Game = class Game extends LST.World {
     slot.taken = true;
     this.upgradeLevels[slot.card.id] = (this.upgradeLevels[slot.card.id] || 0) + 1;
     slot.card.apply(this.tower);
+    if (opts.quiet) return true;
     LST.audio.play(slot.card.rarity === "epic" ? "epic" : "buy");
     LST.haptics.buzz(slot.card.rarity === "epic" ? [20, 30, 40] : 15);
     this.ui.renderShop({ took: index });
@@ -170,6 +231,13 @@ LST.Game = class Game extends LST.World {
 
   leaveShop() {
     if (this.state !== "upgrade" || !this.canLeaveShop()) return;
+    if (this.draft && this.advanceDraft()) {
+      LST.audio.play("deal");
+      this.ui.renderShop({ deal: true });
+      this.ui.updateHud();
+      return;
+    }
+    this.draft = null;
     this.startNextWave();
   }
 
@@ -186,7 +254,7 @@ LST.Game = class Game extends LST.World {
     this.result = {
       wave: this.wave, time: this.runTime, kills: this.kills, coins: this.coinsEarned, score: this.score,
       cards: Object.entries(this.upgradeLevels), bossWaves: this.bossWavesCleared, gears, gearsBefore,
-      gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1,
+      gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1, headStart: this.headStart,
     };
     this.resultsDelay = 1.1; // let the tower explosion play first
     this.ui.show("dying"); // no screen, no HUD
@@ -212,6 +280,27 @@ LST.Game = class Game extends LST.World {
   closeWorkshop() {
     if (this.workshopFrom === "results" && this.state === "gameover") this.ui.show("results");
     else { this.state = "menu"; this.ui.show("start"); }
+  }
+
+  buyUpgrade(id) {
+    if (!LST.meta.buyUpgrade(id)) { LST.audio.play("deny"); return false; }
+    LST.audio.play("upgrade", { pitch: 1 + Math.min(0.6, LST.meta.level(id) * 0.02) });
+    LST.haptics.buzz(20);
+    this.ui.renderWorkshop({ bought: id });
+    return true;
+  }
+
+  toggleBench(id) {
+    if (!LST.meta.toggleBench(id)) { LST.audio.play("deny"); return false; }
+    LST.audio.play(LST.meta.isBenched(id) ? "bench" : "unbench");
+    this.ui.renderWorkshop({ benched: id });
+    return true;
+  }
+
+  resetProgress() {
+    LST.meta.resetAll();
+    this.bestWave = 0;
+    this.toMenu();
   }
 
   unlockCard(id) {
@@ -352,8 +441,9 @@ LST.Game = class Game extends LST.World {
 
   onEnemyKilled(e) {
     super.onEnemyKilled(e);
-    this.coins += e.coins;
-    this.coinsEarned += e.coins;
+    const coins = this.coinMult === 1 ? e.coins : Math.round(e.coins * this.coinMult);
+    this.coins += coins;
+    this.coinsEarned += coins;
     this.score += e.score * this.wave;
     this.kills += 1;
     if (this.tower.lifesteal > 0) this.tower.heal(this.tower.maxHp * this.tower.lifesteal);
