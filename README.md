@@ -53,8 +53,31 @@ Pierce 100, Vampire 140, Splash 190, Overcharge 250. A first run usually pays fo
 Until Multishot is unlocked, enemy HP grows a little gentler over the first 10 waves (+20% per wave instead of
 +25%), so a commons-only first run doesn't hit a wall.
 
-Progress is saved in `localStorage` under `lst.meta.v1`; your best wave keeps its old key (`lst.bestWave`).
-Players from before Gears existed get a one-time Gears payout for their best wave.
+The Workshop has three tabs:
+
+- **Cards:** unlock new cards for the shop.
+- **Upgrades:** lasting boosts for every run. Level n+1 costs `round(base × growth^n)` Gears.
+
+  | Upgrade | Per level | Base / growth / max |
+  | --- | --- | --- |
+  | Power | +5% damage | 12 / 1.15 / 60 |
+  | Rapid | +3% fire rate | 12 / 1.17 / 30 |
+  | Armor | +6% max HP | 10 / 1.15 / 60 |
+  | Bank | +15 starting coins | 15 / 1.30 / 15 |
+  | Greed | +4% coins per kill | 20 / 1.22 / 25 |
+  | Sharp Eye | +1% crit chance | 25 / 1.25 / 15 |
+  | Head Start | start 5 waves later (up to 70% of your best wave) | 30 / 1.4 / 10 |
+
+- **Deck:** bench up to 2 cards so they never show up in the shop (keep at least one attack card).
+
+**Head Start** replays the skipped waves' shops as a quick draft: each hand pays that wave's coins and gives a free
+pick, with extras at that wave's prices. **Auto-draft** does all but the last hand for you. Tap the Head Start chip
+on the start screen to choose the start wave.
+
+Progress is saved in `localStorage` under `lst.meta` (versioned; older saves migrate automatically). Your best wave
+keeps its old key (`lst.bestWave`). Players from before Gears existed get a one-time Gears payout for their best wave.
+**Settings** (gear button on the start screen, or the pause menu) has the sound switches and **Reset progress**
+(with a confirm).
 
 - Shots can **crit** for double damage (big orange numbers). Drop below 25% HP and time slows for a moment as a warning.
 - A typical first run lasts about 5-6 minutes (wave 11-13). With Multishot unlocked, runs reach wave 15-18 in 7-8 minutes.
@@ -104,7 +127,7 @@ Opening `index.html` directly also works (without offline support, since service
 | --- | --- |
 | `src/config.js` | All balance numbers: tower stats, enemy types, wave scaling |
 | `src/upgrades.js` | Shop cards (rarity, effect, cap) and the shop rules (draw, prices). Add an entry to add a card |
-| `src/meta.js` | Lasting progress: Gears formula, card unlocks, the versioned save (`lst.meta.v1`) |
+| `src/meta.js` | Lasting progress: Gears, card unlocks, Workshop upgrades, Head Start, bench, versioned save + migrations |
 | `src/waves.js` | Which enemies are in each wave and how they scale |
 | `src/entities.js` | Tower, Enemy, Projectile, Particle, FloatText |
 | `src/settings.js` | Saved settings (sound, music, vibration) and haptics |
@@ -133,7 +156,7 @@ node tools/sim.js --favor                            # dominance check: always t
 node tools/sim.js --config tweaks.json               # try CONFIG overrides: { "config": { ... } }
 node tools/waves-table.js sim-results.json skilled   # per-wave pressure / DPS / coins table
 node tools/sim.js --unlocked starter                 # only the starter cards (first run); or --unlocked multishot,crit
-node tools/sim.js --campaign --campaigns 40          # Gears + Workshop: runs and minutes to each unlock
+node tools/sim.js --campaign --campaigns 8 --hours 10  # meta model: unlocks, upgrades, Head Start, run lengths per hour
 node tools/sim.js --meta --prestige                  # older planning model (lasting stat upgrades + prestige)
 ```
 

@@ -1,14 +1,14 @@
 # Last Stand Tower: sprint roadmap (planning only)
 
 **Target:** quick runs (5-8 min) inside a long journey. Gears unlock cards and lasting upgrades, six worlds raise the stakes, and Rebuild (prestige) is how you break through walls.
-**Status:** Sprint 1 is shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
+**Status:** Sprints 1 and 2 are shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
 
 ## Sprint overview
 
 | # | Sprint | Ships | Depends on |
 |---|---|---|---|
 | 1 ✅ | Results screen, Gears and locked cards | Run summary, Gears saved, Workshop with card unlocks, commons-only starter pool | none |
-| 2 | Workshop upgrades and Head Start | Lasting stat upgrades, Head Start, save/version migration | 1 |
+| 2 ✅ | Workshop upgrades and Head Start | Lasting stat upgrades, Head Start, save/version migration | 1 |
 | 3 | Trap cards, Codex and Appraisal | 8 trap cards, discovery Codex, Appraisal upgrade | 1 (2 for Appraisal) |
 | 4 | Boss fights and the active ability | Bosses stop at range and attack; Shockwave ability | none (best after 2) |
 | 5 | New enemy types | Spitter, Splitter, Shielded (reskinned per world later) | 4 (ranged attack code) |
@@ -60,25 +60,44 @@ Each sprint ends with: the sim re-run (death wave and minutes per strategy, camp
 
 ---
 
-## Sprint 2: Workshop upgrades and Head Start
+## Sprint 2: Workshop upgrades and Head Start (SHIPPED)
 **Goal:** a steady sense of growth between card unlocks.
 
-**Lasting stat upgrades** (cost = round(base × growth^level)):
+**Lasting stat upgrades** (level n+1 costs round(base × growth^n) Gears; all in `CONFIG.meta.upgrades`):
 
 | Upgrade | Effect / level | Base | Growth | Max |
 |---|---|---|---|---|
-| Power | +5% damage | 12 | 1.15 | 60 |
+| Power | +5% damage (multiplies all damage, cards included) | 12 | 1.15 | 60 |
 | Rapid | +3% fire rate | 12 | 1.17 | 30 |
 | Armor | +6% max HP | 10 | 1.15 | 60 |
 | Bank | +15 starting coins | 15 | 1.30 | 15 |
 | Greed | +4% kill coins | 20 | 1.22 | 25 |
 | Sharp Eye | +1% crit chance | 25 | 1.25 | 15 |
-| Head Start | start 5 waves later per level (capped at 50% of your best in that world), with the coins and free picks of the skipped waves | 60 | 1.5 | 8 |
+| Head Start | start 5 waves later per level, capped at **70%** of your best wave (rounded down to a multiple of 5) | **30** | **1.4** | **10** |
 
-- A small "Deck" panel in the Workshop lists the unlocked cards and lets you **bench up to 2** of them (see risk 1).
-- Save-data versioning and migration, plus a "reset progress" option in settings.
+- **Head Start, as built:** the skipped waves aren't free stats. Their shops are replayed as a quick **draft**: hand k pays wave k's coins (kills plus clear bonus, with Greed), deals a free pick, and sells extras at wave-k prices, exactly as if you had played it. **Auto-draft** finishes every hand but the last in one tap. Then you shop the last hand yourself and the run starts at wave N+1. Skipped boss waves count toward Gears. A chip on the start screen picks the start wave (tap to cycle: off, 5, 10 ... up to the max).
+  - *Why not just hand over the coins and free picks?* In the sim that left Head Start towers much weaker than played ones, because extras get pricier every wave and they died 2-3 waves later.
+  - *Why 70% and not 50%?* With a 50% cap each run still has to play half your best, so median runs drifted to 10-11 min after hour 4 (p90 11-12). At 70%, runs stay at 5-7.5 min.
+- **Deck tab:** tap an unlocked card to **bench** it (max 2) so it stays out of the shop. You must keep at least one attack card and 3 cards in the deck.
+- **Save versioning:** the save moved to `lst.meta` as `{ v: 2, ... }` with step-by-step migrations. The Sprint 1 save (`lst.meta.v1`) migrates automatically and is kept as a backup. Pre-Gears players still get their best-wave bonus, and `lst.bestWave` is unchanged.
+- **Reset progress:** in Settings (a gear button on the start screen, or the pause menu). It needs a confirm and wipes Gears, unlocks, upgrades and best wave. Sound settings stay.
+- **Workshop tabs** (Cards / Upgrades / Deck) fix the scrolling. Every tab fits 360×740, 375×667, 390×844, 844×390 and 1280×800 with no scrolling (667×375 landscape is within a few px).
 
-**Acceptance criteria:** the campaign sim shows all 8 card unlocks by **about 1.3 h** (run 14-16), and no run in the first 10 h takes more than 10 min (Head Start keeps late runs at 6-9 min).
+**Acceptance criteria and measured results** (`node tools/sim.js --campaign --campaigns 8`; 10 h per campaign; 8 s per shop and 2 s per draft hand)
+
+The model's spending policy: unlock the next card when affordable, then spend up to half of the rest on the cheapest upgrade (Head Start first whenever usable), saving the rest. Once every card is unlocked, everything goes to upgrades.
+
+| | Casual | Skilled |
+|---|---|---|
+| All 8 cards unlocked | run 14, **1.2 h** | run 13, **1.17 h** |
+| Wave 20 / 30 / 40 reached | 0.7 / 1.7 / 5.2 h | 0.5 / 1.5 / 5.0 h |
+| Runs over 10 min in the first 10 h | 1 of 815 (10.3 min) | **0 of 768** (longest 9.9) |
+| Median run length by hour 0-10 | 5.0-6.6 min | 5.4-7.4 min |
+| Median start / death wave, hour 9-10 | wave 30 → 39 | wave 30 → 41 |
+
+Target: all 8 cards by about 1.3 h (run 14-16), and no run in the first 10 h over 10 min. **Met** (one casual run at 10.3 min).
+
+Note: in the Backyard alone, best waves level off around 40-45 by hour 10. That's where worlds (Sprint 6) and Rebuild (Sprint 7) take over.
 
 ---
 
