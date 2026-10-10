@@ -1,44 +1,5 @@
 {
- "waves": {
-  "bossCount": "one",
-  "countCap": 36,
-  "spawnSpanCap": 8,
-  "damageGrowth": 0.05,
-  "knee": 20,
-  "hpGrowthLate": 0.12
- },
- "config": {
-  "MAX_SPAWN_DIST": 520,
-  "waves": {
-   "countPerWave": 2,
-   "hpGrowth": 0.21,
-   "baseSpawnInterval": 0.7,
-   "clearBonusBase": 12,
-   "clearBonusPerWave": 4
-  },
-  "enemies": {
-   "basic": {
-    "speed": 62
-   },
-   "fast": {
-    "speed": 115
-   },
-   "tank": {
-    "speed": 30
-   },
-   "boss": {
-    "hp": 350,
-    "speed": 24,
-    "damage": 35
-   }
-  }
- },
- "upgrades": {
-  "range": {
-   "maxLevel": 6,
-   "effect": 20
-  }
- },
+ "_note": "Meta-progression proposal (not in the game yet). Use: node tools/sim.js --meta [--prestige] --config tools/balance-proposal.json",
  "meta": {
   "gemBase": 2,
   "gemExp": 1.4,

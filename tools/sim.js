@@ -6,9 +6,10 @@
 // many seeded runs with scripted "player" strategies and records per-wave stats.
 //
 //   node tools/sim.js                         # all strategies, 40 seeds each
-//   node tools/sim.js --runs 100 --strategies cheapest,greedy
-//   node tools/sim.js --config tools/balance-proposal.json --out sim-proposal.json
-//   node tools/sim.js --meta --config tools/balance-proposal.json   # meta-progression model
+//   node tools/sim.js --runs 100 --strategies casual,skilled
+//   node tools/sim.js --config my-tweaks.json --out sim-tweaks.json   # { "config": { ...CONFIG overrides } }
+//   node tools/sim.js --favor                 # dominance check: skilled player who always takes card X
+//   node tools/sim.js --meta [--prestige]     # meta-progression model (gems, lasting upgrades, prestige)
 //
 // Notes: the sim steps at a fixed 1/60 s, 1x speed, desktop view (1280x800),
 // and skips hit-stop / slow-mo (a few seconds per run at most).
@@ -73,74 +74,12 @@ function loadGame(seed) {
   const LST = sandbox.LST;
 
   // Browser-only pieces become no-ops.
-  LST.UI = class { show() {} updateHud() {} renderUpgrades() {} };
+  LST.UI = class { show() {} updateHud() {} renderShop() {} };
   LST.audio = { play() {}, startMusic() {}, stopMusic() {}, duckMusic() {} };
   LST.haptics = { buzz() {} };
 
-  // Balance overrides: { config: {...}, upgrades: { id: { base, growth, maxLevel, effect } }, waves: {...} }
+  // Balance overrides: { config: { ...deep-merged into LST.CONFIG } }
   if (OVERRIDES.config) deepMerge(LST.CONFIG, OVERRIDES.config);
-  if (OVERRIDES.upgrades) {
-    for (const [id, o] of Object.entries(OVERRIDES.upgrades)) {
-      const up = LST.UPGRADES.find((u) => u.id === id);
-      if (!up) continue;
-      if (o.base !== undefined || o.growth !== undefined) {
-        const base = o.base, growth = o.growth;
-        up.cost = (lvl) => Math.round(base * Math.pow(growth, lvl));
-      }
-      if (o.maxLevel !== undefined) up.maxLevel = o.maxLevel;
-      if (o.effect !== undefined) {
-        // effect: multiplier (damage/fireRate), flat amount (range/maxHp), heal fraction (repair)
-        const e = o.effect;
-        if (id === "damage") up.apply = (t) => { t.damage *= e; };
-        if (id === "fireRate") up.apply = (t) => { t.fireRate *= e; };
-        if (id === "range") up.apply = (t) => { t.range += e; };
-        if (id === "maxHp") up.apply = (t) => { t.maxHp += e; t.hp = Math.min(t.maxHp, t.hp + e); };
-        if (id === "repair") up.apply = (t) => { t.hp = Math.min(t.maxHp, t.hp + t.maxHp * e); };
-      }
-    }
-  }
-  // Wave-shape overrides (proposal knobs that are not plain CONFIG numbers):
-  //   bossCount: "one"     -> exactly one boss per boss wave (instead of wave/5)
-  //   bossHpMult           -> multiply boss HP (to compensate for a single boss)
-  //   countCap             -> max non-boss enemies per wave
-  //   spawnSpanCap         -> squeeze the spawn interval so a wave spawns within N seconds
-  //   damageGrowth, coinGrowth -> per-wave linear growth of enemy damage / coin drops
-  //   knee + hpGrowthLate  -> two-slope HP curve
-  const W = OVERRIDES.waves || {};
-  const origBuild = LST.waves.build.bind(LST.waves);
-  LST.waves.build = (wave) => {
-    const r = origBuild(wave);
-    const bosses = r.queue.filter((t) => t === "boss");
-    let rest = r.queue.filter((t) => t !== "boss");
-    if (W.countCap) rest = rest.slice(0, W.countCap);
-    const keep = W.bossCount === "one" ? bosses.slice(0, 1) : bosses;
-    rest.splice(Math.floor(rest.length / 2), 0, ...keep);
-    r.queue = rest;
-    if (W.spawnSpanCap) r.interval = Math.min(r.interval, W.spawnSpanCap / r.queue.length);
-    return r;
-  };
-  const origMult = LST.waves.multipliers.bind(LST.waves);
-  LST.waves.multipliers = (wave) => {
-    const m = origMult(wave);
-    const n = wave - 1;
-    if (W.damageGrowth !== undefined) m.damage = 1 + W.damageGrowth * n;
-    if (W.coinGrowth !== undefined) m.coins = 1 + W.coinGrowth * n;
-    if (W.hpGrowthLate !== undefined) {
-      const g = LST.CONFIG.waves.hpGrowth, k = W.knee;
-      m.hp = n <= k ? Math.pow(1 + g, n) : Math.pow(1 + g, k) * Math.pow(1 + W.hpGrowthLate, n - k);
-    }
-    return m;
-  };
-  if (W.bossHpMult) {
-    const origSpawn = LST.World.prototype.spawnEnemy;
-    LST.World.prototype.spawnEnemy = function (type, ...rest) {
-      const e = origSpawn.call(this, type, ...rest);
-      const last = this.enemies[this.enemies.length - 1];
-      const boss = e && e.type === "boss" ? e : last && last.type === "boss" && type === "boss" ? last : null;
-      if (boss && !boss._scaled) { boss._scaled = true; boss.hp *= W.bossHpMult; boss.maxHp *= W.bossHpMult; }
-      return e;
-    };
-  }
 
   const renderer = VIEW;
   const game = new LST.Game(renderer);
@@ -149,89 +88,96 @@ function loadGame(seed) {
 
 // ---------- Tower helpers ----------
 const towerDps = (t) => t.damage * t.fireRate * t.targets * (1 + t.critChance * (t.critMult - 1));
-const upgradeById = (LST, id) => LST.UPGRADES.find((u) => u.id === id);
 
-function canBuy(LST, game, id) {
-  const up = upgradeById(LST, id);
-  const lvl = game.upgradeLevels[id] || 0;
-  if (up.maxLevel !== undefined && lvl >= up.maxLevel) return null;
-  if (up.canBuy && !up.canBuy(game.tower)) return null;
-  return up.cost(lvl);
+// Rough "how strong is this tower" estimate the skilled bot uses to rank cards.
+function offense(t) {
+  return t.damage * t.fireRate * (1 + t.critChance * (t.critMult - 1)) * Math.pow(Math.min(t.targets, 5), 0.75) *
+    (1 + 0.6 * t.pierce) * (1 + 2.2 * t.splash) * (1 + 0.7 * t.slow) * Math.pow(t.range / 220, 0.7);
+}
+function defense(t) { return t.maxHp * (1 + t.regen * 16 + t.lifesteal * 25); }
+function cardValue(card, game, last) {
+  const t = game.tower;
+  const c = Object.assign(Object.create(Object.getPrototypeOf(t)), t);
+  card.apply(c);
+  const hurt = last ? Math.min(1.5, last.hpLost / t.maxHp) : 0;
+  const wDef = 0.25 + hurt;
+  return Math.log(offense(c) / offense(t)) + wDef * Math.log(defense(c) / defense(t));
 }
 
-// Buy if affordable; returns true when something was bought.
-function tryBuy(LST, game, id, stats) {
-  const cost = canBuy(LST, game, id);
-  if (cost === null || cost > game.coins) return false;
-  const before = game.coins;
-  game.buyUpgrade(id);
-  if (game.coins === before) return false; // the game refused (wrong state etc.)
-  stats.spent += cost;
-  stats.bought[id] = (stats.bought[id] || 0) + 1;
+// ---------- Shop strategies: called once per shop visit ----------
+// Each gets (LST, game, stats, lastWave) and uses the real shop API:
+// game.takeCard(i) (first is free), game.rerollShop(), game.repairTower(), game.shopPrice(kind).
+const open = (game) => game.shop.cards.map((c, i) => ({ ...c, i })).filter((c) => !c.taken);
+function take(game, slot, stats) {
+  const paid = game.shop.picked ? game.shopPrice("extraCard") : 0;
+  if (!game.takeCard(slot.i)) return false;
+  stats.spent += paid;
+  stats.bought[slot.card.id] = (stats.bought[slot.card.id] || 0) + 1;
+  stats.picks += 1; if (paid) stats.extras += 1;
   return true;
 }
+function repair(game, stats, below) {
+  let n = 0;
+  while (game.tower.hp < game.tower.maxHp * below && game.coins >= game.shopPrice("repair") && n++ < 3) {
+    const price = game.shopPrice("repair");
+    if (!game.repairTower()) break;
+    stats.spent += price; stats.repairs += 1;
+  }
+}
+function reroll(game, stats) {
+  const price = game.shopPrice("reroll");
+  if (game.coins < price || !game.rerollShop()) return false;
+  stats.spent += price; stats.rerolls += 1;
+  return true;
+}
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// ---------- Strategies: called once per shop visit ----------
-const OFFENSE = ["damage", "fireRate", "multishot", "range"];
+// Skilled: ranks cards by estimated value, rerolls weak shops, buys extras that are
+// worth it while keeping a repair reserve.
+function skilled(LST, game, s, last, opts = {}) {
+  const repairBelow = opts.noRepair ? 0 : 0.6;
+  if (!opts.noRepair) repair(game, s, repairBelow);
+  const best = () => open(game).map((c) => ({ ...c, v: cardValue(c.card, game, last) * (opts.favor && opts.favor(c.card) ? 10 : 1) }))
+    .sort((a, b) => b.v - a.v);
+  let cards = best();
+  // Reroll once before the free pick if nothing is good (or the favorite isn't there).
+  const wantReroll = opts.favor ? !cards.some((c) => opts.favor(c.card)) : cards.length && cards[0].v < 0.08;
+  if (wantReroll && game.coins >= game.shopPrice("reroll") * 3) { reroll(game, s); cards = best(); }
+  if (cards.length) take(game, cards[0], s);
+  // Extras: buy the best remaining card while affordable; keep a repair in reserve
+  // only when the tower is already hurt.
+  for (let k = 0; k < 3; k++) {
+    cards = best();
+    if (!cards.length || cards[0].v <= 0) break;
+    const hurt = game.tower.hp < game.tower.maxHp * 0.75;
+    const reserve = opts.noRepair || !hurt ? 0 : LST.shopRules.price("repair", game.wave + 1);
+    if (game.coins - game.shopPrice("extraCard") < reserve) break;
+    take(game, cards[0], s);
+  }
+}
+
+// Focus: take the favourite card whenever it shows up (reroll to look for it), else play skilled.
+const focus = (ids) => (LST, game, s, last) => skilled(LST, game, s, last, { favor: (c) => ids.includes(c.id) });
+
 const STRATEGIES = {
-  // Always buy the cheapest available upgrade (repair included when hurt).
-  cheapest(LST, game, s) {
-    for (let k = 0; k < 200; k++) {
-      const opts = LST.UPGRADES.map((u) => [u.id, canBuy(LST, game, u.id)]).filter(([, c]) => c !== null).sort((a, b) => a[1] - b[1]);
-      if (!opts.length || !tryBuy(LST, game, opts[0][0], s)) break;
+  // Casual: free pick is a random card (shiny rarities slightly preferred), repairs when
+  // under half HP, spends the rest on random extra cards, never rerolls.
+  casual(LST, game, s) {
+    repair(game, s, 0.5);
+    const cards = open(game);
+    const shiny = cards.flatMap((c) => Array(c.card.rarity === "epic" ? 3 : c.card.rarity === "rare" ? 2 : 1).fill(c));
+    if (cards.length) take(game, rand(shiny), s);
+    for (let k = 0; k < 2; k++) {
+      const rest = open(game);
+      if (!rest.length || game.coins < game.shopPrice("extraCard")) break;
+      take(game, rand(rest), s);
     }
   },
-  // Damage only (plus repair when below 40%).
-  damage(LST, game, s) {
-    if (game.tower.hp < game.tower.maxHp * 0.4) tryBuy(LST, game, "repair", s);
-    while (tryBuy(LST, game, "damage", s));
-  },
-  // Fire rate until capped, then damage.
-  fireRate(LST, game, s) {
-    if (game.tower.hp < game.tower.maxHp * 0.4) tryBuy(LST, game, "repair", s);
-    for (let k = 0; k < 100; k++) {
-      if (canBuy(LST, game, "fireRate") !== null) { if (!tryBuy(LST, game, "fireRate", s)) break; }
-      else if (!tryBuy(LST, game, "damage", s)) break;
-    }
-  },
-  // Save for multishot first, then damage/fire rate cheapest-first.
-  multishot(LST, game, s) {
-    if (game.tower.hp < game.tower.maxHp * 0.4) tryBuy(LST, game, "repair", s);
-    for (let k = 0; k < 100; k++) {
-      const ms = canBuy(LST, game, "multishot");
-      if (ms !== null) { if (!tryBuy(LST, game, "multishot", s)) break; continue; }
-      const d = canBuy(LST, game, "damage"), f = canBuy(LST, game, "fireRate");
-      const id = f !== null && f < d ? "fireRate" : "damage";
-      if (!tryBuy(LST, game, id, s)) break;
-    }
-  },
-  // Greedy: best DPS gain per coin; heals when low; buys HP if last wave hurt a lot.
-  greedy(LST, game, s, last) {
-    const t = game.tower;
-    if (t.hp < t.maxHp * 0.5) tryBuy(LST, game, "repair", s);
-    if (last && last.hpLost > t.maxHp * 0.3) tryBuy(LST, game, "maxHp", s);
-    for (let k = 0; k < 100; k++) {
-      const dps = towerDps(t);
-      const value = {
-        damage: dps * 0.25,
-        fireRate: dps * 0.15,
-        multishot: (dps / t.targets) * 0.7, // extra targets are not always available
-        range: dps * (25 / t.range) * 0.6, // more time shooting each enemy
-      };
-      const opts = OFFENSE.map((id) => [id, canBuy(LST, game, id)]).filter(([, c]) => c !== null)
-        .map(([id, c]) => [id, c, value[id] / c]).sort((a, b) => b[2] - a[2]);
-      if (!opts.length) break;
-      // Save up for the best one rather than wasting coins on worse value.
-      if (!tryBuy(LST, game, opts[0][0], s)) break;
-    }
-  },
-  // Cheapest, but never buys Repair.
-  noRepair(LST, game, s) {
-    for (let k = 0; k < 200; k++) {
-      const opts = LST.UPGRADES.filter((u) => u.id !== "repair").map((u) => [u.id, canBuy(LST, game, u.id)]).filter(([, c]) => c !== null).sort((a, b) => a[1] - b[1]);
-      if (!opts.length || !tryBuy(LST, game, opts[0][0], s)) break;
-    }
-  },
+  skilled: (LST, game, s, last) => skilled(LST, game, s, last),
+  damage: focus(["damage", "crit", "overcharge"]),
+  fireRate: focus(["fireRate"]),
+  multishot: focus(["multishot", "pierce", "splash"]),
+  noRepair: (LST, game, s, last) => skilled(LST, game, s, last, { noRepair: true }),
 };
 
 // ---------- Meta-progression (model of the proposed lasting upgrade tree) ----------
@@ -301,14 +247,14 @@ function playRun(strategyName, seed, meta) {
   game.onTowerHit = (e) => { if (cur) cur.hpLost += e.damage; onTowerHit(e); };
 
   game.reset();
-  const runStats = { spent: 0, bought: {} };
+  const runStats = { spent: 0, bought: {}, picks: 0, extras: 0, rerolls: 0, repairs: 0 };
   let realSeconds = 0;
   let startWave = 0;
   if (meta) {
     startWave = applyMeta(LST, game, meta);
-    if (startWave > 0) { // spend the head-start coins in a shop before the first wave
+    if (startWave > 0) { // skipped waves grant their free picks, then one shop for the coins
       game.state = "upgrade";
-      strategy(LST, game, runStats, null);
+      for (let w = 0; w < startWave; w++) { game.openShop(); strategy(LST, game, runStats, null); }
       realSeconds += SHOP_SECONDS;
     }
   }
@@ -319,8 +265,7 @@ function playRun(strategyName, seed, meta) {
     const t = game.tower;
     const types = game.spawnQueue.slice();
     const mult = game.waveMult;
-    const bossMult = (OVERRIDES.waves && OVERRIDES.waves.bossHpMult) || 1;
-    const totalHp = types.reduce((s, ty) => s + LST.CONFIG.enemies[ty].hp * mult.hp * (ty === "boss" ? bossMult : 1), 0);
+    const totalHp = types.reduce((s, ty) => s + LST.CONFIG.enemies[ty].hp * mult.hp, 0);
     const spawnSpan = types.length * game.spawnInterval;
     cur = {
       wave: game.wave, count: types.length, bosses: types.filter((x) => x === "boss").length,
@@ -355,7 +300,7 @@ function playRun(strategyName, seed, meta) {
   }
   return {
     strategy: strategyName, seed, deathWave: game.wave, startWave, realMinutes: realSeconds / 60,
-    bought: runStats.bought, bossKills, waves,
+    bought: runStats.bought, picks: runStats.picks, extras: runStats.extras, rerolls: runStats.rerolls, repairs: runStats.repairs, bossKills, waves,
     finalDps: towerDps(game.tower),
   };
 }
@@ -429,7 +374,7 @@ if (require.main === module) {
   const outPath = opt("out", "sim-results.json");
   const t0 = Date.now();
   if (opt("meta", false)) {
-    const strategy = opt("strategy", "greedy");
+    const strategy = opt("strategy", "skilled");
     const milestones = [10, 20, 30, 40, 50, 60];
     const campaigns = [];
     const seeds = +opt("campaigns", 5);
@@ -440,7 +385,13 @@ if (require.main === module) {
     fs.writeFileSync(outPath, JSON.stringify({ meta: META, strategy, campaigns }, null, 1));
     for (const c of campaigns) console.log(c.seed, JSON.stringify(c.reached), "last:", JSON.stringify(c.history[c.history.length - 1]));
   } else {
-    const names = opt("strategies", "all") === "all" ? Object.keys(STRATEGIES) : String(opt("strategies")).split(",");
+    let names = opt("strategies", "all") === "all" ? Object.keys(STRATEGIES) : String(opt("strategies")).split(",");
+    if (opt("favor", false)) {
+      // Dominance check: one strategy per card that always grabs that card when offered.
+      const { LST } = loadGame(1);
+      names = ["skilled"];
+      for (const c of LST.CARDS) { STRATEGIES["favor:" + c.id] = focus([c.id]); names.push("favor:" + c.id); }
+    }
     const results = [];
     for (const name of names) {
       for (let seed = 1; seed <= RUNS; seed++) results.push(playRun(name, seed));
