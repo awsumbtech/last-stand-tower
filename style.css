@@ -1,0 +1,135 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #07070f;
+  color: #e8e8ff;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+.hidden { display: none !important; }
+
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: max(10px, env(safe-area-inset-top)) 12px 0;
+  pointer-events: none;
+}
+.hud-row { display: flex; gap: 18px; justify-content: center; font-weight: 600; font-size: 16px; }
+.hud-item { text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+.hud-item span { color: #00f0ff; }
+.hud-item.coins, .hud-item.coins span { color: #ffd93d; text-shadow: 0 0 8px rgba(255, 217, 61, 0.6); }
+
+.hp-bar {
+  position: relative;
+  margin: 8px auto 0;
+  width: min(320px, 70vw);
+  height: 14px;
+  border: 1px solid #39ff8a;
+  border-radius: 7px;
+  background: rgba(57, 255, 138, 0.08);
+  overflow: hidden;
+}
+#hud-hp-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #1fd16b, #39ff8a); box-shadow: 0 0 10px #39ff8a; transition: width 0.15s; }
+#hud-hp-fill.low { background: linear-gradient(90deg, #d1261f, #ff4d6d); box-shadow: 0 0 10px #ff4d6d; }
+#hud-hp-text { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 12px; font-weight: 700; color: #fff; text-shadow: 0 0 3px #000; }
+
+.hud-buttons { position: fixed; top: max(8px, env(safe-area-inset-top)); right: 10px; display: flex; gap: 6px; pointer-events: auto; }
+
+/* ---------- Screens ---------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(7, 7, 15, 0.82);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+}
+.screen p { max-width: 420px; color: #b8b8d8; line-height: 1.4; }
+.screen strong { color: #00f0ff; }
+
+h1 { font-size: clamp(36px, 9vw, 64px); line-height: 1; letter-spacing: 4px; color: #00f0ff; text-shadow: 0 0 18px #00f0ff; }
+h1 span { color: #ff2bd6; text-shadow: 0 0 18px #ff2bd6; }
+h2 { font-size: clamp(26px, 6vw, 38px); color: #00f0ff; text-shadow: 0 0 14px #00f0ff; }
+h2.danger { color: #ff4d6d; text-shadow: 0 0 14px #ff4d6d; }
+
+.best { color: #ffd93d !important; }
+.hint { font-size: 12px; opacity: 0.6; }
+.coins-line { font-size: 20px; font-weight: 700; color: #ffd93d !important; }
+
+button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #07070f;
+  background: #00f0ff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 34px;
+  min-width: 180px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+  transition: transform 0.08s, box-shadow 0.15s;
+}
+button:hover { box-shadow: 0 0 26px rgba(0, 240, 255, 0.9); }
+button:active { transform: scale(0.96); }
+button.secondary { background: transparent; color: #00f0ff; border: 1px solid #00f0ff; }
+button.small { min-width: 0; font-size: 14px; padding: 8px 12px; background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid #00f0ff; box-shadow: none; }
+
+/* ---------- Upgrade cards ---------- */
+#upgrade-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  width: min(720px, 100%);
+}
+.upgrade {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  text-align: left;
+  color: #e8e8ff;
+  background: rgba(255, 43, 214, 0.08);
+  border: 1px solid #ff2bd6;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 43, 214, 0.25);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.upgrade:hover { box-shadow: 0 0 18px rgba(255, 43, 214, 0.6); }
+.upgrade .name { font-weight: 700; font-size: 16px; color: #ff2bd6; }
+.upgrade .level { font-weight: 400; font-size: 12px; opacity: 0.7; }
+.upgrade .desc { font-weight: 400; font-size: 12px; color: #b8b8d8; }
+.upgrade .stat { font-weight: 600; font-size: 13px; color: #00f0ff; }
+.upgrade .cost { font-weight: 700; color: #ffd93d; }
+.upgrade:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+.upgrade.maxed .cost { color: #39ff8a; }
+
+/* Phones: move speed/pause buttons to the bottom corner so they don't cover the HUD. */
+@media (max-width: 560px) {
+  .hud-buttons { top: auto; bottom: max(14px, env(safe-area-inset-bottom)); }
+  button.small { font-size: 16px; padding: 10px 16px; }
+}
+
+@media (max-height: 560px) {
+  .screen { gap: 8px; justify-content: flex-start; }
+  #upgrade-list { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+}
