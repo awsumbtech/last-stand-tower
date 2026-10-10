@@ -9,7 +9,9 @@
 //   node tools/sim.js --runs 100 --strategies casual,skilled
 //   node tools/sim.js --config my-tweaks.json --out sim-tweaks.json   # { "config": { ...CONFIG overrides } }
 //   node tools/sim.js --favor                 # dominance check: skilled player who always takes card X
-//   node tools/sim.js --meta [--prestige]     # meta-progression model (gems, lasting upgrades, prestige)
+//   node tools/sim.js --unlocked starter      # card pool: all (default) | starter | multishot,crit,...
+//   node tools/sim.js --campaign              # Sprint 1 model: commons-only start, real Gears + Workshop unlock prices
+//   node tools/sim.js --meta [--prestige]     # older planning model (lasting stat upgrades, prestige)
 //
 // Notes: the sim steps at a fixed 1/60 s, 1x speed, desktop view (1280x800),
 // and skips hit-stop / slow-mo (a few seconds per run at most).
@@ -19,7 +21,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
-const FILES = ["config.js", "utils.js", "upgrades.js", "entities.js", "world.js", "waves.js", "game.js"];
+const FILES = ["config.js", "utils.js", "upgrades.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
 const SOURCES = FILES.map((f) => [f, fs.readFileSync(path.join(ROOT, "src", f), "utf8")]);
 
 // ---------- CLI ----------
@@ -58,7 +60,10 @@ function deepMerge(target, src) {
 }
 
 // ---------- Load the game into a sandbox ----------
-function loadGame(seed) {
+// Which Workshop cards are unlocked: "all", "starter" (none), or a list of ids.
+const UNLOCKED = opt("unlocked", "all");
+
+function loadGame(seed, unlocked = UNLOCKED) {
   const rand = mulberry32(seed);
   const SandMath = Object.create(Math);
   SandMath.random = rand;
@@ -77,6 +82,9 @@ function loadGame(seed) {
   LST.UI = class { show() {} updateHud() {} renderShop() {} };
   LST.audio = { play() {}, startMusic() {}, stopMusic() {}, duckMusic() {} };
   LST.haptics = { buzz() {} };
+
+  LST.meta.state.unlocked = unlocked === "all" ? LST.CARDS.filter((c) => c.unlockCost).map((c) => c.id)
+    : unlocked === "starter" ? [] : Array.isArray(unlocked) ? unlocked.slice() : String(unlocked).split(",");
 
   // Balance overrides: { config: { ...deep-merged into LST.CONFIG } }
   if (OVERRIDES.config) deepMerge(LST.CONFIG, OVERRIDES.config);
@@ -226,8 +234,8 @@ function applyMeta(LST, game, meta) {
 }
 
 // ---------- One run ----------
-function playRun(strategyName, seed, meta) {
-  const { LST, game } = loadGame(seed);
+function playRun(strategyName, seed, meta, unlocked) {
+  const { LST, game } = loadGame(seed, unlocked);
   const strategy = STRATEGIES[strategyName];
   const waves = [];
   let cur = null, bossKills = 0;
@@ -302,6 +310,7 @@ function playRun(strategyName, seed, meta) {
     strategy: strategyName, seed, deathWave: game.wave, startWave, realMinutes: realSeconds / 60,
     bought: runStats.bought, picks: runStats.picks, extras: runStats.extras, rerolls: runStats.rerolls, repairs: runStats.repairs, bossKills, waves,
     finalDps: towerDps(game.tower),
+    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared).total,
   };
 }
 
@@ -355,6 +364,30 @@ function metaCampaign(strategy, seed, maxRuns, milestones, usePrestige) {
   return { strategy, seed, reached, history, levels: meta.levels };
 }
 
+// ---------- Sprint 1 campaign: Gears + Workshop card unlocks ----------
+// Start with the starter pool, earn the real Gears payout each run, and unlock the
+// cheapest locked card whenever affordable (the "Next unlock" the results screen shows).
+function unlockCampaign(strategy, seed, maxRuns = 40) {
+  const { LST } = loadGame(1);
+  const order = LST.meta.lockable().map((c) => [c.id, c.unlockCost]);
+  const unlocked = [];
+  let gears = 0, minutes = 0;
+  const events = {}, runs = [];
+  for (let run = 1; run <= maxRuns && unlocked.length < order.length; run++) {
+    const r = playRun(strategy, seed * 1000 + run, null, unlocked);
+    minutes += r.realMinutes;
+    gears += r.gears;
+    runs.push({ run, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), gears: r.gears, pool: unlocked.length });
+    for (const [id, cost] of order) {
+      if (unlocked.includes(id)) continue;
+      if (gears < cost) break;
+      gears -= cost; unlocked.push(id);
+      events[id] = { run, minutes: Math.round(minutes) };
+    }
+  }
+  return { strategy, seed, events, runs, order };
+}
+
 // ---------- Main ----------
 function summarize(results) {
   const by = {};
@@ -373,7 +406,30 @@ function summarize(results) {
 if (require.main === module) {
   const outPath = opt("out", "sim-results.json");
   const t0 = Date.now();
-  if (opt("meta", false)) {
+  if (opt("campaign", false)) {
+    const n = +opt("campaigns", 30);
+    const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr[Math.min(arr.length - 1, Math.floor(p * arr.length))]; };
+    const out = {};
+    for (const strategy of String(opt("strategies", "casual,skilled")).split(",")) {
+      const camps = [];
+      for (let s = 1; s <= n; s++) camps.push(unlockCampaign(strategy, s));
+      const order = camps[0].order;
+      const run1 = camps.map((c) => c.runs[0]);
+      const firstCost = order[0][1];
+      const row = {
+        firstRun: { wave: q(run1.map((r) => r.wave), 0.5), waveP10: q(run1.map((r) => r.wave), 0.1), minutes: q(run1.map((r) => r.minutes), 0.5), gears: q(run1.map((r) => r.gears), 0.5),
+          firstUnlockAffordable: +(run1.filter((r) => r.gears >= firstCost).length / n).toFixed(2) },
+        secondRun: { wave: q(camps.map((c) => c.runs[1].wave), 0.5), minutes: q(camps.map((c) => c.runs[1].minutes), 0.5) },
+        unlocks: Object.fromEntries(order.map(([id, cost]) => [id, { cost, run: q(camps.map((c) => (c.events[id] ? c.events[id].run : 99)), 0.5),
+          minutes: q(camps.map((c) => (c.events[id] ? c.events[id].minutes : 9999)), 0.5) }])),
+      };
+      out[strategy] = row;
+      console.log(`== ${strategy} (${n} campaigns): first run wave ${row.firstRun.wave} (p10 ${row.firstRun.waveP10}), ${row.firstRun.minutes} min, ${row.firstRun.gears} Gears; ` +
+        `first unlock affordable after run 1 in ${Math.round(row.firstRun.firstUnlockAffordable * 100)}%; run 2: wave ${row.secondRun.wave}, ${row.secondRun.minutes} min`);
+      console.table(row.unlocks);
+    }
+    fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
+  } else if (opt("meta", false)) {
     const strategy = opt("strategy", "skilled");
     const milestones = [10, 20, 30, 40, 50, 60];
     const campaigns = [];
@@ -404,4 +460,4 @@ if (require.main === module) {
   process.stderr.write(`took ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${outPath}\n`);
 }
 
-module.exports = { playRun, metaCampaign, STRATEGIES };
+module.exports = { playRun, metaCampaign, unlockCampaign, STRATEGIES };
