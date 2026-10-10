@@ -10,8 +10,7 @@
 //   node tools/sim.js --config my-tweaks.json --out sim-tweaks.json   # { "config": { ...CONFIG overrides } }
 //   node tools/sim.js --favor                 # dominance check: skilled player who always takes card X
 //   node tools/sim.js --unlocked starter      # card pool: all (default) | starter | multishot,crit,...
-//   node tools/sim.js --campaign              # Sprint 1 model: commons-only start, real Gears + Workshop unlock prices
-//   node tools/sim.js --meta [--prestige]     # older planning model (lasting stat upgrades, prestige)
+//   node tools/sim.js --campaign [--hours 10] # meta model: real Gears, card unlocks, Workshop upgrades, Head Start
 //
 // Notes: the sim steps at a fixed 1/60 s, 1x speed, desktop view (1280x800),
 // and skips hit-stop / slow-mo (a few seconds per run at most).
@@ -37,6 +36,7 @@ const MAX_WAVE = +opt("max-wave", 120);
 const DT = 1 / 60;
 const SHOP_SECONDS = +opt("shop-seconds", 8); // assumed real time a player spends in each shop
 const CELEBRATE_SECONDS = 1.6;
+const DRAFT_SECONDS = +opt("draft-seconds", 2); // per Head Start draft hand
 const VIEW = opt("phone", false) ? { halfW: 310, halfH: 650 } : { halfW: 640, halfH: 400 };
 const CONFIG_PATH = opt("config", null);
 const OVERRIDES = CONFIG_PATH ? JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8")) : {};
@@ -188,54 +188,11 @@ const STRATEGIES = {
   noRepair: (LST, game, s, last) => skilled(LST, game, s, last, { noRepair: true }),
 };
 
-// ---------- Meta-progression (model of the proposed lasting upgrade tree) ----------
-// Gems are earned at the end of every run: floor(gemBase * wave^gemExp * prestigeMult).
-// Nodes cost round(base * growth^level). "headStart" lets a run begin at wave 5*level
-// (capped to half the best wave), with the coins the skipped waves would have paid out.
-const META = (OVERRIDES.meta) || {
-  gemBase: 2, gemExp: 1.3,
-  nodes: {
-    power:     { base: 10, growth: 1.18, max: 60, damagePct: 0.08 },   // +8% damage / level (additive)
-    rapid:     { base: 10, growth: 1.18, max: 40, fireRatePct: 0.04 }, // +4% fire rate
-    armor:     { base: 8,  growth: 1.16, max: 60, hpPct: 0.10 },       // +10% max HP
-    bank:      { base: 12, growth: 1.25, max: 20, startCoins: 20 },    // +20 starting coins
-    greed:     { base: 15, growth: 1.22, max: 30, coinPct: 0.05 },     // +5% coins from kills
-    crit:      { base: 20, growth: 1.25, max: 20, critPct: 0.02 },     // +2% crit chance
-    headStart: { base: 60, growth: 1.6, max: 10, waves: 5 },           // start at wave 5*level
-  },
-  prestige: { minBest: 30, starsPerWaves: 5, starsFrom: 20, gemMultPerStar: 0.2, powerPerStar: 0.05 },
-};
-
-function metaCost(node, lvl) { return Math.round(node.base * Math.pow(node.growth, lvl)); }
-
-function applyMeta(LST, game, meta) {
-  const n = META.nodes, t = game.tower, levels = meta.levels;
-  const L = (k) => levels[k] || 0;
-  const star = 1 + META.prestige.powerPerStar * (meta.stars || 0);
-  t.damage *= (1 + n.power.damagePct * L("power")) * star;
-  t.fireRate *= 1 + n.rapid.fireRatePct * L("rapid");
-  t.maxHp *= (1 + n.armor.hpPct * L("armor")) * star; t.hp = t.maxHp;
-  t.critChance += n.crit.critPct * L("crit");
-  game.coins += n.bank.startCoins * L("bank");
-  game.metaCoinMult = 1 + n.greed.coinPct * L("greed");
-  // Head start: skip waves, collect what they would have paid.
-  const start = Math.min(n.headStart.waves * L("headStart"), Math.floor(((meta.best || 0) * (META.headStartFrac || 0.5)) / 5) * 5);
-  if (start > 0) {
-    let coins = 0;
-    for (let w = 1; w <= start; w++) {
-      const m = LST.waves.multipliers(w);
-      for (const ty of LST.waves.build(w).queue) coins += Math.max(1, Math.round(LST.CONFIG.enemies[ty].coins * m.coins));
-      coins += LST.waves.clearBonus(w);
-    }
-    game.coins += Math.round(coins * game.metaCoinMult);
-    game.wave = start;
-  }
-  return start;
-}
-
 // ---------- One run ----------
+// `meta` (optional) is a saved meta state ({ unlocked, upgrades, benched, ... }) plus `best`;
+// the run then uses the game's own Workshop upgrades and Head Start (LST.meta / game.beginHeadStart).
 function playRun(strategyName, seed, meta, unlocked) {
-  const { LST, game } = loadGame(seed, unlocked);
+  const { LST, game } = loadGame(seed, meta ? meta.unlocked : unlocked);
   const strategy = STRATEGIES[strategyName];
   const waves = [];
   let cur = null, bossKills = 0;
@@ -247,7 +204,6 @@ function playRun(strategyName, seed, meta, unlocked) {
   game.onEnemyKilled = (e) => {
     const before = game.coins;
     onKill(e);
-    if (game.metaCoinMult && game.metaCoinMult !== 1) game.coins += Math.round(e.coins * (game.metaCoinMult - 1));
     if (cur) cur.coinsEarned += game.coins - before;
     if (e.type === "boss") bossKills++;
   };
@@ -259,11 +215,15 @@ function playRun(strategyName, seed, meta, unlocked) {
   let realSeconds = 0;
   let startWave = 0;
   if (meta) {
-    startWave = applyMeta(LST, game, meta);
-    if (startWave > 0) { // skipped waves grant their free picks, then one shop for the coins
-      game.state = "upgrade";
-      for (let w = 0; w < startWave; w++) { game.openShop(); strategy(LST, game, runStats, null); }
-      realSeconds += SHOP_SECONDS;
+    Object.assign(LST.meta.state, JSON.parse(JSON.stringify(meta)));
+    game.bestWave = meta.best || 0;
+    LST.meta.applyToRun(game);
+    startWave = LST.meta.headStartWave(game.bestWave);
+    if (startWave > 0) {
+      game.beginHeadStart(startWave);
+      // The draft replays the skipped waves' shops (a few seconds each); the last hand is a normal shop.
+      do { strategy(LST, game, runStats, null); realSeconds += DRAFT_SECONDS; } while (game.advanceDraft());
+      game.draft = null;
     }
   }
   let last = null;
@@ -314,78 +274,55 @@ function playRun(strategyName, seed, meta, unlocked) {
   };
 }
 
-// ---------- Meta progression model ----------
-// A player who always plays `strategy`, earns gems per run, and spends them between runs
-// on the cheapest node (head start whenever affordable). With `prestige`, they reset once a
-// run gains < 1 wave over the average of their last 3 and best >= prestige.minBest.
-function metaCampaign(strategy, seed, maxRuns, milestones, usePrestige) {
-  const P = META.prestige;
-  const meta = { levels: {}, best: 0, stars: 0 };
-  let gems = 0, totalMinutes = 0;
-  const reached = {};
-  const history = [];
-  let sincePrestige = [];
-  for (let run = 1; run <= maxRuns; run++) {
-    const r = playRun(strategy, seed * 1000 + run, meta);
-    totalMinutes += r.realMinutes;
-    const gemMult = 1 + P.gemMultPerStar * meta.stars;
-    const earned = Math.floor(META.gemBase * Math.pow(r.deathWave, META.gemExp) * gemMult);
-    gems += earned;
-    meta.best = Math.max(meta.best, r.deathWave);
-    sincePrestige.push(r.deathWave);
-    history.push({ run, start: r.startWave, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), totalMinutes: +totalMinutes.toFixed(0), gems: earned, stars: meta.stars,
-      levels: Object.values(meta.levels).reduce((a, b) => a + b, 0) });
-    for (const m of milestones) if (!reached[m] && r.deathWave >= m) reached[m] = { run, hours: +(totalMinutes / 60).toFixed(1) };
-    if (milestones.every((m) => reached[m])) break;
-
-    // Prestige check.
-    const recent = sincePrestige.slice(-4, -1);
-    if (usePrestige && meta.best >= P.minBest && recent.length === 3) {
-      const avg = recent.reduce((a, b) => a + b, 0) / 3;
-      const newStars = Math.max(0, Math.floor((meta.best - P.starsFrom) / P.starsPerWaves));
-      if (r.deathWave < avg + 1 && newStars > meta.stars) {
-        meta.stars = newStars; meta.levels = {}; gems = 0; meta.best = 0; sincePrestige = [];
-        history[history.length - 1].prestige = newStars;
-        continue;
-      }
-    }
-    // Spend gems.
-    for (let k = 0; k < 1000; k++) {
-      const opts = Object.entries(META.nodes).filter(([id, n]) => (meta.levels[id] || 0) < n.max)
-        .map(([id, n]) => [id, metaCost(n, meta.levels[id] || 0)]);
-      const hs = opts.find(([id]) => id === "headStart");
-      const useful = hs && META.nodes.headStart.waves * ((meta.levels.headStart || 0) + 1) <= meta.best * (META.headStartFrac || 0.5);
-      let pickOpt = useful && hs[1] <= gems ? hs : opts.filter(([id]) => id !== "headStart").sort((a, b) => a[1] - b[1])[0];
-      if (!pickOpt || pickOpt[1] > gems) break;
-      gems -= pickOpt[1];
-      meta.levels[pickOpt[0]] = (meta.levels[pickOpt[0]] || 0) + 1;
-    }
-  }
-  return { strategy, seed, reached, history, levels: meta.levels };
-}
-
-// ---------- Sprint 1 campaign: Gears + Workshop card unlocks ----------
-// Start with the starter pool, earn the real Gears payout each run, and unlock the
-// cheapest locked card whenever affordable (the "Next unlock" the results screen shows).
-function unlockCampaign(strategy, seed, maxRuns = 40) {
+// ---------- Campaign: Gears, card unlocks, Workshop upgrades, Head Start, bench ----------
+// A player who keeps playing `strategy` for `hours` of real time. After each run they spend
+// Gears with a simple balanced policy:
+//   1. unlock the next (cheapest) card if affordable,
+//   2. then spend up to `statShare` of what's left on the cheapest Workshop upgrade
+//      (Head Start only when the cap lets them use the new level), saving the rest
+//      toward the next card. Once every card is unlocked, all Gears go to upgrades.
+// Head Start is always used at its max.
+function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5)) {
   const { LST } = loadGame(1);
+  const cfg = LST.CONFIG.meta;
   const order = LST.meta.lockable().map((c) => [c.id, c.unlockCost]);
-  const unlocked = [];
+  const cost = (id, n) => { const u = cfg.upgrades[id]; return n >= u.max ? Infinity : Math.round(u.base * Math.pow(u.growth, n)); };
+  const meta = { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0 };
   let gears = 0, minutes = 0;
   const events = {}, runs = [];
-  for (let run = 1; run <= maxRuns && unlocked.length < order.length; run++) {
-    const r = playRun(strategy, seed * 1000 + run, null, unlocked);
+  for (let run = 1; minutes < hours * 60 && run <= 2000; run++) {
+    const r = playRun(strategy, seed * 10000 + run, meta);
     minutes += r.realMinutes;
     gears += r.gears;
-    runs.push({ run, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), gears: r.gears, pool: unlocked.length });
-    for (const [id, cost] of order) {
-      if (unlocked.includes(id)) continue;
-      if (gears < cost) break;
-      gears -= cost; unlocked.push(id);
-      events[id] = { run, minutes: Math.round(minutes) };
+    meta.best = Math.max(meta.best, r.deathWave);
+    runs.push({ run, start: r.startWave, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), at: +(minutes / 60).toFixed(2), gears: r.gears,
+      levels: Object.values(meta.upgrades).reduce((a, b) => a + b, 0), cards: meta.unlocked.length });
+    for (const m of [20, 30, 40, 50, 60, 80, 100]) if (!events["wave" + m] && r.deathWave >= m) events["wave" + m] = { run, minutes: Math.round(minutes) };
+    // 1. next card
+    for (const [id, c] of order) {
+      if (meta.unlocked.includes(id)) continue;
+      if (gears >= c) { gears -= c; meta.unlocked.push(id); events[id] = { run, minutes: Math.round(minutes) }; }
+      break;
+    }
+    // 2. upgrades
+    const allCards = meta.unlocked.length === order.length;
+    let budget = allCards ? gears : gears * statShare;
+    for (let k = 0; k < 500; k++) {
+      const opts = Object.keys(cfg.upgrades).map((id) => [id, cost(id, meta.upgrades[id] || 0)]).filter(([id, c]) => {
+        if (c === Infinity) return false;
+        if (id !== "headStart") return true;
+        const next = ((meta.upgrades.headStart || 0) + 1) * cfg.upgrades.headStart.per;
+        return next <= Math.floor((meta.best * cfg.headStartCap) / cfg.upgrades.headStart.per) * cfg.upgrades.headStart.per;
+      }).sort((a, b) => a[1] - b[1]);
+      // Head Start first whenever usable and affordable: it's what keeps runs short.
+      const hs = opts.find(([id]) => id === "headStart");
+      const pick = hs && hs[1] <= budget ? hs : opts[0];
+      if (!pick || pick[1] > budget) break;
+      budget -= pick[1]; gears -= pick[1];
+      meta.upgrades[pick[0]] = (meta.upgrades[pick[0]] || 0) + 1;
     }
   }
-  return { strategy, seed, events, runs, order };
+  return { strategy, seed, events, runs, order, upgrades: meta.upgrades, best: meta.best };
 }
 
 // ---------- Main ----------
@@ -407,39 +344,42 @@ if (require.main === module) {
   const outPath = opt("out", "sim-results.json");
   const t0 = Date.now();
   if (opt("campaign", false)) {
-    const n = +opt("campaigns", 30);
+    const n = +opt("campaigns", 12), hours = +opt("hours", 10);
     const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr[Math.min(arr.length - 1, Math.floor(p * arr.length))]; };
     const out = {};
     for (const strategy of String(opt("strategies", "casual,skilled")).split(",")) {
       const camps = [];
-      for (let s = 1; s <= n; s++) camps.push(unlockCampaign(strategy, s));
+      for (let s = 1; s <= n; s++) { camps.push(campaign(strategy, s, hours)); process.stderr.write("."); }
       const order = camps[0].order;
       const run1 = camps.map((c) => c.runs[0]);
-      const firstCost = order[0][1];
+      const ev = (id) => ({ run: q(camps.map((c) => (c.events[id] ? c.events[id].run : 9999)), 0.5), hours: +(q(camps.map((c) => (c.events[id] ? c.events[id].minutes : 99999)), 0.5) / 60).toFixed(2) });
+      // run length per hour band
+      const bands = [];
+      for (let h = 0; h < hours; h++) {
+        const rs = camps.flatMap((c) => c.runs.filter((r) => r.at > h && r.at <= h + 1));
+        if (!rs.length) continue;
+        const m = rs.map((r) => r.minutes);
+        bands.push({ hour: `${h}-${h + 1}`, runs: rs.length, medianMin: q(m, 0.5), p90Min: q(m, 0.9), maxMin: Math.max(...m),
+          medianStart: q(rs.map((r) => r.start), 0.5), medianWave: q(rs.map((r) => r.wave), 0.5) });
+      }
+      const all = camps.flatMap((c) => c.runs);
       const row = {
-        firstRun: { wave: q(run1.map((r) => r.wave), 0.5), waveP10: q(run1.map((r) => r.wave), 0.1), minutes: q(run1.map((r) => r.minutes), 0.5), gears: q(run1.map((r) => r.gears), 0.5),
-          firstUnlockAffordable: +(run1.filter((r) => r.gears >= firstCost).length / n).toFixed(2) },
-        secondRun: { wave: q(camps.map((c) => c.runs[1].wave), 0.5), minutes: q(camps.map((c) => c.runs[1].minutes), 0.5) },
-        unlocks: Object.fromEntries(order.map(([id, cost]) => [id, { cost, run: q(camps.map((c) => (c.events[id] ? c.events[id].run : 99)), 0.5),
-          minutes: q(camps.map((c) => (c.events[id] ? c.events[id].minutes : 9999)), 0.5) }])),
+        firstRun: { wave: q(run1.map((r) => r.wave), 0.5), minutes: q(run1.map((r) => r.minutes), 0.5), gears: q(run1.map((r) => r.gears), 0.5),
+          firstUnlockAffordable: +(run1.filter((r) => r.gears >= order[0][1]).length / n).toFixed(2) },
+        unlocks: Object.fromEntries(order.map(([id, cost]) => [id, { cost, ...ev(id) }])),
+        milestones: Object.fromEntries(["wave20", "wave30", "wave40", "wave50", "wave60", "wave80"].map((m) => [m, ev(m)])),
+        bands, longestRun: Math.max(...all.map((r) => r.minutes)), over10: all.filter((r) => r.minutes > 10).length, totalRuns: all.length,
+        endUpgrades: camps[0].upgrades, endBest: q(camps.map((c) => c.best), 0.5),
       };
       out[strategy] = row;
-      console.log(`== ${strategy} (${n} campaigns): first run wave ${row.firstRun.wave} (p10 ${row.firstRun.waveP10}), ${row.firstRun.minutes} min, ${row.firstRun.gears} Gears; ` +
-        `first unlock affordable after run 1 in ${Math.round(row.firstRun.firstUnlockAffordable * 100)}%; run 2: wave ${row.secondRun.wave}, ${row.secondRun.minutes} min`);
+      console.log(`\n== ${strategy} (${n} campaigns x ${hours} h): first run wave ${row.firstRun.wave}, ${row.firstRun.minutes} min, ${row.firstRun.gears} Gears; ` +
+        `longest run ${row.longestRun} min; runs over 10 min: ${row.over10}/${row.totalRuns}; best wave at the end ${row.endBest}`);
       console.table(row.unlocks);
+      console.table(row.milestones);
+      console.table(bands);
+      console.log("upgrades at the end (campaign 1):", JSON.stringify(row.endUpgrades));
     }
     fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
-  } else if (opt("meta", false)) {
-    const strategy = opt("strategy", "skilled");
-    const milestones = [10, 20, 30, 40, 50, 60];
-    const campaigns = [];
-    const seeds = +opt("campaigns", 5);
-    for (let s = 1; s <= seeds; s++) {
-      campaigns.push(metaCampaign(strategy, s, +opt("max-runs", 150), milestones, !!opt("prestige", false)));
-      process.stderr.write(`campaign ${s}/${seeds} done\n`);
-    }
-    fs.writeFileSync(outPath, JSON.stringify({ meta: META, strategy, campaigns }, null, 1));
-    for (const c of campaigns) console.log(c.seed, JSON.stringify(c.reached), "last:", JSON.stringify(c.history[c.history.length - 1]));
   } else {
     let names = opt("strategies", "all") === "all" ? Object.keys(STRATEGIES) : String(opt("strategies")).split(",");
     if (opt("favor", false)) {
@@ -460,4 +400,4 @@ if (require.main === module) {
   process.stderr.write(`took ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${outPath}\n`);
 }
 
-module.exports = { playRun, metaCampaign, unlockCampaign, STRATEGIES };
+module.exports = { playRun, campaign, STRATEGIES };
