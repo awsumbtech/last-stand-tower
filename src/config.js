@@ -18,6 +18,8 @@ LST.CONFIG = {
     range: 220,
     projectileSpeed: 620,
     targets: 1, // multishot: how many enemies are targeted per volley
+    critChance: 0.1, // chance a shot deals critMult damage
+    critMult: 2,
   },
 
   // Enemy archetypes. hp/damage/coins are scaled per wave in waves.js.

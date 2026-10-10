@@ -10,6 +10,16 @@
   const game = new LST.Game(renderer);
   window.game = game; // handy for debugging in the console
 
+  // Browsers (especially iOS) only allow audio after a user gesture.
+  // The first tap/click/key unlocks it and starts the music.
+  LST.audio.startMusic();
+  const unlockEvents = ["pointerdown", "touchend", "click", "keydown"];
+  const unlock = () => {
+    LST.audio.unlock();
+    if (LST.audio.unlocked) unlockEvents.forEach((ev) => window.removeEventListener(ev, unlock, true));
+  };
+  unlockEvents.forEach((ev) => window.addEventListener(ev, unlock, true));
+
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" || e.code === "KeyP" || e.code === "Escape") {
       e.preventDefault();
@@ -19,6 +29,8 @@
     } else if (e.code === "Enter") {
       if (game.state === "menu" || game.state === "gameover") game.newGame();
       else if (game.state === "upgrade") game.startNextWave();
+    } else if (e.code === "KeyM") {
+      LST.settings.toggle("music");
     }
   });
 

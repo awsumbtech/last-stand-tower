@@ -143,7 +143,7 @@ LST.themes.neon = {
     ctx.fillStyle = t.color;
     ctx.shadowColor = t.color;
     ctx.shadowBlur = 6;
-    ctx.font = "bold 14px system-ui, sans-serif";
+    ctx.font = `bold ${t.kind === "crit" ? 20 : t.kind === "hit" ? 11 : 14}px system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText(t.text, t.x, t.y);
     ctx.shadowBlur = 0;

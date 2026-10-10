@@ -144,6 +144,35 @@ button {
 .round:active { transform: translateY(3px) scale(1.08, 0.9); box-shadow: 0 1px 0 var(--ink); transition-duration: 0.05s; }
 .pause-icon { width: 14px; height: 16px; border-left: 5px solid var(--ink); border-right: 5px solid var(--ink); }
 
+/* Sound / music / vibration toggles */
+.toggle svg { width: 24px; height: 24px; overflow: visible; }
+.toggle svg .fill { fill: var(--ink); }
+.toggle svg .wave { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; }
+.toggle svg .slash { fill: none; stroke: var(--red); stroke-width: 3.4; stroke-linecap: round; opacity: 0; transition: opacity 0.15s; }
+.toggle.off svg .slash { opacity: 1; }
+.toggle.off svg .wave { opacity: 0.25; }
+.round.toggle.off { background: #ece6dc; }
+
+.settings { display: flex; flex-direction: column; gap: 8px; width: min(300px, 100%); }
+.setting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 0 var(--ink);
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+  transition: transform 0.18s var(--bouncy), box-shadow 0.1s;
+}
+.setting span { flex: 1; }
+.setting .state { padding: 2px 10px; border: 2.5px solid var(--ink); border-radius: 999px; background: var(--green); font-size: 14px; }
+.setting.off .state { background: #ddd3c4; color: #7a6a8c; }
+.setting:active { transform: translateY(3px) scale(1.03, 0.95); box-shadow: 0 1px 0 var(--ink); transition-duration: 0.05s; }
+
 /* ---------- HUD ---------- */
 #hud {
   position: fixed;
@@ -362,6 +391,7 @@ a.link:hover { text-decoration: underline; }
 /* ---------- Phones ---------- */
 @media (max-width: 560px) {
   .hud-buttons { top: auto; bottom: max(14px, env(safe-area-inset-bottom)); }
+  .round { width: 46px; height: 46px; }
   .pill { font-size: 15px; padding: 3px 11px; }
   #upgrade-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .upgrade { padding: 8px 8px 10px; }

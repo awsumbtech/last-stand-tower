@@ -32,6 +32,8 @@
       <div class="hp-bar"><div id="hud-hp-fill"></div><span id="hud-hp-text">100 / 100</span></div>
     </div>
     <div class="hud-buttons">
+      <button id="btn-sfx" class="round toggle" data-setting="sfx" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M3 9h4l5-4v14l-5-4H3z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18"/></svg></button>
+      <button id="btn-music" class="round toggle" data-setting="music" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M9 17.5a3 3 0 1 1-2-2.83V5l11-2v11.5a3 3 0 1 1-2-2.83V6.4L9 7.7z"/><path class="slash" d="M3 3l18 18"/></svg></button>
       <button id="btn-speed" class="round" aria-label="Game speed">1x</button>
       <button id="btn-pause" class="round" aria-label="Pause"><span class="pause-icon"></span></button>
     </div>
@@ -45,7 +47,7 @@
       <p>Your tower shoots by itself. Survive the waves, grab coins, and power up between rounds!</p>
       <button id="btn-start" class="btn big">Play</button>
       <div class="pill best">Best wave <b id="start-best">0</b></div>
-      <p class="hint keys-only">Space / P: pause &nbsp;·&nbsp; F: game speed</p>
+      <p class="hint keys-only">Space / P: pause &nbsp;·&nbsp; F: game speed &nbsp;·&nbsp; M: music</p>
       <a class="link" href="styles.html">Art style preview &rarr;</a>
     </div>
   </div>
@@ -64,6 +66,11 @@
   <div id="screen-pause" class="screen hidden">
     <div class="panel">
       <h2 class="title small">Paused</h2>
+      <div class="settings">
+        <button class="setting toggle" data-setting="sfx"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M3 9h4l5-4v14l-5-4H3z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18"/></svg><span>Sound effects</span><b class="state"></b></button>
+        <button class="setting toggle" data-setting="music"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M9 17.5a3 3 0 1 1-2-2.83V5l11-2v11.5a3 3 0 1 1-2-2.83V6.4L9 7.7z"/><path class="slash" d="M3 3l18 18"/></svg><span>Music</span><b class="state"></b></button>
+        <button class="setting toggle haptics-only" data-setting="haptics"><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="fill" x="7" y="3" width="10" height="18" rx="2.5"/><path class="wave" d="M4 8v8M20 8v8"/><path class="slash" d="M3 3l18 18"/></svg><span>Vibration</span><b class="state"></b></button>
+      </div>
       <button id="btn-resume" class="btn">Resume</button>
       <button id="btn-quit" class="btn secondary">Quit to menu</button>
     </div>
@@ -82,6 +89,8 @@
 
   <script src="src/config.js"></script>
   <script src="src/utils.js"></script>
+  <script src="src/settings.js"></script>
+  <script src="src/audio.js"></script>
   <script src="src/upgrades.js"></script>
   <script src="src/entities.js"></script>
   <script src="src/world.js"></script>

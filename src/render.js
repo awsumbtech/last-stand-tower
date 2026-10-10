@@ -95,10 +95,13 @@ LST.Renderer = class Renderer {
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
+    if (scene.confetti) for (const c of scene.confetti) (theme.confetti || LST.draw.confetti)(ctx, c, this);
     for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
-    if (scene.state === "playing" || scene.state === "paused") {
+    if (scene.state === "celebrate") {
+      theme.banner(ctx, "WAVE CLEAR!", Math.min(1, scene.celebrateTimer / 0.35), this);
+    } else if (scene.state === "playing" || scene.state === "paused") {
       if (scene.bossIntro > 0) {
         if (theme.bossBanner) theme.bossBanner(ctx, scene.bossIntro, this);
         else theme.banner(ctx, "BOSS", Math.min(1, scene.bossIntro), this);
@@ -107,11 +110,31 @@ LST.Renderer = class Renderer {
       }
     }
 
+    this.drawOverlays(ctx, scene);
+
     if (ps) {
       const main = this.ctx;
       main.setTransform(1, 0, 0, 1, 0, 0);
       main.imageSmoothingEnabled = false;
       main.drawImage(this.low, 0, 0, this.low.width * ps * this.dpr, this.low.height * ps * this.dpr);
+    }
+  }
+
+  // Screen-space feedback shared by every theme: red low-HP vignette and white flash.
+  drawOverlays(ctx, scene) {
+    const low = scene.lowHpActive && scene.state === "playing" ? 0.22 + 0.1 * Math.sin(this.time * 6) : 0;
+    const v = Math.max(scene.vignette || 0, low);
+    if (v > 0.01) {
+      const w = this.width, h = this.height;
+      const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.hypot(w, h) * 0.55);
+      g.addColorStop(0, "rgba(255, 40, 70, 0)");
+      g.addColorStop(1, `rgba(255, 40, 70, ${Math.min(0.75, v * 0.75)})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+    if (scene.flash > 0.01) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${scene.flash * 0.55})`;
+      ctx.fillRect(0, 0, this.width, this.height);
     }
   }
 };
@@ -128,6 +151,17 @@ LST.draw = {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.closePath();
+  },
+
+  confetti(ctx, c) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, c.life / 0.4);
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.scale(1, Math.cos(c.rot * 1.7)); // paper flipping over
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+    ctx.restore();
   },
 
   roundRect(ctx, x, y, w, h, r) {

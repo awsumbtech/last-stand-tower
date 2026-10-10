@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -17,6 +17,8 @@ const PRECACHE = [
   "manifest.webmanifest",
   "src/config.js",
   "src/utils.js",
+  "src/settings.js",
+  "src/audio.js",
   "src/upgrades.js",
   "src/entities.js",
   "src/world.js",

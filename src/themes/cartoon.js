@@ -200,7 +200,9 @@
       const sx = 1 + hit * 0.16 + t.recoil * 0.04 + breathe;
       const sy = 1 - hit * 0.13 - t.recoil * 0.04 - breathe;
       ctx.save();
-      ctx.translate(t.x, t.y);
+      // Recoil: the whole tower gets shoved back a few units opposite the shot.
+      const kick = t.recoil * t.recoil * 5;
+      ctx.translate(t.x - Math.cos(t.angle) * kick, t.y - Math.sin(t.angle) * kick);
 
       ctx.beginPath();
       ctx.ellipse(4, 10, R * 1.15, R * 0.9, 0, 0, Math.PI * 2);
@@ -480,14 +482,36 @@
         ctx.ellipse(-13, 0, 8 * Math.abs(Math.cos(age * 9)) + 1.5, 8, 0, 0, Math.PI * 2); // spinning coin
         outlined(ctx, "#ffd23f", 2.5);
         textPop(ctx, t.text, 8, 0, "#fff3b0", 20);
+      } else if (t.kind === "hit") {
+        textPop(ctx, t.text, 0, 0, "#ffffff", 19);
+      } else if (t.kind === "crit") {
+        // Crits: bigger, tilted, with a starburst behind the number.
+        ctx.rotate(-0.12);
+        star(ctx, 8, 24, 15);
+        outlined(ctx, "#ff9f43", 3);
+        textPop(ctx, t.text, 0, 1, "#ffd23f", 26);
+      } else if (t.kind === "bonus") {
+        textPop(ctx, t.text, 0, 0, "#3ddc84", 26);
       } else {
         textPop(ctx, t.text, 0, 0, "#ff6b6b", 20);
       }
       ctx.restore();
     },
 
+    confetti(ctx, c) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, c.life / 0.4);
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.scale(1, Math.cos(c.rot * 1.7));
+      LST.draw.roundRect(ctx, -c.w / 2, -c.h / 2, c.w, c.h, 2);
+      outlined(ctx, c.color, 2);
+      ctx.restore();
+    },
+
     banner(ctx, text, alpha, r) {
-      const size = Math.round(Math.min(60, r.width / 7.5));
+      // Fit long banners ("WAVE CLEAR!") on narrow phones, including the pop overshoot.
+      const size = Math.round(Math.min(60, r.width / 7.5, (r.width * 0.82) / (text.length * 0.62 * 1.4)));
       const pop = 1 + Math.max(0, alpha - 0.85) * 2.5;
       ctx.save();
       ctx.globalAlpha = alpha;

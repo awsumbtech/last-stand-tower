@@ -36,6 +36,24 @@ LST.UI = class UI {
     $("btn-quit").addEventListener("click", () => game.toMenu());
     this.el.speed.addEventListener("click", () => game.toggleSpeed());
 
+    // Sound / music / vibration toggles (HUD icons and pause-menu rows).
+    this.toggles = [...document.querySelectorAll(".toggle[data-setting]")];
+    for (const b of this.toggles) {
+      b.addEventListener("click", () => {
+        LST.settings.toggle(b.dataset.setting);
+        if (b.dataset.setting === "haptics") LST.haptics.buzz(40);
+      });
+    }
+    if (!LST.haptics.supported) document.querySelectorAll(".haptics-only").forEach((el) => el.remove());
+    LST.settings.onChange(() => this.updateToggles());
+    this.updateToggles();
+
+    // Every button click gets a little "tap" (buying plays its own sound).
+    document.addEventListener("click", (ev) => {
+      const b = ev.target.closest("button");
+      if (b && !b.classList.contains("upgrade")) LST.audio.play("tap");
+    });
+
     // One delegated listener for all upgrade cards.
     this.el.upgradeList.addEventListener("click", (ev) => {
       const card = ev.target.closest("[data-upgrade]");
@@ -58,6 +76,16 @@ LST.UI = class UI {
       this.el.goScore.textContent = LST.utils.formatNumber(g.score);
       this.el.goBest.textContent = g.newBest ? `New best: wave ${g.bestWave}!` : `Best wave: ${g.bestWave}`;
       this.el.goBest.classList.toggle("new", g.newBest);
+    }
+  }
+
+  updateToggles() {
+    for (const b of this.toggles) {
+      const on = LST.settings.get(b.dataset.setting);
+      b.classList.toggle("off", !on);
+      b.setAttribute("aria-pressed", String(on));
+      const state = b.querySelector(".state");
+      if (state) state.textContent = on ? "ON" : "OFF";
     }
   }
 

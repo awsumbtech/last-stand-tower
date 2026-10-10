@@ -14,6 +14,10 @@ LST.World = class World {
     this.particles = [];
     this.texts = [];
     this.bursts = [];
+    this.confetti = [];
+    this.vignette = 0; // red screen-edge pulse, 0..1
+    this.flash = 0;    // white screen flash, 0..1
+    this.lowHpActive = false;
     this.shake = 0;
     this.bossIntro = 0; // seconds left on the "BOSS!" banner
     this.wave = 0;
@@ -25,6 +29,9 @@ LST.World = class World {
     this.updateList(this.particles, dt);
     this.updateList(this.texts, dt);
     this.updateList(this.bursts, dt);
+    this.updateList(this.confetti, dt);
+    this.vignette = Math.max(0, this.vignette - dt * 0.9);
+    this.flash = Math.max(0, this.flash - dt * 3);
     this.bossIntro = Math.max(0, this.bossIntro - dt);
     this.shake = Math.max(0, this.shake - dt * 2);
   }
@@ -76,9 +83,24 @@ LST.World = class World {
 
   // ---------- Events from entities (subclasses add rewards etc.) ----------
 
-  onHit(e) {
-    this.spawnHitSparks(e.x, e.y, e.color, 5);
-    this.bursts.push(new LST.Burst(e.x, e.y, "#ffffff", e.radius * 0.9, "hit"));
+  onFire() {}
+
+  onHit(e, damage, crit) {
+    this.spawnHitSparks(e.x, e.y, e.color, crit ? 9 : 5);
+    this.bursts.push(new LST.Burst(e.x, e.y, crit ? "#ffd23f" : "#ffffff", e.radius * (crit ? 1.3 : 0.9), "hit"));
+    if (damage) {
+      const n = Math.max(1, Math.round(damage));
+      const x = e.x + LST.utils.rand(-8, 8);
+      const y = e.y - e.radius * 1.4 - 18; // above the enemy's HP bar
+      this.texts.push(crit
+        ? new LST.FloatText(x, y, n + "!", "#ffd23f", "crit")
+        : new LST.FloatText(x, y, String(n), "#ffffff", "hit"));
+    }
+  }
+
+  spawnConfetti(x, y, count = 70) {
+    const colors = ["#ff6fb5", "#ffd23f", "#5ec8ff", "#3ddc84", "#ff9f43", "#8e6cff"];
+    for (let i = 0; i < count; i++) this.confetti.push(new LST.Confetti(x, y, colors[i % colors.length]));
   }
 
   onBossSpawn() {

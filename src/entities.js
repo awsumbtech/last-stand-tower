@@ -14,6 +14,8 @@ LST.Tower = class Tower {
     this.range = c.range;
     this.projectileSpeed = c.projectileSpeed;
     this.targets = c.targets;
+    this.critChance = c.critChance;
+    this.critMult = c.critMult;
     this.cooldown = 0;
     this.angle = -Math.PI / 2; // barrel direction, for drawing
     this.hitFlash = 0;
@@ -33,10 +35,13 @@ LST.Tower = class Tower {
     }
     this.angle = Math.atan2(targets[0].y - this.y, targets[0].x - this.x);
     for (const t of targets) {
-      game.projectiles.push(new LST.Projectile(this.x, this.y, t, this.damage, this.projectileSpeed));
+      const crit = Math.random() < this.critChance;
+      const dmg = this.damage * (crit ? this.critMult : 1);
+      game.projectiles.push(new LST.Projectile(this.x, this.y, t, dmg, this.projectileSpeed, crit));
     }
     this.cooldown = 1 / this.fireRate;
     this.recoil = 1;
+    game.onFire(this);
   }
 
   takeDamage(amount) {
@@ -98,7 +103,8 @@ LST.Enemy = class Enemy {
 };
 
 LST.Projectile = class Projectile {
-  constructor(x, y, target, damage, speed) {
+  constructor(x, y, target, damage, speed, crit) {
+    this.crit = !!crit;
     this.x = x;
     this.y = y;
     this.target = target;
@@ -129,7 +135,7 @@ LST.Projectile = class Projectile {
       // Close enough to reach this frame: count it as a hit (prevents overshooting).
       if (d <= this.speed * dt + t.radius) {
         t.takeDamage(this.damage, game);
-        game.onHit(t);
+        game.onHit(t, this.damage, this.crit);
         this.dead = true;
         return;
       }
@@ -147,7 +153,7 @@ LST.Projectile = class Projectile {
       const r = e.radius + this.radius;
       if (LST.utils.dist2(this.x, this.y, e.x, e.y) <= r * r) {
         e.takeDamage(this.damage, game);
-        game.onHit(e);
+        game.onHit(e, this.damage, this.crit);
         this.dead = true;
         return;
       }
@@ -179,7 +185,8 @@ LST.Particle = class Particle {
   }
 };
 
-// Floating "+2" coin text and similar popups. kind: "coin" | "damage".
+// Floating popups. kind: "coin" (+2), "damage" (tower hurt), "hit" / "crit" (damage
+// numbers on enemies), "bonus" (wave-clear reward).
 LST.FloatText = class FloatText {
   constructor(x, y, text, color, kind) {
     this.kind = kind || "coin";
@@ -187,13 +194,17 @@ LST.FloatText = class FloatText {
     this.y = y;
     this.text = text;
     this.color = color;
-    this.life = this.maxLife = 0.8;
+    const life = { hit: 0.55, crit: 0.85, bonus: 1.4 }[this.kind] || 0.8;
+    this.life = this.maxLife = life;
+    // Damage numbers drift sideways a little so stacked hits stay readable.
+    this.vx = this.kind === "hit" || this.kind === "crit" ? (Math.random() * 2 - 1) * 28 : 0;
     this.dead = false;
   }
 
   update(dt) {
     this.life -= dt;
-    this.y -= 30 * dt;
+    this.x += this.vx * dt;
+    this.y -= (this.kind === "crit" ? 45 : 30) * dt;
     if (this.life <= 0) this.dead = true;
   }
 };
@@ -214,5 +225,35 @@ LST.Burst = class Burst {
   update(dt) {
     this.life -= dt;
     if (this.life <= 0) this.dead = true;
+  }
+};
+
+// Wave-clear confetti: spinning paper bits with gravity.
+LST.Confetti = class Confetti {
+  constructor(x, y, color) {
+    const a = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.2;
+    const sp = 260 + Math.random() * 360;
+    this.x = x;
+    this.y = y;
+    this.vx = Math.cos(a) * sp;
+    this.vy = Math.sin(a) * sp;
+    this.rot = Math.random() * Math.PI * 2;
+    this.vr = (Math.random() * 2 - 1) * 12;
+    this.w = 8 + Math.random() * 6;
+    this.h = 5 + Math.random() * 4;
+    this.color = color;
+    this.life = this.maxLife = 1.6 + Math.random() * 0.8;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.life -= dt;
+    if (this.life <= 0) { this.dead = true; return; }
+    this.vy += 520 * dt;
+    this.vx *= 0.985;
+    this.vy = Math.min(this.vy, 220); // flutter down instead of falling like a rock
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.rot += this.vr * dt;
   }
 };
