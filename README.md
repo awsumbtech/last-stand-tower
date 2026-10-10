@@ -1,10 +1,10 @@
 # Last Stand Tower
 
-A small "last stand" tower defense game for the browser. Your tower sits in the middle of the screen and fires on its own at enemies closing in from every side. Survive each wave, collect coins, and spend them on upgrades before the next one.
+A small "last stand" tower defense game for the browser, in a chunky cartoon style. Your tower (it has a face!) sits in the middle of a lawn and fires on its own at enemies closing in from every side. Survive each wave, collect coins, and spend them on upgrades before the next one.
 
 **[Play it here](https://awsumbtech.github.io/last-stand-tower/)** (works on desktop and mobile, installable, plays offline)
 
-**[Art style preview](https://awsumbtech.github.io/last-stand-tower/styles.html)**: the same scene in neon, pixel art, and cartoon styles.
+**[Art style preview](https://awsumbtech.github.io/last-stand-tower/styles.html)**: the same scene in neon, pixel art, and cartoon styles (cartoon is the game's look).
 
 ![Gameplay screenshot](docs/screenshot.png)
 
@@ -13,7 +13,7 @@ A small "last stand" tower defense game for the browser. Your tower sits in the 
 - Press **Start**. The tower aims and shoots by itself.
 - Enemies that reach the tower damage it. If its HP hits zero, the run is over.
 - Kills give coins. Between waves, buy upgrades: **Damage, Fire Rate, Range, Max HP, Repair, Multishot**. Each one costs more every time you buy it.
-- Enemies: **pink circles** (basic), **yellow triangles** (fast), **orange squares** (tanky), plus a **red hexagon boss** every 5th wave.
+- Enemies: **pink blobs** (basic), **yellow teardrops** (fast), **orange helmets** (tanky), plus **Big Red**, a horned boss, every 5th wave.
 - Your best wave is saved in the browser.
 
 Controls: **Space / P / Esc** pause, **F** toggles 1x/2x speed, **Enter** starts or goes to the next wave. On mobile, tap the buttons.
@@ -29,10 +29,10 @@ After the first visit the game works offline. When a new version is deployed you
 
 ## Art styles
 
-`styles.html` shows one small animated scene in three looks: **Neon** (the default), **Pixel**, and
-**Cartoon**. Tap the tabs or swipe the preview. You can also play the real game in another style with
-`?style=pixel` or `?style=cartoon`, for example
-[awsumbtech.github.io/last-stand-tower/?style=cartoon](https://awsumbtech.github.io/last-stand-tower/?style=cartoon).
+The game uses the **Cartoon** style. `styles.html` shows one small animated scene in all three looks
+(**Neon**, **Pixel**, **Cartoon**); tap the tabs or swipe the preview. To compare in the real game, add
+`?style=neon` or `?style=pixel`, for example
+[awsumbtech.github.io/last-stand-tower/?style=pixel](https://awsumbtech.github.io/last-stand-tower/?style=pixel).
 
 ## Run locally
 
@@ -58,10 +58,11 @@ Opening `index.html` directly also works (without offline support, since service
 | `src/world.js` | Shared simulation: entity lists, targeting, edge spawning, effects |
 | `src/game.js` | Game state, wave flow, coins and score (extends World) |
 | `src/render.js` | Canvas setup, sizing, world transform, shake; delegates the look to a theme |
-| `src/themes/*.js` | Art styles: `neon`, `pixel`, `cartoon`. Each draws background, tower, enemies, shots, effects |
+| `src/themes/*.js` | Art styles: `cartoon` (default), `neon`, `pixel`. Each draws background, tower, enemies, shots, effects |
 | `src/demo.js` | Self-running scene used by `styles.html` |
 | `src/pwa.js`, `sw.js` | Service worker registration, offline cache, update toast |
 | `manifest.webmanifest`, `icons/` | App name, colors and icons (regenerate icons with `python3 tools/make_icons.py`) |
+| `fonts/` | Bundled [Fredoka](https://github.com/hafontia/Fredoka-One) font (SIL Open Font License, see `fonts/OFL.txt`) |
 | `src/ui.js` | HUD and menu screens (HTML overlays) |
 | `src/main.js` | Startup, game loop, keyboard shortcuts |
 
@@ -79,4 +80,4 @@ the new version (and add any new files to its `PRECACHE` list).
 - Permanent meta-upgrades between runs (a "lab" bought with earned gems)
 - Daily challenge seed and online leaderboard
 - Juice: better particles, tower recoil, damage numbers
-- Pick an art style in the game's settings, and restyle the HUD and menus to match
+- Pick an art style in the game's settings
