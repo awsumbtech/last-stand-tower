@@ -47,18 +47,31 @@
       <p>Your tower shoots by itself. Survive the waves, grab coins, and power up between rounds!</p>
       <button id="btn-start" class="btn big">Play</button>
       <div class="pill best">Best wave <b id="start-best">0</b></div>
-      <p class="hint keys-only">Space / P: pause &nbsp;·&nbsp; F: game speed &nbsp;·&nbsp; M: music</p>
+      <p class="hint keys-only">Space / P: pause &nbsp;·&nbsp; F: speed &nbsp;·&nbsp; M: music &nbsp;·&nbsp; Shop: 1-3 pick, R reroll, H repair</p>
       <a class="link" href="styles.html">Art style preview &rarr;</a>
     </div>
   </div>
 
-  <!-- Upgrade screen (between waves) -->
+  <!-- Shop screen (between waves): pick 1 of 3 cards -->
   <div id="screen-upgrade" class="screen hidden">
-    <div class="panel wide">
+    <div class="panel wide shop">
       <h2 class="title small">Wave <span id="up-wave">1</span> cleared!</h2>
       <div class="pill coins big-pill" id="up-coins-pill"><i class="coin"></i><b id="up-coins">0</b></div>
-      <div id="upgrade-list"></div>
+      <p class="shop-hint" id="shop-hint">Pick a card. It's free!</p>
+      <div id="card-row"></div>
+      <div class="shop-footer">
+      <div class="shop-actions">
+        <button id="btn-reroll" class="btn small secondary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></svg>
+          <span>Reroll</span><span class="price"><i class="coin"></i><b id="reroll-price">0</b></span>
+        </button>
+        <button id="btn-repair" class="btn small secondary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>
+          <span>Repair <small id="repair-hp">100/100</small></span><span class="price"><i class="coin"></i><b id="repair-price">0</b></span>
+        </button>
+      </div>
       <button id="btn-next" class="btn">Next wave &#9654;</button>
+      </div>
     </div>
   </div>
 

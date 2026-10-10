@@ -147,6 +147,23 @@ LST.audio = (function () {
       [72, 76, 79, 84].forEach((n, i) => tone({ type: "triangle", freq: midi(n), start: i * 0.055, dur: 0.14, vol: 0.2 }));
       tone({ type: "square", freq: midi(96), start: 0.22, dur: 0.18, vol: 0.04, filter: { freq: 6000 } });
     } },
+    deal: { priority: true, play() {
+      // three quick card "flicks" as the cards fly in
+      for (let i = 0; i < 3; i++) {
+        noise({ start: i * 0.09, dur: 0.07, vol: 0.12, type: "highpass", freq: 1800, to: 5000, q: 0.7 });
+        tone({ type: "triangle", freq: midi(76 + i * 4), start: i * 0.09 + 0.02, dur: 0.08, vol: 0.07 });
+      }
+    } },
+    reroll: { priority: true, play() {
+      noise({ dur: 0.22, vol: 0.14, type: "bandpass", freq: 900, to: 4500, q: 1.2 });
+      tone({ type: "triangle", freq: midi(67), to: midi(79), dur: 0.2, vol: 0.12 });
+      tone({ type: "triangle", freq: midi(84), start: 0.2, dur: 0.12, vol: 0.1 });
+    } },
+    epic: { priority: true, play() {
+      // sparkly arpeggio + shimmer for epic cards
+      [72, 76, 79, 84, 88, 91].forEach((n, i) => tone({ type: "triangle", freq: midi(n), start: i * 0.045, dur: 0.2, vol: 0.17 }));
+      [96, 100, 103].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: 0.28 + i * 0.06, dur: 0.3, vol: 0.06 }));
+    } },
     deny: { throttle: 0.15, play() {
       tone({ type: "square", freq: 180, to: 140, dur: 0.14, vol: 0.08, filter: { freq: 900 } });
     } },

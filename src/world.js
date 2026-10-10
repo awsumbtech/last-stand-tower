@@ -98,6 +98,19 @@ LST.World = class World {
     }
   }
 
+  // Splash card: damage everything near an impact (not the enemy that was hit).
+  splashDamage(center, amount, radius) {
+    const r2 = radius * radius;
+    for (const e of this.enemies) {
+      if (e === center || e.dead) continue;
+      if (LST.utils.dist2(center.x, center.y, e.x, e.y) <= r2) {
+        e.takeDamage(amount, this);
+        e.hitFlash = 0.08;
+      }
+    }
+    this.bursts.push(new LST.Burst(center.x, center.y, "#ff9f43", radius * 0.8, "splash"));
+  }
+
   spawnConfetti(x, y, count = 70) {
     const colors = ["#ff6fb5", "#ffd23f", "#5ec8ff", "#3ddc84", "#ff9f43", "#8e6cff"];
     for (let i = 0; i < count; i++) this.confetti.push(new LST.Confetti(x, y, colors[i % colors.length]));

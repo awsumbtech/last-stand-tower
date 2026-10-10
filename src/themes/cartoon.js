@@ -333,7 +333,8 @@
       const sy = (1 - 0.12 * w) * grow;
       const R = e.radius * 1.35;
       const flash = e.hitFlash > 0;
-      const fill = flash ? "#ffffff" : c.body;
+      const frozen = e.slowTimer > 0; // Frost Shots: icy blue tint
+      const fill = flash ? "#ffffff" : frozen ? "#bfefff" : c.body;
 
       ctx.save();
       ctx.translate(e.x, e.y);
@@ -441,7 +442,17 @@
       ctx.translate(b.x, b.y);
       ctx.rotate(b.rot);
       ctx.lineJoin = "round";
-      if (b.kind === "hit") {
+      if (b.kind === "splash") {
+        // Orange shockwave ring for the Splash card
+        ctx.globalAlpha = 0.85 * (1 - f);
+        ctx.beginPath();
+        ctx.arc(0, 0, b.size * (0.4 + f * 0.9), 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 159, 67, 0.35)";
+        ctx.fill();
+        ctx.lineWidth = 4 * (1 - f) + 1.5;
+        ctx.strokeStyle = b.color;
+        ctx.stroke();
+      } else if (b.kind === "hit") {
         const s = b.size * (0.6 + f * 0.7);
         ctx.globalAlpha = 1 - f * 0.6;
         star(ctx, 5, s, s * 0.45);

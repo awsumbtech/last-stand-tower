@@ -18,7 +18,8 @@ LST.Game = class Game extends LST.World {
     this.coins = 0;
     this.score = 0;
     this.kills = 0;
-    this.upgradeLevels = {};
+    this.upgradeLevels = {}; // card id -> times taken this run
+    this.shop = null;
     this.spawnQueue = [];
     this.spawnTimer = 0;
     this.spawnInterval = 1;
@@ -67,8 +68,100 @@ LST.Game = class Game extends LST.World {
 
   finishCelebration() {
     if (this.state !== "celebrate") return;
+    this.openShop();
     this.state = "upgrade";
     this.ui.show("upgrade");
+  }
+
+  // ---------- Shop: pick 1 of 3 for free, then spend coins ----------
+  // shop.cards: [{ card, taken }]. The first card taken is free; each extra one costs
+  // coins (price rises per extra). Rerolling re-deals the cards not taken yet.
+
+  openShop() {
+    const n = LST.CONFIG.shop.cards;
+    const bossWave = this.wave % LST.CONFIG.waves.bossEvery === 0;
+    this.shop = {
+      cards: LST.shopRules.draw(this.upgradeLevels, n, [], bossWave).map((card) => ({ card, taken: false })),
+      picked: false,
+      extras: 0,
+      rerolls: 0,
+      repairs: 0,
+    };
+  }
+
+  // Coin price of the next extra card / reroll / repair in this shop.
+  shopPrice(kind) {
+    const s = this.shop;
+    const times = { extraCard: s.extras, reroll: s.rerolls, repair: s.repairs }[kind];
+    return LST.shopRules.price(kind, this.wave, times);
+  }
+
+  // Take card `index`. Returns true if it was taken.
+  takeCard(index) {
+    const s = this.shop;
+    const slot = s && s.cards[index];
+    if (this.state !== "upgrade" || !slot || slot.taken) return false;
+    if (!LST.shopRules.available(slot.card, this.upgradeLevels)) return false;
+    if (s.picked) {
+      const price = this.shopPrice("extraCard");
+      if (this.coins < price) { LST.audio.play("deny"); return false; }
+      this.coins -= price;
+      s.extras += 1;
+    }
+    s.picked = true;
+    slot.taken = true;
+    this.upgradeLevels[slot.card.id] = (this.upgradeLevels[slot.card.id] || 0) + 1;
+    slot.card.apply(this.tower);
+    LST.audio.play(slot.card.rarity === "epic" ? "epic" : "buy");
+    LST.haptics.buzz(slot.card.rarity === "epic" ? [20, 30, 40] : 15);
+    this.ui.renderShop({ took: index });
+    this.ui.updateHud();
+    return true;
+  }
+
+  rerollShop() {
+    const s = this.shop;
+    if (this.state !== "upgrade" || !s) return false;
+    const open = s.cards.filter((c) => !c.taken);
+    const price = this.shopPrice("reroll");
+    if (!open.length || this.coins < price) { LST.audio.play("deny"); return false; }
+    this.coins -= price;
+    s.rerolls += 1;
+    const keep = s.cards.filter((c) => c.taken).map((c) => c.card.id);
+    const fresh = LST.shopRules.draw(this.upgradeLevels, open.length, keep);
+    let k = 0;
+    s.cards = s.cards.map((c) => (c.taken ? c : fresh[k] ? { card: fresh[k++], taken: false } : null)).filter(Boolean);
+    LST.audio.play("reroll");
+    this.ui.renderShop({ rerolled: true });
+    this.ui.updateHud();
+    return true;
+  }
+
+  repairTower() {
+    const s = this.shop;
+    const t = this.tower;
+    if (this.state !== "upgrade" || !s || t.hp >= t.maxHp) return false;
+    const price = this.shopPrice("repair");
+    if (this.coins < price) { LST.audio.play("deny"); return false; }
+    this.coins -= price;
+    s.repairs += 1;
+    t.heal(t.maxHp * LST.CONFIG.shop.repair.heal);
+    LST.audio.play("buy");
+    LST.haptics.buzz(15);
+    this.ui.renderShop({ repaired: true });
+    this.ui.updateHud();
+    return true;
+  }
+
+  // Next wave needs the free pick to be used (unless nothing can be taken).
+  canLeaveShop() {
+    const s = this.shop;
+    return !s || s.picked || !s.cards.some((c) => !c.taken);
+  }
+
+  leaveShop() {
+    if (this.state !== "upgrade" || !this.canLeaveShop()) return;
+    this.startNextWave();
   }
 
   gameOver() {
@@ -112,23 +205,6 @@ LST.Game = class Game extends LST.World {
       this.newBest = true;
       LST.utils.storage.set("lst.bestWave", wave);
     }
-  }
-
-  buyUpgrade(id) {
-    const up = LST.UPGRADES.find((u) => u.id === id);
-    if (!up || this.state !== "upgrade") return;
-    const lvl = this.upgradeLevels[id] || 0;
-    if (up.maxLevel !== undefined && lvl >= up.maxLevel) return;
-    if (up.canBuy && !up.canBuy(this.tower)) return;
-    const cost = up.cost(lvl);
-    if (this.coins < cost) return;
-    this.coins -= cost;
-    this.upgradeLevels[id] = lvl + 1;
-    up.apply(this.tower);
-    LST.audio.play("buy");
-    LST.haptics.buzz(15);
-    this.ui.renderUpgrades(id);
-    this.ui.updateHud();
   }
 
   // ---------- Per-frame update ----------
@@ -226,6 +302,7 @@ LST.Game = class Game extends LST.World {
     this.coins += e.coins;
     this.score += e.score * this.wave;
     this.kills += 1;
+    if (this.tower.lifesteal > 0) this.tower.heal(this.tower.maxHp * this.tower.lifesteal);
     LST.audio.play("pop", { pitch: { basic: 1, fast: 1.3, tank: 0.75, boss: 0.5 }[e.type] });
     LST.audio.play("coin");
     if (e.type === "boss") {

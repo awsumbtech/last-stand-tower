@@ -5,18 +5,20 @@ LST.waves = {
   multipliers(wave) {
     const w = LST.CONFIG.waves;
     const n = wave - 1;
+    const early = Math.min(n, w.hpKnee);
+    const late = Math.max(0, n - w.hpKnee);
     return {
-      hp: Math.pow(1 + w.hpGrowth, n),
+      hp: Math.pow(1 + w.hpGrowth, early) * Math.pow(1 + w.hpGrowthLate, late),
       speed: Math.min(w.maxSpeedMult, 1 + w.speedGrowth * n),
-      damage: 1 + 0.06 * n,
-      coins: 1 + 0.05 * n,
+      damage: 1 + w.damageGrowth * n,
+      coins: 1 + w.coinGrowth * n,
     };
   },
 
   // Returns { queue: [types...], interval } for a wave.
   build(wave) {
     const w = LST.CONFIG.waves;
-    const count = w.baseCount + w.countPerWave * (wave - 1);
+    const count = Math.min(w.maxCount, w.baseCount + w.countPerWave * (wave - 1));
 
     // Unlock enemy types gradually: fast from wave 2, tanks from wave 3.
     const weights = [["basic", 6]];
@@ -25,15 +27,11 @@ LST.waves = {
 
     const queue = [];
     for (let i = 0; i < count; i++) queue.push(LST.utils.pick(weights));
-    if (wave % w.bossEvery === 0) {
-      // Bosses arrive roughly in the middle of the wave.
-      const bosses = Math.floor(wave / w.bossEvery);
-      for (let b = 0; b < bosses; b++) {
-        queue.splice(Math.floor(queue.length / 2) + b, 0, "boss");
-      }
-    }
+    // One boss every few waves, arriving in the middle of the wave.
+    if (wave % w.bossEvery === 0) queue.splice(Math.floor(queue.length / 2), 0, "boss");
 
-    const interval = Math.max(w.minSpawnInterval, w.baseSpawnInterval * Math.pow(0.93, wave - 1));
+    let interval = Math.max(w.minSpawnInterval, w.baseSpawnInterval * Math.pow(0.93, wave - 1));
+    interval = Math.min(interval, w.maxSpawnSpan / queue.length);
     return { queue, interval };
   },
 

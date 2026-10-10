@@ -28,7 +28,13 @@
       game.toggleSpeed();
     } else if (e.code === "Enter") {
       if (game.state === "menu" || game.state === "gameover") game.newGame();
-      else if (game.state === "upgrade") game.startNextWave();
+      else if (game.state === "upgrade") game.leaveShop();
+    } else if (game.state === "upgrade" && /^(Digit|Numpad)[1-3]$/.test(e.code)) {
+      game.takeCard(+e.code.slice(-1) - 1);
+    } else if (game.state === "upgrade" && e.code === "KeyR") {
+      game.rerollShop();
+    } else if (game.state === "upgrade" && e.code === "KeyH") {
+      game.repairTower();
     } else if (e.code === "KeyM") {
       LST.settings.toggle("music");
     }

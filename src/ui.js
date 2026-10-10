@@ -22,7 +22,14 @@ LST.UI = class UI {
       startBest: $("start-best"),
       upWave: $("up-wave"),
       upCoins: $("up-coins"),
-      upgradeList: $("upgrade-list"),
+      cardRow: $("card-row"),
+      shopHint: $("shop-hint"),
+      reroll: $("btn-reroll"),
+      rerollPrice: $("reroll-price"),
+      repair: $("btn-repair"),
+      repairPrice: $("repair-price"),
+      repairHp: $("repair-hp"),
+      next: $("btn-next"),
       goWave: $("go-wave"),
       goScore: $("go-score"),
       goBest: $("go-best"),
@@ -30,7 +37,9 @@ LST.UI = class UI {
 
     $("btn-start").addEventListener("click", () => game.newGame());
     $("btn-restart").addEventListener("click", () => game.newGame());
-    $("btn-next").addEventListener("click", () => game.startNextWave());
+    $("btn-next").addEventListener("click", () => game.leaveShop());
+    this.el.reroll.addEventListener("click", () => game.rerollShop());
+    this.el.repair.addEventListener("click", () => game.repairTower());
     $("btn-pause").addEventListener("click", () => game.togglePause());
     $("btn-resume").addEventListener("click", () => game.togglePause());
     $("btn-quit").addEventListener("click", () => game.toMenu());
@@ -51,13 +60,15 @@ LST.UI = class UI {
     // Every button click gets a little "tap" (buying plays its own sound).
     document.addEventListener("click", (ev) => {
       const b = ev.target.closest("button");
-      if (b && !b.classList.contains("upgrade")) LST.audio.play("tap");
+      if (b && !b.classList.contains("card") && !b.closest(".shop-actions")) LST.audio.play("tap");
     });
 
-    // One delegated listener for all upgrade cards.
-    this.el.upgradeList.addEventListener("click", (ev) => {
-      const card = ev.target.closest("[data-upgrade]");
-      if (card && !card.disabled) game.buyUpgrade(card.dataset.upgrade);
+    // One delegated listener for the shop cards.
+    this.el.cardRow.addEventListener("click", (ev) => {
+      const card = ev.target.closest("[data-slot]");
+      if (!card) return;
+      if (card.classList.contains("locked")) { LST.audio.play("deny"); LST.UI.pop(card, "shake"); return; }
+      game.takeCard(+card.dataset.slot);
     });
   }
 
@@ -69,7 +80,7 @@ LST.UI = class UI {
     this.el.hud.classList.toggle("hidden", name === "start" || name === "gameover");
     if (name) LST.UI.pop(this.el.screens[name].querySelector(".panel"));
     if (name === "start") this.el.startBest.textContent = this.game.bestWave;
-    if (name === "upgrade") this.renderUpgrades();
+    if (name === "upgrade") this.renderShop({ deal: true });
     if (name === "gameover") {
       const g = this.game;
       this.el.goWave.textContent = g.wave;
@@ -102,32 +113,68 @@ LST.UI = class UI {
     this.el.speed.textContent = g.speed + "x";
   }
 
-  // justBought: id of the upgrade that was just purchased (gets a bounce).
-  renderUpgrades(justBought) {
+  // Draw the pick-1-of-3 shop.
+  // opts.deal: cards fly in (new shop) · opts.rerolled: open cards re-deal · opts.took: slot just taken
+  renderShop(opts = {}) {
     const g = this.game;
-    if (justBought) LST.UI.pop(document.getElementById("up-coins-pill"), "bump");
+    const s = g.shop;
+    if (!s) return;
+    if (opts.took !== undefined || opts.repaired || opts.rerolled) LST.UI.pop(document.getElementById("up-coins-pill"), "bump");
     this.el.upWave.textContent = g.wave;
     this.el.upCoins.textContent = LST.utils.formatNumber(g.coins);
-    this.el.upgradeList.innerHTML = "";
-    for (const up of LST.UPGRADES) {
-      const lvl = g.upgradeLevels[up.id] || 0;
-      const maxed = up.maxLevel !== undefined && lvl >= up.maxLevel;
-      const cost = up.cost(lvl);
-      const allowed = !up.canBuy || up.canBuy(g.tower);
-      const card = document.createElement("button");
-      card.className = "upgrade" + (maxed ? " maxed" : "") + (up.id === justBought ? " bought" : "");
-      card.style.setProperty("--accent", up.color || "#ffd23f");
-      card.dataset.upgrade = up.id;
-      card.disabled = maxed || !allowed || g.coins < cost;
-      card.innerHTML = `
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${up.icon || ""}</svg></span>
-        <span class="name">${up.name}</span>
-        <span class="level">Lv ${lvl}</span>
-        <span class="desc">${up.desc}</span>
-        <span class="stat">${up.stat(g.tower)}</span>
-        <span class="cost">${maxed ? "MAX" : '<i class="coin"></i>' + cost}</span>`;
-      this.el.upgradeList.appendChild(card);
-    }
+
+    const extraPrice = g.shopPrice("extraCard");
+    const open = s.cards.filter((c) => !c.taken).length;
+    this.el.shopHint.innerHTML = !s.picked
+      ? "Pick a card. It's <b>free</b>!"
+      : open ? "Want another? Extra cards cost coins." : "All cards taken. Nice haul!";
+    this.el.shopHint.classList.toggle("free", !s.picked);
+
+    this.el.cardRow.innerHTML = "";
+    s.cards.forEach((slot, i) => {
+      const { card, taken } = slot;
+      const lvl = g.upgradeLevels[card.id] || 0;
+      const shownLvl = taken ? lvl : lvl + 1; // level after taking it
+      const rar = LST.RARITY[card.rarity];
+      const locked = !taken && s.picked && g.coins < extraPrice;
+      const el = document.createElement("button");
+      el.className = `card ${card.rarity}` + (taken ? " taken" : "") + (locked ? " locked" : "") +
+        (opts.took === i ? " bought" : "") +
+        (opts.deal || (opts.rerolled && !taken) ? " deal" : "");
+      el.style.setProperty("--accent", card.color);
+      el.style.setProperty("--rarity", rar.color);
+      el.style.setProperty("--i", i);
+      el.dataset.slot = i;
+      el.setAttribute("aria-label", `${card.name}, ${rar.label}: ${card.desc}`);
+      const tag = taken ? '<span class="tag done">&#10003; Taken</span>'
+        : !s.picked ? '<span class="tag free">FREE</span>'
+        : `<span class="tag"><i class="coin"></i>${extraPrice}</span>`;
+      el.innerHTML = `
+        <span class="ribbon">${rar.label}</span>
+        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${card.icon}</svg></span>
+        <span class="name">${card.name}</span>
+        <span class="level">${shownLvl === 1 && !taken ? "NEW" : "Lv " + shownLvl}${card.maxLevel ? " / " + card.maxLevel : ""}</span>
+        <span class="desc">${card.desc}</span>
+        <span class="stat">${card.stat(g.tower)}</span>
+        ${tag}`;
+      this.el.cardRow.appendChild(el);
+    });
+
+    const rerollPrice = g.shopPrice("reroll");
+    this.el.rerollPrice.textContent = rerollPrice;
+    this.el.reroll.disabled = !open || g.coins < rerollPrice;
+    const t = g.tower;
+    const repairPrice = g.shopPrice("repair");
+    this.el.repairPrice.textContent = repairPrice;
+    this.el.repairHp.textContent = `${Math.ceil(t.hp)}/${Math.round(t.maxHp)}`;
+    this.el.repair.disabled = t.hp >= t.maxHp || g.coins < repairPrice;
+    this.el.repair.classList.toggle("urgent", t.hp < t.maxHp * 0.4 && !this.el.repair.disabled);
+    if (opts.repaired) LST.UI.pop(this.el.repair, "bump");
+
+    const canGo = g.canLeaveShop();
+    this.el.next.disabled = !canGo;
+    this.el.next.innerHTML = canGo ? "Next wave &#9654;" : "Pick a card first";
+    if (opts.deal) LST.audio.play("deal");
   }
 };
 
