@@ -1,13 +1,13 @@
 # Last Stand Tower: sprint roadmap (planning only)
 
 **Target:** quick runs (5-8 min) inside a long journey. Gears unlock cards and lasting upgrades, six worlds raise the stakes, and Rebuild (prestige) is how you break through walls.
-**Status:** this is a plan only. The live game is unchanged. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
+**Status:** Sprint 1 is shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
 
 ## Sprint overview
 
 | # | Sprint | Ships | Depends on |
 |---|---|---|---|
-| 1 | Results screen, Gears and locked cards | Run summary, Gears saved, Workshop with card unlocks, starter pool | none |
+| 1 ✅ | Results screen, Gears and locked cards | Run summary, Gears saved, Workshop with card unlocks, commons-only starter pool | none |
 | 2 | Workshop upgrades and Head Start | Lasting stat upgrades, Head Start, save/version migration | 1 |
 | 3 | Trap cards, Codex and Appraisal | 8 trap cards, discovery Codex, Appraisal upgrade | 1 (2 for Appraisal) |
 | 4 | Boss fights and the active ability | Bosses stop at range and attack; Shockwave ability | none (best after 2) |
@@ -19,27 +19,44 @@ Each sprint ends with: the sim re-run (death wave and minutes per strategy, camp
 
 ---
 
-## Sprint 1: Results screen, Gears and locked cards
+## Sprint 1: Results screen, Gears and locked cards (SHIPPED)
 **Goal:** every run pays out something that lasts, and the first unlock arrives after run 1.
 
+**Brian's decisions (Oct 10):** Multishot is locked too, as a very cheap first unlock. The starter pool is commons only (Damage, Fire Rate, Range, Max HP). The commons-only wall at wave 10 is fixed with a gentler early HP curve for the starter state. Keep 2-3 pure dud traps (Sprint 3). Monetization comes later, so Gears stay generous.
+
 **Features**
-- **Results screen** replaces game over. It shows: wave reached, time, kills, cards taken (icons), coins earned, and a **Gears breakdown** (waves + bosses + world bonus), plus best wave and "next unlock: Lucky Shot, 25 Gears (you have 67)". Buttons: **Play again** and **Workshop**.
-- **Gears (meta currency)**, saved in localStorage (`lst.meta.v1`). The formula:
-  `Gears = floor((2 × wave^1.3 + 3 × bossWavesCleared) × worldMult × (1 + 0.1 × Cogs))`
-  That's about 46 at wave 10, 76 at wave 15 and 110 at wave 20 in the Backyard.
-- **Locked cards.** The starter pool is **Damage, Fire Rate, Range, Max HP + Multishot**. Multishot stays in the starter pool because without it every commons-only run hits a wall at wave 10 (about 4 min) and there's nothing to decide. The rare and epic cards are unlocked in the **Workshop** for Gears:
+- **Results screen** replaces game over. It shows: wave reached, best wave, time, kills, coins earned, score, cards taken (icon chips), and a **Gears breakdown** (waves + bosses) that counts up with a clink per step. It also shows the next unlock with a progress bar ("Next unlock: Lucky Shot, 35 Gears (you have 41)"). Buttons: **Workshop** (with a "!" badge when something is affordable) and **Play again**.
+- **Gears (meta currency)**, saved in localStorage (`lst.meta.v1`, versioned). The formula:
+  `Gears = floor((2 × wave^1.3 + 3 × bossWavesCleared) × worldMult × (1 + 0.1 × Cogs))` (worldMult = 1 and Cogs = 0 until Sprints 6-7)
+  That's 42 at wave 10, 51 at wave 11, 62 at wave 13, 73 at wave 15 and 107 at wave 20.
+- **Locked cards.** The starter pool is **Damage, Fire Rate, Range, Max HP** (commons only). Every rare and epic card is unlocked in the **Workshop**, in any order. They're listed cheapest first, and the cheapest is flagged as "next":
 
-| Unlock | Lucky Shot | Regen | Frost Shots | Pierce | Vampire | Splash | Overcharge |
-|---|---|---|---|---|---|---|---|
-| Gears | 25 | 45 | 70 | 100 | 140 | 190 | 250 |
+| Unlock order | Multishot | Lucky Shot | Regen | Frost Shots | Pierce | Vampire | Splash | Overcharge |
+|---|---|---|---|---|---|---|---|---|
+| Gears | **15** | 35 | 50 | 75 | 100 | 140 | 190 | 250 |
 
-- **First-run balance (Backyard):** enemy HP growth goes from 0.25 to **0.26** to compensate for the smaller pool. Everything else stays as live.
-- Locked cards appear in the Workshop as silhouettes with their effect shown, so players can plan.
+- **Starter assist (fixes the commons-only wall):** until Multishot is unlocked, enemy HP grows **+20% per wave instead of +25% for waves 1-10** (about 0.69× HP at wave 10). In practice this only affects the first run. Once Multishot is in, the normal curve applies.
+- **Returning players:** an old save keeps its best wave (same `lst.bestWave` key). On the first load it also pays out a one-time Gears bonus for that best wave (for example, best wave 12 gives 62 Gears), so veterans can unlock Multishot straight away.
+- Locked cards appear in the Workshop as dark silhouettes with a padlock, and their effect is shown so players can plan. Affordable cards glow. Unlocking plays a flip-and-sparkle reveal with a fanfare. The shop only deals unlocked cards.
 
-**Acceptance criteria**
-- Sim with the starter pool and 20% traps: casual players reach **wave 14 in about 5.9 min** and skilled players **wave 15 in about 6.3 min**.
-- The first unlock is affordable after run 1 in ≥ 90% of sim campaigns. Measured: 100%, run 1.
-- Results screen fits a 390×844 phone with no scrolling; Gears count up with a coin-pop animation and sound.
+**Acceptance criteria (re-tuned for the commons-only start) and measured results** (`node tools/sim.js --campaign`, 40 campaigns, 8 s per shop)
+- First run (commons only + assist): casual **wave 11 in about 5 min**, skilled **wave 12-13 in about 5.5-5.8 min** (target 4-6 min). Before the assist it was a wall at wave 10 in about 4 min.
+- The first unlock is affordable after run 1 in ≥ 90% of sim campaigns. **Measured: 100%** (even a wave-5 death pays 16).
+- Run 1 usually pays for **Multishot and Lucky Shot** (51-62 Gears). Run 2 with Multishot reaches wave 15-16 (7-7.4 min).
+- Results screen fits a 390×844 phone with no scrolling; Gears count up with a pop animation and sound.
+
+| Unlock | Gears | Casual: after run (min played) | Skilled: after run (min played) |
+|---|---|---|---|
+| Multishot | 15 | 1 (5) | 1 (6) |
+| Lucky Shot | 35 | 1 (6) | 1 (6) |
+| Regen | 50 | 2 (12) | 2 (13) |
+| Frost Shots | 75 | 3 (20) | 3 (21) |
+| Pierce | 100 | 5 (30) | 4 (30) |
+| Vampire | 140 | 7 (43) | 6 (42) |
+| Splash | 190 | 10 (61) | 9 (61) |
+| Overcharge | 250 | 14 (88) | 12 (85) |
+
+(Sprint 1 only, so no Workshop stat upgrades or Head Start yet. Sprint 2 speeds up the back half.)
 
 ---
 
@@ -61,7 +78,7 @@ Each sprint ends with: the sim re-run (death wave and minutes per strategy, camp
 - A small "Deck" panel in the Workshop lists the unlocked cards and lets you **bench up to 2** of them (see risk 1).
 - Save-data versioning and migration, plus a "reset progress" option in settings.
 
-**Acceptance criteria:** the campaign sim shows all 7 card unlocks by **about 1.3 h** (run 14-16), and no run in the first 10 h takes more than 10 min (Head Start keeps late runs at 6-9 min).
+**Acceptance criteria:** the campaign sim shows all 8 card unlocks by **about 1.3 h** (run 14-16), and no run in the first 10 h takes more than 10 min (Head Start keeps late runs at 6-9 min).
 
 ---
 
@@ -158,14 +175,16 @@ Each sprint ends with: the sim re-run (death wave and minutes per strategy, camp
 
 ## Economy check (sim results)
 
+(Planning numbers from before Sprint 1. The shipped Sprint 1 numbers are in the Sprint 1 section.)
+
 The campaign model plays real seeded runs with the starter pool, unlocks, 20% trap duds, world modifiers, Head Start and Rebuild. It assumes 6 s per shop and medians of 4 campaigns.
 
 | Milestone | Skilled | Casual | Skilled, no Rebuild |
 |---|---|---|---|
 | Gears per run, runs 1-3 | 51-88 | 62-76 | 67-76 |
-| First unlock (Lucky Shot, 25) | run 1 (6 min) | run 1 | run 1 |
+| First unlock (Multishot, 15) | run 1 (6 min) | run 1 | run 1 |
 | 3 unlocks | run 2 (0.2 h) | run 2 | run 2 |
-| All 7 base cards | run 14 (1.3 h) | run 17 (1.4 h)* | run 16 (1.3 h) |
+| All 8 base cards | run 14 (1.3 h) | run 17 (1.4 h)* | run 16 (1.3 h) |
 | World 2 Beach | run 16 (1.6 h) | run 22 (1.9 h)* | run 17 (1.6 h) |
 | World 3 Snowy Peak | 4.8 h | 4.7 h* | 4.4 h |
 | First Rebuild | 5.0 h | 5.1 h* | n/a |
@@ -179,5 +198,5 @@ The campaign model plays real seeded runs with the starter pool, unlocks, 20% tr
 ## Risks and open questions for Brian
 
 1. **Unlocking more cards can make runs weaker.** In the sim, the 5-card starter pool reaches the same wave as the full 12-card pool, because rare cards water down the Multishot and Damage draws. Sprint 2's "bench up to 2 cards", Workshop stat upgrades and world difficulty keep unlocks feeling like progress. Is benching OK, or would you rather new cards come in at a lower weight for a few runs?
-2. **Pure dud traps** (Thorns, Long Shot) are the most likely to feel cheap. Should traps be **cursed-only** (always some upside), or keep 2-3 pure duds as "read carefully" lessons?
-3. **Monetization direction:** rewarded ads ("double Gears" on the results screen, or one revive per run) or a one-time premium unlock? This changes how generous the Gears formula should be, so it's best decided before Sprint 1.
+2. ~~Pure dud traps~~ **Decided:** keep 2-3 pure duds (Thorns, Long Shot, plus at most one more) as "read carefully" lessons in Sprint 3; the rest are cursed cards with real upside.
+3. ~~Monetization~~ **Decided:** later. Gears stay generous for now; a "double Gears" button could slot into the results screen later without changing the formula.
