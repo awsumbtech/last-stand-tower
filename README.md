@@ -16,7 +16,17 @@ A small "last stand" tower defense game for the browser, in a chunky cartoon sty
 - Enemies: **pink blobs** (basic), **yellow teardrops** (fast), **orange helmets** (tanky), plus **Big Red**, a horned boss, every 5th wave.
 - Your best wave is saved in the browser.
 
-Controls: **Space / P / Esc** pause, **F** toggles 1x/2x speed, **Enter** starts or goes to the next wave. On mobile, tap the buttons.
+- Shots can **crit** for double damage (big orange numbers). Drop below 25% HP and time slows for a moment as a warning.
+
+Controls: **Space / P / Esc** pause, **F** toggles 1x/2x speed, **M** toggles music, **Enter** starts or goes to the next wave. On mobile, tap the buttons.
+
+## Sound
+
+Every sound effect and the background music are synthesized in code with the Web Audio API
+(`src/audio.js`); there are no audio files. Audio starts on your first tap or key press (browsers
+require that). The speaker and note buttons in the HUD mute sound effects and music separately,
+and the pause menu has the same switches plus **Vibration** on phones that support it. Settings are
+saved in the browser.
 
 ## Install it as an app
 
@@ -55,6 +65,8 @@ Opening `index.html` directly also works (without offline support, since service
 | `src/upgrades.js` | Upgrade list (cost curve, effect, cap). Add an entry to add an upgrade |
 | `src/waves.js` | Which enemies are in each wave and how they scale |
 | `src/entities.js` | Tower, Enemy, Projectile, Particle, FloatText |
+| `src/settings.js` | Saved settings (sound, music, vibration) and haptics |
+| `src/audio.js` | Synthesized sound effects and looping music (Web Audio API) |
 | `src/world.js` | Shared simulation: entity lists, targeting, edge spawning, effects |
 | `src/game.js` | Game state, wave flow, coins and score (extends World) |
 | `src/render.js` | Canvas setup, sizing, world transform, shake; delegates the look to a theme |
@@ -73,7 +85,6 @@ the new version (and add any new files to its `PRECACHE` list).
 
 ## Roadmap ideas
 
-- Sound effects and music
 - More enemy types: ranged shooters, splitters, shielded enemies
 - Tower abilities with cooldowns (shockwave, freeze, overcharge)
 - Crits, piercing shots, chain lightning, and other upgrade branches
