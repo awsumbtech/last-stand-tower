@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#07070f" />
+  <meta name="theme-color" content="#86cc5f" />
   <meta name="description" content="A single-tower last-stand defense game. Survive the waves and upgrade between rounds." />
   <title>Last Stand Tower</title>
   <!-- PWA / home screen -->
@@ -14,6 +14,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Last Stand" />
+  <link rel="preload" href="fonts/Fredoka.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -22,50 +23,61 @@
   <!-- HUD (shown while playing) -->
   <div id="hud" class="hidden">
     <div class="hud-row">
-      <div class="hud-item">Wave <span id="hud-wave">1</span></div>
-      <div class="hud-item coins">&#9679; <span id="hud-coins">0</span></div>
-      <div class="hud-item">Score <span id="hud-score">0</span></div>
+      <div class="pill">Wave <b id="hud-wave">1</b></div>
+      <div class="pill coins"><i class="coin"></i><b id="hud-coins">0</b></div>
+      <div class="pill">Score <b id="hud-score">0</b></div>
     </div>
-    <div class="hp-bar"><div id="hud-hp-fill"></div><span id="hud-hp-text">100 / 100</span></div>
+    <div class="hp-wrap">
+      <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8.5-5.3-8.5-11.2A4.8 4.8 0 0 1 12 6.6a4.8 4.8 0 0 1 8.5 3.2C20.5 15.7 12 21 12 21z"/></svg>
+      <div class="hp-bar"><div id="hud-hp-fill"></div><span id="hud-hp-text">100 / 100</span></div>
+    </div>
     <div class="hud-buttons">
-      <button id="btn-speed" class="small">1x</button>
-      <button id="btn-pause" class="small">&#10073;&#10073;</button>
+      <button id="btn-speed" class="round" aria-label="Game speed">1x</button>
+      <button id="btn-pause" class="round" aria-label="Pause"><span class="pause-icon"></span></button>
     </div>
   </div>
 
   <!-- Start screen -->
-  <div id="screen-start" class="screen">
-    <img class="logo" src="icons/icon-192.png" alt="" width="96" height="96" />
-    <h1>LAST STAND<br /><span>TOWER</span></h1>
-    <p>Your tower fires on its own. Survive the waves, collect coins, and upgrade between rounds.</p>
-    <button id="btn-start">Start</button>
-    <p class="best">Best wave: <span id="start-best">0</span></p>
-    <p class="hint">Space / P: pause &nbsp;·&nbsp; F: game speed</p>
-    <a class="link" href="styles.html">Art style preview &rarr;</a>
+  <div id="screen-start" class="screen start">
+    <div class="panel">
+      <img class="logo" src="icons/icon-192.png" alt="" width="104" height="104" />
+      <h1 class="title"><span>LAST STAND</span><span class="yellow">TOWER</span></h1>
+      <p>Your tower shoots by itself. Survive the waves, grab coins, and power up between rounds!</p>
+      <button id="btn-start" class="btn big">Play</button>
+      <div class="pill best">Best wave <b id="start-best">0</b></div>
+      <p class="hint keys-only">Space / P: pause &nbsp;·&nbsp; F: game speed</p>
+      <a class="link" href="styles.html">Art style preview &rarr;</a>
+    </div>
   </div>
 
   <!-- Upgrade screen (between waves) -->
   <div id="screen-upgrade" class="screen hidden">
-    <h2>Wave <span id="up-wave">1</span> cleared!</h2>
-    <p class="coins-line">&#9679; <span id="up-coins">0</span> coins</p>
-    <div id="upgrade-list"></div>
-    <button id="btn-next">Next wave &#9654;</button>
+    <div class="panel wide">
+      <h2 class="title small">Wave <span id="up-wave">1</span> cleared!</h2>
+      <div class="pill coins big-pill" id="up-coins-pill"><i class="coin"></i><b id="up-coins">0</b></div>
+      <div id="upgrade-list"></div>
+      <button id="btn-next" class="btn">Next wave &#9654;</button>
+    </div>
   </div>
 
   <!-- Pause screen -->
   <div id="screen-pause" class="screen hidden">
-    <h2>Paused</h2>
-    <button id="btn-resume">Resume</button>
-    <button id="btn-quit" class="secondary">Quit to menu</button>
+    <div class="panel">
+      <h2 class="title small">Paused</h2>
+      <button id="btn-resume" class="btn">Resume</button>
+      <button id="btn-quit" class="btn secondary">Quit to menu</button>
+    </div>
   </div>
 
   <!-- Game over screen -->
   <div id="screen-gameover" class="screen hidden">
-    <h2 class="danger">Tower destroyed</h2>
-    <p>You reached wave <strong id="go-wave">1</strong></p>
-    <p>Score <strong id="go-score">0</strong></p>
-    <p class="best" id="go-best">Best wave: 0</p>
-    <button id="btn-restart">Play again</button>
+    <div class="panel">
+      <h2 class="title small red">Tower down!</h2>
+      <p class="big-line">You reached wave <b id="go-wave">1</b></p>
+      <p class="big-line">Score <b id="go-score">0</b></p>
+      <div class="pill best" id="go-best">Best wave: 0</div>
+      <button id="btn-restart" class="btn big">Play again</button>
+    </div>
   </div>
 
   <script src="src/config.js"></script>

@@ -13,7 +13,9 @@ LST.World = class World {
     this.projectiles = [];
     this.particles = [];
     this.texts = [];
+    this.bursts = [];
     this.shake = 0;
+    this.bossIntro = 0; // seconds left on the "BOSS!" banner
     this.wave = 0;
     this.waveIntro = 0;
   }
@@ -22,6 +24,8 @@ LST.World = class World {
   updateEffects(dt) {
     this.updateList(this.particles, dt);
     this.updateList(this.texts, dt);
+    this.updateList(this.bursts, dt);
+    this.bossIntro = Math.max(0, this.bossIntro - dt);
     this.shake = Math.max(0, this.shake - dt * 2);
   }
 
@@ -53,6 +57,7 @@ LST.World = class World {
     if (d > max) { x *= max / d; y *= max / d; }
     const enemy = new LST.Enemy(type, x, y, mult);
     this.enemies.push(enemy);
+    if (type === "boss") this.onBossSpawn(enemy);
     return enemy;
   }
 
@@ -71,8 +76,19 @@ LST.World = class World {
 
   // ---------- Events from entities (subclasses add rewards etc.) ----------
 
+  onHit(e) {
+    this.spawnHitSparks(e.x, e.y, e.color, 5);
+    this.bursts.push(new LST.Burst(e.x, e.y, "#ffffff", e.radius * 0.9, "hit"));
+  }
+
+  onBossSpawn() {
+    this.bossIntro = 2.4;
+    this.shake = Math.min(1, this.shake + 0.5);
+  }
+
   onEnemyKilled(e) {
     this.spawnHitSparks(e.x, e.y, e.color, 14, 160);
+    this.bursts.push(new LST.Burst(e.x, e.y, e.color, e.radius * 1.8, "kill"));
     this.texts.push(new LST.FloatText(e.x, e.y - e.radius, "+" + e.coins, "#ffd93d", "coin"));
   }
 

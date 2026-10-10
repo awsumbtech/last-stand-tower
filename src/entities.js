@@ -129,7 +129,7 @@ LST.Projectile = class Projectile {
       // Close enough to reach this frame: count it as a hit (prevents overshooting).
       if (d <= this.speed * dt + t.radius) {
         t.takeDamage(this.damage, game);
-        game.spawnHitSparks(t.x, t.y, t.color, 5);
+        game.onHit(t);
         this.dead = true;
         return;
       }
@@ -147,7 +147,7 @@ LST.Projectile = class Projectile {
       const r = e.radius + this.radius;
       if (LST.utils.dist2(this.x, this.y, e.x, e.y) <= r * r) {
         e.takeDamage(this.damage, game);
-        game.spawnHitSparks(this.x, this.y, e.color, 5);
+        game.onHit(e);
         this.dead = true;
         return;
       }
@@ -194,6 +194,25 @@ LST.FloatText = class FloatText {
   update(dt) {
     this.life -= dt;
     this.y -= 30 * dt;
+    if (this.life <= 0) this.dead = true;
+  }
+};
+
+// Short "impact" effect: kind is "hit" (projectile lands) or "kill".
+LST.Burst = class Burst {
+  constructor(x, y, color, size, kind) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.size = size;
+    this.kind = kind;
+    this.rot = Math.random() * Math.PI;
+    this.life = this.maxLife = kind === "kill" ? 0.32 : 0.16;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.life -= dt;
     if (this.life <= 0) this.dead = true;
   }
 };

@@ -10,6 +10,8 @@
 //   range(ctx, tower, r)       - world space
 //   tower / enemy / projectile / particle / text (ctx, obj, r) - world space
 //   banner(ctx, text, alpha, r)- screen space (CSS px), e.g. "WAVE 3"
+//   burst(ctx, burst, r)       - optional, world space impact effect
+//   bossBanner(ctx, t, r)      - optional, screen space; t counts down from 2.4
 // `r` is the renderer: r.time, r.halfW, r.halfH, r.px (world units per art pixel).
 
 LST.themes = LST.themes || {};
@@ -92,11 +94,17 @@ LST.Renderer = class Renderer {
     for (const e of scene.enemies) theme.enemy(ctx, e, this);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
+    if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
     for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
-    if (scene.state === "playing" && scene.waveIntro > 0) {
-      theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), this);
+    if (scene.state === "playing" || scene.state === "paused") {
+      if (scene.bossIntro > 0) {
+        if (theme.bossBanner) theme.bossBanner(ctx, scene.bossIntro, this);
+        else theme.banner(ctx, "BOSS", Math.min(1, scene.bossIntro), this);
+      } else if (scene.waveIntro > 0) {
+        theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), this);
+      }
     }
 
     if (ps) {

@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -35,6 +35,7 @@ const PRECACHE = [
   "icons/icon-maskable-512.png",
   "icons/apple-touch-icon.png",
   "icons/favicon-32.png",
+  "fonts/Fredoka.woff2",
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

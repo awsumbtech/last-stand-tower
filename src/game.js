@@ -99,7 +99,7 @@ LST.Game = class Game extends LST.World {
     this.coins -= cost;
     this.upgradeLevels[id] = lvl + 1;
     up.apply(this.tower);
-    this.ui.renderUpgrades();
+    this.ui.renderUpgrades(id);
     this.ui.updateHud();
   }
 

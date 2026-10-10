@@ -19,7 +19,7 @@
     if (document.querySelector(".update-toast")) return;
     const toast = document.createElement("div");
     toast.className = "update-toast";
-    toast.innerHTML = '<span>New version available</span><button type="button">Refresh</button>';
+    toast.innerHTML = '<span>New version available!</span><button type="button" class="btn">Refresh</button>';
     toast.querySelector("button").addEventListener("click", () => {
       worker.postMessage({ type: "SKIP_WAITING" });
       toast.remove();
