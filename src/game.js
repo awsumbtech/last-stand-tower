@@ -1,5 +1,6 @@
 // Core game state and rules.
-// States: "menu" | "playing" | "paused" | "celebrate" (wave-clear party) | "upgrade" | "gameover".
+// States: "menu" | "playing" | "paused" | "celebrate" (wave-clear party) | "upgrade" | "gameover" (results screen).
+// "workshop" is the between-runs card unlock screen.
 // Sound and vibration hooks live here (not in World) so the art-style demo stays silent.
 
 LST.Game = class Game extends LST.World {
@@ -28,6 +29,12 @@ LST.Game = class Game extends LST.World {
     this.slowmo = 0;        // real seconds left of the low-HP slow-down
     this.heartbeat = 0;
     this.celebrateTimer = 0;
+    // Run stats for the results screen.
+    this.runTime = 0;          // real seconds (waves + shops)
+    this.coinsEarned = 0;
+    this.bossWavesCleared = 0;
+    this.result = null;
+    this.resultsDelay = 0;
   }
 
   // ---------- Flow ----------
@@ -56,6 +63,8 @@ LST.Game = class Game extends LST.World {
   endWave() {
     const bonus = LST.waves.clearBonus(this.wave);
     this.coins += bonus;
+    this.coinsEarned += bonus;
+    if (this.wave % LST.CONFIG.waves.bossEvery === 0) this.bossWavesCleared += 1;
     this.score += this.wave * 50;
     this.saveBest(this.wave);
     this.state = "celebrate";
@@ -168,10 +177,49 @@ LST.Game = class Game extends LST.World {
     this.state = "gameover";
     this.spawnExplosion(this.tower.x, this.tower.y);
     this.saveBest(this.wave);
-    this.ui.show("gameover");
+    // Pay out Gears (saved right away, so closing the tab can't lose them).
+    const meta = LST.meta;
+    const nextBefore = meta.nextUnlock();
+    const gears = meta.gearsFor(this.wave, this.bossWavesCleared);
+    const gearsBefore = meta.state.gears;
+    meta.recordRun(gears.total);
+    this.result = {
+      wave: this.wave, time: this.runTime, kills: this.kills, coins: this.coinsEarned, score: this.score,
+      cards: Object.entries(this.upgradeLevels), bossWaves: this.bossWavesCleared, gears, gearsBefore,
+      gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1,
+    };
+    this.resultsDelay = 1.1; // let the tower explosion play first
+    this.ui.show("dying"); // no screen, no HUD
     LST.audio.stopMusic();
     LST.audio.play("gameOver");
     LST.haptics.buzz([120, 60, 250]);
+  }
+
+  showResults() {
+    this.resultsDelay = 0;
+    this.ui.show("results");
+  }
+
+  openWorkshop(from = "start") {
+    if (this.state === "gameover" && this.resultsDelay > 0) return;
+    this.workshopFrom = from;
+    if (this.state !== "gameover") this.state = "workshop";
+    LST.meta.state.seenWorkshop = true;
+    LST.meta.save();
+    this.ui.show("workshop");
+  }
+
+  closeWorkshop() {
+    if (this.workshopFrom === "results" && this.state === "gameover") this.ui.show("results");
+    else { this.state = "menu"; this.ui.show("start"); }
+  }
+
+  unlockCard(id) {
+    if (!LST.meta.unlock(id)) { LST.audio.play("deny"); return false; }
+    LST.audio.play("unlock");
+    LST.haptics.buzz([20, 40, 60]);
+    this.ui.renderWorkshop({ unlocked: id });
+    return true;
   }
 
   toMenu() {
@@ -217,6 +265,11 @@ LST.Game = class Game extends LST.World {
       return;
     }
     this.updateEffects(dt);
+    if (this.state === "playing" || this.state === "celebrate" || this.state === "upgrade") this.runTime += dt;
+    if (this.state === "gameover" && this.resultsDelay > 0) {
+      this.resultsDelay -= dt;
+      if (this.resultsDelay <= 0) this.showResults();
+    }
 
     if (this.state === "celebrate") {
       this.celebrateTimer -= dt;
@@ -300,6 +353,7 @@ LST.Game = class Game extends LST.World {
   onEnemyKilled(e) {
     super.onEnemyKilled(e);
     this.coins += e.coins;
+    this.coinsEarned += e.coins;
     this.score += e.score * this.wave;
     this.kills += 1;
     if (this.tower.lifesteal > 0) this.tower.heal(this.tower.maxHp * this.tower.lifesteal);

@@ -164,6 +164,27 @@ LST.audio = (function () {
       [72, 76, 79, 84, 88, 91].forEach((n, i) => tone({ type: "triangle", freq: midi(n), start: i * 0.045, dur: 0.2, vol: 0.17 }));
       [96, 100, 103].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: 0.28 + i * 0.06, dur: 0.3, vol: 0.06 }));
     } },
+    gear: { throttle: 0.045, priority: true, play(o) {
+      // metallic clink for each Gear counted on the results screen
+      const p = jitter(0.03) * (o.pitch || 1);
+      tone({ type: "square", freq: midi(86) * p, dur: 0.05, vol: 0.06, filter: { freq: 6000 } });
+      tone({ type: "triangle", freq: midi(93) * p, start: 0.02, dur: 0.09, vol: 0.08 });
+      noise({ dur: 0.03, vol: 0.05, freq: 7000, q: 2 });
+    } },
+    gearsTotal: { priority: true, play() {
+      // ka-ching: a ratchet clunk then a bright chord
+      for (let i = 0; i < 3; i++) noise({ start: i * 0.045, dur: 0.035, vol: 0.12, freq: 2200 + i * 600, q: 3 });
+      [79, 83, 86, 91].forEach((n) => tone({ type: "triangle", freq: midi(n), start: 0.14, dur: 0.45, vol: 0.1 }));
+      tone({ type: "square", freq: midi(98), start: 0.14, dur: 0.25, vol: 0.035, filter: { freq: 7000 } });
+    } },
+    unlock: { priority: true, play() {
+      // padlock clack, then a rising fanfare with sparkles
+      noise({ dur: 0.06, vol: 0.2, type: "bandpass", freq: 1500, q: 2 });
+      tone({ type: "square", freq: 220, to: 140, dur: 0.06, vol: 0.08, filter: { freq: 1500 } });
+      [72, 76, 79, 84, 88].forEach((n, i) => tone({ type: "triangle", freq: midi(n), start: 0.1 + i * 0.07, dur: 0.22, vol: 0.17 }));
+      [60, 67, 72].forEach((n) => tone({ type: "sawtooth", freq: midi(n), start: 0.45, dur: 0.6, vol: 0.035, attack: 0.03, filter: { freq: 2200 } }));
+      [96, 100, 103, 108].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: 0.5 + i * 0.06, dur: 0.3, vol: 0.05 }));
+    } },
     deny: { throttle: 0.15, play() {
       tone({ type: "square", freq: 180, to: 140, dur: 0.14, vol: 0.08, filter: { freq: 900 } });
     } },

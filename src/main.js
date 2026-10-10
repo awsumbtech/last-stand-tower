@@ -21,13 +21,18 @@
   unlockEvents.forEach((ev) => window.addEventListener(ev, unlock, true));
 
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" || e.code === "KeyP" || e.code === "Escape") {
+    const inWorkshop = !document.getElementById("screen-workshop").classList.contains("hidden");
+    if (inWorkshop && (e.code === "Escape" || e.code === "KeyW")) {
+      game.closeWorkshop();
+    } else if (e.code === "Space" || e.code === "KeyP" || e.code === "Escape") {
       e.preventDefault();
       game.togglePause();
+    } else if (e.code === "KeyW" && (game.state === "menu" || (game.state === "gameover" && !game.resultsDelay))) {
+      game.openWorkshop(game.state === "gameover" ? "results" : "start");
     } else if (e.code === "KeyF") {
       game.toggleSpeed();
     } else if (e.code === "Enter") {
-      if (game.state === "menu" || game.state === "gameover") game.newGame();
+      if (game.state === "menu" || game.state === "workshop" || (game.state === "gameover" && !game.resultsDelay)) game.newGame();
       else if (game.state === "upgrade") game.leaveShop();
     } else if (game.state === "upgrade" && /^(Digit|Numpad)[1-3]$/.test(e.code)) {
       game.takeCard(+e.code.slice(-1) - 1);

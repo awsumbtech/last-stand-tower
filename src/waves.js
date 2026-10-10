@@ -7,8 +7,14 @@ LST.waves = {
     const n = wave - 1;
     const early = Math.min(n, w.hpKnee);
     const late = Math.max(0, n - w.hpKnee);
+    let hp = Math.pow(1 + w.hpGrowth, early) * Math.pow(1 + w.hpGrowthLate, late);
+    if (LST.meta && LST.meta.starterAssist()) {
+      const a = LST.CONFIG.meta.starterAssist;
+      const k = Math.min(n, a.untilWave);
+      hp *= Math.pow((1 + a.hpGrowth) / (1 + w.hpGrowth), k);
+    }
     return {
-      hp: Math.pow(1 + w.hpGrowth, early) * Math.pow(1 + w.hpGrowthLate, late),
+      hp,
       speed: Math.min(w.maxSpeedMult, 1 + w.speedGrowth * n),
       damage: 1 + w.damageGrowth * n,
       coins: 1 + w.coinGrowth * n,

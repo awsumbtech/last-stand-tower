@@ -66,4 +66,13 @@ LST.CONFIG = {
     reroll:    { base: 6,  growth: 1.09, step: 2 },   // re-deal the cards you haven't taken
     repair:    { base: 10, growth: 1.09, step: 1.5, heal: 0.4 }, // heal 40% of max HP
   },
+
+  // Lasting progression between runs (src/meta.js).
+  meta: {
+    // Gears per run = floor((perWave * wave^waveExp + perBoss * boss waves cleared) * worldMult * (1 + cogBonus * Cogs))
+    gears: { perWave: 2, waveExp: 1.3, perBoss: 3, cogBonus: 0.1 },
+    // Until Multishot is unlocked (normally just the first run), enemy HP grows
+    // gentler for the first `untilWave` waves so a commons-only tower doesn't hit a wall at wave 10.
+    starterAssist: { untilWave: 10, hpGrowth: 0.2 },
+  },
 };

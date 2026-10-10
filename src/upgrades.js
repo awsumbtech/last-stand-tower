@@ -7,6 +7,7 @@
 //   apply(tower) -> mutate tower stats
 //   stat(tower)  -> short "current value" text for the card
 //   maxLevel     -> optional cap (maxed cards stop showing up)
+//   unlockCost   -> Gears to unlock it in the Workshop (cards without one are starter cards)
 LST.CARDS = [
   // ---------- Common ----------
   {
@@ -43,7 +44,7 @@ LST.CARDS = [
   },
   // ---------- Rare ----------
   {
-    id: "multishot", offense: true, rarity: "rare", color: "#8e6cff",
+    id: "multishot", unlockCost: 15, offense: true, rarity: "rare", color: "#8e6cff",
     icon: '<circle cx="6" cy="16" r="3.6"/><circle cx="12" cy="7" r="3.6"/><circle cx="18" cy="16" r="3.6"/>',
     name: "Multishot", desc: "+1 target per volley",
     apply: (t) => { t.targets += 1; },
@@ -51,7 +52,7 @@ LST.CARDS = [
     maxLevel: 4,
   },
   {
-    id: "crit", offense: true, rarity: "rare", color: "#ffd23f",
+    id: "crit", unlockCost: 35, offense: true, rarity: "rare", color: "#ffd23f",
     icon: '<circle cx="12" cy="12" r="9"/><path d="M12 6.5l1.6 3.6 3.9.4-2.9 2.6.8 3.9L12 15l-3.4 2 .8-3.9-2.9-2.6 3.9-.4z"/>',
     name: "Lucky Shot", desc: "+7% crit chance",
     apply: (t) => { t.critChance += 0.07; },
@@ -59,7 +60,7 @@ LST.CARDS = [
     maxLevel: 5,
   },
   {
-    id: "pierce", offense: true, rarity: "rare", color: "#ff9f43",
+    id: "pierce", unlockCost: 100, offense: true, rarity: "rare", color: "#ff9f43",
     icon: '<path d="M2 12h14M12 6l7 6-7 6"/><path d="M4 8l3 4-3 4"/>',
     name: "Pierce", desc: "Shots pass through +1 enemy",
     apply: (t) => { t.pierce += 1; },
@@ -67,7 +68,7 @@ LST.CARDS = [
     maxLevel: 2,
   },
   {
-    id: "slow", rarity: "rare", color: "#7fe3ff",
+    id: "slow", unlockCost: 75, rarity: "rare", color: "#7fe3ff",
     icon: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.8L12 6l2.5-2.2M9.5 20.2L12 18l2.5 2.2"/>',
     name: "Frost Shots", desc: "Hits slow enemies 15% more",
     apply: (t) => { t.slow = Math.min(0.45, t.slow + 0.15); },
@@ -75,7 +76,7 @@ LST.CARDS = [
     maxLevel: 3,
   },
   {
-    id: "regen", rarity: "rare", color: "#3ddc84",
+    id: "regen", unlockCost: 50, rarity: "rare", color: "#3ddc84",
     icon: '<path d="M12 21C6 17 4 12.5 4 9a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 3.5-2 8-8 12z"/><path d="M12 9v6M9 12h6"/>',
     name: "Regen", desc: "+0.5% max HP / sec in waves",
     apply: (t) => { t.regen += 0.005; },
@@ -84,7 +85,7 @@ LST.CARDS = [
   },
   // ---------- Epic ----------
   {
-    id: "splash", offense: true, rarity: "epic", color: "#ff5e3a",
+    id: "splash", unlockCost: 190, offense: true, rarity: "epic", color: "#ff5e3a",
     icon: '<circle cx="12" cy="12" r="4"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4M4.6 4.6l2.8 2.8M16.6 16.6l2.8 2.8M4.6 19.4l2.8-2.8M16.6 7.4l2.8-2.8"/>',
     name: "Splash", desc: "Hits blast nearby enemies",
     apply: (t) => { t.splash += t.splash ? 0.15 : 0.35; t.splashRadius = t.splashRadius ? t.splashRadius + 12 : 55; },
@@ -92,7 +93,7 @@ LST.CARDS = [
     maxLevel: 2,
   },
   {
-    id: "lifesteal", rarity: "epic", color: "#d63384",
+    id: "lifesteal", unlockCost: 140, rarity: "epic", color: "#d63384",
     icon: '<path d="M12 2.5C9 7.5 6.5 10.6 6.5 14a5.5 5.5 0 0 0 11 0c0-3.4-2.5-6.5-5.5-11.5z"/>',
     name: "Vampire", desc: "Kills heal 0.5% max HP",
     apply: (t) => { t.lifesteal += 0.005; },
@@ -100,7 +101,7 @@ LST.CARDS = [
     maxLevel: 3,
   },
   {
-    id: "overcharge", offense: true, rarity: "epic", color: "#b06cff",
+    id: "overcharge", unlockCost: 250, offense: true, rarity: "epic", color: "#b06cff",
     icon: '<path d="M8 2l1.6 4.4L14 8l-4.4 1.6L8 14l-1.6-4.4L2 8l4.4-1.6zM16.5 10l1.2 3.3 3.3 1.2-3.3 1.2-1.2 3.3-1.2-3.3-3.3-1.2 3.3-1.2z"/>',
     name: "Overcharge", desc: "Crits deal +100% damage",
     apply: (t) => { t.critMult += 1; },
@@ -124,7 +125,9 @@ LST.shopRules = {
     return Math.round(c.base * Math.pow(c.growth, wave - 1) * Math.pow(c.step, times));
   },
 
+  // Unlocked in the Workshop (or a starter card) and not maxed out.
   available(card, levels) {
+    if (LST.meta && !LST.meta.isUnlocked(card.id)) return false;
     const lvl = levels[card.id] || 0;
     return card.maxLevel === undefined || lvl < card.maxLevel;
   },
@@ -137,7 +140,8 @@ LST.shopRules = {
     const pool = LST.CARDS.filter((c) => this.available(c, levels) && !exclude.includes(c.id));
     const out = [];
     while (out.length < n && pool.length) {
-      const needRare = minRare && out.length === n - 1 && !out.some((c) => c.rarity !== "common");
+      // (only when a rare card can actually be dealt: the starter pool is all commons)
+      const needRare = minRare && out.length === n - 1 && !out.some((c) => c.rarity !== "common") && pool.some((c) => c.rarity !== "common");
       const rarities = Object.keys(weights).filter((r) => pool.some((c) => c.rarity === r) && !(needRare && r === "common"));
       if (!rarities.length) break;
       const rarity = LST.utils.pick(rarities.map((r) => [r, weights[r]]));
@@ -147,7 +151,8 @@ LST.shopRules = {
       pool.splice(pool.indexOf(card), 1);
     }
     if (n >= 3 && out.length && !out.some((c) => c.offense)) {
-      const attack = pool.filter((c) => c.offense && (!minRare || out.slice(0, -1).some((o) => o.rarity !== "common") || c.rarity !== "common"));
+      const rareOk = !minRare || out.slice(0, -1).some((o) => o.rarity !== "common") || !pool.some((c) => c.offense && c.rarity !== "common");
+      const attack = pool.filter((c) => c.offense && (rareOk || c.rarity !== "common"));
       if (attack.length) out[out.length - 1] = attack[Math.floor(Math.random() * attack.length)];
     }
     return out;
