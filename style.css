@@ -21,7 +21,8 @@ canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; display: blo
 #hud {
   position: fixed;
   top: 0; left: 0; right: 0;
-  padding: max(10px, env(safe-area-inset-top)) 12px 0;
+  /* Safe areas keep the HUD clear of the notch / rounded corners. */
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
   pointer-events: none;
 }
 .hud-row { display: flex; gap: 18px; justify-content: center; font-weight: 600; font-size: 16px; }
@@ -43,7 +44,7 @@ canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; display: blo
 #hud-hp-fill.low { background: linear-gradient(90deg, #d1261f, #ff4d6d); box-shadow: 0 0 10px #ff4d6d; }
 #hud-hp-text { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 12px; font-weight: 700; color: #fff; text-shadow: 0 0 3px #000; }
 
-.hud-buttons { position: fixed; top: max(8px, env(safe-area-inset-top)); right: 10px; display: flex; gap: 6px; pointer-events: auto; }
+.hud-buttons { position: fixed; top: max(8px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); display: flex; gap: 6px; pointer-events: auto; }
 
 /* ---------- Screens ---------- */
 .screen {
@@ -54,7 +55,8 @@ canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; display: blo
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   text-align: center;
   background: rgba(7, 7, 15, 0.82);
   backdrop-filter: blur(3px);
@@ -69,6 +71,29 @@ h2 { font-size: clamp(26px, 6vw, 38px); color: #00f0ff; text-shadow: 0 0 14px #0
 h2.danger { color: #ff4d6d; text-shadow: 0 0 14px #ff4d6d; }
 
 .best { color: #ffd93d !important; }
+.logo { width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 0 24px rgba(0, 240, 255, 0.35); }
+a.link { color: #ff2bd6; font-size: 14px; text-decoration: none; padding: 8px; }
+a.link:hover { text-decoration: underline; }
+
+/* "New version available" toast from the service worker */
+.update-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid #00f0ff;
+  border-radius: 12px;
+  background: rgba(7, 7, 15, 0.95);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.update-toast button { min-width: 0; padding: 8px 14px; font-size: 14px; }
 .hint { font-size: 12px; opacity: 0.6; }
 .coins-line { font-size: 20px; font-weight: 700; color: #ffd93d !important; }
 

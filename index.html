@@ -4,8 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#07070f" />
+  <meta name="description" content="A single-tower last-stand defense game. Survive the waves and upgrade between rounds." />
   <title>Last Stand Tower</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,8 88,30 88,70 50,92 12,70 12,30' fill='none' stroke='%2300f0ff' stroke-width='8'/%3E%3Ccircle cx='50' cy='50' r='14' fill='%2300f0ff'/%3E%3C/svg%3E" />
+  <!-- PWA / home screen -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Last Stand" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -27,11 +35,13 @@
 
   <!-- Start screen -->
   <div id="screen-start" class="screen">
+    <img class="logo" src="icons/icon-192.png" alt="" width="96" height="96" />
     <h1>LAST STAND<br /><span>TOWER</span></h1>
     <p>Your tower fires on its own. Survive the waves, collect coins, and upgrade between rounds.</p>
     <button id="btn-start">Start</button>
     <p class="best">Best wave: <span id="start-best">0</span></p>
     <p class="hint">Space / P: pause &nbsp;·&nbsp; F: game speed</p>
+    <a class="link" href="styles.html">Art style preview &rarr;</a>
   </div>
 
   <!-- Upgrade screen (between waves) -->
@@ -62,10 +72,15 @@
   <script src="src/utils.js"></script>
   <script src="src/upgrades.js"></script>
   <script src="src/entities.js"></script>
+  <script src="src/world.js"></script>
   <script src="src/waves.js"></script>
   <script src="src/render.js"></script>
+  <script src="src/themes/neon.js"></script>
+  <script src="src/themes/pixel.js"></script>
+  <script src="src/themes/cartoon.js"></script>
   <script src="src/ui.js"></script>
   <script src="src/game.js"></script>
   <script src="src/main.js"></script>
+  <script src="src/pwa.js"></script>
 </body>
 </html>

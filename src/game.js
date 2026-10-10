@@ -1,8 +1,8 @@
 // Core game state and rules. States: "menu" | "playing" | "paused" | "upgrade" | "gameover".
 
-LST.Game = class Game {
+LST.Game = class Game extends LST.World {
   constructor(renderer) {
-    this.renderer = renderer;
+    super(renderer);
     this.state = "menu";
     this.speed = 1; // 1x or 2x game speed
     this.bestWave = LST.utils.storage.get("lst.bestWave", 0);
@@ -12,12 +12,7 @@ LST.Game = class Game {
   }
 
   reset() {
-    this.tower = new LST.Tower();
-    this.enemies = [];
-    this.projectiles = [];
-    this.particles = [];
-    this.texts = [];
-    this.wave = 0;
+    this.resetWorld();
     this.coins = 0;
     this.score = 0;
     this.kills = 0;
@@ -25,8 +20,6 @@ LST.Game = class Game {
     this.spawnQueue = [];
     this.spawnTimer = 0;
     this.spawnInterval = 1;
-    this.waveIntro = 0;
-    this.shake = 0;
     this.newBest = false;
   }
 
@@ -61,7 +54,7 @@ LST.Game = class Game {
 
   gameOver() {
     this.state = "gameover";
-    this.spawnGameOverExplosion();
+    this.spawnExplosion(this.tower.x, this.tower.y);
     this.saveBest(this.wave);
     this.ui.show("gameover");
   }
@@ -113,10 +106,7 @@ LST.Game = class Game {
   // ---------- Per-frame update ----------
 
   update(dt) {
-    // Effects keep animating behind menus so the scene feels alive.
-    this.updateList(this.particles, dt);
-    this.updateList(this.texts, dt);
-    this.shake = Math.max(0, this.shake - dt * 2);
+    this.updateEffects(dt);
     if (this.state !== "playing") return;
 
     // At 2x speed we run two normal-sized steps instead of one big one,
@@ -139,82 +129,19 @@ LST.Game = class Game {
     }
   }
 
-  updateList(list, dt) {
-    for (const obj of list) obj.update(dt, this);
-    // Remove dead objects in place (keeps the same array reference).
-    let j = 0;
-    for (let i = 0; i < list.length; i++) if (!list[i].dead) list[j++] = list[i];
-    list.length = j;
-  }
-
   updateSpawning(dt) {
     if (this.spawnQueue.length === 0) return;
     this.spawnTimer -= dt;
     while (this.spawnTimer <= 0 && this.spawnQueue.length > 0) {
-      this.spawnEnemy(this.spawnQueue.shift());
+      this.spawnEnemy(this.spawnQueue.shift(), this.waveMult);
       this.spawnTimer += this.spawnInterval;
     }
   }
 
-  // Spawn just outside a random point on the screen edge.
-  spawnEnemy(type) {
-    const r = LST.CONFIG.enemies[type].radius;
-    const hw = this.renderer.halfW + r + 10;
-    const hh = this.renderer.halfH + r + 10;
-    let x, y;
-    // Pick an edge weighted by its length so spawns are uniform around the border.
-    if (Math.random() < hw / (hw + hh)) {
-      x = LST.utils.rand(-hw, hw);
-      y = Math.random() < 0.5 ? -hh : hh;
-    } else {
-      x = Math.random() < 0.5 ? -hw : hw;
-      y = LST.utils.rand(-hh, hh);
-    }
-    // Very tall screens would make enemies walk forever; pull them in.
-    const d = Math.hypot(x, y);
-    const max = LST.CONFIG.MAX_SPAWN_DIST;
-    if (d > max) { x *= max / d; y *= max / d; }
-    this.enemies.push(new LST.Enemy(type, x, y, this.waveMult));
-  }
-
-  // Up to `count` living enemies within `range`, nearest first.
-  nearestEnemies(x, y, range, count) {
-    const r2 = range * range;
-    const inRange = [];
-    for (const e of this.enemies) {
-      if (e.dead) continue;
-      const d2 = LST.utils.dist2(x, y, e.x, e.y);
-      if (d2 <= r2) inRange.push({ e, d2 });
-    }
-    inRange.sort((a, b) => a.d2 - b.d2);
-    return inRange.slice(0, count).map((o) => o.e);
-  }
-
-  // ---------- Events from entities ----------
-
   onEnemyKilled(e) {
+    super.onEnemyKilled(e);
     this.coins += e.coins;
     this.score += e.score * this.wave;
     this.kills += 1;
-    this.spawnHitSparks(e.x, e.y, e.color, 14, 160);
-    this.texts.push(new LST.FloatText(e.x, e.y - e.radius, "+" + e.coins, "#ffd93d"));
-  }
-
-  onTowerHit(e) {
-    this.shake = Math.min(1, this.shake + 0.4);
-    this.spawnHitSparks(e.x, e.y, "#ff4d6d", 12, 140);
-    this.texts.push(new LST.FloatText(e.x, e.y, "-" + Math.round(e.damage), "#ff4d6d"));
-  }
-
-  spawnHitSparks(x, y, color, count, speed = 90) {
-    for (let i = 0; i < count; i++) {
-      this.particles.push(new LST.Particle(x, y, color, speed, LST.utils.rand(0.25, 0.55), LST.utils.rand(2, 4)));
-    }
-  }
-
-  spawnGameOverExplosion() {
-    this.spawnHitSparks(this.tower.x, this.tower.y, "#00f0ff", 60, 320);
-    this.spawnHitSparks(this.tower.x, this.tower.y, "#ff4d6d", 40, 240);
-    this.shake = 1;
   }
 };

@@ -1,7 +1,21 @@
-// All canvas drawing. The game state is read-only from here.
+// Renderer: owns the canvas, sizing, the world transform and screen shake.
+// What things actually LOOK like is up to the active theme (src/themes/*.js).
+//
+// A theme is a plain object registered in LST.themes:
+//   id, name, label            - for menus
+//   pixelSize(scale)           - optional; return CSS px per "art pixel" to render
+//                                at low resolution and upscale crisply (pixel art)
+//   init(renderer)             - optional one-time setup (build sprites, etc.)
+//   background(ctx, r, scene)  - world space, fill the visible area
+//   range(ctx, tower, r)       - world space
+//   tower / enemy / projectile / particle / text (ctx, obj, r) - world space
+//   banner(ctx, text, alpha, r)- screen space (CSS px), e.g. "WAVE 3"
+// `r` is the renderer: r.time, r.halfW, r.halfH, r.px (world units per art pixel).
+
+LST.themes = LST.themes || {};
 
 LST.Renderer = class Renderer {
-  constructor(canvas) {
+  constructor(canvas, theme) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.dpr = 1;
@@ -9,12 +23,23 @@ LST.Renderer = class Renderer {
     this.width = 0; // CSS pixels
     this.height = 0;
     this.time = 0;
+    this.low = null; // offscreen canvas for pixel-art themes
+    this.setTheme(theme || LST.themes.neon);
   }
 
+  setTheme(theme) {
+    this.theme = theme;
+    if (theme.init && !theme._ready) {
+      theme.init(this);
+      theme._ready = true;
+    }
+  }
+
+  // Sizes to the canvas's CSS box (full screen in the game, a panel in styles.html).
   resize() {
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = this.canvas.clientWidth || window.innerWidth;
+    this.height = this.canvas.clientHeight || window.innerHeight;
     this.canvas.width = Math.round(this.width * this.dpr);
     this.canvas.height = Math.round(this.height * this.dpr);
     const portrait = this.height > this.width * 1.3;
@@ -26,184 +51,84 @@ LST.Renderer = class Renderer {
   get halfW() { return this.width / 2 / this.scale; }
   get halfH() { return this.height / 2 / this.scale; }
 
-  draw(game, dt) {
+  draw(scene, dt) {
     this.time += dt;
-    const ctx = this.ctx;
-    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    ctx.fillStyle = "#07070f";
-    ctx.fillRect(0, 0, this.width, this.height);
+    const theme = this.theme;
+    const ps = theme.pixelSize ? theme.pixelSize(this.scale) : 0;
+    this.ps = ps; // CSS px per art pixel (0 = normal full-res drawing)
+    let ctx = this.ctx;
 
-    // World transform: origin at the screen center, plus screen shake.
-    const shake = game.shake > 0 ? game.shake * 8 : 0;
+    if (ps) {
+      // Low-res pass: draw into a small canvas, then blow it up with no smoothing.
+      const lw = Math.ceil(this.width / ps);
+      const lh = Math.ceil(this.height / ps);
+      if (!this.low) this.low = document.createElement("canvas");
+      if (this.low.width !== lw || this.low.height !== lh) {
+        this.low.width = lw;
+        this.low.height = lh;
+      }
+      ctx = this.low.getContext("2d");
+      ctx.imageSmoothingEnabled = false;
+      ctx.setTransform(1 / ps, 0, 0, 1 / ps, 0, 0); // draw in CSS px, land on art pixels
+      this.px = ps / this.scale;
+    } else {
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      this.px = 1 / this.scale;
+    }
+
+    // World transform: origin at the center, plus screen shake.
+    const snap = (v) => (ps ? Math.round(v / ps) * ps : v);
+    const shake = scene.shake > 0 ? scene.shake * 8 : 0;
     ctx.save();
     ctx.translate(
-      this.width / 2 + (Math.random() - 0.5) * shake,
-      this.height / 2 + (Math.random() - 0.5) * shake
+      snap(this.width / 2 + (Math.random() - 0.5) * shake),
+      snap(this.height / 2 + (Math.random() - 0.5) * shake)
     );
     ctx.scale(this.scale, this.scale);
 
-    this.drawGrid();
-    this.drawRange(game.tower);
-    for (const p of game.particles) this.drawParticle(p);
-    for (const e of game.enemies) this.drawEnemy(e);
-    for (const p of game.projectiles) this.drawProjectile(p);
-    this.drawTower(game.tower);
-    for (const t of game.texts) this.drawText(t);
-
+    theme.background(ctx, this, scene);
+    theme.range(ctx, scene.tower, this);
+    for (const p of scene.particles) theme.particle(ctx, p, this);
+    for (const e of scene.enemies) theme.enemy(ctx, e, this);
+    for (const p of scene.projectiles) theme.projectile(ctx, p, this);
+    theme.tower(ctx, scene.tower, this);
+    for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
-    if (game.state === "playing" && game.waveIntro > 0) this.drawWaveBanner(game);
-  }
-
-  drawGrid() {
-    const ctx = this.ctx;
-    const step = 50;
-    const w = Math.ceil(this.halfW / step) * step;
-    const h = Math.ceil(this.halfH / step) * step;
-    ctx.strokeStyle = "rgba(0, 240, 255, 0.05)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let x = -w; x <= w; x += step) { ctx.moveTo(x, -h); ctx.lineTo(x, h); }
-    for (let y = -h; y <= h; y += step) { ctx.moveTo(-w, y); ctx.lineTo(w, y); }
-    ctx.stroke();
-  }
-
-  drawRange(tower) {
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(tower.x, tower.y, tower.range, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(0, 240, 255, 0.035)";
-    ctx.fill();
-    ctx.setLineDash([8, 10]);
-    ctx.lineDashOffset = -this.time * 12;
-    ctx.strokeStyle = "rgba(0, 240, 255, 0.35)";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  drawTower(t) {
-    const ctx = this.ctx;
-    const color = t.hitFlash > 0 ? "#ff4d6d" : "#00f0ff";
-    ctx.save();
-    ctx.translate(t.x, t.y);
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 20;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-
-    // Base: a slowly rotating hexagon.
-    ctx.save();
-    ctx.rotate(this.time * 0.3);
-    this.polygon(6, t.radius);
-    ctx.fillStyle = "rgba(0, 240, 255, 0.12)";
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // Barrel points at the current target.
-    ctx.rotate(t.angle);
-    ctx.fillStyle = color;
-    ctx.fillRect(0, -4, t.radius + 10, 8);
-    ctx.beginPath();
-    ctx.arc(0, 0, t.radius * 0.45, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  drawEnemy(e) {
-    const ctx = this.ctx;
-    const color = e.hitFlash > 0 ? "#ffffff" : e.color;
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, e.age / 0.4); // fade in after spawning
-    ctx.translate(e.x, e.y);
-    ctx.shadowColor = e.color;
-    ctx.shadowBlur = 12;
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color + "33";
-    ctx.lineWidth = 2.5;
-    ctx.save();
-    ctx.rotate(e.spin);
-    if (e.shape === "circle") {
-      ctx.beginPath();
-      ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
-    } else if (e.shape === "triangle") {
-      this.polygon(3, e.radius * 1.2);
-    } else if (e.shape === "square") {
-      this.polygon(4, e.radius * 1.2);
-    } else {
-      this.polygon(6, e.radius);
+    if (scene.state === "playing" && scene.waveIntro > 0) {
+      theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), this);
     }
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
 
-    // Small HP bar once damaged.
-    if (e.hp < e.maxHp) {
-      ctx.shadowBlur = 0;
-      const w = e.radius * 2;
-      ctx.fillStyle = "rgba(255,255,255,0.15)";
-      ctx.fillRect(-w / 2, -e.radius - 9, w, 3);
-      ctx.fillStyle = e.color;
-      ctx.fillRect(-w / 2, -e.radius - 9, w * Math.max(0, e.hp / e.maxHp), 3);
+    if (ps) {
+      const main = this.ctx;
+      main.setTransform(1, 0, 0, 1, 0, 0);
+      main.imageSmoothingEnabled = false;
+      main.drawImage(this.low, 0, 0, this.low.width * ps * this.dpr, this.low.height * ps * this.dpr);
     }
-    ctx.restore();
   }
+};
 
-  drawProjectile(p) {
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.shadowColor = "#00f0ff";
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = "#c8fbff";
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  drawParticle(p) {
-    const ctx = this.ctx;
-    ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
-    ctx.fillStyle = p.color;
-    ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-    ctx.globalAlpha = 1;
-  }
-
-  drawText(t) {
-    const ctx = this.ctx;
-    ctx.globalAlpha = Math.max(0, t.life / t.maxLife);
-    ctx.fillStyle = t.color;
-    ctx.font = "bold 14px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(t.text, t.x, t.y);
-    ctx.globalAlpha = 1;
-  }
-
-  drawWaveBanner(game) {
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, game.waveIntro);
-    ctx.fillStyle = "#00f0ff";
-    ctx.shadowColor = "#00f0ff";
-    ctx.shadowBlur = 16;
-    ctx.font = `bold ${Math.round(Math.min(48, this.width / 10))}px system-ui, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.fillText(`WAVE ${game.wave}`, this.width / 2, this.height * 0.3);
-    ctx.restore();
-  }
-
+// Small drawing helpers shared by themes.
+LST.draw = {
   // Regular polygon path centered on the current origin.
-  polygon(sides, r) {
-    const ctx = this.ctx;
+  polygon(ctx, sides, r, rot = -Math.PI / 2) {
     ctx.beginPath();
     for (let i = 0; i < sides; i++) {
-      const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+      const a = rot + (i / sides) * Math.PI * 2;
       const x = Math.cos(a) * r;
       const y = Math.sin(a) * r;
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.closePath();
-  }
+  },
+
+  roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  },
 };

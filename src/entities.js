@@ -17,10 +17,12 @@ LST.Tower = class Tower {
     this.cooldown = 0;
     this.angle = -Math.PI / 2; // barrel direction, for drawing
     this.hitFlash = 0;
+    this.recoil = 0; // 1 right after firing, eases back to 0 (for animation)
   }
 
   update(dt, game) {
     this.hitFlash = Math.max(0, this.hitFlash - dt);
+    this.recoil = Math.max(0, this.recoil - dt * 6);
     this.cooldown -= dt;
     if (this.cooldown > 0) return;
 
@@ -34,6 +36,7 @@ LST.Tower = class Tower {
       game.projectiles.push(new LST.Projectile(this.x, this.y, t, this.damage, this.projectileSpeed));
     }
     this.cooldown = 1 / this.fireRate;
+    this.recoil = 1;
   }
 
   takeDamage(amount) {
@@ -106,12 +109,16 @@ LST.Projectile = class Projectile {
     this.vx = Math.cos(a) * speed;
     this.vy = Math.sin(a) * speed;
     this.life = 2; // seconds before it fizzles
+    this.prevX = x; // last position, for drawing trails
+    this.prevY = y;
     this.dead = false;
   }
 
   update(dt, game) {
     this.life -= dt;
     if (this.life <= 0) { this.dead = true; return; }
+    this.prevX = this.x;
+    this.prevY = this.y;
 
     // Home in on the target while it's alive; otherwise fly straight.
     const t = this.target;
@@ -172,9 +179,10 @@ LST.Particle = class Particle {
   }
 };
 
-// Floating "+2" coin text and similar popups.
+// Floating "+2" coin text and similar popups. kind: "coin" | "damage".
 LST.FloatText = class FloatText {
-  constructor(x, y, text, color) {
+  constructor(x, y, text, color, kind) {
+    this.kind = kind || "coin";
     this.x = x;
     this.y = y;
     this.text = text;

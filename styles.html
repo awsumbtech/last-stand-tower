@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07070f" />
+  <title>Art Styles · Last Stand Tower</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Last Stand" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    html, body { overflow: auto; height: auto; min-height: 100%; touch-action: pan-y; }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: max(14px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+        max(20px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    header h2 { font-size: clamp(20px, 5vw, 28px); }
+    header a { color: #00f0ff; text-decoration: none; font-weight: 600; font-size: 14px; white-space: nowrap; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .tabs button {
+      min-width: 0; padding: 12px 6px; font-size: 15px;
+      background: transparent; color: #b8b8d8; border: 1px solid #33335a; box-shadow: none;
+    }
+    .tabs button[aria-selected="true"] { background: #00f0ff; color: #07070f; border-color: #00f0ff; box-shadow: 0 0 14px rgba(0, 240, 255, 0.5); }
+    .preview {
+      position: relative;
+      width: 100%;
+      height: min(68vh, 620px);
+      min-height: 300px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #33335a;
+      touch-action: pan-y; /* vertical scroll stays native; horizontal swipes switch styles */
+    }
+    .preview canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .badge {
+      position: absolute; left: 10px; top: 10px; padding: 4px 10px; border-radius: 8px;
+      background: rgba(7, 7, 15, 0.7); font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    }
+    .swipe-hint { position: absolute; right: 10px; bottom: 8px; font-size: 12px; opacity: 0.7; background: rgba(7, 7, 15, 0.6); padding: 2px 8px; border-radius: 6px; }
+    .label { color: #e8e8ff; font-size: 16px; min-height: 2.6em; }
+    .dots { display: flex; justify-content: center; gap: 8px; }
+    .dots span { width: 8px; height: 8px; border-radius: 50%; background: #33335a; }
+    .dots span.on { background: #00f0ff; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .actions a { flex: 1; text-align: center; text-decoration: none; }
+    .actions a button { width: 100%; min-width: 0; }
+    .note { font-size: 13px; color: #8888aa; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h2>Art style preview</h2>
+      <a href="./">&larr; Back to game</a>
+    </header>
+
+    <div class="tabs" role="tablist" id="tabs"></div>
+
+    <div class="preview" id="preview">
+      <canvas id="demo"></canvas>
+      <div class="badge" id="badge"></div>
+      <div class="swipe-hint">swipe &harr;</div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <p class="label" id="label"></p>
+
+    <div class="actions">
+      <a id="play-link" href="./"><button type="button">Play in this style</button></a>
+    </div>
+    <p class="note">Same scene, three looks. The game uses Neon by default; the other styles are previews of where the art could go.</p>
+  </div>
+
+  <script src="src/config.js"></script>
+  <script src="src/utils.js"></script>
+  <script src="src/entities.js"></script>
+  <script src="src/world.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/themes/neon.js"></script>
+  <script src="src/themes/pixel.js"></script>
+  <script src="src/themes/cartoon.js"></script>
+  <script src="src/demo.js"></script>
+  <script src="src/pwa.js"></script>
+  <script>
+    (function () {
+      const ORDER = ["neon", "pixel", "cartoon"];
+      const canvas = document.getElementById("demo");
+      const renderer = new LST.Renderer(canvas, LST.themes.neon);
+      renderer.resize();
+      const scene = new LST.DemoScene(renderer);
+      window.demo = { scene, renderer };
+
+      const tabs = document.getElementById("tabs");
+      const dots = document.getElementById("dots");
+      ORDER.forEach((id, i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "tab");
+        b.dataset.style = id;
+        b.textContent = String.fromCharCode(97 + i) + ". " + LST.themes[id].name;
+        b.addEventListener("click", () => select(id));
+        tabs.appendChild(b);
+        dots.appendChild(document.createElement("span"));
+      });
+
+      let current = 0;
+      function select(id) {
+        current = ORDER.indexOf(id);
+        const theme = LST.themes[id];
+        renderer.setTheme(theme);
+        [...tabs.children].forEach((b) => b.setAttribute("aria-selected", b.dataset.style === id));
+        [...dots.children].forEach((d, i) => d.classList.toggle("on", i === current));
+        document.getElementById("badge").textContent = theme.name.toUpperCase();
+        document.getElementById("label").textContent = theme.label;
+        document.getElementById("play-link").href = id === "neon" ? "./" : "./?style=" + id;
+        history.replaceState(null, "", "#" + id);
+      }
+      window.demo.select = select;
+
+      // Horizontal swipe on the preview switches styles.
+      const preview = document.getElementById("preview");
+      let sx = 0, sy = 0, tracking = false;
+      preview.addEventListener("touchstart", (e) => {
+        tracking = true;
+        sx = e.touches[0].clientX;
+        sy = e.touches[0].clientY;
+      }, { passive: true });
+      preview.addEventListener("touchend", (e) => {
+        if (!tracking) return;
+        tracking = false;
+        const dx = e.changedTouches[0].clientX - sx;
+        const dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          const next = (current + (dx < 0 ? 1 : -1) + ORDER.length) % ORDER.length;
+          select(ORDER[next]);
+        }
+      }, { passive: true });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") select(ORDER[(current + 1) % ORDER.length]);
+        if (e.key === "ArrowLeft") select(ORDER[(current + ORDER.length - 1) % ORDER.length]);
+      });
+
+      window.addEventListener("resize", () => renderer.resize());
+      const initial = location.hash.slice(1);
+      select(ORDER.includes(initial) ? initial : "neon");
+
+      let last = performance.now();
+      function frame(now) {
+        const dt = Math.min(LST.CONFIG.MAX_DT, (now - last) / 1000);
+        last = now;
+        scene.update(dt);
+        renderer.draw(scene, dt);
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
