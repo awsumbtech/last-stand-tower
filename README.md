@@ -65,7 +65,7 @@ copies show an **eye icon** and their real effect.
   The tower **shoots it first whenever nothing is within 120 of the tower**, and a big HP bar shows up at the top.
   Killing it pays **+25 coins** (x Greed) and **+3 Gears**. If you can't kill it within 35 s it gets bored and
   **charges** the tower for double contact damage (and pays nothing). The first two go easier (wave 5: half HP, 60% slam;
-  wave 10: 80% HP, 85% slam). Big Red HP = 400 x (wave HP multiplier ^ 0.85), slam = 12 x wave damage multiplier.
+  wave 10: 80% HP, 85% slam). Big Red HP = 400 x (wave HP multiplier ^ 0.8), slam = 12 x wave damage multiplier.
 - **Wave 20 is the FINALE.** No normal enemies: the lawn goes dark, a FINALE banner slams in, and **King Mole** digs up
   (1900 x wave HP multiplier, about 132k HP). He pops up, slams and calls minions for a few seconds, then burrows (can't be
   hit) and pops up somewhere closer. Three phases at 66% and 33% HP, each with a banner, faster slams, nastier minions
@@ -115,7 +115,7 @@ The Workshop has four tabs:
   | Bank | +15 starting coins | 15 / 1.30 / 15 |
   | Greed | +4% coins per kill | 20 / 1.22 / 25 |
   | Sharp Eye | +1% crit chance | 25 / 1.25 / 15 |
-  | Head Start | start 5 waves later (up to 80% of your best wave; not past King Mole until you've beaten him) | 30 / 1.4 / 10 |
+  | Head Start | start 5 waves later (up to 85% of your best wave; not past King Mole until you've beaten him) | 30 / 1.4 / 10 |
   | Appraisal | L1 cursed traps wobble, L2 fine print in full, L3 return a trap within 1 wave | 40 / 120 / 300 |
 
 - **Deck:** pick your active ability (Shockwave, or unlock Freeze / Overdrive), and bench up to 2 cards so they never show up in the shop (keep at least one attack card).

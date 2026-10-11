@@ -54,7 +54,7 @@ LST.CONFIG = {
     killGears: 3,      // bonus Gears per mini-boss killed
     killCoins: 25,     // bonus coins per mini-boss killed (x Greed)
     thornsReflect: 0.25, // Thorns trap: share of slam damage bounced back
-    hpExp: 0.85,       // boss HP = hp x (wave HP multiplier ^ hpExp): grows a bit slower than the crowd
+    hpExp: 0.8,        // boss HP = hp x (wave HP multiplier ^ hpExp): grows a bit slower than the crowd
     early: { 5: { hp: 0.5, dmg: 0.6 }, 10: { hp: 0.8, dmg: 0.85 } }, // the first bosses go easier (HP and slam x)
   },
 
@@ -136,7 +136,7 @@ LST.CONFIG = {
       headStart: { base: 30, growth: 1.4,  max: 10, per: 5 },    // start 5 waves later per level...
       appraisal: { costs: [40, 120, 300], max: 3 },               // reads trap cards (see src/traps.js)
     },
-    headStartCap: 0.8, // ...but never past 80% of your best wave (rounded down to a multiple of 5)
+    headStartCap: 0.85, // ...but never past 85% of your best wave (rounded down to a multiple of 5)
     benchMax: 2,       // cards you can keep out of the shop
   },
 };

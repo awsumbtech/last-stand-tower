@@ -226,7 +226,7 @@ LST.meta = (function () {
       game.coinMult = 1 + u.greed.per * L("greed");
     },
 
-    // Highest Head Start wave allowed: 5 per level, capped at 50% of the best wave (multiple of 5).
+    // Highest Head Start wave allowed: 5 per level, capped at headStartCap (85%) of the best wave (multiple of 5).
     headStartMax(best) {
       const per = M().upgrades.headStart.per;
       let cap = Math.floor((best * M().headStartCap) / per) * per;
