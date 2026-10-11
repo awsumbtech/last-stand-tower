@@ -1,7 +1,7 @@
 # Last Stand Tower: sprint roadmap (planning only)
 
 **Target:** quick runs (5-8 min) inside a long journey. Gears unlock cards and lasting upgrades, six worlds raise the stakes, and Rebuild (prestige) is how you break through walls.
-**Status:** Sprints 1, 2 and 3 are shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
+**Status:** Sprints 1, 2, 3 and 4 are shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
 
 ## Sprint overview
 
@@ -10,7 +10,7 @@
 | 1 ✅ | Results screen, Gears and locked cards | Run summary, Gears saved, Workshop with card unlocks, commons-only starter pool | none |
 | 2 ✅ | Workshop upgrades and Head Start | Lasting stat upgrades, Head Start, save/version migration | 1 |
 | 3 ✅ | Trap cards, Codex and Appraisal | 8 trap cards, discovery Codex, Appraisal upgrade | 1 (2 for Appraisal) |
-| 4 | Boss fights and the active ability | Bosses stop at range and attack; Shockwave ability | none (best after 2) |
+| 4 ✅ | Boss fights and the active ability | Bosses stop at range and attack; Shockwave ability | none (best after 2) |
 | 5 | New enemy types | Spitter, Splitter, Shielded (reskinned per world later) | 4 (ranged attack code) |
 | 6 | Worlds 1-3 | World select, Backyard / Beach / Snowy Peak, world bosses, Gear multipliers | 1, 4, 5 |
 | 7 | Rebuild (Cogs) and worlds 4-6 | Prestige layer, Spooky Swamp / Lava Factory / Space | 6 |
@@ -190,13 +190,35 @@ and 2-3% of runs go past 10 min. Still inside the 5-10 min target, but it's the 
 
 ---
 
-## Sprint 4: Boss fights and the active ability
+## Sprint 4: Boss fights and the active ability (SHIPPED)
 **Goal:** bosses become events instead of a damage tax. Live sim today: bosses are killed only about 0.3 times per run.
 
 - **Boss behavior:** the boss walks to **range 170** and stops. Every 3.0 s it does a telegraphed slam (a 0.8 s wind-up with a red ring) for 18 × wave damage multiplier, and it spawns 2 minions every 6 s. The tower **auto-targets the boss when no enemy is within 120 units**. Boss HP goes from 250 to **900** (× wave HP multiplier) to give it about 8-12 s of fight time. Killing it pays +3 Gears and +25 coins. Keep the boss intro banner and the hit-stop on kill.
 - **Active ability: Shockwave** (starter, free). A big button by the HUD: it knocks enemies back 120 units and stuns them for 1.5 s, cooldown 25 s, and charges up during waves. Later Workshop unlocks (150 / 250 Gears): **Freeze** (slows everything 60% for 4 s) and **Overdrive** (2× fire rate for 5 s). You equip one at a time.
 
 **Acceptance criteria:** the sim adds a boss-fight model plus a "uses the ability on cooldown" bot. Bosses get killed in at least 70% of boss waves the player survives, and median death waves stay within ±1 of Sprint 3. Works with one thumb on a phone.
+
+**Shipped (Oct 10).** Brian's call: mini-bosses every 5 waves, plus a boss-only finale at wave 20 that unlocks the next world, then Endless.
+
+- **Big Red mini-boss** on waves 5, 10, 15 (then every 5 in Endless): stops at range 170, slams every 3 s behind a 0.8 s red wind-up ring (12 × wave damage multiplier), calls 2 blobs every 6 s. HP = 400 × (wave HP multiplier ^ 0.8); waves 5 and 10 are softened (50% / 80% HP, 60% / 85% slam). The tower targets it first when nothing is within 120. Kill pays +25 coins (× Greed) and +3 Gears; after 35 s it charges for double contact damage and pays nothing.
+- **King Mole finale (wave 20):** boss only. 1900 × wave HP multiplier (about 132k HP), burrows and pops up closer, three phases (66% / 33%) with faster slams and nastier minions. Beating him shows **World cleared!** (+250 Gears first time, +75 after), marks the Backyard cleared, then **Continue (Endless)** or **Return to Workshop**. Head Start stops at wave 16 until he's beaten once; after that the cap is 85% of best wave (was 70%).
+- **Thorns** now reflects 25% of boss slam damage (still a dud against normal enemies).
+- **Abilities** (25 s cooldown, ticks only during waves, starts charged; Q on keyboard): **Shockwave** (starter: knockback 120 + 1.5 s stun within 330, cancels a slam wind-up), **Freeze** (150 Gears: 60% slow for 4 s), **Overdrive** (250 Gears: 2× fire rate for 5 s). Equip one on the Deck tab.
+- Gears formula adds +3 per mini-boss killed.
+
+*Sim at ship* (fresh runs, all cards, 25 runs per strategy): casual median wave 15 (6.8 min), skilled 17 (8.0 min), multishot 18 (8.5 min); mini-boss kill rate on survived boss waves 100% (target ≥70%).
+*Campaign* (`--campaign --campaigns 4 --hours 4`):
+| | Casual | Skilled |
+|---|---|---|
+| First run | wave 10, 4.8 min, 64 Gears | wave 13, 6.2 min, 68 Gears |
+| King Mole first beaten | runs 14-16 (about 1.5 h) | runs 13-15 (about 1.6 h) |
+| All 8 cards unlocked | run 15, 1.37 h | run 14, 1.53 h |
+| Wave 30 / 40 reached | 1.7 / 2.5 h | 1.8 / 2.5 h |
+| Median run length by hour 0-4 | 4.8-6.0 min | 5.7-7.1 min |
+| Runs over 10 min | 5 of 174 (max 12.0) | 7 of 160 (max 12.8) |
+| Boss kill rate, every boss wave 5-50 | 100% | 100% |
+
+Watch item: the few 10+ minute runs come in hours 0-2 (long finale attempts). Bosses are possibly a bit soft at 100% kills; Sprint 5's enemies are the place to revisit.
 
 ---
 
