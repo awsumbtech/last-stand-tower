@@ -202,6 +202,72 @@ LST.audio = (function () {
       tone({ type: "triangle", freq: midi(72), start: 0.08, dur: 0.08, vol: 0.14 });
       tone({ type: "triangle", freq: midi(79), start: 0.14, dur: 0.14, vol: 0.14 });
     } },
+    // ---------- Bosses and abilities (Sprint 4) ----------
+    windup: { throttle: 0.2, priority: true, play(o) {
+      // rising "uh-oh" warble so you know a slam is coming
+      const p = o.pitch || 1;
+      tone({ type: "square", freq: 220 * p, to: 520 * p, dur: 0.7, vol: 0.06, filter: { freq: 1600, q: 6 } });
+      tone({ type: "triangle", freq: 330 * p, to: 780 * p, start: 0.05, dur: 0.65, vol: 0.08 });
+    } },
+    slam: { throttle: 0.1, priority: true, play() {
+      tone({ type: "sine", freq: 110, to: 32, dur: 0.45, vol: 0.6 });
+      noise({ dur: 0.35, vol: 0.35, type: "lowpass", freq: 900, to: 120 });
+      noise({ start: 0.02, dur: 0.12, vol: 0.12, type: "bandpass", freq: 2500, q: 0.8 });
+    } },
+    charge: { priority: true, play() {
+      for (const det of [-10, 10]) tone({ type: "sawtooth", freq: 160 * Math.pow(2, det / 1200), to: 320, dur: 0.5, vol: 0.07, filter: { freq: 1400, q: 4 } });
+      noise({ dur: 0.5, vol: 0.08, type: "bandpass", freq: 600, to: 2400, q: 2 });
+    } },
+    burrow: { throttle: 0.2, play() {
+      noise({ dur: 0.45, vol: 0.25, type: "lowpass", freq: 1500, to: 200 });
+      tone({ type: "sine", freq: 300, to: 90, dur: 0.35, vol: 0.18 });
+    } },
+    popUp: { throttle: 0.2, priority: true, play() {
+      noise({ dur: 0.18, vol: 0.3, type: "lowpass", freq: 2200, to: 400 });
+      tone({ type: "sine", freq: 180, to: 620, dur: 0.16, vol: 0.3 });
+      tone({ type: "triangle", freq: 620, to: 900, start: 0.12, dur: 0.1, vol: 0.12 });
+    } },
+    phase: { priority: true, play() {
+      // two big brass-ish hits a semitone apart: things just got worse
+      for (const [n, st] of [[45, 0], [46, 0.32]]) {
+        for (const det of [-9, 0, 8]) tone({ type: "sawtooth", freq: midi(n) * Math.pow(2, det / 1200), start: st, dur: 0.4, vol: 0.085, filter: { freq: 1100, q: 3 } });
+        tone({ type: "sine", freq: 110, to: 40, start: st, dur: 0.35, vol: 0.45 });
+        noise({ start: st, dur: 0.2, vol: 0.18, type: "lowpass", freq: 1500 });
+      }
+    } },
+    finaleIntro: { priority: true, play() {
+      // rumble, then a long low "DUN... DUN... DUNNN"
+      noise({ dur: 1.4, vol: 0.22, type: "lowpass", freq: 300, to: 900 });
+      tone({ type: "sine", freq: 50, to: 38, dur: 1.4, vol: 0.4, attack: 0.3 });
+      const hits = [[40, 0.9, 0.3], [40, 1.35, 0.3], [35, 1.8, 1.2]];
+      for (const [n, st, d] of hits) {
+        for (const det of [-10, 0, 9]) tone({ type: "sawtooth", freq: midi(n + 12) * Math.pow(2, det / 1200), start: st, dur: d, vol: 0.09, filter: { freq: 800, q: 3 } });
+        tone({ type: "sine", freq: 100, to: 35, start: st, dur: 0.5, vol: 0.5 });
+        noise({ start: st, dur: 0.15, vol: 0.2, type: "lowpass", freq: 1000 });
+      }
+    } },
+    victory: { priority: true, play() {
+      // big fanfare: up the arpeggio, hold a major chord, sparkle on top
+      const notes = [60, 64, 67, 72, 67, 72, 76, 79];
+      notes.forEach((n, i) => tone({ type: "square", freq: midi(n), start: i * 0.11, dur: i === 7 ? 0.9 : 0.13, vol: 0.075, filter: { freq: 3500 } }));
+      [48, 60, 64, 67, 72].forEach((n) => tone({ type: "triangle", freq: midi(n), start: 0.88, dur: 1.4, vol: 0.09, attack: 0.03 }));
+      for (let i = 0; i < 8; i++) tone({ type: "sine", freq: midi(84 + (i % 4) * 3), start: 1 + i * 0.07, dur: 0.12, vol: 0.06 });
+      tone({ type: "sine", freq: 130, to: 45, start: 0.88, dur: 0.4, vol: 0.5 });
+      noise({ start: 0.88, dur: 0.6, vol: 0.12, type: "highpass", freq: 5000 });
+    } },
+    shockwave: { priority: true, play() {
+      tone({ type: "sine", freq: 140, to: 40, dur: 0.5, vol: 0.6 });
+      noise({ dur: 0.5, vol: 0.3, type: "bandpass", freq: 400, to: 3000, q: 0.7 });
+      tone({ type: "triangle", freq: 500, to: 1400, start: 0.02, dur: 0.25, vol: 0.12 });
+    } },
+    freeze: { priority: true, play() {
+      [88, 91, 95, 100].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: i * 0.05, dur: 0.3, vol: 0.08 }));
+      noise({ dur: 0.6, vol: 0.15, type: "highpass", freq: 6000 });
+    } },
+    overdrive: { priority: true, play() {
+      tone({ type: "sawtooth", freq: 110, to: 880, dur: 0.45, vol: 0.09, filter: { freq: 2500, q: 5 } });
+      tone({ type: "square", freq: 220, to: 1320, start: 0.05, dur: 0.4, vol: 0.05, filter: { freq: 3000 } });
+    } },
     gotcha: { priority: true, play() {
       // cartoon "wah-wah" + a springy boing
       for (const [n, st] of [[64, 0], [61, 0.22]]) {
@@ -311,7 +377,10 @@ LST.audio = (function () {
 
   // ---------- Music: a small looping tune, scheduled ahead of time ----------
   const BPM = 112;
-  const STEP = 60 / BPM / 2; // eighth notes
+  let tension = 0; // 0 normal, 1 finale / endless (minor + busier drums), 2-3 boss phases (faster, pulsing)
+  const stepLen = () => 60 / (BPM * (1 + 0.09 * Math.max(0, tension - 1))) / 2; // eighth notes
+  const STEP = stepLen();
+  const TENSE_CHORDS = [[45, 48, 52], [41, 45, 48], [43, 46, 50], [40, 44, 47]]; // Am F Gm E
   // I - vi - IV - V in C, two passes with a different melody on the second.
   const CHORDS = [[48, 52, 55], [45, 48, 52], [41, 45, 48], [43, 47, 50]];
   const MELODY = [
@@ -333,7 +402,7 @@ LST.audio = (function () {
   function scheduleStep(s, t) {
     const bar = Math.floor(s / 8) % 8;
     const beat = s % 8;
-    const chord = CHORDS[bar % 4];
+    const chord = (tension ? TENSE_CHORDS : CHORDS)[bar % 4];
     const at = t - ctx.currentTime;
     const m = { bus: musicBus };
     // kick on 1 and 3, hat on the off-beats
@@ -345,6 +414,13 @@ LST.audio = (function () {
     if (bass) tone({ ...m, type: "triangle", freq: midi(bass), start: at, dur: STEP * 1.6, vol: 0.5 });
     // plucky chord stabs on the off-beats
     if (beat % 2 === 1) for (const n of chord) tone({ ...m, type: "square", freq: midi(n + 12), start: at, dur: 0.09, vol: 0.045, filter: { freq: 1800 } });
+    if (tension) {
+      // extra 16th hats and a low pulse
+      noise({ ...m, start: at + STEP / 2, dur: 0.03, vol: 0.08, type: "highpass", freq: 8000 });
+      if (tension >= 2) tone({ ...m, type: "sawtooth", freq: midi(chord[0] - 24), start: at, dur: STEP * 0.8, vol: 0.12 + 0.05 * tension, filter: { freq: 500 } });
+      if (tension >= 3 && beat % 2 === 0) tone({ ...m, type: "sine", freq: 90, to: 45, start: at, dur: 0.1, vol: 0.4 });
+    }
+    // (A minor shares C major's notes, so the tune still fits the darker chords)
     const note = MELODY[bar][beat];
     if (note) tone({ ...m, type: "triangle", freq: midi(note), start: at, dur: STEP * 1.5, vol: 0.32, attack: 0.01 });
   }
@@ -352,7 +428,7 @@ LST.audio = (function () {
   function scheduler() {
     while (nextTime < ctx.currentTime + 0.15) {
       scheduleStep(step, nextTime);
-      nextTime += STEP;
+      nextTime += stepLen();
       step = (step + 1) % 64;
     }
   }
@@ -419,6 +495,8 @@ LST.audio = (function () {
     play,
     startMusic,
     stopMusic,
+    setTension(level) { tension = Math.max(0, Math.min(3, level | 0)); },
+    get tension() { return tension; },
     duckMusic,
     get unlocked() { return !!ctx && ctx.state === "running"; },
     get voices() { return voices; },

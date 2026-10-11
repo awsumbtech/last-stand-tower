@@ -31,6 +31,10 @@
       game.openWorkshop(game.state === "gameover" ? "results" : "start");
     } else if (e.code === "KeyF") {
       game.toggleSpeed();
+    } else if (e.code === "KeyQ" || e.code === "KeyE") {
+      game.useAbility();
+    } else if (e.code === "Enter" && game.state === "cleared") {
+      game.continueEndless();
     } else if (e.code === "Enter" && game.state === "gotcha") {
       game.dismissGotcha();
     } else if (e.code === "Enter") {

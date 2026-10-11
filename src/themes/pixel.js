@@ -285,10 +285,11 @@
       const px = r.px;
       // Retro spawn-in: blink for the first moment.
       if (e.age < 0.4 && Math.floor(e.age * 12) % 2 === 1) return;
-      const frames = art.enemies[e.type];
+      const frames = art.enemies[e.type] || art.enemies.boss;
+      if (e.untargetable) ctx.globalAlpha = 0.35;
       const rate = e.type === "fast" ? 10 : e.type === "basic" ? 5 : 3;
       let spr = frames[Math.floor(e.age * rate) % frames.length];
-      if (e.hitFlash > 0) spr = art.flash[e.type];
+      if (e.hitFlash > 0) spr = art.flash[e.type] || art.flash.boss;
       const scale = Math.max(1, Math.round((e.radius * 2) / (spr.width * px)));
       drawSprite(ctx, spr, e.x, e.y, px, scale);
 

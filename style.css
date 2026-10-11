@@ -893,3 +893,189 @@ svg.eye-ico circle { fill: var(--ink); }
   .codex-tile .name { font-size: 8.5px; overflow-wrap: anywhere; }
   .tab { font-size: 13.5px; }
 }
+
+/* ---------- Sprint 4: bosses, finale, abilities ---------- */
+.title.green { color: var(--green); }
+
+/* Active ability: one big round thumb button (bottom-left on phones, bottom-center on desktop) */
+.ability {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  border: var(--outline);
+  background: #ece6dc;
+  box-shadow: var(--drop);
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ink);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+  --cd: 0deg;
+}
+.ability .ab-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(43, 29, 58, 0.45) var(--cd), transparent var(--cd));
+}
+.ability.ready { background: var(--blue); animation: abReady 1.2s ease-in-out infinite; }
+.ability.ready .ab-ring { background: none; }
+.ability[data-id="freeze"].ready { background: #8fdcff; }
+.ability[data-id="overdrive"].ready { background: #ff9f43; }
+.ability .ab-icon { position: absolute; inset: 0; display: grid; place-items: center; }
+.ability .ab-icon svg { width: 46px; height: 46px; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ability .ab-icon svg .fill { fill: #fff; }
+.ability:not(.ready) .ab-icon svg { opacity: 0.45; }
+.ability .ab-cd {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 30px; font-weight: 700; color: #fff;
+  -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.ability .ab-name {
+  position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
+  background: var(--yellow); border: 3px solid var(--ink); border-radius: 999px;
+  padding: 0 9px; font-size: 13px; font-weight: 700; white-space: nowrap; line-height: 1.4;
+}
+.ability:not(.ready) .ab-name { background: #ece6dc; }
+.ability:active { transform: translateX(-50%) translateY(4px) scale(1.06, 0.92); box-shadow: 0 2px 0 var(--ink); transition: transform 0.05s; }
+@keyframes abReady {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.07); }
+}
+
+/* Big boss HP bar, top-center under the HUD pills */
+.boss-bar {
+  position: fixed;
+  left: 50%;
+  top: calc(max(10px, env(safe-area-inset-top)) + 92px);
+  transform: translateX(-50%);
+  width: min(560px, 86vw);
+  pointer-events: none;
+  animation: bossBarIn 0.45s var(--bouncy);
+}
+.boss-bar .boss-top { display: flex; justify-content: space-between; align-items: end; padding: 0 6px 2px; }
+.boss-bar .boss-top b {
+  font-size: 18px; color: #fff; letter-spacing: 1px;
+  -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink);
+}
+.boss-bar .boss-top span { font-size: 14px; font-weight: 700; color: var(--yellow); -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; }
+.boss-track {
+  position: relative; height: 20px; border: var(--outline); border-radius: 999px; background: #3b2a4a; overflow: hidden;
+  box-shadow: 0 4px 0 var(--ink);
+}
+#boss-fill { height: 100%; background: linear-gradient(#ff7a85, var(--red)); border-radius: 999px; transition: width 0.15s; }
+.boss-bar .pip { display: none; position: absolute; top: 0; bottom: 0; width: 4px; background: var(--ink); }
+.boss-bar .pip.p1 { left: 33.3%; }
+.boss-bar .pip.p2 { left: 66.6%; }
+.boss-bar.finale { width: min(640px, 92vw); }
+.boss-bar.finale .boss-track { height: 26px; }
+.boss-bar.finale #boss-fill { background: linear-gradient(#ffb36b, #e0631c); }
+.boss-bar.finale .pip { display: block; }
+.boss-bar.under #boss-fill { opacity: 0.45; }
+@keyframes bossBarIn { from { transform: translateX(-50%) scale(0.6, 0.2); opacity: 0; } }
+
+/* World cleared! */
+.panel.cleared { max-width: 460px; text-align: center; gap: 10px; }
+.panel.cleared .trophy { width: 96px; height: 96px; margin: -6px auto 0; animation: trophySpin 2.4s ease-in-out infinite; }
+.trophy svg { width: 100%; height: 100%; overflow: visible; }
+.trophy .cup, .trophy .base { fill: var(--yellow); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.trophy .base { fill: #b9773a; }
+.trophy .handle { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.trophy .star { fill: #fff; stroke: var(--ink); stroke-width: 1.5; }
+@keyframes trophySpin { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(6deg) scale(1.08); } }
+.panel.cleared .cl-sub { font-size: 16px; }
+.panel.cleared .res-stats { grid-template-columns: repeat(3, 1fr); }
+.panel.cleared .gears-row.total { border-top: 3px dashed rgba(43, 29, 58, 0.25); margin-top: 4px; padding-top: 4px; font-size: 18px; }
+.first-tag { background: var(--pink); color: #fff; border-radius: 999px; padding: 0 7px; font-size: 12px; border: 2px solid var(--ink); }
+.panel.cleared .cl-next { font-size: 14px; opacity: 0.8; }
+.panel.cleared .res-buttons { display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px; width: 100%; }
+.panel.cleared .res-buttons .btn { font-size: 17px; padding-left: 8px; padding-right: 8px; }
+.gears-row.world b { color: #1f9d58; }
+.trophy-pill { background: var(--yellow); }
+
+/* Workshop Deck tab: ability strip */
+.ab-strip { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ab-chip {
+  display: flex; align-items: center; gap: 6px; padding: 5px 7px; min-width: 0;
+  border: 3px solid var(--ink); border-radius: 14px; background: var(--paper); box-shadow: 0 3px 0 var(--ink);
+  font-family: inherit; color: var(--ink); cursor: pointer; text-align: left;
+}
+.ab-chip .ab-ico { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--ink); display: grid; place-items: center; background: #ece6dc; }
+.ab-chip .ab-ico svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ab-chip .ab-ico svg .fill { fill: #fff; }
+.ab-chip .ab-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.ab-chip .ab-txt b { font-size: 14px; }
+.ab-chip .ab-txt small { font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 2px; }
+.ab-chip .ab-txt small svg.gear { width: 12px; height: 12px; }
+.ab-chip.on { background: #dff5ff; }
+.ab-chip.on .ab-ico { background: var(--blue); }
+.ab-chip.on[data-ability="freeze"] .ab-ico { background: #8fdcff; }
+.ab-chip.on[data-ability="overdrive"] .ab-ico { background: #ff9f43; }
+.ab-chip.locked { opacity: 0.7; }
+.ab-chip.afford { opacity: 1; animation: glow 1.4s ease-in-out infinite; }
+.ab-chip.bought { animation: abPop 0.45s var(--bouncy); }
+@keyframes abPop { 0% { transform: scale(0.8); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes abReadyFixed { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+
+@media (max-width: 560px) {
+  .ability { left: max(14px, env(safe-area-inset-left)); transform: none; width: 84px; height: 84px; bottom: max(22px, env(safe-area-inset-bottom)); }
+  .ability:active { transform: translateY(4px) scale(1.06, 0.92); }
+  .ability.ready { animation-name: abReadyFixed; }
+  .ability .ab-icon svg { width: 40px; height: 40px; }
+  .boss-bar { top: calc(max(10px, env(safe-area-inset-top)) + 84px); }
+  .boss-bar .boss-top b { font-size: 16px; }
+  .ab-strip { gap: 5px; }
+  .ab-chip { padding: 3px 4px; gap: 4px; border-radius: 12px; }
+  .ab-chip .ab-ico { width: 28px; height: 28px; }
+  .ab-chip .ab-ico svg { width: 18px; height: 18px; }
+  .ab-chip .ab-txt b { font-size: 12px; }
+  .ab-chip .ab-txt small { font-size: 10px; }
+  .panel.cleared .trophy { width: 72px; height: 72px; }
+  .panel.cleared .res-buttons .btn { font-size: 15px; }
+}
+@media (max-height: 500px) {
+  .ability { left: auto; right: max(14px, env(safe-area-inset-right)); transform: none; bottom: max(70px, env(safe-area-inset-bottom)); width: 76px; height: 76px; }
+  .ability.ready { animation-name: abReadyFixed; }
+  .ability:active { transform: translateY(4px) scale(1.06, 0.92); }
+  .boss-bar { top: calc(max(6px, env(safe-area-inset-top)) + 66px); width: min(520px, 70vw); }
+  .boss-bar.finale { width: min(560px, 74vw); }
+  .boss-bar .boss-top b { font-size: 15px; }
+  .boss-bar.finale .boss-track { height: 20px; }
+  .panel.cleared { gap: 5px; max-width: 640px; }
+  .panel.cleared .trophy { width: 52px; height: 52px; }
+  .panel.cleared .cl-next { display: none; }
+}
+@media (max-width: 360px) {
+  .ab-chip .ab-txt small { display: none; }
+  .ab-chip .ab-txt b { font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; }
+  .ab-chip .ab-ico { width: 24px; height: 24px; border-width: 2.5px; }
+  .ab-chip .ab-ico svg { width: 15px; height: 15px; }
+  .ab-chip { padding: 3px; gap: 3px; }
+}
+@media (max-height: 620px) and (max-width: 560px) {
+  .deck-card { padding: 3px 2px 4px; gap: 1px; border-width: 3px; }
+  .deck-card .icon { width: 30px; height: 30px; }
+  .deck-card .icon svg { width: 18px; height: 18px; }
+  .deck-card .name { font-size: 12px; }
+  .deck-card .state { font-size: 10px; padding: 0 5px; }
+  .panel.cleared { gap: 6px; padding-top: 12px; padding-bottom: 14px; }
+  .panel.cleared .trophy { width: 54px; height: 54px; }
+  .panel.cleared .cl-next { display: none; }
+}
+@media (max-height: 500px) {
+  .panel.cleared {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; column-gap: 16px; row-gap: 6px;
+    align-items: center; max-width: 760px; width: min(760px, 96vw); padding: 10px 16px 12px;
+  }
+  .panel.cleared .trophy { grid-column: 1; grid-row: 1; width: 48px; height: 48px; margin: 0 auto; }
+  .panel.cleared .title { grid-column: 1; grid-row: 2; font-size: 30px; }
+  .panel.cleared .cl-sub { display: none; }
+  .panel.cleared .res-stats { grid-column: 1; grid-row: 3; }
+  .panel.cleared .gears-box { grid-column: 2; grid-row: 1 / span 2; }
+  .panel.cleared .res-buttons { grid-column: 2; grid-row: 3; }
+  .panel.cleared .res-buttons .btn { font-size: 15px; padding-top: 6px; padding-bottom: 8px; }
+}

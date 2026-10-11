@@ -29,16 +29,22 @@ LST.Tower = class Tower {
     this.angle = -Math.PI / 2; // barrel direction, for drawing
     this.hitFlash = 0;
     this.recoil = 0; // 1 right after firing, eases back to 0 (for animation)
+    this.thorns = 0;    // Thorns trap: share of boss slam damage reflected
+    this.overdrive = 0; // Overdrive ability: seconds left
   }
 
   update(dt, game) {
     this.hitFlash = Math.max(0, this.hitFlash - dt);
     this.recoil = Math.max(0, this.recoil - dt * 6);
+    this.overdrive = Math.max(0, this.overdrive - dt);
     if (this.regen > 0 && this.hp > 0) this.heal(this.maxHp * this.regen * dt);
     this.cooldown -= dt;
     if (this.cooldown > 0) return;
 
-    const targets = game.nearestEnemies(this.x, this.y, this.range, this.targets);
+    let targets = game.nearestEnemies(this.x, this.y, this.range, this.targets);
+    // Bosses get focus fire when nothing is close to the tower.
+    const boss = game.bossFocus ? game.bossFocus(this) : null;
+    if (boss && targets[0] !== boss) targets = [boss, ...targets.filter((t) => t !== boss)].slice(0, this.targets);
     if (targets.length === 0) {
       this.cooldown = 0; // ready to fire the moment something enters range
       return;
@@ -55,7 +61,7 @@ LST.Tower = class Tower {
       p.splashRadius = this.splashRadius;
       game.projectiles.push(p);
     }
-    this.cooldown = 1 / this.fireRate;
+    this.cooldown = 1 / (this.fireRate * (this.overdrive > 0 ? LST.CONFIG.abilities.overdrive.mult : 1));
     this.recoil = 1;
     game.onFire(this);
   }
@@ -90,12 +96,23 @@ LST.Enemy = class Enemy {
     this.age = 0;
     this.slowAmount = 0; // 0..1 fraction of speed removed by Frost Shots
     this.slowTimer = 0;
+    this.stun = 0;          // Shockwave: seconds frozen in place
+    this.dmgMult = mult.damage;
+    this.untargetable = false; // King Mole underground
     this.dead = false;
+    // Mini-boss fight state
+    this.windup = 0;    // seconds left on a telegraphed slam
+    this.windupMax = 1;
+    this.slamAnim = 0;  // 1 right after a slam, for the squash
+    this.arrived = false;
+    this.charging = false;
   }
+
+  get isBoss() { return this.type === "boss" || this.type === "mole"; }
 
   // Bosses only take half the slow.
   applySlow(amount, time) {
-    const a = this.type === "boss" ? amount * 0.5 : amount;
+    const a = this.isBoss ? amount * 0.5 : amount;
     this.slowAmount = Math.max(this.slowTimer > 0 ? this.slowAmount : 0, a);
     this.slowTimer = time;
   }
@@ -106,6 +123,13 @@ LST.Enemy = class Enemy {
       this.slowTimer -= dt;
       if (this.slowTimer <= 0) this.slowAmount = 0;
     }
+    this.slamAnim = Math.max(0, this.slamAnim - dt * 3);
+    if (this.stun > 0) {
+      this.stun -= dt;
+      this.hitFlash = Math.max(0, this.hitFlash - dt);
+      return;
+    }
+    if (this.type === "boss") { this.updateBoss(dt, game); return; }
     const tower = game.tower;
     const dx = tower.x - this.x;
     const dy = tower.y - this.y;
@@ -125,8 +149,65 @@ LST.Enemy = class Enemy {
     this.y += (dy / d) * speed * dt;
   }
 
+  // Mini-boss: walk to range, stop, slam on a telegraph, call minions. Gets bored and
+  // charges the tower (no reward) if it isn't killed within `enrageAfter` seconds.
+  updateBoss(dt, game) {
+    const B = LST.CONFIG.bosses, t = game.tower;
+    const dx = t.x - this.x, dy = t.y - this.y, d = Math.hypot(dx, dy) || 1;
+    this.hitFlash = Math.max(0, this.hitFlash - dt);
+    this.spin += dt;
+    const walk = (speed) => {
+      this.x += (dx / d) * speed * (1 - this.slowAmount) * dt;
+      this.y += (dy / d) * speed * (1 - this.slowAmount) * dt;
+    };
+    if (this.charging) {
+      if (d <= t.radius + this.radius) {
+        this.damage *= B.chargeDamage;
+        t.takeDamage(this.damage);
+        game.onTowerHit(this);
+        this.dead = true;
+        this.escaped = true;
+        return;
+      }
+      walk(B.chargeSpeed);
+      return;
+    }
+    if (d > B.stopRange) { walk(this.speed); return; }
+    if (!this.arrived) { this.arrived = true; this.slamTimer = 1.4; this.minionTimer = 2.5; this.atRange = 0; }
+    this.atRange += dt;
+    if (this.windup > 0) {
+      this.windup -= dt;
+      if (this.windup <= 0) { this.slamAnim = 1; game.onBossSlam(this, B.slamDamage * this.dmgMult); }
+    } else if (this.atRange > B.enrageAfter) {
+      this.charging = true;
+      if (game.onBossCharge) game.onBossCharge(this);
+      return;
+    } else {
+      this.slamTimer -= dt;
+      if (this.slamTimer <= 0) {
+        this.windup = this.windupMax = B.windup;
+        this.slamTimer = B.slamEvery;
+        if (game.onSlamWindup) game.onSlamWindup(this);
+      }
+    }
+    this.minionTimer -= dt;
+    if (this.minionTimer <= 0) {
+      this.minionTimer = B.minionEvery;
+      if (game.spawnMinions) game.spawnMinions(this, Array(B.minions).fill("basic"));
+    }
+  }
+
+  // Shockwave: shove away from the tower and stun (cancels a slam wind-up).
+  knock(dist, stun) {
+    const d = Math.hypot(this.x, this.y) || 1;
+    this.x += (this.x / d) * dist;
+    this.y += (this.y / d) * dist;
+    this.stun = Math.max(this.stun, stun);
+    if (this.windup > 0) { this.windup = 0; this.slamTimer = Math.max(this.slamTimer || 0, 1); }
+  }
+
   takeDamage(amount, game) {
-    if (this.dead) return;
+    if (this.dead || this.untargetable) return;
     this.hp -= amount;
     this.hitFlash = 0.08;
     if (this.hp <= 0) {
@@ -185,7 +266,7 @@ LST.Projectile = class Projectile {
 
     // Home in on the target while it's alive; otherwise fly straight.
     const t = this.target;
-    if (t && !t.dead) {
+    if (t && !t.dead && !t.untargetable) {
       const dx = t.x - this.x;
       const dy = t.y - this.y;
       const d = Math.hypot(dx, dy);
@@ -271,7 +352,8 @@ LST.Burst = class Burst {
     this.size = size;
     this.kind = kind;
     this.rot = Math.random() * Math.PI;
-    this.life = this.maxLife = kind === "kill" || kind === "splash" ? 0.32 : 0.16;
+    const LIFE = { kill: 0.32, splash: 0.32, slam: 0.45, shockwave: 0.65, freeze: 0.7, overdrive: 0.5, dirt: 0.5 };
+    this.life = this.maxLife = LIFE[kind] || 0.16;
     this.dead = false;
   }
 
@@ -308,5 +390,104 @@ LST.Confetti = class Confetti {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.rot += this.vr * dt;
+  }
+};
+
+// King Mole, the Backyard finale boss. Pops up, slams and calls minions, then burrows and
+// pops up somewhere closer. Three phases (HP above 66%, above 33%, below), each one closer,
+// angrier and faster. Can't be hit while underground.
+LST.KingMole = class KingMole extends LST.Enemy {
+  constructor(mult) {
+    super("mole", 0, -LST.CONFIG.finale.phases[0].dist, mult);
+    this.phase = 0;
+    this.pops = 0;          // pop-ups in this phase
+    this.mode = "rise";     // rise -> up -> dig -> under -> rise ...
+    this.timer = 0.9;
+    this.untargetable = true;
+    this.fromX = this.x; this.fromY = this.y;
+    this.toX = this.x; this.toY = this.y;
+  }
+
+  get P() { return LST.CONFIG.finale.phases[this.phase]; }
+
+  update(dt, game) {
+    this.age += dt;
+    this.hitFlash = Math.max(0, this.hitFlash - dt);
+    this.slamAnim = Math.max(0, this.slamAnim - dt * 3);
+    if (this.slowTimer > 0) { this.slowTimer -= dt; if (this.slowTimer <= 0) this.slowAmount = 0; }
+    const F = LST.CONFIG.finale, P = this.P;
+    if (this.mode === "up" && this.stun > 0) { this.stun -= dt; return; }
+    this.timer -= dt;
+    if (this.mode === "rise" && this.timer <= 0) {
+      this.mode = "up"; this.untargetable = false;
+      this.timer = P.up; this.slamTimer = 1.1; this.minionTimer = 1.6;
+      if (game.onMolePop) game.onMolePop(this);
+    } else if (this.mode === "up") {
+      if (this.windup > 0) {
+        this.windup -= dt * (1 - this.slowAmount * 0.5);
+        if (this.windup <= 0) { this.slamAnim = 1; game.onBossSlam(this, F.slamDamage * this.dmgMult * P.dmg); }
+      } else if (this.timer <= 0) {
+        this.burrow(game);
+      } else {
+        this.slamTimer -= dt;
+        if (this.slamTimer <= 0) {
+          this.windup = this.windupMax = P.windup;
+          this.slamTimer = P.slamEvery;
+          if (game.onSlamWindup) game.onSlamWindup(this);
+        }
+      }
+      this.minionTimer -= dt;
+      if (this.minionTimer <= 0 && this.mode === "up") {
+        this.minionTimer = P.minionEvery;
+        if (game.spawnMinions) game.spawnMinions(this, P.minions);
+      }
+    } else if (this.mode === "dig" && this.timer <= 0) {
+      this.mode = "under"; this.timer = F.underTime;
+      const dist = Math.max(F.minDist, P.dist - F.closerPerPop * this.pops);
+      // Somewhere else around the tower, kept clear of the HUD on short (landscape) screens.
+      const maxY = game.renderer ? Math.max(60, game.renderer.halfH - 110) : 1e9;
+      let a = 0;
+      for (let k = 0; k < 8; k++) {
+        a = Math.atan2(this.y, this.x) + LST.utils.rand(0.9, 2.2) * (Math.random() < 0.5 ? -1 : 1);
+        if (Math.abs(Math.sin(a) * dist) <= maxY) break;
+      }
+      this.fromX = this.x; this.fromY = this.y;
+      this.toX = Math.cos(a) * dist; this.toY = Math.sin(a) * dist;
+      if (Math.abs(this.toY) > maxY) this.toY = Math.sign(this.toY) * maxY;
+      this.pops += 1;
+    } else if (this.mode === "under") {
+      const k = 1 - Math.max(0, this.timer) / F.underTime;
+      const e = k * k * (3 - 2 * k);
+      this.x = this.fromX + (this.toX - this.fromX) * e;
+      this.y = this.fromY + (this.toY - this.fromY) * e;
+      if (this.timer <= 0) { this.mode = "rise"; this.timer = 0.55; if (game.onMoleRise) game.onMoleRise(this); }
+    }
+  }
+
+  burrow(game) {
+    this.mode = "dig"; this.timer = 0.5; this.untargetable = true;
+    this.windup = 0; this.stun = 0;
+    if (game && game.onMoleBurrow) game.onMoleBurrow(this);
+  }
+
+  knock(dist, stun) {
+    if (this.mode !== "up") return;
+    this.stun = Math.max(this.stun, stun);
+    if (this.windup > 0) { this.windup = 0; this.slamTimer = Math.max(this.slamTimer || 0, 1); }
+  }
+
+  takeDamage(amount, game) {
+    if (this.dead || this.untargetable) return;
+    super.takeDamage(amount, game);
+    if (this.dead) return;
+    const f = this.hp / this.maxHp;
+    const next = f < 1 / 3 ? 2 : f < 2 / 3 ? 1 : 0;
+    if (next > this.phase) {
+      this.phase = next;
+      this.pops = 0;
+      this.burrow(game);
+      this.timer = 0.9; // a longer dig for the phase change
+      if (game.onMolePhase) game.onMolePhase(this);
+    }
   }
 };

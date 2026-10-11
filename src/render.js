@@ -90,6 +90,15 @@ LST.Renderer = class Renderer {
 
     theme.background(ctx, this, scene);
     theme.range(ctx, scene.tower, this);
+    if (scene.tower.overdrive > 0) {
+      // Overdrive: a hot orange pulse around the tower
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, scene.tower.radius * (1.9 + 0.25 * Math.sin(this.time * 18)), 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 159, 67, 0.35)";
+      ctx.fill();
+      ctx.restore();
+    }
     for (const p of scene.particles) theme.particle(ctx, p, this);
     for (const e of scene.enemies) theme.enemy(ctx, e, this);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
@@ -99,10 +108,27 @@ LST.Renderer = class Renderer {
     for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
+    const fin = scene.finale;
+    if (fin && !fin.mole && !fin.won && (scene.state === "playing" || scene.state === "paused")) {
+      // Finale intro: the lawn goes dark, then the banner slams in.
+      const total = LST.CONFIG.finale.introTime;
+      ctx.fillStyle = `rgba(30, 15, 40, ${0.45 * Math.min(1, (total - fin.intro) / 0.5)})`;
+      ctx.fillRect(0, 0, this.width, this.height);
+    }
     if (scene.state === "celebrate") {
       theme.banner(ctx, "WAVE CLEAR!", Math.min(1, scene.celebrateTimer / 0.35), this);
+    } else if (scene.state === "victory") {
+      theme.banner(ctx, "VICTORY!", Math.min(1, scene.victoryTimer / 0.35), this);
     } else if (scene.state === "playing" || scene.state === "paused") {
-      if (scene.bossIntro > 0) {
+      if (fin && !fin.mole && !fin.won && fin.intro < LST.CONFIG.finale.introTime - 0.4) {
+        const t = Math.min(2.6, fin.intro);
+        if (theme.bossBanner) theme.bossBanner(ctx, t, this, { total: 2.6, title: "FINALE!", sub: "King Mole rises!", color: "#ffffff" });
+        else theme.banner(ctx, "FINALE", Math.min(1, t), this);
+      } else if (scene.phaseBanner) {
+        const p = scene.phaseBanner;
+        if (theme.bossBanner) theme.bossBanner(ctx, p.t, this, { total: p.max, title: p.text, sub: p.sub });
+        else theme.banner(ctx, p.text, Math.min(1, p.t), this);
+      } else if (scene.bossIntro > 0) {
         if (theme.bossBanner) theme.bossBanner(ctx, scene.bossIntro, this);
         else theme.banner(ctx, "BOSS", Math.min(1, scene.bossIntro), this);
       } else if (scene.waveIntro > 0) {

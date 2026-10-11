@@ -49,7 +49,7 @@ copies show an **eye icon** and their real effect.
 | Glass Cannon | Epic | +35% damage! | ...and max HP x0.6 (cursed: good with Regen/Vampire/Armor) |
 | Big Bertha | Rare | +80% damage per shot | ...but -45% fire rate, -30% shot speed: no DPS gain |
 | Long Shot | Common | +90 range | ...and -15% damage; enemies are already in range (dud) |
-| Thorns | Rare | Enemies touching the tower take 300% of their HP | nothing: they already pop on contact (dud until boss slams arrive) |
+| Thorns | Rare | Enemies touching the tower take 300% of their HP | the 300% does nothing (they already pop on contact); it only bounces 25% of boss slam damage back |
 | Overclock | Rare | +40% fire rate | for 3 waves, then -20% fire rate for the rest of the run |
 | Hot Streak | Common | Crits hit x3! | ...and every shot -15% damage: only good with high crit chance |
 | Piggy Bank | Rare | +40% Gears this run | ...for -3% damage (a real trade: weaker run, faster Workshop) |
@@ -58,12 +58,43 @@ copies show an **eye icon** and their real effect.
 - Enemies: **pink blobs** (basic), **yellow teardrops** (fast), **orange helmets** (tanky), plus **Big Red**, a horned boss, every 5th wave.
 - Your best wave is saved in the browser.
 
+### Bosses, the finale and Endless
+
+- **Mini-bosses (Big Red)** come on waves 5, 10 and 15, then 25, 30, 35... in Endless. Big Red walks in to range 170 and
+  stops. Every 3 s it rears up behind a red warning ring (0.8 s) and **slams** the tower, and every 6 s it calls in 2 blobs.
+  The tower **shoots it first whenever nothing is within 120 of the tower**, and a big HP bar shows up at the top.
+  Killing it pays **+25 coins** (x Greed) and **+3 Gears**. If you can't kill it within 35 s it gets bored and
+  **charges** the tower for double contact damage (and pays nothing). The first two go easier (wave 5: half HP, 60% slam;
+  wave 10: 80% HP, 85% slam). Big Red HP = 400 x (wave HP multiplier ^ 0.8), slam = 12 x wave damage multiplier.
+- **Wave 20 is the FINALE.** No normal enemies: the lawn goes dark, a FINALE banner slams in, and **King Mole** digs up
+  (1900 x wave HP multiplier, about 132k HP). He pops up, slams and calls minions for a few seconds, then burrows (can't be
+  hit) and pops up somewhere closer. Three phases at 66% and 33% HP, each with a banner, faster slams, nastier minions
+  (blobs, then teardrops, then helmets), pop-ups closer to the tower, and darker, faster music.
+- **Beat him** and you get a victory party and the **World cleared!** screen: **+250 Gears** the first time (+75 after
+  that), paid and saved right away. The Backyard is marked as cleared in your save (world 2 arrives in a later update).
+  Then choose **Continue (Endless)**: waves keep scaling, with a mini-boss every 5 waves; or **Return to Workshop**: the run
+  ends and pays its Gears. Losing to King Mole is a normal results screen.
+- Head Start can't skip King Mole until you've beaten him once (it stops at wave 16).
+
+### Active ability
+
+A big round button (bottom-left on phones, bottom-center on desktop; **Q** on a keyboard) fires your ability. Its
+cooldown only ticks during waves, and it starts each run charged.
+
+| Ability | Effect | Cooldown | Unlock |
+| --- | --- | --- | --- |
+| Shockwave | Knocks enemies within 330 back 120 and stuns them for 1.5 s (bosses: 35 back, 1.2 s); cancels a slam wind-up | 25 s | starter |
+| Freeze | Slows every enemy 60% for 4 s (bosses half as much) | 25 s | 150 Gears |
+| Overdrive | 2x fire rate for 5 s | 25 s | 250 Gears |
+
+You equip one at a time, on the **Deck** tab of the Workshop.
+
 ### Gears and the Workshop
 
 When the tower falls, the **results screen** shows your wave, time, kills, coins, the cards you took, and the
 **Gears** you earned. Gears last between runs:
 
-`Gears = floor(2 × wave^1.3 + 3 × boss waves cleared)`, so wave 10 pays 42, wave 13 pays 62, and wave 20 pays 107.
+`Gears = floor(2 × wave^1.3 + 3 × boss waves cleared + 3 × mini-bosses killed)`, so wave 10 pays 42, wave 13 pays 62, and wave 20 pays 107 (plus 3 per Big Red you killed, and the World cleared bonus).
 
 Spend them in the **Workshop** (from the start screen or the results screen) to unlock cards. Locked cards show as
 silhouettes with their effect, so you can plan. Prices: Multishot 15, Lucky Shot 35, Regen 50, Frost Shots 75,
@@ -84,10 +115,10 @@ The Workshop has four tabs:
   | Bank | +15 starting coins | 15 / 1.30 / 15 |
   | Greed | +4% coins per kill | 20 / 1.22 / 25 |
   | Sharp Eye | +1% crit chance | 25 / 1.25 / 15 |
-  | Head Start | start 5 waves later (up to 70% of your best wave) | 30 / 1.4 / 10 |
+  | Head Start | start 5 waves later (up to 85% of your best wave; not past King Mole until you've beaten him) | 30 / 1.4 / 10 |
   | Appraisal | L1 cursed traps wobble, L2 fine print in full, L3 return a trap within 1 wave | 40 / 120 / 300 |
 
-- **Deck:** bench up to 2 cards so they never show up in the shop (keep at least one attack card).
+- **Deck:** pick your active ability (Shockwave, or unlock Freeze / Overdrive), and bench up to 2 cards so they never show up in the shop (keep at least one attack card).
 - **Codex:** every card you've been dealt and every trap you've found ("GOTCHA" stamp). Tap one for its real effect and a lesson tip.
 
 Armor used to be +6% max HP. Saves from before keep their Armor level (up to the new max of 35); Gears spent on levels
@@ -103,9 +134,9 @@ keeps its old key (`lst.bestWave`). Players from before Gears existed get a one-
 (with a confirm).
 
 - Shots can **crit** for double damage (big orange numbers). Drop below 25% HP and time slows for a moment as a warning.
-- A typical first run lasts about 5-6 minutes (wave 11-13). With Multishot unlocked, runs reach wave 15-18 in 7-8 minutes.
+- A typical first run lasts about 5 minutes (wave 10-12). With every card unlocked, a fresh run reaches wave 14-15 in about 7-8 minutes; King Mole usually falls around run 11-17, after some Workshop upgrades.
 
-Controls: **Space / P / Esc** pause, **F** toggles 1x/2x speed, **M** toggles music, **Enter** starts or goes to the next wave, **W** opens the Workshop from the menu or results screen. In the shop, **1 / 2 / 3** take a card, **R** rerolls, and **H** repairs. On mobile, tap the buttons.
+Controls: **Space / P / Esc** pause, **Q** fires the ability, **F** toggles 1x/2x speed, **M** toggles music, **Enter** starts or goes to the next wave, **W** opens the Workshop from the menu or results screen. In the shop, **1 / 2 / 3** take a card, **R** rerolls, and **H** repairs. On mobile, tap the buttons.
 
 ## Sound
 
@@ -153,7 +184,7 @@ Opening `index.html` directly also works (without offline support, since service
 | `src/traps.js` | The 8 trap cards: what they say, the fine print, what they really do, Codex lessons |
 | `src/meta.js` | Lasting progress: Gears, card unlocks, Workshop upgrades, Head Start, bench, versioned save + migrations |
 | `src/waves.js` | Which enemies are in each wave and how they scale |
-| `src/entities.js` | Tower, Enemy, Projectile, Particle, FloatText |
+| `src/entities.js` | Tower, Enemy (incl. the mini-boss fight), KingMole (the finale boss), Projectile, Particle, FloatText |
 | `src/settings.js` | Saved settings (sound, music, vibration) and haptics |
 | `src/audio.js` | Synthesized sound effects and looping music (Web Audio API) |
 | `src/world.js` | Shared simulation: entity lists, targeting, edge spawning, effects |
@@ -182,7 +213,9 @@ node tools/sim.js --upgrade-check --gears 1500       # Workshop check: one fixed
 node tools/sim.js --config tweaks.json               # try CONFIG overrides: { "config": { ... } }
 node tools/waves-table.js sim-results.json skilled   # per-wave pressure / DPS / coins table
 node tools/sim.js --unlocked starter                 # only the starter cards (first run); or --unlocked multishot,crit
-node tools/sim.js --campaign --campaigns 8 --hours 10  # meta model: unlocks, upgrades, Head Start, run lengths per hour
+node tools/sim.js --campaign --campaigns 8 --hours 10  # meta model: unlocks, upgrades, Head Start, run lengths per hour,
+                                                     #   boss kill rate per boss wave, the run King Mole is first beaten
+node tools/sim.js --no-ability                       # bots never use the ability (they fire it when something is close or a boss winds up)
 node tools/sim.js --meta --prestige                  # older planning model (lasting stat upgrades + prestige)
 ```
 
@@ -192,8 +225,7 @@ the new version (and add any new files to its `PRECACHE` list).
 ## Roadmap ideas
 
 - More enemy types: ranged shooters, splitters, shielded enemies
-- Tower abilities with cooldowns (shockwave, freeze, overcharge)
-- Chain lightning and more card types; boss fights where the boss stops and slams instead of crashing
+- Chain lightning and more card types
 - See [docs/ROADMAP.md](docs/ROADMAP.md): Workshop stat upgrades and Head Start, trap cards, worlds, Rebuild (prestige)
 - Daily challenge seed and online leaderboard
 - Pick an art style in the game's settings

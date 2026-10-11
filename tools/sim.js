@@ -62,6 +62,7 @@ function deepMerge(target, src) {
 // ---------- Load the game into a sandbox ----------
 // Which Workshop cards are unlocked: "all", "starter" (none), or a list of ids.
 const UNLOCKED = opt("unlocked", "all");
+const USE_ABILITY = !opt("no-ability", false); // bots fire the ability when something is close or a boss winds up
 
 function loadGame(seed, unlocked = UNLOCKED) {
   const rand = mulberry32(seed);
@@ -80,7 +81,7 @@ function loadGame(seed, unlocked = UNLOCKED) {
 
   // Browser-only pieces become no-ops.
   LST.UI = class { show() {} updateHud() {} renderShop() {} };
-  LST.audio = { play() {}, startMusic() {}, stopMusic() {}, duckMusic() {} };
+  LST.audio = { play() {}, startMusic() {}, stopMusic() {}, duckMusic() {}, setTension() {} };
   LST.haptics = { buzz() {} };
 
   LST.meta.state.unlocked = unlocked === "all" ? LST.CARDS.filter((c) => c.unlockCost).map((c) => c.id)
@@ -201,7 +202,7 @@ function playRun(strategyName, seed, meta, unlocked) {
   const { LST, game } = loadGame(seed, meta ? meta.unlocked : unlocked);
   const strategy = STRATEGIES[strategyName];
   const waves = [];
-  let cur = null, bossKills = 0;
+  let cur = null, bossKills = 0, bossWavesSurvived = 0, bossWavesKilled = 0, finaleWon = false;
 
   // Instrument events.
   const onHit = game.onHit.bind(game);
@@ -249,7 +250,9 @@ function playRun(strategyName, seed, meta, unlocked) {
       coinsEarned: 0, spent: 0, hpLost: 0, damageDealt: 0, seconds: 0,
     };
     let time = 0;
+    const killsBefore = game.bossKills;
     while (game.state === "playing" && time < 900) {
+      if (USE_ABILITY && game.ability.cd <= 0 && game.enemies.some((e) => !e.dead && (e.windup > 0 || (!e.isBoss && e.x * e.x + e.y * e.y < 95 * 95)))) game.useAbility();
       game.step(DT);
       time += DT;
       game.texts.length = 0; game.particles.length = 0; game.bursts.length = 0; game.confetti.length = 0;
@@ -257,6 +260,19 @@ function playRun(strategyName, seed, meta, unlocked) {
     cur.seconds = time;
     cur.realDps = cur.damageDealt / Math.max(1, time);
     realSeconds += time;
+    if (game.state === "victory") {
+      finaleWon = true;
+      realSeconds += 7; // party + World cleared! screen
+      game.state = "cleared";
+      game.continueEndless(); // straight into Endless (Gears are paid when the run ends)
+      cur.died = false;
+      waves.push(cur);
+      last = cur;
+      realSeconds += SHOP_SECONDS;
+      strategy(LST, game, runStats, cur);
+      continue;
+    }
+    if (LST.waves.isBossWave(game.wave) && game.state === "celebrate") { bossWavesSurvived++; cur.bossKilled = game.bossKills > killsBefore; if (cur.bossKilled) bossWavesKilled++; cur.bossFight = cur.seconds; }
     const died = game.state !== "celebrate";
     cur.died = died;
     if (!died) {
@@ -275,12 +291,16 @@ function playRun(strategyName, seed, meta, unlocked) {
     if (died) break;
   }
   for (const p of game.pendingGotchas) LST.meta.discoverTrap(p.id);
-  if (meta) meta.codex = JSON.parse(JSON.stringify(LST.meta.state.codex));
+  if (meta) {
+    meta.codex = JSON.parse(JSON.stringify(LST.meta.state.codex));
+    meta.worlds = JSON.parse(JSON.stringify(LST.meta.state.worlds));
+  }
   return {
     strategy: strategyName, seed, deathWave: game.wave, startWave, realMinutes: realSeconds / 60,
     bought: runStats.bought, picks: runStats.picks, extras: runStats.extras, rerolls: runStats.rerolls, repairs: runStats.repairs, bossKills, waves,
     finalDps: towerDps(game.tower),
-    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared, game.gearMult).total,
+    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared, game.gearMult, 0, game.bossKills).total + (game.worldBonus ? game.worldBonus.bonus : 0),
+    bossWavesSurvived, bossWavesKilled, bossEscapes: game.bossEscapes, finaleWon, reachedFinale: game.wave >= LST.CONFIG.finale.wave,
     traps: game.trapLog.map((t) => t.id),
   };
 }
@@ -307,8 +327,12 @@ function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5
     gears += r.gears;
     meta.best = Math.max(meta.best, r.deathWave);
     runs.push({ run, start: r.startWave, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), at: +(minutes / 60).toFixed(2), gears: r.gears,
-      levels: Object.values(meta.upgrades).reduce((a, b) => a + b, 0), cards: meta.unlocked.length });
+      levels: Object.values(meta.upgrades).reduce((a, b) => a + b, 0), cards: meta.unlocked.length, finaleWon: r.finaleWon,
+      bossKilled: r.bossWavesKilled, bossSurvived: r.bossWavesSurvived,
+      bossWaves: r.waves.filter((w) => w.bossKilled !== undefined).map((w) => [w.wave, w.bossKilled ? 1 : 0, Math.round(w.seconds)]) });
     for (const m of [20, 30, 40, 50, 60, 80, 100]) if (!events["wave" + m] && r.deathWave >= m) events["wave" + m] = { run, minutes: Math.round(minutes) };
+    if (r.finaleWon && !events.finale) events.finale = { run, minutes: Math.round(minutes) };
+    if (r.reachedFinale && !events.reach20) events.reach20 = { run, minutes: Math.round(minutes) };
     // 1. next card
     for (const [id, c] of order) {
       if (meta.unlocked.includes(id)) continue;
@@ -346,7 +370,10 @@ function summarize(results) {
     const m = rs.map((r) => r.realMinutes).sort((a, b) => a - b);
     const q = (arr, p) => arr[Math.min(arr.length - 1, Math.floor(p * arr.length))];
     out[s] = { runs: rs.length, deathWave: { min: w[0], p25: q(w, 0.25), median: q(w, 0.5), p75: q(w, 0.75), max: w[w.length - 1] },
-      minutes: { median: +q(m, 0.5).toFixed(1), p25: +q(m, 0.25).toFixed(1), p75: +q(m, 0.75).toFixed(1) } };
+      minutes: { median: +q(m, 0.5).toFixed(1), p25: +q(m, 0.25).toFixed(1), p75: +q(m, 0.75).toFixed(1) },
+      bossKillRate: +(rs.reduce((a, r) => a + r.bossWavesKilled, 0) / Math.max(1, rs.reduce((a, r) => a + r.bossWavesSurvived, 0))).toFixed(2),
+      finaleReached: +(rs.filter((r) => r.reachedFinale).length / rs.length).toFixed(2),
+      finaleWon: +(rs.filter((r) => r.finaleWon).length / rs.length).toFixed(2) };
   }
   return out;
 }
@@ -402,16 +429,23 @@ if (require.main === module) {
         firstRun: { wave: q(run1.map((r) => r.wave), 0.5), minutes: q(run1.map((r) => r.minutes), 0.5), gears: q(run1.map((r) => r.gears), 0.5),
           firstUnlockAffordable: +(run1.filter((r) => r.gears >= order[0][1]).length / n).toFixed(2) },
         unlocks: Object.fromEntries(order.map(([id, cost]) => [id, { cost, ...ev(id) }])),
-        milestones: Object.fromEntries(["wave20", "wave30", "wave40", "wave50", "wave60", "wave80"].map((m) => [m, ev(m)])),
+        milestones: Object.fromEntries(["reach20", "finale", "wave30", "wave40", "wave50", "wave60", "wave80"].map((m) => [m, ev(m)])),
         bands, longestRun: Math.max(...all.map((r) => r.minutes)), over10: all.filter((r) => r.minutes > 10).length, totalRuns: all.length,
         endUpgrades: camps[0].upgrades, endBest: q(camps.map((c) => c.best), 0.5),
+        bossKillRate: +(all.reduce((a, r) => a + r.bossKilled, 0) / Math.max(1, all.reduce((a, r) => a + r.bossSurvived, 0))).toFixed(2),
+        finaleRuns: camps.map((c) => (c.events.finale ? c.events.finale.run : null)),
       };
+      const bw = {};
+      for (const r of all) for (const [w, k, sec] of r.bossWaves) { const b = (bw[w] = bw[w] || { n: 0, killed: 0, secs: [] }); b.n++; b.killed += k; b.secs.push(sec); }
+      row.bossByWave = Object.fromEntries(Object.entries(bw).map(([w, b]) => [w, { survived: b.n, killRate: +(b.killed / b.n).toFixed(2), medianWaveSec: q(b.secs, 0.5) }]));
       out[strategy] = row;
       console.log(`\n== ${strategy} (${n} campaigns x ${hours} h): first run wave ${row.firstRun.wave}, ${row.firstRun.minutes} min, ${row.firstRun.gears} Gears; ` +
-        `longest run ${row.longestRun} min; runs over 10 min: ${row.over10}/${row.totalRuns}; best wave at the end ${row.endBest}`);
+        `longest run ${row.longestRun} min; runs over 10 min: ${row.over10}/${row.totalRuns}; best wave at the end ${row.endBest}; ` +
+        `boss kill rate ${row.bossKillRate}; finale first beaten on runs ${JSON.stringify(row.finaleRuns)}`);
       console.table(row.unlocks);
       console.table(row.milestones);
       console.table(bands);
+      console.table(row.bossByWave);
       console.log("upgrades at the end (campaign 1):", JSON.stringify(row.endUpgrades));
     }
     fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
@@ -431,7 +465,7 @@ if (require.main === module) {
     }
     const summary = summarize(results);
     fs.writeFileSync(outPath, JSON.stringify({ overrides: OVERRIDES, summary, results }, null, 0));
-    console.table(Object.fromEntries(Object.entries(summary).map(([k, v]) => [k, { median: v.deathWave.median, p25: v.deathWave.p25, p75: v.deathWave.p75, min: v.deathWave.min, max: v.deathWave.max, mean: +(results.filter((r) => r.strategy === k).reduce((a, r) => a + r.deathWave, 0) / RUNS).toFixed(2), minutes: v.minutes.median }])));
+    console.table(Object.fromEntries(Object.entries(summary).map(([k, v]) => [k, { median: v.deathWave.median, p25: v.deathWave.p25, p75: v.deathWave.p75, min: v.deathWave.min, max: v.deathWave.max, mean: +(results.filter((r) => r.strategy === k).reduce((a, r) => a + r.deathWave, 0) / RUNS).toFixed(2), minutes: v.minutes.median, bossKill: v.bossKillRate, reach20: v.finaleReached, won20: v.finaleWon }])));
   }
   process.stderr.write(`took ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${outPath}\n`);
 }

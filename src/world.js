@@ -63,6 +63,9 @@ LST.World = class World {
     const max = LST.CONFIG.MAX_SPAWN_DIST;
     if (d > max) { x *= max / d; y *= max / d; }
     const enemy = new LST.Enemy(type, x, y, mult);
+    if (type === "boss") { enemy.maxHp = enemy.hp = LST.CONFIG.enemies.boss.hp * Math.pow(mult.hp, LST.CONFIG.bosses.hpExp); }
+    const early = type === "boss" && LST.CONFIG.bosses.early[this.wave];
+    if (early) { enemy.maxHp *= early.hp; enemy.hp = enemy.maxHp; enemy.dmgMult *= early.dmg; }
     this.enemies.push(enemy);
     if (type === "boss") this.onBossSpawn(enemy);
     return enemy;
@@ -73,12 +76,53 @@ LST.World = class World {
     const r2 = range * range;
     const inRange = [];
     for (const e of this.enemies) {
-      if (e.dead) continue;
+      if (e.dead || e.untargetable) continue;
       const d2 = LST.utils.dist2(x, y, e.x, e.y);
       if (d2 <= r2) inRange.push({ e, d2 });
     }
     inRange.sort((a, b) => a.d2 - b.d2);
     return inRange.slice(0, count).map((o) => o.e);
+  }
+
+  // A boss in range gets focus fire when no other enemy is within focusRadius of the tower.
+  bossFocus(tower) {
+    let boss = null, near = false;
+    const f2 = LST.CONFIG.bosses.focusRadius ** 2, r2 = tower.range * tower.range;
+    for (const e of this.enemies) {
+      if (e.dead || e.untargetable) continue;
+      const d2 = LST.utils.dist2(tower.x, tower.y, e.x, e.y);
+      if (e.isBoss) { if (d2 <= r2 && !boss) boss = e; }
+      else if (d2 <= f2) near = true;
+    }
+    return near ? null : boss;
+  }
+
+  // Bosses call in helpers next to themselves.
+  spawnMinions(boss, types) {
+    const m = this.waveMult || { hp: 1, speed: 1, damage: 1, coins: 1 };
+    types.forEach((type, i) => {
+      const a = Math.atan2(boss.y, boss.x) + (i - (types.length - 1) / 2) * 0.55;
+      const r = boss.radius + 26;
+      const e = new LST.Enemy(type, boss.x + Math.cos(a) * r, boss.y + Math.sin(a) * r, m);
+      e.age = 0;
+      this.enemies.push(e);
+      this.bursts.push(new LST.Burst(e.x, e.y, "#ffffff", 22, "hit"));
+    });
+  }
+
+  // A telegraphed slam lands: the tower takes damage, Thorns bounces some back.
+  onBossSlam(boss, damage) {
+    const t = this.tower;
+    t.takeDamage(damage);
+    this.shake = Math.min(1, this.shake + 0.7);
+    this.bursts.push(new LST.Burst(t.x, t.y, "#ff4757", t.radius * 3.2, "slam"));
+    this.spawnHitSparks(t.x, t.y, "#ff4757", 16, 200);
+    this.texts.push(new LST.FloatText(t.x + LST.utils.rand(-10, 10), t.y - 40, "-" + Math.round(damage * (1 - t.armor)), "#ff4d6d", "damage"));
+    if (t.thorns > 0 && !boss.dead) {
+      const back = damage * t.thorns;
+      boss.takeDamage(back, this);
+      this.texts.push(new LST.FloatText(boss.x, boss.y - boss.radius * 1.6, "Thorns " + Math.round(back), "#66bb6a", "bonus"));
+    }
   }
 
   // ---------- Events from entities (subclasses add rewards etc.) ----------
