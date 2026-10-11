@@ -39,14 +39,13 @@ LST.TRAPS = [
     remove: (t) => { t.range -= 90; t.damageMult /= 0.85; },
   },
   {
-    id: "thorns", trap: true, kind: "dud", rarity: "rare", color: "#66bb6a",
+    id: "thorns", trap: true, kind: "weak", rarity: "rare", color: "#66bb6a",
     icon: '<path d="M12 3c-4 4-6 7-6 10a6 6 0 0 0 12 0c0-3-2-6-6-10z"/><path d="M3 10l3 2M21 10l-3 2M5 19l3-2M19 19l-3-2"/>',
     name: "Thorns", desc: "Enemies touching the tower take 300% of their HP", fine: "*on contact",
-    truth: "Does nothing (for now): enemies already pop when they crash into the tower. Boss slams will make it real later.",
-    lesson: "Ask what it changes. If enemies already die on contact, hurting them on contact does nothing.",
-    // Sprint 4: reflects 25% of boss slam damage once bosses stop and slam.
-    apply: () => {},
-    remove: () => {},
+    truth: "Enemies already pop when they crash into the tower, so the 300% does nothing. All it really does: bounces 25% of boss slam damage back at the boss.",
+    lesson: "Ask what it changes. Only bosses survive touching you, and only their slams get bounced back: a small bonus, not a card.",
+    apply: (t) => { t.thorns += LST.CONFIG.bosses.thornsReflect; },
+    remove: (t) => { t.thorns = Math.max(0, t.thorns - LST.CONFIG.bosses.thornsReflect); },
   },
   {
     id: "overclock", trap: true, kind: "delayed", rarity: "rare", color: "#ff7043",

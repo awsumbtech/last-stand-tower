@@ -21,10 +21,17 @@ LST.UI = class UI {
         workshop: $("screen-workshop"),
         confirm: $("screen-confirm"),
         gotcha: $("screen-gotcha"),
+        cleared: $("screen-cleared"),
       },
       startGears: $("start-gears"),
       startBadge: $("start-badge"),
       startWelcome: $("start-welcome"),
+      startTrophy: $("start-trophy"),
+      ability: $("btn-ability"),
+      bossBar: $("boss-bar"),
+      bossName: $("boss-name"),
+      bossFill: $("boss-fill"),
+      bossPhase: $("boss-phase"),
       wsGears: $("ws-gears"),
       wsHint: $("ws-hint"),
       wsGrid: $("ws-grid"),
@@ -53,10 +60,16 @@ LST.UI = class UI {
     // Workshop: one delegated listener for all three tabs.
     this.wsTab = "cards";
     this.el.wsGrid.addEventListener("click", (ev) => {
-      const el = ev.target.closest("[data-card],[data-upgrade],[data-bench],[data-codex]");
+      const el = ev.target.closest("[data-card],[data-upgrade],[data-bench],[data-codex],[data-ability]");
       if (!el) return;
       const m = LST.meta;
-      if (el.dataset.card) {
+      if (el.dataset.ability) {
+        const id = el.dataset.ability, cost = LST.CONFIG.abilities[id].unlockCost;
+        if (!game.pickAbility(id)) {
+          LST.UI.pop(el, "shake");
+          this.el.wsHint.innerHTML = `Need <b>${cost - m.state.gears}</b> more Gears for ${ABILITY_NAME[id]}.`;
+        }
+      } else if (el.dataset.card) {
         if (el.classList.contains("owned")) return;
         if (!game.unlockCard(el.dataset.card)) {
           LST.UI.pop(el, "shake");
@@ -95,6 +108,12 @@ LST.UI = class UI {
     this.el.auto.addEventListener("click", () => game.autoDraft());
     $("btn-return").addEventListener("click", () => game.returnTrap());
     $("btn-gotcha").addEventListener("click", () => game.dismissGotcha());
+    $("btn-endless").addEventListener("click", () => game.continueEndless());
+    $("btn-retire").addEventListener("click", () => game.retireToWorkshop());
+    const abilityBtn = $("btn-ability");
+    // pointerdown: fires the instant your thumb lands (no 300 ms tap delay)
+    abilityBtn.addEventListener("pointerdown", (ev) => { ev.preventDefault(); game.useAbility(); });
+    abilityBtn.addEventListener("click", (ev) => ev.preventDefault());
     // Settings (start screen) reuses the pause panel; reset progress asks first.
     $("btn-settings").addEventListener("click", () => this.show("pause"));
     $("btn-reset").addEventListener("click", () => this.show("confirm"));
@@ -144,7 +163,7 @@ LST.UI = class UI {
     for (const [key, el] of Object.entries(this.el.screens)) {
       el.classList.toggle("hidden", key !== name);
     }
-    this.el.hud.classList.toggle("hidden", name === "start" || name === "results" || name === "workshop" || name === "dying" || name === "gotcha");
+    this.el.hud.classList.toggle("hidden", ["start", "results", "workshop", "dying", "gotcha", "cleared"].includes(name));
     if (this.el.screens[name]) LST.UI.pop(this.el.screens[name].querySelector(".panel"));
     if (name !== "results") this.stopCount();
     if (name === "start") this.renderStart();
@@ -157,6 +176,7 @@ LST.UI = class UI {
     if (name === "upgrade") this.renderShop({ deal: true });
     if (name === "results") this.renderResults();
     if (name === "gotcha") this.renderGotcha();
+    if (name === "cleared") this.renderCleared();
     if (name === "workshop") this.renderWorkshop();
   }
 
@@ -173,7 +193,11 @@ LST.UI = class UI {
     this.el.headStart.classList.toggle("off", hs <= 0);
     // One-time hello for players from before Gears existed.
     const w = this.el.startWelcome;
-    if (m.state.armorNotice) {
+    this.el.startTrophy.classList.toggle("hidden", !m.worldCleared());
+    if (m.state.finaleNotice) {
+      w.innerHTML = `New: bosses fight back, and <b>King Mole</b> waits at wave 20! Tap the big button for a <b>Shockwave</b>.`;
+      w.classList.remove("hidden");
+    } else if (m.state.armorNotice) {
       w.innerHTML = `New: <b>Armor</b> now blocks damage (-${(m.armorReduction() * 100).toFixed(0)}% at your level)${m.state.armorRefund ? `, and you got <b>${m.state.armorRefund} Gears</b> back for levels above the new max` : ""}.`;
       w.classList.remove("hidden");
     } else if (m.state.veteranBonus && !m.state.seenWorkshop) {
@@ -212,6 +236,22 @@ LST.UI = class UI {
     setTimeout(() => { LST.audio.play("stamp"); LST.haptics.buzz(30); }, 900);
   }
 
+  // ---------- World cleared! ----------
+  renderCleared() {
+    const g = this.game, wb = g.worldBonus || { bonus: 0, first: false };
+    const $ = (id) => document.getElementById(id);
+    const runGears = LST.meta.gearsFor(g.wave + 1, g.bossWavesCleared, g.gearMult, 0, g.bossKills).total;
+    const sec = Math.round(g.runTime);
+    $("cl-time").textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+    $("cl-kills").textContent = g.kills;
+    $("cl-bosses").textContent = g.bossKills;
+    $("cl-bonus").textContent = "+" + wb.bonus;
+    $("cl-first").classList.toggle("hidden", !wb.first);
+    $("cl-run").textContent = "+" + runGears;
+    $("cl-total").textContent = LST.utils.formatNumber(LST.meta.state.gears);
+    LST.UI.pop($("cl-trophy"), "bump");
+  }
+
   // ---------- Results screen ----------
   renderResults() {
     const g = this.game;
@@ -220,6 +260,13 @@ LST.UI = class UI {
     const $ = (id) => document.getElementById(id);
     const fmt = LST.utils.formatNumber;
     $("res-wave").textContent = r.wave;
+    const title = $("res-title");
+    title.textContent = r.won ? "World cleared!" : r.endless ? "Endless run over!" : "Tower down!";
+    title.classList.toggle("red", !r.won);
+    title.classList.toggle("green", !!r.won);
+    const wbRow = $("res-g-world");
+    wbRow.classList.toggle("hidden", !r.worldBonus);
+    if (r.worldBonus) wbRow.querySelector("b").textContent = `+${r.worldBonus.bonus} (banked)`;
     const best = $("res-best");
     best.textContent = r.newBest ? `New best: wave ${g.bestWave}!` : `Best wave: ${g.bestWave}`;
     best.classList.toggle("new", r.newBest);
@@ -237,7 +284,7 @@ LST.UI = class UI {
 
     $("res-g-wave-n").textContent = `wave ${r.wave}`;
     $("res-g-waves").textContent = `+${r.gears.waves}`;
-    $("res-g-boss-n").textContent = `x${r.bossWaves}`;
+    $("res-g-boss-n").textContent = `x${r.bossKills}`;
     $("res-g-bosses").textContent = `+${r.gears.bosses}`;
     $("res-gears").textContent = "+0";
     const piggy = $("res-g-piggy");
@@ -395,6 +442,20 @@ LST.UI = class UI {
     this.el.wsHint.innerHTML = opts.benched
       ? (m.isBenched(opts.benched) ? `<b>${m.card(opts.benched).name}</b> benched. It won't show up in the shop.` : `<b>${m.card(opts.benched).name}</b> is back in the deck.`)
       : `Tap a card to bench it (${n}/${max}). Benched cards stay out of the shop.`;
+    if (opts.ability) this.el.wsHint.innerHTML = `<b>${ABILITY_NAME[opts.ability]}</b> equipped: ${ABILITY_DESC[opts.ability]}.`;
+    // Active ability strip: tap to equip (or unlock with Gears).
+    const strip = document.createElement("div");
+    strip.className = "ab-strip";
+    for (const id of Object.keys(LST.CONFIG.abilities)) {
+      const owned = m.abilityUnlocked(id), on = m.state.ability === id, cost = LST.CONFIG.abilities[id].unlockCost;
+      const b = document.createElement("button");
+      b.className = "ab-chip" + (on ? " on" : "") + (owned ? "" : " locked") + (!owned && m.state.gears >= cost ? " afford" : "") + (opts.ability === id ? " bought" : "");
+      b.dataset.ability = id;
+      b.setAttribute("aria-label", `${ABILITY_NAME[id]}: ${ABILITY_DESC[id]}. ${on ? "Equipped" : owned ? "Tap to equip" : cost + " Gears"}`);
+      b.innerHTML = `<span class="ab-ico">${ABILITY_ICON[id]}</span><span class="ab-txt"><b>${ABILITY_NAME[id]}</b><small>${on ? "Equipped" : owned ? ABILITY_DESC[id] : `${GEAR_SVG}${cost}`}</small></span>`;
+      strip.appendChild(b);
+    }
+    grid.appendChild(strip);
     for (const c of LST.CARDS) {
       const unlocked = m.isUnlocked(c.id), benched = m.isBenched(c.id);
       const el = document.createElement("button");
@@ -467,6 +528,33 @@ LST.UI = class UI {
     this.el.hpFill.classList.toggle("low", pct < 0.3);
     this.el.hpText.textContent = `${Math.ceil(t.hp)} / ${Math.round(t.maxHp)}`;
     this.el.speed.textContent = g.speed + "x";
+    // Active ability: a radial cooldown fill, "ready" bounce.
+    const ab = g.ability, btn = this.el.ability;
+    const playing = g.state === "playing" || g.state === "paused";
+    btn.classList.toggle("hidden", !playing);
+    if (playing) {
+      if (btn.dataset.id !== ab.id) {
+        btn.dataset.id = ab.id;
+        btn.querySelector(".ab-icon").innerHTML = ABILITY_ICON[ab.id];
+        btn.setAttribute("aria-label", ABILITY_NAME[ab.id]);
+        btn.querySelector(".ab-name").textContent = ABILITY_NAME[ab.id];
+      }
+      const k = ab.cd > 0 ? ab.cd / ab.max : 0;
+      btn.style.setProperty("--cd", (k * 360).toFixed(1) + "deg");
+      btn.classList.toggle("ready", k === 0);
+      btn.querySelector(".ab-cd").textContent = k > 0 ? Math.ceil(ab.cd) : "";
+    }
+    // Big boss HP bar (mini-bosses and King Mole).
+    const boss = playing ? g.enemies.find((e) => e.isBoss && !e.dead) : null;
+    this.el.bossBar.classList.toggle("hidden", !boss);
+    if (boss) {
+      const mole = boss.type === "mole";
+      this.el.bossBar.classList.toggle("finale", mole);
+      this.el.bossName.textContent = mole ? "KING MOLE" : boss.charging ? "BIG RED IS CHARGING!" : "BIG RED";
+      this.el.bossFill.style.width = (Math.max(0, boss.hp / boss.maxHp) * 100).toFixed(1) + "%";
+      this.el.bossPhase.textContent = mole ? `Phase ${boss.phase + 1} / 3` : "";
+      this.el.bossBar.classList.toggle("under", !!boss.untargetable);
+    }
   }
 
   // Draw the pick-1-of-3 shop.
@@ -503,7 +591,7 @@ LST.UI = class UI {
       const el = document.createElement("button");
       el.className = `card ${card.rarity}` + (taken ? " taken" : "") + (locked ? " locked" : "") +
         (opts.took === i ? " bought" : "") + (slot.from && opts.took === i ? " mystery" : "") +
-        (card.trap && appraisal >= 1 && card.kind !== "dud" && card.kind !== "build" ? " cursed" : "") +
+        (card.trap && appraisal >= 1 && !["dud", "build", "weak"].includes(card.kind) ? " cursed" : "") +
         (opts.deal || (opts.rerolled && !taken) ? " deal" : "");
       el.style.setProperty("--accent", card.color);
       el.style.setProperty("--rarity", rar.color);
@@ -551,8 +639,15 @@ LST.UI = class UI {
 };
 
 const GEAR_SVG = '<svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg>';
+const ABILITY_NAME = { shockwave: "Shockwave", freeze: "Freeze", overdrive: "Overdrive" };
+const ABILITY_DESC = { shockwave: "Knock back + stun", freeze: "Slow all 60%, 4s", overdrive: "2x fire rate, 5s" };
+const ABILITY_ICON = {
+  shockwave: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" class="fill"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4M3.5 3.5a12 12 0 0 0 0 17M20.5 3.5a12 12 0 0 1 0 17"/></svg>',
+  freeze: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>',
+  overdrive: '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+};
 const EYE_SVG = '<svg class="eye-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg>';
-const KIND_LABEL = { cursed: "Cursed", delayed: "Delayed cost", build: "Build-dependent", gamble: "Gamble", dud: "Dud" };
+const KIND_LABEL = { cursed: "Cursed", delayed: "Delayed cost", build: "Build-dependent", gamble: "Gamble", dud: "Dud", weak: "Nearly a dud" };
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>';
 
 // Restart a CSS "squash & stretch" entrance animation on an element.

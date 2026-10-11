@@ -21,9 +21,14 @@ LST.waves = {
     };
   },
 
+  // Wave 20 is the world finale (boss only); every other 5th wave has a mini-boss.
+  isFinale(wave) { return wave === LST.CONFIG.finale.wave; },
+  isBossWave(wave) { return wave % LST.CONFIG.waves.bossEvery === 0 && !this.isFinale(wave); },
+
   // Returns { queue: [types...], interval } for a wave.
   build(wave) {
     const w = LST.CONFIG.waves;
+    if (this.isFinale(wave)) return { queue: [], interval: 1 }; // King Mole arrives after the intro
     const count = Math.min(w.maxCount, w.baseCount + w.countPerWave * (wave - 1));
 
     // Unlock enemy types gradually: fast from wave 2, tanks from wave 3.
@@ -34,7 +39,7 @@ LST.waves = {
     const queue = [];
     for (let i = 0; i < count; i++) queue.push(LST.utils.pick(weights));
     // One boss every few waves, arriving in the middle of the wave.
-    if (wave % w.bossEvery === 0) queue.splice(Math.floor(queue.length / 2), 0, "boss");
+    if (this.isBossWave(wave)) queue.splice(Math.floor(queue.length / 2), 0, "boss");
 
     let interval = Math.max(w.minSpawnInterval, w.baseSpawnInterval * Math.pow(0.93, wave - 1));
     interval = Math.min(interval, w.maxSpawnSpan / queue.length);

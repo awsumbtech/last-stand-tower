@@ -8,7 +8,174 @@
     fast: { body: "#ffd23f", shade: "#e8b417" },
     tank: { body: "#ff9f43", shade: "#e07b1c" },
     boss: { body: "#ff4757", shade: "#d42a3a" },
+    mole: { body: "#8d6e63", shade: "#6d4c41" },
   };
+
+  // Slam telegraph: a red ring closes in on the tower and a dashed line points at it.
+  function telegraph(ctx, e, r) {
+    const k = 1 - Math.max(0, e.windup) / (e.windupMax || 1); // 0 -> 1
+    ctx.save();
+    ctx.setLineDash([10, 8]);
+    ctx.lineDashOffset = -r.time * 60;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = `rgba(255, 71, 87, ${0.4 + 0.5 * k})`;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const R = 34 + (1 - k) * 70;
+    ctx.beginPath();
+    ctx.arc(0, 0, R, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 71, 87, ${0.12 + 0.2 * k})`;
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ff4757";
+    ctx.stroke();
+    if (Math.floor(r.time * 8) % 2 === 0) {
+      ctx.font = `700 26px ${FONT}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = INK;
+      ctx.strokeText("!", e.x, e.y - e.radius * 2.6);
+      ctx.fillStyle = "#ffd23f";
+      ctx.fillText("!", e.x, e.y - e.radius * 2.6);
+    }
+    ctx.restore();
+  }
+
+  // Cartoon dizzy stars for stunned enemies.
+  function dizzy(ctx, e, r) {
+    ctx.save();
+    for (let i = 0; i < 3; i++) {
+      const a = r.time * 5 + (i * Math.PI * 2) / 3;
+      ctx.save();
+      ctx.translate(e.x + Math.cos(a) * e.radius * 1.1, e.y - e.radius * 1.6 + Math.sin(a) * e.radius * 0.35);
+      star(ctx, 5, 6, 2.8);
+      outlined(ctx, "#ffd23f", 2);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  // King Mole: a dirt mound underground, a big brown mole with a crown above ground.
+  function drawMole(ctx, e, r) {
+    const R = e.radius * 1.2;
+    const look = Math.atan2(-e.y, -e.x);
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    // the hole / mound
+    const moundW = R * 1.35, moundH = R * 0.5;
+    if (e.mode === "under") {
+      const bob = Math.sin(r.time * 30) * 2;
+      ctx.beginPath();
+      ctx.ellipse(0, bob, moundW * 0.8, moundH * 0.9, 0, Math.PI, 0);
+      ctx.lineTo(moundW * 0.8, bob);
+      outlined(ctx, "#a1887f", 4);
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.sin(i * 2.3 + r.time * 9) * moundW * 0.7, -moundH * 0.6 + Math.cos(i * 1.7 + r.time * 11) * 6, 4, 0, Math.PI * 2);
+        outlined(ctx, "#6d4c41", 2);
+      }
+      ctx.restore();
+      return;
+    }
+    ctx.beginPath();
+    ctx.ellipse(0, R * 0.55, moundW, moundH, 0, 0, Math.PI * 2);
+    outlined(ctx, "#5d4037", 4);
+    ctx.beginPath();
+    ctx.ellipse(0, R * 0.5, moundW * 0.72, moundH * 0.55, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#3e2723";
+    ctx.fill();
+    // how far out of the hole he is
+    let out = 1;
+    if (e.mode === "rise") out = 1 - Math.max(0, e.timer) / 0.55;
+    if (e.mode === "dig") out = Math.max(0, e.timer) / (e.timer > 0.5 ? 0.9 : 0.5);
+    out = Math.max(0, Math.min(1, out));
+    const lift = e.windup > 0 ? (1 - e.windup / (e.windupMax || 1)) : 0; // rears up before a slam
+    const squash = e.slamAnim;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(-R * 2, -R * 4, R * 4, R * 4.5); // clip at the hole's front edge
+    ctx.clip();
+    ctx.translate(0, R * 0.5 + (1 - out) * R * 2.2 - lift * 10);
+    ctx.scale(1 + squash * 0.25 - lift * 0.08, 1 - squash * 0.25 + lift * 0.12);
+    const flash = e.hitFlash > 0;
+    const fill = flash ? "#c8a99b" : e.slowTimer > 0 ? "#bfefff" : COLORS.mole.body; // bosses only blush when hit (they get hit a lot)
+    // claws
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.translate(side * R * 0.95, -R * 0.55 - lift * 18);
+      ctx.rotate(side * (0.4 + lift * 0.8));
+      LST.draw.roundRect(ctx, -R * 0.28, -R * 0.2, R * 0.56, R * 0.5, R * 0.2);
+      outlined(ctx, "#ffccbc", 3.5);
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * R * 0.15, -R * 0.2);
+        ctx.lineTo(i * R * 0.15 + side * 2, -R * 0.42);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = INK;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // body
+    ctx.beginPath();
+    ctx.ellipse(0, -R * 0.55, R, R * 1.05, 0, 0, Math.PI * 2);
+    outlined(ctx, fill, 5);
+    ctx.beginPath();
+    ctx.ellipse(0, -R * 0.25, R * 0.62, R * 0.6, 0, 0, Math.PI * 2);
+    ctx.fillStyle = flash ? "#e3d3cc" : "#bcaaa4";
+    ctx.fill();
+    // eyes (angrier each phase)
+    ctx.save();
+    ctx.translate(0, -R * 0.95);
+    eyes(ctx, R * 0.33, R * 0.17, look, e.phase > 0);
+    ctx.restore();
+    // nose
+    ctx.beginPath();
+    ctx.ellipse(0, -R * 0.62, R * 0.24, R * 0.17, 0, 0, Math.PI * 2);
+    outlined(ctx, "#ff8fab", 3);
+    // mouth + teeth
+    ctx.beginPath();
+    ctx.moveTo(-R * 0.25, -R * 0.38);
+    ctx.quadraticCurveTo(0, -R * (e.phase === 2 ? 0.12 : 0.26), R * 0.25, -R * 0.38);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+    LST.draw.roundRect(ctx, -R * 0.1, -R * 0.37, R * 0.2, R * 0.16, 2);
+    outlined(ctx, "#ffffff", 2);
+    // crown
+    ctx.save();
+    ctx.translate(0, -R * 1.55);
+    ctx.rotate(Math.sin(r.time * 3) * 0.06 + (e.phase === 2 ? 0.25 : 0));
+    ctx.beginPath();
+    ctx.moveTo(-R * 0.45, R * 0.12);
+    ctx.lineTo(-R * 0.5, -R * 0.3);
+    ctx.lineTo(-R * 0.22, -R * 0.08);
+    ctx.lineTo(0, -R * 0.42);
+    ctx.lineTo(R * 0.22, -R * 0.08);
+    ctx.lineTo(R * 0.5, -R * 0.3);
+    ctx.lineTo(R * 0.45, R * 0.12);
+    ctx.closePath();
+    outlined(ctx, "#ffd23f", 3.5);
+    ctx.beginPath();
+    ctx.arc(0, -R * 0.02, R * 0.08, 0, Math.PI * 2);
+    outlined(ctx, "#ff4757", 2);
+    ctx.restore();
+    ctx.restore();
+    // front lip of the hole
+    ctx.beginPath();
+    ctx.ellipse(0, R * 0.55, moundW, moundH, 0, 0, Math.PI);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // Small seeded random so the ground looks the same every frame.
   function rng(seed) {
@@ -322,19 +489,23 @@
       ctx.restore();
     },
 
-    enemy(ctx, e) {
+    enemy(ctx, e, r) {
+      if (e.windup > 0) telegraph(ctx, e, r);
+      if (e.type === "mole") { drawMole(ctx, e, r); if (e.stun > 0 && e.mode === "up") dizzy(ctx, { x: e.x, y: e.y - e.radius * 1.5, radius: e.radius }, r); return; }
+      if (e.stun > 0) dizzy(ctx, e, r);
       const c = COLORS[e.type];
       const look = Math.atan2(-e.y, -e.x); // toward the tower at 0,0
       const pop = Math.min(1, e.age / (e.type === "boss" ? 0.6 : 0.3)); // pop in with a bounce
       const grow = pop < 1 ? 0.5 + 0.8 * pop - 0.3 * pop * pop : 1;
       const freq = e.type === "fast" ? 18 : e.type === "basic" ? 10 : 6;
       const w = Math.sin(e.age * freq);
-      const sx = (1 + 0.12 * w) * grow;
-      const sy = (1 - 0.12 * w) * grow;
+      const lift = e.windup > 0 ? 1 - e.windup / (e.windupMax || 1) : 0;
+      const sx = (1 + 0.12 * w + e.slamAnim * 0.3 - lift * 0.12) * grow;
+      const sy = (1 - 0.12 * w - e.slamAnim * 0.3 + lift * 0.2) * grow;
       const R = e.radius * 1.35;
       const flash = e.hitFlash > 0;
       const frozen = e.slowTimer > 0; // Frost Shots: icy blue tint
-      const fill = flash ? "#ffffff" : frozen ? "#bfefff" : c.body;
+      const fill = flash ? (e.isBoss ? "#ff8a95" : "#ffffff") : frozen ? "#bfefff" : e.charging && Math.floor(e.age * 10) % 2 ? "#ff1f3d" : c.body;
 
       ctx.save();
       ctx.translate(e.x, e.y);
@@ -345,7 +516,8 @@
 
       ctx.save();
       // Squash a bit harder on the frame it gets hit
-      ctx.scale(sx * (flash ? 1.12 : 1), sy * (flash ? 0.88 : 1));
+      const sq = e.isBoss ? 0.04 : 0.12;
+      ctx.scale(sx * (flash ? 1 + sq : 1), sy * (flash ? 1 - sq : 1));
       ctx.lineJoin = "round";
       if (e.type === "basic") {
         ctx.beginPath();
@@ -442,7 +614,40 @@
       ctx.translate(b.x, b.y);
       ctx.rotate(b.rot);
       ctx.lineJoin = "round";
-      if (b.kind === "splash") {
+      if (b.kind === "slam" || b.kind === "shockwave" || b.kind === "freeze" || b.kind === "overdrive") {
+        const col = { slam: "#ff4757", shockwave: "#ffffff", freeze: "#8fdcff", overdrive: "#ff9f43" }[b.kind];
+        const e2 = 1 - Math.pow(1 - f, 2);
+        ctx.globalAlpha = 1 - f;
+        ctx.beginPath();
+        ctx.arc(0, 0, b.size * (0.15 + 0.85 * e2), 0, Math.PI * 2);
+        ctx.fillStyle = b.kind === "freeze" ? "rgba(143, 220, 255, 0.25)" : b.kind === "shockwave" ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 71, 87, 0.15)";
+        ctx.fill();
+        ctx.lineWidth = 12 * (1 - f) + 2;
+        ctx.strokeStyle = INK;
+        ctx.stroke();
+        ctx.lineWidth = 7 * (1 - f) + 1;
+        ctx.strokeStyle = col;
+        ctx.stroke();
+        if (b.kind === "freeze") {
+          for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            ctx.save();
+            ctx.translate(Math.cos(a) * b.size * 0.5 * e2, Math.sin(a) * b.size * 0.5 * e2);
+            star(ctx, 6, 9, 3);
+            outlined(ctx, "#ffffff", 2);
+            ctx.restore();
+          }
+        }
+      } else if (b.kind === "dirt") {
+        for (let i = 0; i < 9; i++) {
+          const a = (i / 9) * Math.PI * 2;
+          const d = b.size * (0.3 + f * 0.9);
+          ctx.globalAlpha = 1 - f;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * d, Math.sin(a) * d * 0.6 - Math.sin(f * Math.PI) * 30, 7 * (1 - f * 0.5), 0, Math.PI * 2);
+          outlined(ctx, i % 2 ? "#8d6e63" : "#6d4c41", 2.5);
+        }
+      } else if (b.kind === "splash") {
         // Orange shockwave ring for the Splash card
         ctx.globalAlpha = 0.85 * (1 - f);
         ctx.beginPath();
@@ -534,8 +739,8 @@
     },
 
     // Warning stripes slam in, "BOSS!" wobbles, then it all slides away.
-    bossBanner(ctx, t, r) {
-      const total = 2.4;
+    bossBanner(ctx, t, r, o = {}) {
+      const total = o.total || 2.4;
       const age = total - t;
       const inK = Math.min(1, age / 0.25);
       const outK = Math.min(1, t / 0.3);
@@ -573,11 +778,11 @@
       ctx.rotate(wob);
       const s = 1 + Math.max(0, 0.3 - age) * 1.5;
       ctx.scale(s, s);
-      textPop(ctx, "BOSS!", 0, -size * 0.05, "#ff4757", size);
+      textPop(ctx, o.title || "BOSS!", 0, -size * 0.05, o.color || "#ff4757", size);
       ctx.restore();
       ctx.save();
       ctx.globalAlpha = outK * Math.min(1, Math.max(0, (age - 0.35) / 0.2));
-      textPop(ctx, "Big Red is coming!", W / 2, H * 0.3 + bandH / 2 + 26, "#ffffff", Math.round(Math.min(26, W / 16)));
+      textPop(ctx, o.sub || "Big Red is coming!", W / 2, H * 0.3 + bandH / 2 + 26, "#ffffff", Math.round(Math.min(26, W / 16)));
       ctx.restore();
     },
   };

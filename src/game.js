@@ -1,5 +1,6 @@
 // Core game state and rules.
-// States: "menu" | "playing" | "paused" | "celebrate" (wave-clear party) | "upgrade" | "gameover" (results screen).
+// States: "menu" | "playing" | "paused" | "celebrate" (wave-clear party) | "upgrade" | "gameover" (results screen)
+//         | "victory" (finale beaten: party) | "cleared" (World cleared! screen).
 // "workshop" is the between-runs card unlock screen.
 // Sound and vibration hooks live here (not in World) so the art-style demo stays silent.
 
@@ -45,11 +46,22 @@ LST.Game = class Game extends LST.World {
     this.bossWavesCleared = 0;
     this.result = null;
     this.resultsDelay = 0;
+    // Bosses (Sprint 4)
+    this.bossKills = 0;       // mini-bosses killed (skipped Head Start boss waves count)
+    this.bossEscapes = 0;     // mini-bosses that got bored and charged
+    this.finale = null;       // { intro, mole, won } during the wave-20 finale
+    this.endless = false;     // past the finale
+    this.worldBonus = null;   // { bonus, first } after beating the finale
+    this.victoryTimer = 0;
+    this.phaseBanner = null;  // { text, sub, t } canvas banner for finale phases
+    const ab = LST.meta ? LST.meta.state.ability : "shockwave";
+    this.ability = { id: ab || "shockwave", cd: 0, max: LST.CONFIG.abilities[ab || "shockwave"].cooldown, flash: 0 };
   }
 
   // ---------- Flow ----------
 
   newGame() {
+    if (LST.meta.state.finaleNotice) { LST.meta.state.finaleNotice = false; LST.meta.save(); }
     this.reset();
     LST.audio.startMusic();
     LST.meta.applyToRun(this);
@@ -67,10 +79,13 @@ LST.Game = class Game extends LST.World {
       const m = LST.waves.multipliers(w);
       let coins = LST.waves.clearBonus(w);
       for (const ty of LST.waves.build(w).queue) coins += Math.max(1, Math.round(LST.CONFIG.enemies[ty].coins * m.coins * this.coinMult));
+      if (LST.waves.isBossWave(w)) coins += Math.round(LST.CONFIG.bosses.killCoins * this.coinMult);
       income.push(coins);
     }
     this.headStart = skip;
     this.bossWavesCleared = Math.floor(skip / LST.CONFIG.waves.bossEvery);
+    for (let w = 1; w <= skip; w++) if (LST.waves.isBossWave(w)) this.bossKills += 1;
+    if (skip >= LST.CONFIG.finale.wave) this.endless = true;
     this.draft = { hand: 0, of: skip, income };
     this.state = "upgrade";
     this.advanceDraft();
@@ -124,7 +139,50 @@ LST.Game = class Game extends LST.World {
     this.projectiles = [];
     this.state = "playing";
     this.ui.show(null);
-    LST.audio.play("waveStart");
+    if (LST.waves.isFinale(this.wave)) {
+      // Boss-only finale: the lawn goes quiet, then King Mole digs in.
+      this.finale = { intro: LST.CONFIG.finale.introTime, mole: null, won: false };
+      this.waveIntro = 0;
+      this.flash = 0.6;
+      LST.audio.play("finaleIntro");
+      LST.audio.setTension(1);
+      LST.haptics.buzz([80, 60, 80, 60, 200]);
+    } else {
+      this.finale = null;
+      LST.audio.setTension(this.endless ? 1 : 0);
+      LST.audio.play("waveStart");
+    }
+  }
+
+  // ---------- Active ability ----------
+  abilityReady() { return this.state === "playing" && this.ability.cd <= 0; }
+
+  useAbility() {
+    if (!this.abilityReady()) { if (this.state === "playing") LST.audio.play("deny"); return false; }
+    const A = LST.CONFIG.abilities, id = this.ability.id, t = this.tower;
+    this.ability.cd = this.ability.max = A[id].cooldown;
+    this.ability.flash = 1;
+    if (id === "shockwave") {
+      const c = A.shockwave, r2 = c.radius * c.radius;
+      for (const e of this.enemies) {
+        if (e.dead || LST.utils.dist2(t.x, t.y, e.x, e.y) > r2) continue;
+        if (e.isBoss) e.knock(c.bossKnockback, c.bossStun);
+        else e.knock(c.knockback, c.stun);
+      }
+      this.bursts.push(new LST.Burst(t.x, t.y, "#ffffff", c.radius, "shockwave"));
+      this.shake = Math.min(1, this.shake + 0.6);
+    } else if (id === "freeze") {
+      const c = A.freeze;
+      for (const e of this.enemies) if (!e.dead) e.applySlow(c.slow, c.time);
+      this.bursts.push(new LST.Burst(t.x, t.y, "#8fdcff", 420, "freeze"));
+    } else if (id === "overdrive") {
+      t.overdrive = A.overdrive.time;
+      this.bursts.push(new LST.Burst(t.x, t.y, "#ff9f43", 90, "overdrive"));
+    }
+    LST.audio.play(id);
+    LST.haptics.buzz([30, 30, 60]);
+    this.ui.updateHud();
+    return true;
   }
 
   // Wave cleared: a short celebration, then the upgrade shop.
@@ -132,7 +190,7 @@ LST.Game = class Game extends LST.World {
     const bonus = LST.waves.clearBonus(this.wave);
     this.coins += bonus;
     this.coinsEarned += bonus;
-    if (this.wave % LST.CONFIG.waves.bossEvery === 0) this.bossWavesCleared += 1;
+    if (LST.waves.isBossWave(this.wave)) this.bossWavesCleared += 1;
     // Overclock overheats after 3 cleared waves.
     if (this.overclock && this.overclock.hot && --this.overclock.waves <= 0) {
       this.overclock.hot = false;
@@ -342,6 +400,18 @@ LST.Game = class Game extends LST.World {
   gameOver() {
     this.state = "gameover";
     this.spawnExplosion(this.tower.x, this.tower.y);
+    this.finishRun({ won: false });
+    this.resultsDelay = 1.1; // let the tower explosion play first
+    this.ui.show("dying"); // no screen, no HUD
+    LST.audio.stopMusic();
+    LST.audio.setTension(0);
+    LST.audio.play("gameOver");
+    LST.haptics.buzz([120, 60, 250]);
+  }
+
+  // Pay out and build the results. won = left after beating the finale.
+  finishRun({ won }) {
+    this.state = "gameover";
     this.saveBest(this.wave);
     // Pay out Gears (saved right away, so closing the tab can't lose them).
     const meta = LST.meta;
@@ -349,7 +419,7 @@ LST.Game = class Game extends LST.World {
     // Traps still waiting for their reveal go straight into the Codex.
     for (const p of this.pendingGotchas) if (meta.discoverTrap(p.id)) this.newCodex.push(p.id);
     this.pendingGotchas = [];
-    const gears = meta.gearsFor(this.wave, this.bossWavesCleared, this.gearMult);
+    const gears = meta.gearsFor(won ? this.wave + 1 : this.wave, this.bossWavesCleared, this.gearMult, 0, this.bossKills);
     const gearsBefore = meta.state.gears;
     meta.recordRun(gears.total);
     this.result = {
@@ -357,12 +427,8 @@ LST.Game = class Game extends LST.World {
       cards: Object.entries(this.upgradeLevels), bossWaves: this.bossWavesCleared, gears, gearsBefore,
       gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1, headStart: this.headStart,
       gearMult: this.gearMult, newCodex: this.newCodex.slice(),
+      won, bossKills: this.bossKills, worldBonus: this.worldBonus, endless: this.endless,
     };
-    this.resultsDelay = 1.1; // let the tower explosion play first
-    this.ui.show("dying"); // no screen, no HUD
-    LST.audio.stopMusic();
-    LST.audio.play("gameOver");
-    LST.haptics.buzz([120, 60, 250]);
   }
 
   showResults() {
@@ -390,6 +456,23 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("upgrade", { pitch: 1 + Math.min(0.6, LST.meta.level(id) * 0.02) });
     LST.haptics.buzz(20);
     this.ui.renderWorkshop({ bought: id });
+    return true;
+  }
+
+  // Workshop: equip an ability, or unlock it with Gears.
+  pickAbility(id) {
+    const m = LST.meta;
+    if (m.abilityUnlocked(id)) {
+      if (m.state.ability === id) return true;
+      m.equipAbility(id);
+      LST.audio.play("bench");
+    } else {
+      if (!m.unlockAbility(id)) { LST.audio.play("deny"); return false; }
+      LST.audio.play("unlock");
+      LST.haptics.buzz([20, 40, 60]);
+    }
+    this.ability = { id, cd: 0, max: LST.CONFIG.abilities[id].cooldown, flash: 0 };
+    this.ui.renderWorkshop({ ability: id });
     return true;
   }
 
@@ -457,12 +540,18 @@ LST.Game = class Game extends LST.World {
       return;
     }
     this.updateEffects(dt);
-    if (this.state === "playing" || this.state === "celebrate" || this.state === "upgrade") this.runTime += dt;
+    if (this.state === "playing" || this.state === "celebrate" || this.state === "upgrade" || this.state === "victory") this.runTime += dt;
     if (this.state === "gameover" && this.resultsDelay > 0) {
       this.resultsDelay -= dt;
       if (this.resultsDelay <= 0) this.showResults();
     }
 
+    if (this.state === "victory") {
+      this.victoryTimer -= dt;
+      if (Math.random() < dt * 6) this.spawnConfetti(LST.utils.rand(-200, 200), LST.utils.rand(-200, 100), 30);
+      if (this.victoryTimer <= 0) { this.state = "cleared"; this.ui.show("cleared"); LST.audio.play("unlock"); }
+      return;
+    }
     if (this.state === "celebrate") {
       this.celebrateTimer -= dt;
       if (this.celebrateTimer <= 0) this.finishCelebration();
@@ -492,15 +581,30 @@ LST.Game = class Game extends LST.World {
 
   step(dt) {
     this.waveIntro = Math.max(0, this.waveIntro - dt);
+    this.ability.cd = Math.max(0, this.ability.cd - dt);
+    this.ability.flash = Math.max(0, this.ability.flash - dt * 2);
+    if (this.phaseBanner && (this.phaseBanner.t -= dt) <= 0) this.phaseBanner = null;
+    const f = this.finale;
+    if (f && !f.mole && !f.won) {
+      f.intro -= dt;
+      if (f.intro <= 0) {
+        f.mole = new LST.KingMole(this.waveMult);
+        if (this.renderer.halfW > this.renderer.halfH * 1.15) { f.mole.x = -f.mole.y; f.mole.y = 0; } // landscape: from the side
+        this.enemies.push(f.mole);
+        this.onMoleRise(f.mole);
+        LST.audio.play("boss");
+      }
+    }
     this.updateSpawning(dt);
     this.tower.update(dt, this);
     this.updateList(this.enemies, dt);
     this.updateList(this.projectiles, dt);
     this.checkLowHp();
 
+    if (this.state !== "playing") return; // e.g. King Mole just went down
     if (this.tower.hp <= 0) {
       this.gameOver();
-    } else if (this.spawnQueue.length === 0 && this.enemies.length === 0) {
+    } else if (this.spawnQueue.length === 0 && this.enemies.length === 0 && !(f && !f.won)) {
       this.endWave();
     }
   }
@@ -553,6 +657,14 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("pop", { pitch: { basic: 1, fast: 1.3, tank: 0.75, boss: 0.5 }[e.type] });
     LST.audio.play("coin");
     if (e.type === "boss") {
+      this.bossKills += 1;
+      const bonus = Math.round(LST.CONFIG.bosses.killCoins * this.coinMult);
+      this.coins += bonus;
+      this.coinsEarned += bonus;
+      this.texts.push(new LST.FloatText(e.x, e.y - e.radius * 2.2, `+${bonus} BOSS BONUS`, "#ffd93d", "bonus"));
+    }
+    if (e.type === "mole") { this.onFinaleWon(e); return; }
+    if (e.type === "boss") {
       this.hitStop = 0.16;
       this.flash = 1;
       this.shake = 1;
@@ -560,6 +672,91 @@ LST.Game = class Game extends LST.World {
       LST.audio.play("bossDown");
       LST.haptics.buzz(90);
     }
+  }
+
+  // ---------- Bosses ----------
+  onSlamWindup(e) {
+    LST.audio.play("windup", { pitch: e.type === "mole" ? 0.8 : 1 });
+  }
+
+  onBossSlam(e, damage) {
+    super.onBossSlam(e, damage);
+    LST.audio.play("slam");
+    LST.audio.play("towerHit");
+    LST.haptics.buzz(e.type === "mole" ? 140 : 90);
+  }
+
+  onBossCharge(e) {
+    this.bossEscapes += 1;
+    this.texts.push(new LST.FloatText(e.x, e.y - e.radius * 2, "CHARGE!", "#ff4757", "bonus"));
+    LST.audio.play("charge");
+  }
+
+  onMoleRise(m) {
+    this.bursts.push(new LST.Burst(m.x, m.y, "#8d6e63", 70, "dirt"));
+    this.spawnHitSparks(m.x, m.y, "#8d6e63", 18, 180);
+    this.shake = Math.min(1, this.shake + 0.4);
+    LST.audio.play("popUp");
+  }
+
+  onMoleBurrow(m) {
+    this.bursts.push(new LST.Burst(m.x, m.y, "#8d6e63", 60, "dirt"));
+    this.spawnHitSparks(m.x, m.y, "#8d6e63", 12, 140);
+    LST.audio.play("burrow");
+  }
+
+  onMolePhase(m) {
+    const text = m.phase === 1 ? ["PHASE 2", "He's digging deeper!"] : ["PHASE 3", "King Mole is MAD!"];
+    this.phaseBanner = { text: text[0], sub: text[1], t: 2.2, max: 2.2 };
+    this.flash = 0.7;
+    this.shake = 1;
+    LST.audio.play("phase");
+    LST.audio.setTension(m.phase + 1);
+    LST.haptics.buzz([60, 40, 60, 40, 120]);
+  }
+
+  // King Mole is down: party, then the World cleared! screen.
+  onFinaleWon(m) {
+    this.finale.won = true;
+    this.hitStop = 0.35;
+    this.flash = 1;
+    this.shake = 1;
+    // His minions pop too.
+    for (const e of this.enemies) if (!e.dead && e !== m) { e.dead = true; super.onEnemyKilled(e); }
+    this.spawnHitSparks(m.x, m.y, "#ffd23f", 50, 320);
+    this.spawnConfetti(0, -40, 160);
+    const bonus = LST.waves.clearBonus(this.wave);
+    this.coins += bonus;
+    this.coinsEarned += bonus;
+    this.bossWavesCleared += 1;
+    this.score += this.wave * 200;
+    this.saveBest(this.wave);
+    this.worldBonus = LST.meta.clearWorld("backyard", this.runTime);
+    this.state = "victory";
+    this.victoryTimer = 3.4;
+    this.ui.show(null);
+    LST.audio.setTension(0);
+    LST.audio.play("victory");
+    LST.haptics.buzz([100, 50, 100, 50, 300]);
+    this.ui.updateHud();
+  }
+
+  // From the World cleared! screen.
+  continueEndless() {
+    if (this.state !== "cleared") return;
+    this.endless = true;
+    this.finale = null;
+    this.openShop();
+    this.state = "upgrade";
+    this.ui.show("upgrade");
+    LST.audio.startMusic();
+  }
+
+  retireToWorkshop() {
+    if (this.state !== "cleared") return;
+    this.finishRun({ won: true });
+    this.resultsDelay = 0;
+    this.openWorkshop("results");
   }
 
   onTowerHit(e) {

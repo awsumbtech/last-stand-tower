@@ -33,7 +33,7 @@ LST.UPGRADES = [
 
 LST.meta = (function () {
   const KEY = "lst.meta";
-  const VERSION = 3;
+  const VERSION = 4;
   const storage = LST.utils.storage;
   const M = () => LST.CONFIG.meta;
 
@@ -44,6 +44,9 @@ LST.meta = (function () {
       codex: { seen: [], traps: [] }, // cards you've been dealt / traps you've discovered
       armorRefund: 0,                 // Gears refunded when Armor changed
       armorNotice: false,             // show the "Armor changed" note once
+      worlds: { backyard: { cleared: false, clears: 0, bestTime: 0 } }, // world finales beaten (world 2 unlocks in Sprint 6)
+      abilities: ["shockwave"], ability: "shockwave", // unlocked / equipped active ability
+      finaleNotice: false,            // "King Mole waits at wave 20" note for older saves
     };
   }
 
@@ -59,6 +62,11 @@ LST.meta = (function () {
       if (lvl > max) { s.upgrades.armor = max; s.gears = (s.gears || 0) + refund; }
       return Object.assign(s, { v: 3, codex: { seen: [], traps: [] }, armorRefund: refund, armorNotice: lvl > 0 });
     },
+    // v4: world finales (King Mole at wave 20) and active abilities.
+    3: (s) => Object.assign(s, {
+      v: 4, worlds: { backyard: { cleared: false, clears: 0, bestTime: 0 } }, abilities: ["shockwave"], ability: "shockwave",
+      finaleNotice: (+storage.get("lst.bestWave", 0) || 0) >= 15,
+    }),
   };
 
   function sanitize(s) {
@@ -74,6 +82,12 @@ LST.meta = (function () {
     }
     s.unlocked = s.unlocked.filter((id) => LST.CARDS.some((c) => c.id === id && c.unlockCost));
     if (!s.codex || typeof s.codex !== "object") s.codex = { seen: [], traps: [] };
+    if (!s.worlds || typeof s.worlds !== "object") s.worlds = {};
+    s.worlds.backyard = Object.assign({ cleared: false, clears: 0, bestTime: 0 }, s.worlds.backyard || {});
+    if (!Array.isArray(s.abilities)) s.abilities = ["shockwave"];
+    s.abilities = s.abilities.filter((a) => LST.CONFIG.abilities[a]);
+    if (!s.abilities.includes("shockwave")) s.abilities.unshift("shockwave");
+    if (!s.abilities.includes(s.ability)) s.ability = "shockwave";
     for (const k of ["seen", "traps"]) if (!Array.isArray(s.codex[k])) s.codex[k] = [];
     s.benched = s.benched.filter((id) => LST.CARDS.some((c) => c.id === id)).slice(0, M().benchMax);
     return s;
@@ -115,10 +129,10 @@ LST.meta = (function () {
     },
 
     // Gears = floor((perWave * wave^waveExp + perBoss * bossWavesCleared) * worldMult * (1 + cogBonus * cogs))
-    gearsFor(wave, bossWaves, worldMult = 1, cogs = 0) {
+    gearsFor(wave, bossWaves, worldMult = 1, cogs = 0, bossKills = 0) {
       const g = M().gears;
       const waves = g.perWave * Math.pow(Math.max(0, wave), g.waveExp);
-      const bosses = g.perBoss * bossWaves;
+      const bosses = g.perBoss * bossWaves + LST.CONFIG.bosses.killGears * bossKills;
       const mult = worldMult * (1 + g.cogBonus * cogs);
       return { waves: Math.floor(waves), bosses, mult, total: Math.floor((waves + bosses) * mult) };
     },
@@ -215,8 +229,45 @@ LST.meta = (function () {
     // Highest Head Start wave allowed: 5 per level, capped at 50% of the best wave (multiple of 5).
     headStartMax(best) {
       const per = M().upgrades.headStart.per;
-      const cap = Math.floor((best * M().headStartCap) / per) * per;
+      let cap = Math.floor((best * M().headStartCap) / per) * per;
+      // You can't skip King Mole until you've beaten him once.
+      if (!this.worldCleared()) cap = Math.min(cap, LST.CONFIG.finale.wave - per);
       return Math.max(0, Math.min(per * this.level("headStart"), cap));
+    },
+
+    // ---------- Worlds ----------
+    worldCleared(id = "backyard") { return !!(this.state.worlds[id] && this.state.worlds[id].cleared); },
+    // Beat a world finale: pays the bonus right away (saved) and returns it.
+    clearWorld(id, seconds) {
+      const w = this.state.worlds[id] || (this.state.worlds[id] = { cleared: false, clears: 0, bestTime: 0 });
+      const g = LST.CONFIG.finale.gears;
+      const first = !w.cleared;
+      const bonus = first ? g.first : g.again;
+      w.cleared = true;
+      w.clears += 1;
+      if (seconds && (!w.bestTime || seconds < w.bestTime)) w.bestTime = Math.round(seconds);
+      this.state.gears += bonus;
+      this.state.lifetimeGears += bonus;
+      this.save();
+      return { bonus, first };
+    },
+
+    // ---------- Active abilities ----------
+    abilityUnlocked(id) { return this.state.abilities.includes(id); },
+    equipAbility(id) {
+      if (!this.abilityUnlocked(id)) return false;
+      this.state.ability = id;
+      this.save();
+      return true;
+    },
+    unlockAbility(id) {
+      const a = LST.CONFIG.abilities[id];
+      if (!a || this.abilityUnlocked(id) || this.state.gears < a.unlockCost) return false;
+      this.state.gears -= a.unlockCost;
+      this.state.abilities.push(id);
+      this.state.ability = id;
+      this.save();
+      return true;
     },
     // What the next run will skip to (the player can pick lower on the start screen).
     headStartWave(best) {

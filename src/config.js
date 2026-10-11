@@ -35,7 +35,51 @@ LST.CONFIG = {
     basic: { hp: 20, speed: 62, damage: 6, coins: 2, score: 10, radius: 12, color: "#ff2bd6", shape: "circle" },
     fast:  { hp: 10, speed: 115, damage: 4, coins: 2, score: 12, radius: 9, color: "#ffd93d", shape: "triangle" },
     tank:  { hp: 75, speed: 30, damage: 15, coins: 6, score: 30, radius: 18, color: "#ff8a3d", shape: "square" },
-    boss:  { hp: 250, speed: 17, damage: 28, coins: 40, score: 250, radius: 30, color: "#ff4d6d", shape: "hexagon" },
+    boss:  { hp: 400, speed: 26, damage: 28, coins: 40, score: 250, radius: 30, color: "#ff4d6d", shape: "hexagon" }, // mini-boss (see bosses)
+    mole:  { hp: 1900, speed: 0, damage: 30, coins: 150, score: 3000, radius: 46, color: "#8d6e63", shape: "mole" },   // King Mole, the Backyard finale
+  },
+
+  // Mini-bosses (every 5th wave except the finale): walk to range, stop, and slam.
+  bosses: {
+    stopRange: 170,    // stops this far from the tower
+    slamEvery: 3.0,    // seconds between slams...
+    windup: 0.8,       // ...each telegraphed by a red ring for this long
+    slamDamage: 12,    // x the wave's damage multiplier
+    minionEvery: 6,    // spawns `minions` basics this often
+    minions: 2,
+    focusRadius: 120,  // the tower shoots the boss first when nothing is closer than this
+    enrageAfter: 35,   // seconds at range before it gets bored and charges the tower (no reward)
+    chargeSpeed: 70,
+    chargeDamage: 2,   // x its contact damage
+    killGears: 3,      // bonus Gears per mini-boss killed
+    killCoins: 25,     // bonus coins per mini-boss killed (x Greed)
+    thornsReflect: 0.25, // Thorns trap: share of slam damage bounced back
+    hpExp: 0.85,       // boss HP = hp x (wave HP multiplier ^ hpExp): grows a bit slower than the crowd
+    early: { 5: { hp: 0.5, dmg: 0.6 }, 10: { hp: 0.8, dmg: 0.85 } }, // the first bosses go easier (HP and slam x)
+  },
+
+  // The world finale: wave 20 is boss-only (King Mole in the Backyard).
+  finale: {
+    wave: 20,
+    introTime: 3.2,          // seconds of "FINALE" intro before he pops up
+    // per phase (HP above 66% / 33% / below): time above ground, slam timing, pop-up distance, minions
+    phases: [
+      { up: 6.0, slamEvery: 3.0, windup: 0.85, dmg: 1.0, dist: 225, minionEvery: 6.5, minions: ["basic", "basic"] },
+      { up: 5.0, slamEvery: 2.6, windup: 0.75, dmg: 1.2, dist: 185, minionEvery: 5.5, minions: ["fast", "fast", "basic"] },
+      { up: 4.2, slamEvery: 2.2, windup: 0.65, dmg: 1.45, dist: 150, minionEvery: 5.0, minions: ["tank", "fast", "fast"] },
+    ],
+    underTime: 1.5,          // seconds underground between pop-ups (can't be hit)
+    closerPerPop: 12,        // each pop-up in a phase lands a bit closer...
+    minDist: 115,            // ...but never closer than this
+    slamDamage: 20,          // x the wave's damage multiplier x the phase's dmg
+    gears: { first: 250, again: 75 }, // World cleared bonus
+  },
+
+  // Active abilities (one equipped). Cooldowns only tick during waves.
+  abilities: {
+    shockwave: { cooldown: 25, radius: 330, knockback: 120, stun: 1.5, bossKnockback: 35, bossStun: 1.2 },
+    freeze:    { cooldown: 25, slow: 0.6, time: 4, unlockCost: 150 },
+    overdrive: { cooldown: 25, mult: 2, time: 5, unlockCost: 250 },
   },
 
   waves: {
@@ -77,7 +121,7 @@ LST.CONFIG = {
   // Lasting progression between runs (src/meta.js).
   meta: {
     // Gears per run = floor((perWave * wave^waveExp + perBoss * boss waves cleared) * worldMult * (1 + cogBonus * Cogs))
-    gears: { perWave: 2, waveExp: 1.3, perBoss: 3, cogBonus: 0.1 },
+    gears: { perWave: 2, waveExp: 1.3, perBoss: 3, cogBonus: 0.1 }, // (+ bosses.killGears per mini-boss kill)
     // Until Multishot is unlocked (normally just the first run), enemy HP grows
     // gentler for the first `untilWave` waves so a commons-only tower doesn't hit a wall at wave 10.
     starterAssist: { untilWave: 10, hpGrowth: 0.2 },
@@ -92,7 +136,7 @@ LST.CONFIG = {
       headStart: { base: 30, growth: 1.4,  max: 10, per: 5 },    // start 5 waves later per level...
       appraisal: { costs: [40, 120, 300], max: 3 },               // reads trap cards (see src/traps.js)
     },
-    headStartCap: 0.7, // ...but never past 70% of your best wave (rounded down to a multiple of 5)
+    headStartCap: 0.8, // ...but never past 80% of your best wave (rounded down to a multiple of 5)
     benchMax: 2,       // cards you can keep out of the shop
   },
 };
