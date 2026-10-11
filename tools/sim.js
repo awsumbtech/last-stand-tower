@@ -20,7 +20,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
-const FILES = ["config.js", "utils.js", "upgrades.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
+const FILES = ["config.js", "utils.js", "upgrades.js", "traps.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
 const SOURCES = FILES.map((f) => [f, fs.readFileSync(path.join(ROOT, "src", f), "utf8")]);
 
 // ---------- CLI ----------
@@ -104,6 +104,7 @@ function offense(t) {
 }
 function defense(t) { return t.maxHp * (1 + t.regen * 16 + t.lifesteal * 25); }
 function cardValue(card, game, last) {
+  if (card.trap) return -1; // the skilled bot reads the fine print
   const t = game.tower;
   const c = Object.assign(Object.create(Object.getPrototypeOf(t)), t);
   card.apply(c);
@@ -145,11 +146,11 @@ const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 function skilled(LST, game, s, last, opts = {}) {
   const repairBelow = opts.noRepair ? 0 : 0.6;
   if (!opts.noRepair) repair(game, s, repairBelow);
-  const best = () => open(game).map((c) => ({ ...c, v: cardValue(c.card, game, last) * (opts.favor && opts.favor(c.card) ? 10 : 1) }))
+  const best = () => open(game).map((c) => ({ ...c, v: opts.favor && opts.favor(c.card) ? 100 : cardValue(c.card, game, last) }))
     .sort((a, b) => b.v - a.v);
   let cards = best();
   // Reroll once before the free pick if nothing is good (or the favorite isn't there).
-  const wantReroll = opts.favor ? !cards.some((c) => opts.favor(c.card)) : cards.length && cards[0].v < 0.08;
+  const wantReroll = opts.favor && !opts.noSeek ? !cards.some((c) => opts.favor(c.card)) : cards.length && cards[0].v < 0.08;
   if (wantReroll && game.coins >= game.shopPrice("reroll") * 3) { reroll(game, s); cards = best(); }
   if (cards.length) take(game, cards[0], s);
   // Extras: buy the best remaining card while affordable; keep a repair in reserve
@@ -166,17 +167,22 @@ function skilled(LST, game, s, last, opts = {}) {
 
 // Focus: take the favourite card whenever it shows up (reroll to look for it), else play skilled.
 const focus = (ids) => (LST, game, s, last) => skilled(LST, game, s, last, { favor: (c) => ids.includes(c.id) });
+// Trap check: the trap is put into every deal from wave 4 (CONFIG.traps.force) and always taken.
+const trapFocus = (id) => (LST, game, s, last) => skilled(LST, game, s, last, { favor: (c) => c.id === id, noSeek: true });
 
 const STRATEGIES = {
   // Casual: free pick is a random card (shiny rarities slightly preferred), repairs when
   // under half HP, spends the rest on random extra cards, never rerolls.
+  // Learns traps like a player: skips ones already in the Codex (eye icon), and all of them
+  // once Appraisal L2 prints the fine print in full.
   casual(LST, game, s) {
     repair(game, s, 0.5);
-    const cards = open(game);
+    const wary = (c) => !(c.card.trap && (LST.meta.knowsTrap(c.card.id) || LST.meta.level("appraisal") >= 2));
+    const cards = open(game).filter(wary);
     const shiny = cards.flatMap((c) => Array(c.card.rarity === "epic" ? 3 : c.card.rarity === "rare" ? 2 : 1).fill(c));
     if (cards.length) take(game, rand(shiny), s);
     for (let k = 0; k < 2; k++) {
-      const rest = open(game);
+      const rest = open(game).filter(wary);
       if (!rest.length || game.coins < game.shopPrice("extraCard")) break;
       take(game, rand(rest), s);
     }
@@ -208,7 +214,8 @@ function playRun(strategyName, seed, meta, unlocked) {
     if (e.type === "boss") bossKills++;
   };
   const onTowerHit = game.onTowerHit.bind(game);
-  game.onTowerHit = (e) => { if (cur) cur.hpLost += e.damage; onTowerHit(e); };
+  game.onTowerHit = (e) => { if (cur) cur.hpLost += e.damage * (1 - game.tower.armor); onTowerHit(e); };
+  if (strategyName.startsWith("trap:")) LST.CONFIG.traps.force = strategyName.slice(5);
 
   game.reset();
   const runStats = { spent: 0, bought: {}, picks: 0, extras: 0, rerolls: 0, repairs: 0 };
@@ -256,6 +263,7 @@ function playRun(strategyName, seed, meta, unlocked) {
       // Clear bonus was added in endWave; count it as earned.
       cur.coinsEarned += LST.waves.clearBonus(game.wave);
       game.finishCelebration();
+      while (game.state === "gotcha") game.dismissGotcha();
       realSeconds += CELEBRATE_SECONDS + SHOP_SECONDS;
       const spentBefore = runStats.spent;
       strategy(LST, game, runStats, cur);
@@ -266,11 +274,14 @@ function playRun(strategyName, seed, meta, unlocked) {
     last = cur;
     if (died) break;
   }
+  for (const p of game.pendingGotchas) LST.meta.discoverTrap(p.id);
+  if (meta) meta.codex = JSON.parse(JSON.stringify(LST.meta.state.codex));
   return {
     strategy: strategyName, seed, deathWave: game.wave, startWave, realMinutes: realSeconds / 60,
     bought: runStats.bought, picks: runStats.picks, extras: runStats.extras, rerolls: runStats.rerolls, repairs: runStats.repairs, bossKills, waves,
     finalDps: towerDps(game.tower),
-    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared).total,
+    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared, game.gearMult).total,
+    traps: game.trapLog.map((t) => t.id),
   };
 }
 
@@ -286,8 +297,8 @@ function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5
   const { LST } = loadGame(1);
   const cfg = LST.CONFIG.meta;
   const order = LST.meta.lockable().map((c) => [c.id, c.unlockCost]);
-  const cost = (id, n) => { const u = cfg.upgrades[id]; return n >= u.max ? Infinity : Math.round(u.base * Math.pow(u.growth, n)); };
-  const meta = { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0 };
+  const cost = (id, n) => { const u = cfg.upgrades[id]; return n >= u.max ? Infinity : u.costs ? u.costs[n] : Math.round(u.base * Math.pow(u.growth, n)); };
+  const meta = { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0, codex: { seen: [], traps: [] } };
   let gears = 0, minutes = 0;
   const events = {}, runs = [];
   for (let run = 1; minutes < hours * 60 && run <= 2000; run++) {
@@ -343,7 +354,31 @@ function summarize(results) {
 if (require.main === module) {
   const outPath = opt("out", "sim-results.json");
   const t0 = Date.now();
-  if (opt("campaign", false)) {
+  if (opt("upgrade-check", false)) {
+    // Workshop dominance check: spend a fixed Gear budget on ONE upgrade (or cheapest-first
+    // "balanced"), all cards unlocked, then play skilled runs. Head Start off.
+    const budget = +opt("gears", 1500), runs = +opt("runs", 40);
+    const { LST } = loadGame(1);
+    const cfg = LST.CONFIG.meta.upgrades;
+    const cost = (id, n) => (n >= cfg[id].max ? Infinity : Math.round(cfg[id].base * Math.pow(cfg[id].growth, n)));
+    const ids = ["power", "rapid", "armor", "greed", "sharpEye", "bank"];
+    const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr[Math.floor(p * arr.length)]; };
+    const rows = {};
+    for (const plan of ["none", ...ids, "balanced", "balanced-no-armor"]) {
+      const up = {}; let g = plan === "none" ? 0 : budget;
+      for (let k = 0; k < 1000 && plan !== "none"; k++) {
+        const opts = (plan.startsWith("balanced") ? ids.filter((i) => plan === "balanced" || i !== "armor") : [plan]).map((i) => [i, cost(i, up[i] || 0)]).sort((a, b) => a[1] - b[1]);
+        if (!opts.length || opts[0][1] > g) break;
+        g -= opts[0][1]; up[opts[0][0]] = (up[opts[0][0]] || 0) + 1;
+      }
+      const meta = { unlocked: LST.CARDS.filter((c) => c.unlockCost).map((c) => c.id), upgrades: up, benched: [], headStartPick: 0, best: 0 };
+      const rs = []; for (let s = 1; s <= runs; s++) rs.push(playRun("skilled", s, meta));
+      rows[plan] = { levels: JSON.stringify(up), medianWave: q(rs.map((r) => r.deathWave), 0.5), p25: q(rs.map((r) => r.deathWave), 0.25), minutes: +q(rs.map((r) => r.realMinutes), 0.5).toFixed(1) };
+    }
+    console.log(`Upgrade check: ${budget} Gears on one upgrade, skilled, all cards, ${runs} runs`);
+    console.table(rows);
+    fs.writeFileSync(outPath, JSON.stringify(rows, null, 1));
+  } else if (opt("campaign", false)) {
     const n = +opt("campaigns", 12), hours = +opt("hours", 10);
     const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr[Math.min(arr.length - 1, Math.floor(p * arr.length))]; };
     const out = {};
@@ -386,7 +421,8 @@ if (require.main === module) {
       // Dominance check: one strategy per card that always grabs that card when offered.
       const { LST } = loadGame(1);
       names = ["skilled"];
-      for (const c of LST.CARDS) { STRATEGIES["favor:" + c.id] = focus([c.id]); names.push("favor:" + c.id); }
+      if (!opt("traps-only", false)) for (const c of LST.CARDS) { STRATEGIES["favor:" + c.id] = focus([c.id]); names.push("favor:" + c.id); }
+      for (const c of LST.TRAPS) { STRATEGIES["trap:" + c.id] = trapFocus(c.id); names.push("trap:" + c.id); }
     }
     const results = [];
     for (const name of names) {
@@ -395,7 +431,7 @@ if (require.main === module) {
     }
     const summary = summarize(results);
     fs.writeFileSync(outPath, JSON.stringify({ overrides: OVERRIDES, summary, results }, null, 0));
-    console.table(Object.fromEntries(Object.entries(summary).map(([k, v]) => [k, { median: v.deathWave.median, p25: v.deathWave.p25, p75: v.deathWave.p75, min: v.deathWave.min, max: v.deathWave.max, minutes: v.minutes.median }])));
+    console.table(Object.fromEntries(Object.entries(summary).map(([k, v]) => [k, { median: v.deathWave.median, p25: v.deathWave.p25, p75: v.deathWave.p75, min: v.deathWave.min, max: v.deathWave.max, mean: +(results.filter((r) => r.strategy === k).reduce((a, r) => a + r.deathWave, 0) / RUNS).toFixed(2), minutes: v.minutes.median }])));
   }
   process.stderr.write(`took ${((Date.now() - t0) / 1000).toFixed(1)}s -> ${outPath}\n`);
 }

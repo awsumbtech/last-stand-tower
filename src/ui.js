@@ -20,6 +20,7 @@ LST.UI = class UI {
         results: $("screen-results"),
         workshop: $("screen-workshop"),
         confirm: $("screen-confirm"),
+        gotcha: $("screen-gotcha"),
       },
       startGears: $("start-gears"),
       startBadge: $("start-badge"),
@@ -52,7 +53,7 @@ LST.UI = class UI {
     // Workshop: one delegated listener for all three tabs.
     this.wsTab = "cards";
     this.el.wsGrid.addEventListener("click", (ev) => {
-      const el = ev.target.closest("[data-card],[data-upgrade],[data-bench]");
+      const el = ev.target.closest("[data-card],[data-upgrade],[data-bench],[data-codex]");
       if (!el) return;
       const m = LST.meta;
       if (el.dataset.card) {
@@ -69,6 +70,10 @@ LST.UI = class UI {
           const cost = m.upgradeCost(id);
           this.el.wsHint.innerHTML = cost === Infinity ? "That one is maxed out!" : `Need <b>${cost - m.state.gears}</b> more Gears.`;
         }
+      } else if (el.dataset.codex) {
+        this.codexSel = this.codexSel === el.dataset.codex ? null : el.dataset.codex;
+        LST.audio.play("tap");
+        this.renderWorkshop();
       } else if (el.dataset.bench) {
         const why = m.benchBlock(el.dataset.bench);
         if (!game.toggleBench(el.dataset.bench)) {
@@ -88,6 +93,8 @@ LST.UI = class UI {
       this.renderStart();
     });
     this.el.auto.addEventListener("click", () => game.autoDraft());
+    $("btn-return").addEventListener("click", () => game.returnTrap());
+    $("btn-gotcha").addEventListener("click", () => game.dismissGotcha());
     // Settings (start screen) reuses the pause panel; reset progress asks first.
     $("btn-settings").addEventListener("click", () => this.show("pause"));
     $("btn-reset").addEventListener("click", () => this.show("confirm"));
@@ -137,7 +144,7 @@ LST.UI = class UI {
     for (const [key, el] of Object.entries(this.el.screens)) {
       el.classList.toggle("hidden", key !== name);
     }
-    this.el.hud.classList.toggle("hidden", name === "start" || name === "results" || name === "workshop" || name === "dying");
+    this.el.hud.classList.toggle("hidden", name === "start" || name === "results" || name === "workshop" || name === "dying" || name === "gotcha");
     if (this.el.screens[name]) LST.UI.pop(this.el.screens[name].querySelector(".panel"));
     if (name !== "results") this.stopCount();
     if (name === "start") this.renderStart();
@@ -149,6 +156,7 @@ LST.UI = class UI {
     }
     if (name === "upgrade") this.renderShop({ deal: true });
     if (name === "results") this.renderResults();
+    if (name === "gotcha") this.renderGotcha();
     if (name === "workshop") this.renderWorkshop();
   }
 
@@ -165,10 +173,43 @@ LST.UI = class UI {
     this.el.headStart.classList.toggle("off", hs <= 0);
     // One-time hello for players from before Gears existed.
     const w = this.el.startWelcome;
-    if (m.state.veteranBonus && !m.state.seenWorkshop) {
+    if (m.state.armorNotice) {
+      w.innerHTML = `New: <b>Armor</b> now blocks damage (-${(m.armorReduction() * 100).toFixed(0)}% at your level)${m.state.armorRefund ? `, and you got <b>${m.state.armorRefund} Gears</b> back for levels above the new max` : ""}.`;
+      w.classList.remove("hidden");
+    } else if (m.state.veteranBonus && !m.state.seenWorkshop) {
       w.innerHTML = `Welcome back! Your best wave earned you <b>${m.state.veteranBonus} Gears</b>. Spend them in the Workshop.`;
       w.classList.remove("hidden");
     } else w.classList.add("hidden");
+  }
+
+  // ---------- "Gotcha!" reveal ----------
+  renderGotcha() {
+    const id = this.game.gotchaQueue[0];
+    const c = id && LST.cardById(id);
+    if (!c) return;
+    const rar = LST.RARITY[c.rarity];
+    const flip = document.getElementById("gotcha-flip");
+    flip.style.setProperty("--accent", c.color);
+    flip.style.setProperty("--rarity", rar.color);
+    flip.className = `gotcha-flip ${c.rarity}`;
+    flip.innerHTML = `
+      <div class="face front card ${c.rarity}" style="--accent:${c.color};--rarity:${rar.color}">
+        <span class="ribbon">${rar.label}</span>
+        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg></span>
+        <span class="name">${c.name}</span>
+        <span class="desc">${c.desc}</span>
+        <span class="fine">${c.fine}</span>
+      </div>
+      <div class="face back">
+        <span class="stamp">GOTCHA!</span>
+        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg></span>
+        <span class="name">${c.name} <i class="kind">${KIND_LABEL[c.kind]}</i></span>
+        <span class="truth">${c.truth}</span>
+      </div>`;
+    document.getElementById("gotcha-lesson").innerHTML = `<b>Lesson:</b> ${c.lesson}`;
+    void flip.offsetWidth;
+    flip.classList.add("go");
+    setTimeout(() => { LST.audio.play("stamp"); LST.haptics.buzz(30); }, 900);
   }
 
   // ---------- Results screen ----------
@@ -189,7 +230,7 @@ LST.UI = class UI {
     $("res-score").textContent = fmt(r.score);
 
     // Cards taken this run, as little icon chips.
-    const cards = r.cards.map(([id, n]) => [LST.meta.card(id), n]).filter(([c]) => c);
+    const cards = r.cards.filter(([, n]) => n > 0).map(([id, n]) => [LST.cardById(id), n]).filter(([c]) => c && c.id !== "mysteryBox");
     $("res-cards").innerHTML = cards.length
       ? cards.map(([c, n]) => `<span class="chip ${c.rarity}" style="--accent:${c.color}" title="${c.name}"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg>${n > 1 ? `<b>x${n}</b>` : ""}</span>`).join("")
       : '<small>No cards this time</small>';
@@ -199,6 +240,12 @@ LST.UI = class UI {
     $("res-g-boss-n").textContent = `x${r.bossWaves}`;
     $("res-g-bosses").textContent = `+${r.gears.bosses}`;
     $("res-gears").textContent = "+0";
+    const piggy = $("res-g-piggy");
+    piggy.classList.toggle("hidden", !(r.gearMult > 1));
+    piggy.querySelector("b").textContent = `x${(r.gearMult || 1).toFixed(1)}`;
+    const nc = $("res-codex");
+    nc.classList.toggle("hidden", !r.newCodex.length);
+    nc.innerHTML = r.newCodex.length ? `${EYE_SVG}<span>New in the Codex: <b>${r.newCodex.map((id) => LST.cardById(id).name).join(", ")}</b></span>` : "";
     document.getElementById("res-badge").classList.add("hidden");
     this.renderNextUnlock(r.gearsBefore);
     this.countGears(r);
@@ -281,6 +328,7 @@ LST.UI = class UI {
     grid.innerHTML = "";
     if (tab === "cards") this.renderCardsTab(grid, opts);
     else if (tab === "upgrades") this.renderUpgradesTab(grid, opts);
+    else if (tab === "codex") this.renderCodexTab(grid, opts);
     else this.renderDeckTab(grid, opts);
     [...grid.children].forEach((c, i) => c.style.setProperty("--n", i));
   }
@@ -362,6 +410,33 @@ LST.UI = class UI {
     }
   }
 
+  // Codex: every card you've been dealt, and the traps you've discovered (with their lesson).
+  renderCodexTab(grid, opts) {
+    const m = LST.meta;
+    const found = LST.TRAPS.filter((t) => m.knowsTrap(t.id)).length;
+    const seen = LST.CARDS.filter((c) => m.state.codex.seen.includes(c.id)).length;
+    const sel = this.codexSel && LST.cardById(this.codexSel);
+    const known = sel && (sel.trap ? m.knowsTrap(sel.id) : m.state.codex.seen.includes(sel.id));
+    this.el.wsHint.innerHTML = sel && known
+      ? (sel.trap ? `<b>${sel.name}:</b> ${sel.truth} <i>${sel.lesson}</i>` : `<b>${sel.name}:</b> ${sel.desc}`)
+      : sel ? "Not found yet. Keep playing!"
+      : `Cards <b>${seen}/${LST.CARDS.length}</b> &middot; Traps found <b>${found}/${LST.TRAPS.length}</b>. Tap one to read it.`;
+    this.el.wsHint.classList.toggle("codex-detail", !!(sel && known));
+    const add = (c, isTrap) => {
+      const has = isTrap ? m.knowsTrap(c.id) : m.state.codex.seen.includes(c.id);
+      const el = document.createElement("button");
+      el.className = `codex-tile ${c.rarity}` + (isTrap ? " trap" : "") + (has ? " found" : " unknown") + (this.codexSel === c.id ? " sel" : "");
+      el.dataset.codex = c.id;
+      el.style.setProperty("--accent", c.color);
+      el.setAttribute("aria-label", has ? c.name : "Unknown card");
+      el.innerHTML = `<span class="icon">${has ? `<svg viewBox="0 0 24 24" aria-hidden="true">${c.icon}</svg>` : "?"}</span>
+        <span class="name">${has ? c.name : "???"}</span>${isTrap && has ? '<span class="stamp">GOTCHA</span>' : ""}`;
+      grid.appendChild(el);
+    };
+    LST.CARDS.forEach((c) => add(c, false));
+    LST.TRAPS.forEach((c) => add(c, true));
+  }
+
   // Small floating message at the bottom of the screen.
   toast(text) {
     const t = document.createElement("div");
@@ -420,12 +495,15 @@ LST.UI = class UI {
     s.cards.forEach((slot, i) => {
       const { card, taken } = slot;
       const lvl = g.upgradeLevels[card.id] || 0;
+      const appraisal = LST.meta.level("appraisal");
+      const known = card.trap && LST.meta.knowsTrap(card.id);
       const shownLvl = taken ? lvl : lvl + 1; // level after taking it
       const rar = LST.RARITY[card.rarity];
       const locked = !taken && s.picked && g.coins < extraPrice;
       const el = document.createElement("button");
       el.className = `card ${card.rarity}` + (taken ? " taken" : "") + (locked ? " locked" : "") +
-        (opts.took === i ? " bought" : "") +
+        (opts.took === i ? " bought" : "") + (slot.from && opts.took === i ? " mystery" : "") +
+        (card.trap && appraisal >= 1 && card.kind !== "dud" && card.kind !== "build" ? " cursed" : "") +
         (opts.deal || (opts.rerolled && !taken) ? " deal" : "");
       el.style.setProperty("--accent", card.color);
       el.style.setProperty("--rarity", rar.color);
@@ -439,12 +517,20 @@ LST.UI = class UI {
         <span class="ribbon">${rar.label}</span>
         <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${card.icon}</svg></span>
         <span class="name">${card.name}</span>
-        <span class="level">${shownLvl === 1 && !taken ? "NEW" : "Lv " + shownLvl}${card.maxLevel ? " / " + card.maxLevel : ""}</span>
+        ${known ? `<span class="eye" title="Known trap">${EYE_SVG}</span>` : ""}
+        <span class="level">${slot.from ? "from Mystery Box" : card.trap ? "NEW" : (shownLvl === 1 && !taken ? "NEW" : "Lv " + shownLvl) + (card.maxLevel ? " / " + card.maxLevel : "")}</span>
         <span class="desc">${card.desc}</span>
-        <span class="stat">${card.stat(g.tower)}</span>
+        ${card.trap ? `<span class="fine${appraisal >= 2 || known ? " full" : ""}">${appraisal >= 2 || known ? card.truth : card.fine}</span>` : `<span class="stat">${card.stat(g.tower)}</span>`}
         ${tag}`;
       this.el.cardRow.appendChild(el);
     });
+
+    // Appraisal L3: return a trap you just took.
+    const ret = g.returnableTrap();
+    const retEl = document.getElementById("btn-return");
+    retEl.classList.toggle("hidden", !ret);
+    if (ret) retEl.innerHTML = `&#8617; Return ${LST.cardById(ret.id).name} <small>(${ret.paid ? "+" + ret.paid + " coins" : "free reroll"})</small>`;
+    if (opts.returned) this.el.shopHint.innerHTML = `${LST.cardById(opts.returned).name} returned. Good eye!`;
 
     const rerollPrice = g.shopPrice("reroll");
     this.el.rerollPrice.textContent = rerollPrice;
@@ -465,6 +551,8 @@ LST.UI = class UI {
 };
 
 const GEAR_SVG = '<svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg>';
+const EYE_SVG = '<svg class="eye-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg>';
+const KIND_LABEL = { cursed: "Cursed", delayed: "Delayed cost", build: "Build-dependent", gamble: "Gamble", dud: "Dud" };
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>';
 
 // Restart a CSS "squash & stretch" entrance animation on an element.

@@ -37,6 +37,24 @@ with **Gears** in the Workshop (see below), and the shop only deals cards you've
 | Vampire | Epic | Each kill heals 0.5% max HP (max 3) | 140 Gears |
 | Overcharge | Epic | Crits deal +100% damage (max 1) | 250 Gears |
 
+### Trap cards ("Gotcha!")
+
+From wave 4, about 1 deal in 5 hides a **trap**: a card that sounds great but has a catch. Traps look like normal
+cards and cost the same. The tell is the wording and a tiny grey line of fine print, so read carefully. The first time
+you take one, it flips over at the end of the next wave with a **Gotcha!** and goes into your **Codex**. After that,
+copies show an **eye icon** and their real effect.
+
+| Trap | Shown as | Says | Really does |
+| --- | --- | --- | --- |
+| Glass Cannon | Epic | +35% damage! | ...and max HP x0.6 (cursed: good with Regen/Vampire/Armor) |
+| Big Bertha | Rare | +80% damage per shot | ...but -45% fire rate, -30% shot speed: no DPS gain |
+| Long Shot | Common | +90 range | ...and -15% damage; enemies are already in range (dud) |
+| Thorns | Rare | Enemies touching the tower take 300% of their HP | nothing: they already pop on contact (dud until boss slams arrive) |
+| Overclock | Rare | +40% fire rate | for 3 waves, then -20% fire rate for the rest of the run |
+| Hot Streak | Common | Crits hit x3! | ...and every shot -15% damage: only good with high crit chance |
+| Piggy Bank | Rare | +40% Gears this run | ...for -3% damage (a real trade: weaker run, faster Workshop) |
+| Mystery Box | Epic | Could be anything! | 50% a Common, 25% a Rare/Epic, 25% another trap |
+
 - Enemies: **pink blobs** (basic), **yellow teardrops** (fast), **orange helmets** (tanky), plus **Big Red**, a horned boss, every 5th wave.
 - Your best wave is saved in the browser.
 
@@ -53,7 +71,7 @@ Pierce 100, Vampire 140, Splash 190, Overcharge 250. A first run usually pays fo
 Until Multishot is unlocked, enemy HP grows a little gentler over the first 10 waves (+20% per wave instead of
 +25%), so a commons-only first run doesn't hit a wall.
 
-The Workshop has three tabs:
+The Workshop has four tabs:
 
 - **Cards:** unlock new cards for the shop.
 - **Upgrades:** lasting boosts for every run. Level n+1 costs `round(base × growth^n)` Gears.
@@ -62,13 +80,18 @@ The Workshop has three tabs:
   | --- | --- | --- |
   | Power | +5% damage | 12 / 1.15 / 60 |
   | Rapid | +3% fire rate | 12 / 1.17 / 30 |
-  | Armor | +6% max HP | 10 / 1.15 / 60 |
+  | Armor | damage taken x0.97 per level (-26% at 10, -46% at 20, max 65% at 35) | 14 / 1.2 / 35 |
   | Bank | +15 starting coins | 15 / 1.30 / 15 |
   | Greed | +4% coins per kill | 20 / 1.22 / 25 |
   | Sharp Eye | +1% crit chance | 25 / 1.25 / 15 |
   | Head Start | start 5 waves later (up to 70% of your best wave) | 30 / 1.4 / 10 |
+  | Appraisal | L1 cursed traps wobble, L2 fine print in full, L3 return a trap within 1 wave | 40 / 120 / 300 |
 
 - **Deck:** bench up to 2 cards so they never show up in the shop (keep at least one attack card).
+- **Codex:** every card you've been dealt and every trap you've found ("GOTCHA" stamp). Tap one for its real effect and a lesson tip.
+
+Armor used to be +6% max HP. Saves from before keep their Armor level (up to the new max of 35); Gears spent on levels
+above 35 are refunded, and the start screen says so once.
 
 **Head Start** replays the skipped waves' shops as a quick draft: each hand pays that wave's coins and gives a free
 pick, with extras at that wave's prices. **Auto-draft** does all but the last hand for you. Tap the Head Start chip
@@ -127,6 +150,7 @@ Opening `index.html` directly also works (without offline support, since service
 | --- | --- |
 | `src/config.js` | All balance numbers: tower stats, enemy types, wave scaling |
 | `src/upgrades.js` | Shop cards (rarity, effect, cap) and the shop rules (draw, prices). Add an entry to add a card |
+| `src/traps.js` | The 8 trap cards: what they say, the fine print, what they really do, Codex lessons |
 | `src/meta.js` | Lasting progress: Gears, card unlocks, Workshop upgrades, Head Start, bench, versioned save + migrations |
 | `src/waves.js` | Which enemies are in each wave and how they scale |
 | `src/entities.js` | Tower, Enemy, Projectile, Particle, FloatText |
@@ -152,7 +176,9 @@ The game object is on `window.game` for poking around in the browser console.
 
 ```bash
 node tools/sim.js --runs 50 --shop-seconds 6        # death wave + real minutes per strategy
-node tools/sim.js --favor                            # dominance check: always take card X
+node tools/sim.js --favor                            # dominance check: always take card X (and each trap, forced into a wave-4+ deal)
+node tools/sim.js --favor --traps-only --runs 150    # just the trap check
+node tools/sim.js --upgrade-check --gears 1500       # Workshop check: one fixed Gear budget on a single upgrade
 node tools/sim.js --config tweaks.json               # try CONFIG overrides: { "config": { ... } }
 node tools/waves-table.js sim-results.json skilled   # per-wave pressure / DPS / coins table
 node tools/sim.js --unlocked starter                 # only the starter cards (first run); or --unlocked multishot,crit

@@ -17,6 +17,7 @@ LST.Tower = class Tower {
     this.critChance = c.critChance;
     this.critMult = c.critMult;
     this.damageMult = 1; // Workshop "Power" upgrade
+    this.armor = 0;      // Workshop "Armor": fraction of incoming damage blocked
     this.pierce = c.pierce;
     this.slow = c.slow;
     this.slowTime = c.slowTime;
@@ -64,7 +65,7 @@ LST.Tower = class Tower {
   }
 
   takeDamage(amount) {
-    this.hp = Math.max(0, this.hp - amount);
+    this.hp = Math.max(0, this.hp - amount * (1 - this.armor));
     this.hitFlash = 0.2;
   }
 };

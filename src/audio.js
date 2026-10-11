@@ -202,6 +202,20 @@ LST.audio = (function () {
       tone({ type: "triangle", freq: midi(72), start: 0.08, dur: 0.08, vol: 0.14 });
       tone({ type: "triangle", freq: midi(79), start: 0.14, dur: 0.14, vol: 0.14 });
     } },
+    gotcha: { priority: true, play() {
+      // cartoon "wah-wah" + a springy boing
+      for (const [n, st] of [[64, 0], [61, 0.22]]) {
+        tone({ type: "sawtooth", freq: midi(n) * 1.03, to: midi(n) * 0.97, start: st, dur: 0.2, vol: 0.07, filter: { freq: 1400, q: 4 } });
+      }
+      tone({ type: "sine", freq: 220, to: 660, start: 0.5, dur: 0.12, vol: 0.18 });
+      tone({ type: "sine", freq: 660, to: 330, start: 0.62, dur: 0.18, vol: 0.12 });
+    } },
+    stamp: { priority: true, play() {
+      // rubber stamp thud + paper slap
+      tone({ type: "sine", freq: 140, to: 60, dur: 0.16, vol: 0.45 });
+      noise({ dur: 0.08, vol: 0.25, type: "lowpass", freq: 1800 });
+      noise({ start: 0.02, dur: 0.05, vol: 0.12, type: "highpass", freq: 4000 });
+    } },
     deny: { throttle: 0.15, play() {
       tone({ type: "square", freq: 180, to: 140, dur: 0.14, vol: 0.08, filter: { freq: 900 } });
     } },

@@ -18,7 +18,7 @@ LST.UPGRADES = [
   { id: "rapid", name: "Rapid", color: "#ffb020", icon: '<path d="M13.5 2L4 13.5h6.5L9 22l10-12h-6.6z"/>',
     desc: (n) => `+${Math.round(n * 3)}% fire rate` },
   { id: "armor", name: "Armor", color: "#5ec8ff", icon: '<path d="M12 2l8 3v6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5z"/>',
-    desc: (n) => `+${Math.round(n * 6)}% max HP` },
+    desc: (n) => `-${(LST.meta.armorReduction(n) * 100).toFixed(1).replace(/\.0$/, "")}% damage taken` },
   { id: "bank", name: "Bank", color: "#ffd23f", icon: '<circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M14.8 8.6c-.6-.8-1.6-1.2-2.8-1.2-1.6 0-2.8.9-2.8 2.2 0 3 5.8 1.7 5.8 4.7 0 1.3-1.3 2.3-3 2.3-1.3 0-2.4-.5-3-1.4"/>',
     desc: (n) => `+${n * 15} starting coins` },
   { id: "greed", name: "Greed", color: "#3ddc84", icon: '<path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/>',
@@ -27,11 +27,13 @@ LST.UPGRADES = [
     desc: (n) => `+${n}% crit chance` },
   { id: "headStart", name: "Head Start", color: "#ff9f43", icon: '<path d="M5 21V3"/><path d="M5 4h12l-2.5 4L17 12H5"/>',
     desc: (n) => n ? `Start up to wave ${n * 5 + 1}` : "Skip the early waves" },
+  { id: "appraisal", name: "Appraisal", color: "#26a69a", icon: '<circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/><path d="M7.5 10h5M10 7.5v5"/>',
+    desc: (n) => ["Learn to read trap cards", "Cursed cards wobble", "Fine print shown in full", "Return a trap within 1 wave"][n] },
 ];
 
 LST.meta = (function () {
   const KEY = "lst.meta";
-  const VERSION = 2;
+  const VERSION = 3;
   const storage = LST.utils.storage;
   const M = () => LST.CONFIG.meta;
 
@@ -39,12 +41,24 @@ LST.meta = (function () {
     return {
       v: VERSION, gears: 0, lifetimeGears: 0, runs: 0, seenWorkshop: false, veteranBonus: 0,
       unlocked: [], upgrades: {}, benched: [], headStartPick: null, // null = use the highest allowed
+      codex: { seen: [], traps: [] }, // cards you've been dealt / traps you've discovered
+      armorRefund: 0,                 // Gears refunded when Armor changed
+      armorNotice: false,             // show the "Armor changed" note once
     };
   }
 
   // Each step takes a save of version k and returns version k + 1.
   const MIGRATIONS = {
     1: (s) => Object.assign(s, { v: 2, upgrades: {}, benched: [], headStartPick: null }),
+    // v3: Armor became damage reduction with max 35 levels (was +6% max HP, max 60).
+    // Levels up to 35 are kept; Gears spent on levels above that are refunded.
+    2: (s) => {
+      const lvl = Math.floor(+((s.upgrades || {}).armor) || 0), max = M().upgrades.armor.max;
+      let refund = 0;
+      for (let n = max; n < lvl; n++) refund += Math.round(10 * Math.pow(1.15, n)); // old Armor price curve
+      if (lvl > max) { s.upgrades.armor = max; s.gears = (s.gears || 0) + refund; }
+      return Object.assign(s, { v: 3, codex: { seen: [], traps: [] }, armorRefund: refund, armorNotice: lvl > 0 });
+    },
   };
 
   function sanitize(s) {
@@ -59,6 +73,8 @@ LST.meta = (function () {
       s.upgrades[id] = Math.max(0, Math.min(cfg.max, n));
     }
     s.unlocked = s.unlocked.filter((id) => LST.CARDS.some((c) => c.id === id && c.unlockCost));
+    if (!s.codex || typeof s.codex !== "object") s.codex = { seen: [], traps: [] };
+    for (const k of ["seen", "traps"]) if (!Array.isArray(s.codex[k])) s.codex[k] = [];
     s.benched = s.benched.filter((id) => LST.CARDS.some((c) => c.id === id)).slice(0, M().benchMax);
     return s;
   }
@@ -108,7 +124,7 @@ LST.meta = (function () {
     },
 
     // ---------- Cards ----------
-    card(id) { return LST.CARDS.find((c) => c.id === id); },
+    card(id) { return LST.cardById ? LST.cardById(id) : LST.CARDS.find((c) => c.id === id); },
     isUnlocked(id) {
       const c = this.card(id);
       return !!c && (!c.unlockCost || this.state.unlocked.includes(id));
@@ -153,7 +169,27 @@ LST.meta = (function () {
     upgradeCost(id) {
       const u = M().upgrades[id];
       const n = this.level(id);
-      return n >= u.max ? Infinity : Math.round(u.base * Math.pow(u.growth, n));
+      if (n >= u.max) return Infinity;
+      return u.costs ? u.costs[n] : Math.round(u.base * Math.pow(u.growth, n));
+    },
+    // Armor: damage taken x keep^level, capped (diminishing returns, never 100%).
+    armorReduction(level = this.level("armor")) {
+      const a = M().upgrades.armor;
+      return Math.min(a.cap, 1 - Math.pow(a.keep, level));
+    },
+
+    // ---------- Codex ----------
+    knowsTrap(id) { return this.state.codex.traps.includes(id); },
+    discoverTrap(id) {
+      if (this.knowsTrap(id)) return false;
+      this.state.codex.traps.push(id);
+      this.save();
+      return true;
+    },
+    seeCards(ids) {
+      let changed = false;
+      for (const id of ids) if (!this.state.codex.seen.includes(id)) { this.state.codex.seen.push(id); changed = true; }
+      if (changed) this.save();
     },
     buyUpgrade(id) {
       const cost = this.upgradeCost(id);
@@ -170,8 +206,7 @@ LST.meta = (function () {
       const u = M().upgrades, t = game.tower, L = (id) => this.level(id);
       t.damageMult *= 1 + u.power.per * L("power");
       t.fireRate *= 1 + u.rapid.per * L("rapid");
-      t.maxHp *= 1 + u.armor.per * L("armor");
-      t.hp = t.maxHp;
+      t.armor = this.armorReduction();
       t.critChance += u.sharpEye.per * L("sharpEye");
       game.coins += u.bank.per * L("bank");
       game.coinMult = 1 + u.greed.per * L("greed");

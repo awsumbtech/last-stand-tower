@@ -20,6 +20,13 @@ LST.Game = class Game extends LST.World {
     this.coinMult = 1;     // Workshop "Greed"
     this.headStart = 0;    // waves skipped this run
     this.draft = null;     // Head Start draft: { hand, of, income[] }
+    // Trap cards (src/traps.js)
+    this.gearMult = 1;     // Piggy Bank
+    this.overclock = null; // { waves, hot }
+    this.trapLog = [];     // [{ id, wave, paid }] traps taken this run (for Appraisal L3 returns)
+    this.pendingGotchas = []; // undiscovered traps waiting for their "Gotcha!" reveal: [{ id, wave }]
+    this.gotchaQueue = [];    // reveals to show now
+    this.newCodex = [];       // traps discovered this run
     this.score = 0;
     this.kills = 0;
     this.upgradeLevels = {}; // card id -> times taken this run
@@ -89,7 +96,8 @@ LST.Game = class Game extends LST.World {
     if (this.state !== "upgrade" || !this.draft) return;
     const lvl = (id) => this.upgradeLevels[id] || 0;
     const takeBest = () => {
-      const open = this.shop.cards.map((c, i) => ({ c, i })).filter((o) => !o.c.taken && LST.shopRules.available(o.c.card, this.upgradeLevels));
+      // (skips traps you already know; unknown ones can still fool it, same as you)
+      const open = this.shop.cards.map((c, i) => ({ c, i })).filter((o) => !o.c.taken && LST.shopRules.available(o.c.card, this.upgradeLevels) && !(o.c.card.trap && LST.meta.knowsTrap(o.c.card.id)));
       if (!open.length) return false;
       open.sort((a, b) => (b.c.card.offense ? 1 : 0) - (a.c.card.offense ? 1 : 0) || lvl(a.c.card.id) - lvl(b.c.card.id));
       const pick = Math.random() < 0.7 ? open[0] : open[Math.floor(Math.random() * open.length)];
@@ -125,6 +133,19 @@ LST.Game = class Game extends LST.World {
     this.coins += bonus;
     this.coinsEarned += bonus;
     if (this.wave % LST.CONFIG.waves.bossEvery === 0) this.bossWavesCleared += 1;
+    // Overclock overheats after 3 cleared waves.
+    if (this.overclock && this.overclock.hot && --this.overclock.waves <= 0) {
+      this.overclock.hot = false;
+      this.tower.fireRate = (this.tower.fireRate / 1.4) * 0.8;
+      this.texts.push(new LST.FloatText(this.tower.x, this.tower.y - 90, "Overheated!", "#ff7043", "bonus"));
+    }
+    // Traps taken before this wave flip over now.
+    for (const p of this.pendingGotchas.filter((p) => p.wave < this.wave)) {
+      this.gotchaQueue.push(p.id);
+      LST.meta.discoverTrap(p.id);
+      this.newCodex.push(p.id);
+    }
+    this.pendingGotchas = this.pendingGotchas.filter((p) => p.wave >= this.wave);
     this.score += this.wave * 50;
     this.saveBest(this.wave);
     this.state = "celebrate";
@@ -137,6 +158,13 @@ LST.Game = class Game extends LST.World {
 
   finishCelebration() {
     if (this.state !== "celebrate") return;
+    if (this.gotchaQueue.length) {
+      this.state = "gotcha";
+      this.ui.show("gotcha");
+      LST.audio.play("gotcha");
+      LST.haptics.buzz([40, 60, 120]);
+      return;
+    }
     this.openShop();
     this.state = "upgrade";
     this.ui.show("upgrade");
@@ -149,8 +177,11 @@ LST.Game = class Game extends LST.World {
   openShop() {
     const n = LST.CONFIG.shop.cards;
     const bossWave = this.wave % LST.CONFIG.waves.bossEvery === 0;
+    const cards = LST.shopRules.draw(this.upgradeLevels, n, [], bossWave, { wave: this.wave });
+    LST.meta.seeCards(cards.filter((c) => !c.trap).map((c) => c.id));
     this.shop = {
-      cards: LST.shopRules.draw(this.upgradeLevels, n, [], bossWave).map((card) => ({ card, taken: false })),
+      freeRerolls: 0, // Appraisal L3: returning a free-pick trap gives a free reroll
+      cards: cards.map((card) => ({ card, taken: false })),
       picked: false,
       extras: 0,
       rerolls: 0,
@@ -161,6 +192,7 @@ LST.Game = class Game extends LST.World {
   // Coin price of the next extra card / reroll / repair in this shop.
   shopPrice(kind) {
     const s = this.shop;
+    if (kind === "reroll" && s.freeRerolls > 0) return 0;
     const times = { extraCard: s.extras, reroll: s.rerolls, repair: s.repairs }[kind];
     return LST.shopRules.price(kind, this.wave, times);
   }
@@ -171,22 +203,87 @@ LST.Game = class Game extends LST.World {
     const slot = s && s.cards[index];
     if (this.state !== "upgrade" || !slot || slot.taken) return false;
     if (!LST.shopRules.available(slot.card, this.upgradeLevels)) return false;
+    let paid = 0;
     if (s.picked) {
       const price = this.shopPrice("extraCard");
       if (this.coins < price) { LST.audio.play("deny"); return false; }
       this.coins -= price;
       s.extras += 1;
+      paid = price;
     }
     s.picked = true;
     slot.taken = true;
     this.upgradeLevels[slot.card.id] = (this.upgradeLevels[slot.card.id] || 0) + 1;
-    slot.card.apply(this.tower);
+    // Mystery Box: swap in the card inside (50% Common, 25% Rare/Epic, 25% another trap).
+    if (slot.card.id === "mysteryBox") {
+      LST.meta.discoverTrap("mysteryBox");
+      slot.from = slot.card;
+      slot.card = this.openMysteryBox();
+      this.upgradeLevels[slot.card.id] = (this.upgradeLevels[slot.card.id] || 0) + 1;
+    }
+    slot.card.apply(this.tower, this);
+    if (slot.card.trap) {
+      this.trapLog.push({ id: slot.card.id, wave: this.wave, paid });
+      if (!LST.meta.knowsTrap(slot.card.id) && !this.pendingGotchas.some((p) => p.id === slot.card.id)) {
+        this.pendingGotchas.push({ id: slot.card.id, wave: this.wave });
+      }
+    }
     if (opts.quiet) return true;
+    if (slot.from) LST.audio.play("reroll");
     LST.audio.play(slot.card.rarity === "epic" ? "epic" : "buy");
     LST.haptics.buzz(slot.card.rarity === "epic" ? [20, 30, 40] : 15);
     this.ui.renderShop({ took: index });
     this.ui.updateHud();
     return true;
+  }
+
+  openMysteryBox() {
+    const r = Math.random();
+    const ok = (c) => LST.shopRules.available(c, this.upgradeLevels);
+    const commons = LST.CARDS.filter((c) => c.rarity === "common" && ok(c));
+    const shiny = LST.CARDS.filter((c) => c.rarity !== "common" && ok(c));
+    const traps = LST.TRAPS.filter((c) => c.id !== "mysteryBox" && ok(c));
+    const pool = r < 0.5 ? commons : r < 0.75 ? (shiny.length ? shiny : commons) : (traps.length ? traps : commons);
+    return pool[Math.floor(Math.random() * pool.length)] || LST.CARDS[0];
+  }
+
+  // Appraisal L3: the trap you can return right now (taken this shop or in the last one).
+  returnableTrap() {
+    if (this.state !== "upgrade" || LST.meta.level("appraisal") < 3 || this.draft) return null;
+    const w = LST.CONFIG.traps.returnWaves;
+    for (let i = this.trapLog.length - 1; i >= 0; i--) {
+      const t = this.trapLog[i];
+      if (!t.returned && this.wave - t.wave <= w) return t;
+    }
+    return null;
+  }
+
+  returnTrap() {
+    const t = this.returnableTrap();
+    if (!t) return false;
+    const card = LST.cardById(t.id);
+    card.remove(this.tower, this);
+    t.returned = true;
+    this.upgradeLevels[t.id] = Math.max(0, (this.upgradeLevels[t.id] || 0) - 1);
+    if (t.paid) this.coins += t.paid;
+    else this.shop.freeRerolls += 1;
+    // If it's still on the table in this shop, put it back.
+    const slot = this.shop.cards.find((c) => c.taken && c.card.id === t.id);
+    if (slot) slot.taken = false;
+    LST.audio.play("unbench");
+    this.ui.renderShop({ returned: t.id });
+    this.ui.updateHud();
+    return true;
+  }
+
+  // "Gotcha!" reveals, shown between the wave-clear party and the shop.
+  dismissGotcha() {
+    if (this.state !== "gotcha") return;
+    this.gotchaQueue.shift();
+    if (this.gotchaQueue.length) { this.ui.show("gotcha"); return; }
+    this.openShop();
+    this.state = "upgrade";
+    this.ui.show("upgrade");
   }
 
   rerollShop() {
@@ -196,9 +293,10 @@ LST.Game = class Game extends LST.World {
     const price = this.shopPrice("reroll");
     if (!open.length || this.coins < price) { LST.audio.play("deny"); return false; }
     this.coins -= price;
-    s.rerolls += 1;
+    if (s.freeRerolls > 0) s.freeRerolls -= 1; else s.rerolls += 1;
     const keep = s.cards.filter((c) => c.taken).map((c) => c.card.id);
-    const fresh = LST.shopRules.draw(this.upgradeLevels, open.length, keep);
+    const fresh = LST.shopRules.draw(this.upgradeLevels, open.length, keep, false, { wave: this.wave });
+    LST.meta.seeCards(fresh.filter((c) => !c.trap).map((c) => c.id));
     let k = 0;
     s.cards = s.cards.map((c) => (c.taken ? c : fresh[k] ? { card: fresh[k++], taken: false } : null)).filter(Boolean);
     LST.audio.play("reroll");
@@ -248,13 +346,17 @@ LST.Game = class Game extends LST.World {
     // Pay out Gears (saved right away, so closing the tab can't lose them).
     const meta = LST.meta;
     const nextBefore = meta.nextUnlock();
-    const gears = meta.gearsFor(this.wave, this.bossWavesCleared);
+    // Traps still waiting for their reveal go straight into the Codex.
+    for (const p of this.pendingGotchas) if (meta.discoverTrap(p.id)) this.newCodex.push(p.id);
+    this.pendingGotchas = [];
+    const gears = meta.gearsFor(this.wave, this.bossWavesCleared, this.gearMult);
     const gearsBefore = meta.state.gears;
     meta.recordRun(gears.total);
     this.result = {
       wave: this.wave, time: this.runTime, kills: this.kills, coins: this.coinsEarned, score: this.score,
       cards: Object.entries(this.upgradeLevels), bossWaves: this.bossWavesCleared, gears, gearsBefore,
       gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1, headStart: this.headStart,
+      gearMult: this.gearMult, newCodex: this.newCodex.slice(),
     };
     this.resultsDelay = 1.1; // let the tower explosion play first
     this.ui.show("dying"); // no screen, no HUD
@@ -273,6 +375,7 @@ LST.Game = class Game extends LST.World {
     this.workshopFrom = from;
     if (this.state !== "gameover") this.state = "workshop";
     LST.meta.state.seenWorkshop = true;
+    LST.meta.state.armorNotice = false;
     LST.meta.save();
     this.ui.show("workshop");
   }

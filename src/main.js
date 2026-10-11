@@ -31,6 +31,8 @@
       game.openWorkshop(game.state === "gameover" ? "results" : "start");
     } else if (e.code === "KeyF") {
       game.toggleSpeed();
+    } else if (e.code === "Enter" && game.state === "gotcha") {
+      game.dismissGotcha();
     } else if (e.code === "Enter") {
       if (game.state === "menu" || game.state === "workshop" || (game.state === "gameover" && !game.resultsDelay)) game.newGame();
       else if (game.state === "upgrade") game.leaveShop();

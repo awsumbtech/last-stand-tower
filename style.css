@@ -790,3 +790,106 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
   .panel.workshop { row-gap: 5px; padding: 8px 14px 9px; }
   .panel.workshop .ws-list { gap: 5px; }
 }
+
+/* ================= Sprint 3: trap cards, Gotcha!, Codex ================= */
+/* The only tell on a trap is its wording and this tiny grey fine print. */
+.card .fine { font-size: 9.5px; line-height: 1.15; color: #a397ad; font-style: italic; letter-spacing: 0.1px; }
+.card .fine.full { font-size: 11.5px; color: #c0392b; font-style: normal; font-weight: 600; padding: 2px 5px; border: 2px dashed #e57373; border-radius: 8px; background: #fff3f2; }
+.card .eye { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; display: grid; place-items: center; border: 2.5px solid var(--ink); border-radius: 50%; background: #ffe066; animation: wiggle 1.6s ease-in-out infinite; }
+svg.eye-ico { width: 18px; height: 18px; fill: #fff; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; vertical-align: -4px; }
+svg.eye-ico circle { fill: var(--ink); }
+/* Appraisal L1: cursed cards wobble with a purple glow */
+.card.cursed:not(.taken) { animation: cursed 2.2s ease-in-out infinite; box-shadow: 0 6px 0 var(--ink), inset 0 0 0 5px var(--rarity), 0 0 0 4px rgba(142, 108, 255, 0.55); }
+.card.cursed.deal { animation: deal-in 0.55s ease-out both, cursed 2.2s 0.6s ease-in-out infinite; }
+@keyframes cursed { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-2deg) scale(1.01); } 40% { transform: rotate(2deg); } 60% { transform: rotate(-1deg); } }
+.card.mystery { animation: reveal 0.6s ease-out; }
+.return-btn { margin-top: -2px; padding: 4px 14px 5px; border: 3px solid var(--ink); border-radius: 999px; background: #d9fbe7; box-shadow: 0 3px 0 var(--ink); font-size: 15px; font-weight: 700; animation: squash-in 0.4s ease-out both; }
+.return-btn small { font-weight: 600; color: #4a3a5c; }
+
+/* Gotcha! reveal */
+.panel.gotcha { gap: 12px; }
+.gotcha-flip { position: relative; width: 200px; height: 250px; perspective: 900px; }
+.gotcha-flip .face {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 18px 12px; border: 4px solid var(--ink); border-radius: 20px; box-shadow: 0 6px 0 var(--ink);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.7s cubic-bezier(0.5, 1.6, 0.5, 1) 0.35s;
+}
+.gotcha-flip .face.front { min-height: 0; }
+.gotcha-flip .face.back { transform: rotateY(180deg); background: repeating-linear-gradient(-45deg, #fff1f0 0 12px, #ffe3e0 12px 24px); }
+.gotcha-flip.go .face.front { transform: rotateY(-180deg); }
+.gotcha-flip.go .face.back { transform: rotateY(0); }
+.gotcha-flip .icon { width: 56px; height: 56px; display: grid; place-items: center; border: 3px solid var(--ink); border-radius: 50%; background: var(--accent); }
+.gotcha-flip .icon svg { width: 32px; height: 32px; fill: #fff; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.gotcha-flip .name { font-size: 20px; font-weight: 700; }
+.gotcha-flip .desc { font-size: 15px; }
+.gotcha-flip .kind { display: block; font-style: normal; font-size: 12px; font-weight: 700; color: #c0392b; }
+.gotcha-flip .truth { font-size: 14px; line-height: 1.25; font-weight: 600; }
+.gotcha-flip .stamp, .codex-tile .stamp {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%) rotate(-12deg);
+  padding: 0 10px 2px; border: 4px solid var(--red); border-radius: 10px; color: var(--red); background: rgba(255, 255, 255, 0.8);
+  font-size: 30px; font-weight: 700; letter-spacing: 1px;
+}
+.gotcha-flip.go .stamp { animation: stamp-in 0.35s 0.9s ease-out both; }
+@keyframes stamp-in { 0% { transform: translateX(-50%) rotate(-12deg) scale(2.6); opacity: 0; } 70% { transform: translateX(-50%) rotate(-12deg) scale(0.92); opacity: 1; } 100% { transform: translateX(-50%) rotate(-12deg) scale(1); } }
+.gotcha-flip .back .icon { margin-top: 26px; }
+.gotcha-lesson { font-size: 16px !important; color: var(--ink) !important; padding: 8px 12px; border: 3px solid var(--ink); border-radius: 14px; background: #fff7d1; }
+.gotcha-note { font-size: 14px !important; }
+
+/* Results: Piggy Bank row + new Codex entries */
+.gears-row.piggy b { color: #d63384; }
+.res-codex { display: flex; align-items: center; gap: 6px; font-size: 14px; padding: 3px 10px; border: 2.5px dashed var(--ink); border-radius: 12px; background: #fff7d1; }
+
+/* Codex tab: 20 small tiles */
+.ws-list.tab-codex { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.codex-tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px 5px; border: 3px solid var(--ink); border-radius: 14px; background: #fff; box-shadow: 0 3px 0 var(--ink); overflow: hidden; transition: transform 0.18s var(--bouncy); }
+.codex-tile:active { transform: scale(1.06, 0.92); }
+.codex-tile .icon { width: 36px; height: 36px; display: grid; place-items: center; border: 2.5px solid var(--ink); border-radius: 50%; background: var(--accent); font-weight: 700; font-size: 20px; }
+.codex-tile .icon svg { width: 21px; height: 21px; fill: #fff; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.codex-tile .name { font-size: 11px; font-weight: 700; line-height: 1.05; min-height: 2.1em; display: flex; align-items: center; }
+.codex-tile.unknown { background: repeating-linear-gradient(-45deg, #f3eee6 0 8px, #ebe4d8 8px 16px); }
+.codex-tile.unknown .icon { background: #c9bfd6; color: var(--ink); }
+.codex-tile.trap { background: #fff6f5; }
+.codex-tile.trap.unknown { background: repeating-linear-gradient(-45deg, #f6e9e8 0 8px, #efdcdb 8px 16px); }
+.codex-tile .stamp { top: 22px; font-size: 10px; padding: 0 4px; border-width: 2px; border-radius: 5px; }
+.codex-tile.sel { background: #fff1b8; transform: translateY(-2px); box-shadow: 0 5px 0 var(--ink); }
+.ws-hint.codex-detail { font-size: 14px !important; line-height: 1.25; text-align: left; padding: 6px 10px; border: 2.5px solid var(--ink); border-radius: 12px; background: #fff7d1; min-height: 3.9em; }
+.ws-hint.codex-detail i { display: block; color: #2e8f5a; font-style: normal; font-weight: 600; }
+.tabs .tab { min-width: 0; }
+@media (max-width: 560px) {
+  .tab { font-size: 15px; padding-left: 2px; padding-right: 2px; }
+  .tabs { gap: 3px; }
+  .ws-list.tab-codex { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+  .codex-tile .name { font-size: 10px; }
+}
+@media (max-height: 760px) and (max-width: 560px) {
+  .codex-tile { padding: 4px 1px 3px; }
+  .codex-tile .icon { width: 30px; height: 30px; }
+  .codex-tile .icon svg { width: 18px; height: 18px; }
+  .gotcha-flip { width: 180px; height: 220px; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .panel.workshop .ws-list.tab-codex { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+  .panel.workshop .ws-hint.codex-detail { display: block; grid-column: 1 / -1; font-size: 12.5px !important; min-height: 0; padding: 3px 8px; }
+  .panel.gotcha { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 16px; width: min(760px, 100%); padding: 12px 18px; }
+  .panel.gotcha .title { grid-column: 1 / -1; font-size: 26px; }
+  .panel.gotcha .gotcha-flip { grid-row: 2 / span 3; width: 170px; height: 210px; }
+  .panel.gotcha .gotcha-lesson, .panel.gotcha .gotcha-note, .panel.gotcha .btn { grid-column: 2; }
+  .card .fine { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.cursed, .card .eye, .card.mystery, .gotcha-flip.go .stamp, .return-btn { animation: none !important; }
+  .gotcha-flip .face { transition: none; }
+}
+/* Small phones hide the hint line; the Codex still shows the card you tapped, compactly. */
+.panel.workshop .ws-hint.codex-detail { display: block; }
+@media (max-height: 700px) and (max-width: 560px) {
+  .ws-hint.codex-detail { font-size: 11.5px !important; min-height: 0; padding: 4px 8px; }
+  .codex-tile .icon { width: 26px; height: 26px; }
+  .codex-tile .icon svg { width: 16px; height: 16px; }
+  .codex-tile .name { font-size: 9px; min-height: 2em; }
+  .codex-tile .stamp { top: 16px; font-size: 8.5px; }
+}
+@media (max-width: 340px) {
+  .codex-tile .name { font-size: 8.5px; overflow-wrap: anywhere; }
+  .tab { font-size: 13.5px; }
+}

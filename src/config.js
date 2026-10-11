@@ -67,6 +67,13 @@ LST.CONFIG = {
     repair:    { base: 10, growth: 1.09, step: 1.5, heal: 0.4 }, // heal 40% of max HP
   },
 
+  // Trap ("gotcha") cards, src/traps.js.
+  traps: {
+    fromWave: 4,   // traps can be dealt after this wave...
+    chance: 0.2,   // ...in 20% of deals, at most one per deal
+    returnWaves: 1, // Appraisal L3: a trap can be returned within this many waves
+  },
+
   // Lasting progression between runs (src/meta.js).
   meta: {
     // Gears per run = floor((perWave * wave^waveExp + perBoss * boss waves cleared) * worldMult * (1 + cogBonus * Cogs))
@@ -78,11 +85,12 @@ LST.CONFIG = {
     upgrades: {
       power:     { base: 12, growth: 1.15, max: 60, per: 0.05 }, // +5% damage
       rapid:     { base: 12, growth: 1.17, max: 30, per: 0.03 }, // +3% fire rate
-      armor:     { base: 10, growth: 1.15, max: 60, per: 0.06 }, // +6% max HP
+      armor:     { base: 14, growth: 1.2,  max: 35, keep: 0.97, cap: 0.65 }, // damage taken x0.97 per level (max 65% reduced)
       bank:      { base: 15, growth: 1.3,  max: 15, per: 15 },   // +15 starting coins
       greed:     { base: 20, growth: 1.22, max: 25, per: 0.04 }, // +4% coins per kill
       sharpEye:  { base: 25, growth: 1.25, max: 15, per: 0.01 }, // +1% crit chance
       headStart: { base: 30, growth: 1.4,  max: 10, per: 5 },    // start 5 waves later per level...
+      appraisal: { costs: [40, 120, 300], max: 3 },               // reads trap cards (see src/traps.js)
     },
     headStartCap: 0.7, // ...but never past 70% of your best wave (rounded down to a multiple of 5)
     benchMax: 2,       // cards you can keep out of the shop

@@ -4,7 +4,7 @@
 //   offense      -> attack card (every shop offers at least one)
 //   color / icon -> icon bubble color and inner SVG shapes (24x24 viewBox)
 //   desc         -> what one more level does
-//   apply(tower) -> mutate tower stats
+//   apply(tower, game) -> mutate tower stats
 //   stat(tower)  -> short "current value" text for the card
 //   maxLevel     -> optional cap (maxed cards stop showing up)
 //   unlockCost   -> Gears to unlock it in the Workshop (cards without one are starter cards)
@@ -127,7 +127,7 @@ LST.shopRules = {
 
   // In the deck (unlocked in the Workshop and not benched) and not maxed out.
   available(card, levels) {
-    if (LST.meta && !LST.meta.inDeck(card.id)) return false;
+    if (!card.trap && LST.meta && !LST.meta.inDeck(card.id)) return false;
     const lvl = levels[card.id] || 0;
     return card.maxLevel === undefined || lvl < card.maxLevel;
   },
@@ -135,7 +135,10 @@ LST.shopRules = {
   // Draw `n` different cards. Rarity first (weighted), then a card of that rarity.
   // `minRare` guarantees at least one rare-or-better card (after boss waves), and every
   // full deal contains at least one attack card so a shop is never all duds.
-  draw(levels, n, exclude = [], minRare = false) {
+  // opts.wave enables trap cards (see CONFIG.traps): from wave `fromWave` on, a `chance` per deal
+  // that one slot becomes a trap. Never more than one, and never the guaranteed attack card or the
+  // boss-wave Rare slot. opts.forceTrap (simulator) puts that trap in every deal it can.
+  draw(levels, n, exclude = [], minRare = false, opts = {}) {
     const weights = LST.CONFIG.shop.rarityWeights;
     const pool = LST.CARDS.filter((c) => this.available(c, levels) && !exclude.includes(c.id));
     const out = [];
@@ -154,6 +157,18 @@ LST.shopRules = {
       const rareOk = !minRare || out.slice(0, -1).some((o) => o.rarity !== "common") || !pool.some((c) => c.offense && c.rarity !== "common");
       const attack = pool.filter((c) => c.offense && (rareOk || c.rarity !== "common"));
       if (attack.length) out[out.length - 1] = attack[Math.floor(Math.random() * attack.length)];
+    }
+    const T = LST.CONFIG.traps;
+    if (LST.TRAPS && opts.wave >= T.fromWave && out.length >= 2) {
+      const ok = (c) => this.available(c, levels) && !exclude.includes(c.id);
+      let force = opts.forceTrap || T.force;
+      if (force && !LST.TRAPS.some((c) => c.id === force && ok(c))) force = null; // already taken: back to normal
+      const traps = LST.TRAPS.filter((c) => (!force || c.id === force) && ok(c));
+      if (traps.length && (force || Math.random() < T.chance)) {
+        const attacks = out.filter((c) => c.offense), rares = out.filter((c) => c.rarity !== "common");
+        const slots = out.map((c, i) => i).filter((i) => !(out[i].offense && attacks.length === 1) && !(minRare && out[i].rarity !== "common" && rares.length === 1));
+        if (slots.length) out[slots[Math.floor(Math.random() * slots.length)]] = traps[Math.floor(Math.random() * traps.length)];
+      }
     }
     return out;
   },

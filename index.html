@@ -66,6 +66,7 @@
       <div class="pill coins big-pill" id="up-coins-pill"><i class="coin"></i><b id="up-coins">0</b></div>
       <p class="shop-hint" id="shop-hint">Pick a card. It's free!</p>
       <div id="card-row"></div>
+      <button id="btn-return" class="return-btn hidden"></button>
       <div class="shop-footer">
       <div class="shop-actions">
         <button id="btn-auto" class="btn small secondary hidden">
@@ -101,6 +102,17 @@
     </div>
   </div>
 
+  <!-- "Gotcha!": a trap card flips over and goes into the Codex -->
+  <div id="screen-gotcha" class="screen hidden">
+    <div class="panel gotcha">
+      <h2 class="title small">Wait a minute&hellip;</h2>
+      <div id="gotcha-flip" class="gotcha-flip"></div>
+      <p class="gotcha-lesson" id="gotcha-lesson"></p>
+      <p class="gotcha-note"><svg class="eye-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg> Added to your Codex. You'll spot it next time.</p>
+      <button id="btn-gotcha" class="btn">Got it!</button>
+    </div>
+  </div>
+
   <!-- Reset progress: confirm -->
   <div id="screen-confirm" class="screen hidden">
     <div class="panel confirm">
@@ -129,8 +141,10 @@
       <div class="gears-box">
         <div class="gears-row"><span>Waves reached <small id="res-g-wave-n">x1</small></span><b id="res-g-waves">+0</b></div>
         <div class="gears-row"><span>Bosses beaten <small id="res-g-boss-n">x0</small></span><b id="res-g-bosses">+0</b></div>
+        <div class="gears-row piggy hidden" id="res-g-piggy"><span>Piggy Bank</span><b>x1.4</b></div>
         <div class="gears-total" id="res-gears-total"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><b id="res-gears">+0</b><span>Gears</span></div>
       </div>
+      <div class="res-codex hidden" id="res-codex"></div>
       <div class="next-unlock" id="res-next"></div>
       <div class="res-buttons">
         <button id="btn-res-workshop" class="btn secondary"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><span>Workshop</span><i class="badge hidden" id="res-badge">!</i></button>
@@ -150,6 +164,7 @@
         <button class="tab" role="tab" data-tab="cards">Cards<i class="dot hidden"></i></button>
         <button class="tab" role="tab" data-tab="upgrades">Upgrades<i class="dot hidden"></i></button>
         <button class="tab" role="tab" data-tab="deck">Deck</button>
+        <button class="tab" role="tab" data-tab="codex">Codex</button>
       </div>
       <p class="ws-hint" id="ws-hint">Unlock cards to add them to the shop.</p>
       <div id="ws-grid" class="ws-list"></div>
@@ -165,6 +180,7 @@
   <script src="src/settings.js"></script>
   <script src="src/audio.js"></script>
   <script src="src/upgrades.js"></script>
+  <script src="src/traps.js"></script>
   <script src="src/meta.js"></script>
   <script src="src/entities.js"></script>
   <script src="src/world.js"></script>

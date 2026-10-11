@@ -1,7 +1,7 @@
 # Last Stand Tower: sprint roadmap (planning only)
 
 **Target:** quick runs (5-8 min) inside a long journey. Gears unlock cards and lasting upgrades, six worlds raise the stakes, and Rebuild (prestige) is how you break through walls.
-**Status:** Sprints 1 and 2 are shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
+**Status:** Sprints 1, 2 and 3 are shipped (see below). The rest is a plan. All numbers were sanity-checked with `tools/sim.js` plus a campaign model (`plan-meta.js`, kept in the box's `balance-data/` folder). The model plays real runs with locked card pools, trap cards, world modifiers and Rebuilds.
 
 ## Sprint overview
 
@@ -9,7 +9,7 @@
 |---|---|---|---|
 | 1 ✅ | Results screen, Gears and locked cards | Run summary, Gears saved, Workshop with card unlocks, commons-only starter pool | none |
 | 2 ✅ | Workshop upgrades and Head Start | Lasting stat upgrades, Head Start, save/version migration | 1 |
-| 3 | Trap cards, Codex and Appraisal | 8 trap cards, discovery Codex, Appraisal upgrade | 1 (2 for Appraisal) |
+| 3 ✅ | Trap cards, Codex and Appraisal | 8 trap cards, discovery Codex, Appraisal upgrade | 1 (2 for Appraisal) |
 | 4 | Boss fights and the active ability | Bosses stop at range and attack; Shockwave ability | none (best after 2) |
 | 5 | New enemy types | Spitter, Splitter, Shielded (reskinned per world later) | 4 (ranged attack code) |
 | 6 | Worlds 1-3 | World select, Backyard / Beach / Snowy Peak, world bosses, Gear multipliers | 1, 4, 5 |
@@ -69,7 +69,7 @@ Each sprint ends with: the sim re-run (death wave and minutes per strategy, camp
 |---|---|---|---|---|
 | Power | +5% damage (multiplies all damage, cards included) | 12 | 1.15 | 60 |
 | Rapid | +3% fire rate | 12 | 1.17 | 30 |
-| Armor | +6% max HP | 10 | 1.15 | 60 |
+| Armor | ~~+6% max HP~~ changed in Sprint 3: damage taken ×0.97 per level (see Sprint 3) | 14 | 1.2 | 35 |
 | Bank | +15 starting coins | 15 | 1.30 | 15 |
 | Greed | +4% kill coins | 20 | 1.22 | 25 |
 | Sharp Eye | +1% crit chance | 25 | 1.25 | 15 |
@@ -101,34 +101,92 @@ Note: in the Backyard alone, best waves level off around 40-45 by hour 10. That'
 
 ---
 
-## Sprint 3: Trap cards, Codex and Appraisal
+## Sprint 3: Trap cards, Codex and Appraisal (SHIPPED)
 **Goal:** reading cards becomes a skill. Traps are fair, funny and learnable.
 
-**Rules**
-- **When they appear:** from wave 4 onward. In each deal, a **20%** chance that one slot becomes a trap. Never more than one per deal, and a trap never replaces the guaranteed attack card or the boss-wave Rare slot.
-- **Cost:** traps cost the same as any card. They can be your free pick (which is the trap) or bought as an extra. They are dealt at Common/Rare/Epic rarity like normal cards. The only tell is the wording plus a tiny fine-print line in grey.
-- **Discovery:** the first time you take a trap, it flips over at the end of the next wave with a "Gotcha!" sting and gets a stamp in the **Codex**, the card collection in the Workshop that shows every card you've seen. Once a trap is in the Codex, future copies show a small **eye icon**.
-- **Appraisal** (Workshop):
-  - **L1, 40 Gears:** cursed cards get a purple wobble.
-  - **L2, 120 Gears:** fine print is shown in full.
-  - **L3, 300 Gears:** you can **return** a trap within one wave for a full refund (a free pick returns as a free reroll).
+**Armor change (Brian, Oct 10).** Armor is now damage reduction instead of +6% max HP:
+`reduction = min(65%, 1 − 0.97^level)`, max level 35, cost `round(14 × 1.2^n)` Gears.
+Level 5 → −14%, 10 → −26%, 15 → −37%, 20 → −46%, 25 → −53%, 30 → −60%, 35 → −65% (cap). The Workshop shows the
+current and next %. **Migration (save v2 → v3):** Armor levels up to 35 are kept; Gears paid for levels above 35
+(at the old `10 × 1.15^n` prices) are refunded, and the start screen explains the change once.
 
-**Sim check:** traps modeled as duds in 20% of deals cost about 1 median wave (casual 16 → 15, skilled 16 → 15). Part of that is simply one fewer real option per deal. The casual bot takes traps at random; the skilled bot never does. The real traps are designed to widen that gap: knowledge, not luck.
+*Tuning (`node tools/sim.js --upgrade-check --gears N`: the whole budget on one upgrade, skilled bot, all cards, 30 runs, median death wave):*
 
-**The 8 trap cards**
+| Budget | None | Power only | Armor only | Balanced | Balanced without Armor |
+|---|---|---|---|---|---|
+| 1,500 Gears | 14 | 26 (L21) | 21 (L17) | 31 | 30 |
+| 4,000 Gears | 14 | 28 (L28) | 29 (L22) | 38 | 32 |
 
-| Card | Shown as | Type | Exact effect | Why it's a trap / what it teaches |
-|---|---|---|---|---|
-| **Glass Cannon** | Epic | Cursed | +60% damage; max HP ×0.6 (current HP scaled too) | Real upside for runs with Regen or Vampire, deadly otherwise. Teaches you to weigh survival. |
-| **Big Bertha** | Rare | Cursed | +80% damage per shot, −45% fire rate, shot speed −30% | 1.8 × 0.55 = 0.99, so no DPS gain and more overkill on small enemies. Teaches DPS = damage × rate. Good with Splash. |
-| **Long Shot** | Common | Context dud | +90 range, −15% damage | Enemies spawn within 520 units, so past about 400 range it does nothing (less on phones). Teaches you to look at the screen. |
-| **Thorns** | Rare | Pure dud (for now) | Enemies touching the tower take 300% of their HP | Enemies already die when they crash, so it does nothing. It becomes real once bosses melee-slam in Sprint 4 (reflects 25% of slam damage), which rewards remembering it. |
-| **Overclock** | Rare | Delayed cost | +40% fire rate for 3 waves, then −20% fire rate for the rest of the run (fine print: "overheats") | Great for getting through a boss wave, a trap if you take it early. Teaches timing. |
-| **Hot Streak** | Common | Build-dependent | Crits deal +50% damage | Worth about +5% at the base 10% crit; good with Lucky Shot ×3+. Teaches synergy. |
-| **Piggy Bank** | Rare | Cursed / meta | −15% damage for the run; +40% Gears at the end | A true choice: a weaker run for faster meta progress. Bad when you're chasing a world unlock. |
-| **Mystery Box** | Epic | Gamble | Becomes a random card: 55% Common, 30% Rare/Epic, 15% another trap | Fun; the odds are printed once it's in the Codex. |
+The first try (base 12, growth 1.17) made Armor-only reach wave 38 at 4,000 Gears versus 28 for Power, and pushed
+late campaign runs to a 10 min median, so the price curve was raised. Now it's on par with Power: worth buying, not a must.
 
-**Acceptance criteria:** each trap has a Codex entry and a one-line "lesson" tip. The sim's `--favor` check with each trap shows only Piggy Bank and Glass Cannon above a −2 wave penalty (they are cursed, not useless). The rest cost 1-4 waves.
+**Rules (as built)**
+- **When they appear:** from the shop after wave 4 onward (`CONFIG.traps`). Each deal has a **20%** chance that one slot becomes a trap. Never more than one per deal, and a trap never replaces the guaranteed attack card or the boss-wave Rare slot. Each trap can be taken once per run. Traps are never locked or benched.
+- **Cost:** the same as any card (free pick or paid extra), dealt at Common/Rare/Epic like normal cards. The tell is the wording plus a tiny grey italic line of fine print where normal cards show their stat line.
+- **Discovery:** the first time you take a trap, it flips over at the end of the next wave ("Wait a minute…", card flip, **GOTCHA!** stamp, sad-trombone sting, haptic buzz) with its real effect and a lesson. It goes into the **Codex**. If the run ends first, the results screen lists it as "New in the Codex". After that, copies in the shop show an **eye icon** and their real effect in red. Mystery Box is discovered as soon as you open it.
+- **Codex tab** (4th Workshop tab): all 12 cards you've been dealt plus the 8 traps (striped "???" until found, "GOTCHA" stamp once found). Tap one for its real effect and lesson tip. It fits 320×568 up to desktop and 667×375 / 844×390 landscape with no scrolling.
+- **Appraisal** (Workshop upgrade, fixed prices):
+  - **L1, 40 Gears:** cursed cards (Glass Cannon, Big Bertha, Piggy Bank, Overclock, Mystery Box) wobble with a purple glow. The duds don't, so you still have to read.
+  - **L2, 120 Gears:** the fine print is shown in full on every trap.
+  - **L3, 300 Gears:** a **Return** button in the shop gives back a trap taken this shop or the one before: coins refunded, or a free reroll if it was the free pick. The effect is undone.
+- Head Start's Auto-draft skips traps you already know (unknown ones can fool it, like they fool you).
+
+**The 8 trap cards (final effects)**
+
+| Card | Shown as | Type | Card says | Fine print | Really does | Lesson |
+|---|---|---|---|---|---|---|
+| **Glass Cannon** | Epic | Cursed | +35% damage! | hull made of glass | +35% damage; max HP ×0.6 (current HP too) | Only worth it with Regen, Vampire or lots of Armor |
+| **Big Bertha** | Rare | Cursed | +80% damage per shot | heavy shells, slow reload | +80% damage per shot, −45% fire rate, −30% shot speed | DPS = damage × rate; 1.8 × 0.55 ≈ 1 |
+| **Long Shot** | Common | **Dud** | +90 range | -15% dmg | +90 range, −15% damage | More range only helps if enemies are out of reach |
+| **Thorns** | Rare | **Dud** (for now) | Enemies touching the tower take 300% of their HP | on contact | nothing: enemies already pop on contact. Sprint 4: reflects 25% of boss slam damage | Ask what it changes |
+| **Overclock** | Rare | Delayed cost | +40% fire rate | may overheat | +40% fire rate for 3 waves, then −20% for the rest of the run | Great for a boss wave, a trap early |
+| **Hot Streak** | Common | Build-dependent | Crits hit x3! | cools your other shots | crits ×3 instead of ×2, every shot −15% damage (−7% DPS at 10% crit, a gain with Lucky Shot) | Crit bonuses need crit chance first |
+| **Piggy Bank** | Rare | Cursed / meta | +40% Gears this run | savings come out of your shells | −3% damage; ×1.4 Gears at the end (own row on the results screen) | A weaker run for faster Workshop progress |
+| **Mystery Box** | Epic | Gamble | Could be anything! | no refunds | becomes a random card: 50% Common, 25% Rare/Epic, 25% another trap | Usually worse than picking a good card |
+
+The two pure duds are Long Shot and Thorns (Brian: 2-3 read-carefully lessons). Changes from the plan: Glass Cannon
++60% → +35% (it was +4 waves *better* than skilled play), Hot Streak got a real cost (it was free), Piggy Bank −15% →
+−3% damage (the lost pick already costs a wave), Mystery Box odds 55/30/15 → 50/25/25.
+
+**Acceptance criteria and measured results**
+
+`node tools/sim.js --favor --traps-only --runs 150`: the skilled bot (which never takes traps) against the same bot
+taking trap X, forced into the first deal from wave 4 (mean death wave over 150 seeded runs):
+
+| | Mean wave | vs skilled |
+|---|---|---|
+| skilled (no traps taken) | 14.25 | |
+| Glass Cannon | 14.55 | **+0.3** (cursed, not useless) |
+| Piggy Bank | 12.29 | **−2.0** (plus 40% more Gears) |
+| Mystery Box | 13.51 | −0.7 |
+| Thorns | 13.06 | −1.2 |
+| Long Shot | 12.26 | −2.0 |
+| Hot Streak | 12.31 | −1.9 |
+| Overclock | 11.47 | −2.8 |
+| Big Bertha | 11.26 | −3.0 |
+
+Glass Cannon is above −2 as planned. Piggy Bank sits right on −2.0, which is the price of a lost pick (Thorns, −1.2) plus a small damage cut,
+paid back in Gears. The rest cost 1-3 waves, except Mystery Box at −0.7 (a coin flip, about one median wave).
+The full `--favor` run (all 12 cards plus the 8 traps, 60 runs) is in the same range: cards from −5 to +1 against skilled.
+
+*Cost to the run:* all cards unlocked, 150 runs, traps on vs off: casual 14.8 → 12.1 mean (7.1 → 5.1 min), skilled
+15.8 → 14.3. On the first run (starter cards only): casual 11.0 → 10.3 (4.9 → 4.4 min), skilled 12.1 → 11.8. In the
+campaign model the casual bot learns like a player: it skips traps already in its Codex, and all traps once it has Appraisal L2.
+
+*Campaign* (`--campaign --campaigns 8`, 10 h, with Armor, traps, Codex learning and Appraisal; the bot buys Appraisal as a cheap upgrade):
+| | Casual | Skilled |
+|---|---|---|
+| First run | wave 11, 5.1 min, 62 Gears | wave 12, 5.3 min, 56 Gears |
+| All 8 cards unlocked | run 15, 1.23 h | run 14, 1.2 h |
+| Wave 20 / 30 / 40 / 50 reached | 0.7 / 1.7 / 3.5 / 7.0 h | 0.6 / 1.6 / 3.7 / 9.4 h |
+| Median run length by hour 0-10 | 4.8-7.8 min | 5.4-9.1 min |
+| Runs over 10 min in the first 10 h | 20 of 742 (max 11.1) | 10 of 677 (max 10.9) |
+| Median start / death wave, hour 9-10 | 35 → 49 | 35 → 49 |
+
+Card unlock timing is unchanged from Sprint 2. Best waves by hour 10 are higher (49 vs 39-41), mostly from damage-reduction
+Armor stacking with Regen and Vampire, so late runs are longer: skilled medians reach 8-9 min after hour 7 (Sprint 2: 5.4-7.4)
+and 2-3% of runs go past 10 min. Still inside the 5-10 min target, but it's the number to watch. Sprint 4's boss slams
+(which hit hard, so Armor matters there) are the natural place to re-check it, or raise the Head Start cap.
 
 ---
 
