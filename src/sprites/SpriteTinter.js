@@ -4,7 +4,8 @@
 // clipped back to the sprite's own alpha, so a flashed enemy reads as "lit up" rather
 // than as a ghostly white silhouette. Plain canvas composite modes only (no ctx.filter,
 // which older iOS Safari lacks).
-//   tint = { color, alpha, mode }  mode: a globalCompositeOperation blend, default "overlay"
+//   tint = { color, alpha, mode } or a list of them applied in order
+//   mode: a globalCompositeOperation blend, default "overlay"
 LST.SpriteTinter = class SpriteTinter {
   constructor() { this.canvas = null; this.ctx = null; }
 
@@ -25,10 +26,12 @@ LST.SpriteTinter = class SpriteTinter {
     g.globalAlpha = 1;
     g.clearRect(0, 0, w, h);
     g.drawImage(atlas.image, frame.sx, frame.sy, w, h, 0, 0, w, h);
-    g.globalCompositeOperation = tint.mode || "overlay";
-    g.globalAlpha = tint.alpha;
-    g.fillStyle = tint.color;
-    g.fillRect(0, 0, w, h);
+    for (const pass of Array.isArray(tint) ? tint : [tint]) {
+      g.globalCompositeOperation = pass.mode || "overlay";
+      g.globalAlpha = pass.alpha;
+      g.fillStyle = pass.color;
+      g.fillRect(0, 0, w, h);
+    }
     g.globalCompositeOperation = "destination-in"; // back to the sprite's silhouette
     g.globalAlpha = 1;
     g.drawImage(atlas.image, frame.sx, frame.sy, w, h, 0, 0, w, h);

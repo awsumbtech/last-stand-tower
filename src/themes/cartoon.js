@@ -263,10 +263,10 @@
   // The same color cues as the vector fills, blended into the sprite (SpriteTinter keeps
   // the ink outlines): flash lights it up, frost turns it icy blue, charge flickers red.
   const TINT = {
-    flash: { color: "#ffffff", alpha: 0.85, mode: "overlay" },
-    bossFlash: { color: "#ff8a95", alpha: 0.8, mode: "overlay" },
-    frozen: { color: "#8fdcff", alpha: 0.75, mode: "color" },
-    charge: { color: "#ff1f3d", alpha: 0.7, mode: "overlay" },
+    flash: [{ color: "#ffffff", alpha: 1, mode: "overlay" }, { color: "#ffffff", alpha: 0.6, mode: "overlay" }],
+    bossFlash: [{ color: "#ff8a95", alpha: 1, mode: "overlay" }, { color: "#ffffff", alpha: 0.5, mode: "overlay" }],
+    frozen: [{ color: "#8fdcff", alpha: 0.8, mode: "color" }, { color: "#bfefff", alpha: 0.45, mode: "screen" }],
+    charge: { color: "#ff1f3d", alpha: 0.8, mode: "overlay" },
   };
   function spriteTint(e, flash, frozen, charge) {
     if (flash) return e.isBoss ? TINT.bossFlash : TINT.flash;
