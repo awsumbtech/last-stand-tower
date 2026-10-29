@@ -198,6 +198,7 @@ Opening `index.html` directly also works (without offline support, since service
 | `src/ui.js` | HUD and menu screens (HTML overlays) |
 | `src/main.js` | Startup, game loop, keyboard shortcuts |
 | `tools/sim.js` | Headless balance simulator (see below) |
+| `tools/simChunks.js` | Chunked, resumable sim jobs (results in `tools/out/`, git-ignored) |
 
 The game object is on `window.game` for poking around in the browser console.
 
@@ -218,6 +219,28 @@ node tools/sim.js --campaign --campaigns 8 --hours 10  # meta model: unlocks, up
 node tools/sim.js --no-ability                       # bots never use the ability (they fire it when something is close or a boss winds up)
 node tools/sim.js --meta --prestige                  # older planning model (lasting stat upgrades + prestige)
 ```
+
+### Chunked sim jobs (long checks)
+
+Long sims are split into short chunks so no single command runs long enough to get cut off.
+`next` runs **one** chunk (it stops after the job's time budget, 45 s by default), saves it to
+`tools/out/<job>/chunk-N.json` and exits. Run it again to resume after the last finished chunk.
+`merge` combines every chunk into `tools/out/<job>/summary.json`.
+
+```bash
+node tools/simChunks.js init base --kind runs --strategies casual,skilled --seeds 60       # single seeded runs
+node tools/simChunks.js init camp --kind campaign --strategies casual,skilled --seeds 8 --hours 4  # Gears/unlocks/Head Start campaigns
+node tools/simChunks.js next camp     # one chunk; repeat until it prints "done"
+node tools/simChunks.js status camp
+node tools/simChunks.js merge camp    # run length, Big Red kill rate per wave, King Mole fight seconds, unlock/milestone times
+```
+
+`init` options: `--budget <seconds per chunk>`, `--max-units <per chunk>`, `--sim "<tools/sim.js flags>"`
+(for example `--sim "--unlocked starter --config tweaks.json"`), and `--force` to re-create a job spec.
+A lock file stops two `next` commands from running on the same job at once, and `merge` drops any
+overlapping chunk. Parts: `JobKind` (`RunsKind`, `CampaignKind`: what a unit is, how to run and
+summarize it), `SimJob` (the saved spec), `ResultStore` (files and lock), `ChunkRunner` (one time-boxed chunk)
+and `Summarizer` (merge). To add a new kind of check, add a `JobKind` subclass.
 
 **Deploying changes:** bump `VERSION` in `sw.js` whenever you change files, so installed copies pick up
 the new version (and add any new files to its `PRECACHE` list).

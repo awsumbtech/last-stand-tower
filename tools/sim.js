@@ -329,7 +329,9 @@ function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5
     runs.push({ run, start: r.startWave, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), at: +(minutes / 60).toFixed(2), gears: r.gears,
       levels: Object.values(meta.upgrades).reduce((a, b) => a + b, 0), cards: meta.unlocked.length, finaleWon: r.finaleWon,
       bossKilled: r.bossWavesKilled, bossSurvived: r.bossWavesSurvived,
-      bossWaves: r.waves.filter((w) => w.bossKilled !== undefined).map((w) => [w.wave, w.bossKilled ? 1 : 0, Math.round(w.seconds)]) });
+      bossWaves: r.waves.filter((w) => w.bossKilled !== undefined).map((w) => [w.wave, w.bossKilled ? 1 : 0, Math.round(w.seconds)]),
+      finaleSec: (() => { const f = r.waves.find((w) => w.wave === LST.CONFIG.finale.wave); return f ? Math.round(f.seconds) : null; })(),
+      bossEscapes: r.bossEscapes || 0 });
     for (const m of [20, 30, 40, 50, 60, 80, 100]) if (!events["wave" + m] && r.deathWave >= m) events["wave" + m] = { run, minutes: Math.round(minutes) };
     if (r.finaleWon && !events.finale) events.finale = { run, minutes: Math.round(minutes) };
     if (r.reachedFinale && !events.reach20) events.reach20 = { run, minutes: Math.round(minutes) };
