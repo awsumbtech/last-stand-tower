@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v10"; // sprites-enemies branch only; main stays v9 until this ships
+const VERSION = "v11"; // enemy sprite sheets (Game Art & Motion v1.1)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
