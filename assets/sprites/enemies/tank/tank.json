@@ -439,7 +439,7 @@
   },
   "meta": {
     "app": "game-art last-stand-tower enemy generator",
-    "version": "1.0",
+    "version": "1.1",
     "image": "tank.png",
     "format": "indexed8 (pngquant)",
     "size": {
@@ -447,6 +447,10 @@
       "h": 388
     },
     "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, frame = sourceSize, pivot at the centre."
+    },
     "frameTags": [
       {
         "name": "walk",
@@ -470,7 +474,7 @@
     "pivot": {
       "x": 64,
       "y": 64,
-      "note": "frame center = entity position"
+      "note": "in sourceSize px: frame centre = entity position"
     },
     "hitbox": {
       "r": 36,
@@ -498,10 +502,14 @@
       "tool": "pngquant 3.0.3",
       "quality": "85-100",
       "dither": 0.5,
-      "before": 86521,
-      "after": 20379,
-      "psnr": 54.9,
-      "maxChannelError": 29
+      "before": 75385,
+      "after": 16885,
+      "psnr": 64.5,
+      "maxChannelError": 12
+    },
+    "memory": {
+      "decodedRGBA": 1207456,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
     }
   }
 }

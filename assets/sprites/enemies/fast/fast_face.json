@@ -726,7 +726,7 @@
   },
   "meta": {
     "app": "game-art last-stand-tower enemy generator",
-    "version": "1.0",
+    "version": "1.1",
     "image": "fast_face.png",
     "format": "indexed8 (pngquant)",
     "size": {
@@ -734,6 +734,10 @@
       "h": 268
     },
     "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, frame = sourceSize, pivot at the centre."
+    },
     "frameTags": [
       {
         "name": "walk",
@@ -757,7 +761,7 @@
     "pivot": {
       "x": 44,
       "y": 44,
-      "note": "frame center = entity position"
+      "note": "in sourceSize px: frame centre = entity position"
     },
     "hitbox": {
       "r": 18,
@@ -786,7 +790,21 @@
       "of": "fast",
       "order": 1,
       "rotates": false,
-      "note": "eye whites, blink, hurt eyes and the death O mouth (pupils come from fast_pupil.png, placed by the code like Basic's); always drawn upright on top of the body. Draw the layers in 'order' (0 first) with the same frame index, both at the entity position + frames[name].offset (screen space, frame px: the walk bob, applied after rotating); they share frame size, pivot and timing."
+      "set": [
+        {
+          "name": "body",
+          "atlas": "fast_body.json",
+          "order": 0,
+          "rotates": true
+        },
+        {
+          "name": "face",
+          "atlas": "fast_face.json",
+          "order": 1,
+          "rotates": false
+        }
+      ],
+      "note": "eye whites, blink, hurt eyes and the death O mouth (pupils come from fast_pupil.png, placed by the code like Basic's); always drawn upright on top of the body. Draw every atlas in 'set' in 'order' (0 first) with the same animation and frame index, each at the entity position + frames[name].offset (screen space, frame px: the walk bob, applied after any rotation); they share sourceSize, pivot and timing."
     },
     "pupils": {
       "image": "fast_pupil.png",
@@ -812,6 +830,10 @@
       "after": 1656,
       "psnr": null,
       "maxChannelError": 0
+    },
+    "memory": {
+      "decodedRGBA": 576736,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
     }
   }
 }

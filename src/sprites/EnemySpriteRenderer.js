@@ -3,7 +3,8 @@
 // does for vector art and hands them over as `fx`; this class applies them to the frames.
 // Every draw returns false when no sprite is available, so the caller draws vector art.
 //   fx = { sx, sy, rot, look, tint: {color, alpha, mode} | null, anchorY }
-//   rot only turns layers flagged `rotates`; look aims code-drawn pupils (EyeLayer).
+//   rot only turns layers flagged `rotates`; tint only colours layers flagged `tinted`
+//   (King Mole: body yes, hole/front no); look aims code-drawn pupils (EyeLayer).
 LST.EnemySpriteRenderer = class EnemySpriteRenderer {
   constructor(library, rules) {
     this.library = library;
@@ -21,7 +22,12 @@ LST.EnemySpriteRenderer = class EnemySpriteRenderer {
       for (const l of set) {
         const atlas = this.library.get(l.sheet);
         if (!atlas || !atlas.has(anim)) break;
-        out.push({ atlas, rotates: !!l.rotates });
+        const meta = atlas.layer || {};
+        out.push({
+          atlas,
+          rotates: l.rotates != null ? !!l.rotates : !!meta.rotates,
+          tinted: l.tinted != null ? !!l.tinted : meta.tinted !== false,
+        });
       }
       if (out.length === set.length) return out;
     }
@@ -97,7 +103,7 @@ LST.EnemySpriteRenderer = class EnemySpriteRenderer {
       if (!frame) continue;
       ctx.save();
       if (l.rotates && fx.rot) ctx.rotate(fx.rot);
-      if (fx.tint) this.tinter.drawFrame(ctx, l.atlas, frame, fx.tint);
+      if (fx.tint && l.tinted) this.tinter.drawFrame(ctx, l.atlas, frame, fx.tint);
       else l.atlas.drawFrame(ctx, frame);
       ctx.restore();
       if (!l.rotates && fx.look !== undefined) this.eyes.draw(ctx, l.atlas, frame, fx.look);

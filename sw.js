@@ -62,10 +62,14 @@ const PRECACHE = [
   "assets/sprites/enemies/tank/tank.png",
   "assets/sprites/enemies/big_red/big_red.json",
   "assets/sprites/enemies/big_red/big_red.png",
-  "assets/sprites/enemies/king_mole/king_mole.json",
-  "assets/sprites/enemies/king_mole/king_mole.png",
-  "assets/sprites/enemies/king_mole/king_mole_angry.json",
-  "assets/sprites/enemies/king_mole/king_mole_angry.png",
+  "assets/sprites/enemies/king_mole/king_mole_hole.json",
+  "assets/sprites/enemies/king_mole/king_mole_hole.png",
+  "assets/sprites/enemies/king_mole/king_mole_body.json",
+  "assets/sprites/enemies/king_mole/king_mole_body.png",
+  "assets/sprites/enemies/king_mole/king_mole_angry_body.json",
+  "assets/sprites/enemies/king_mole/king_mole_angry_body.png",
+  "assets/sprites/enemies/king_mole/king_mole_front.json",
+  "assets/sprites/enemies/king_mole/king_mole_front.png",
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

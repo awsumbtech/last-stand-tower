@@ -6,7 +6,7 @@
 - Rows (in order):
   - walk: 6 frames @ 10 fps, loops
   - idle: 4 frames @ 4 fps, loops
-  - death: 6 frames @ 12 fps, plays once
+  - death: 6 frames @ 12 fps, plays once (squint, X eyes + swell, then the body's own shards fly out and fade; no pow star, ring or sparks: the game draws its own kill burst)
 
 ## Pupils (basic_pupil.png): drawn by the code
 - The sheet's eyes have EMPTY whites. Draw the pupils yourself, like cartoon.js eyes(): pupil centre = eye centre + (cos(look), sin(look)) * maxOffset, look = angle from the enemy to the tower.

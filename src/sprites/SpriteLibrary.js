@@ -36,7 +36,10 @@ LST.SPRITE_MANIFEST = {
   fast_face: "assets/sprites/enemies/fast/fast_face.json", // layer 1, upright + pupils
   tank: "assets/sprites/enemies/tank/tank.json",
   big_red: "assets/sprites/enemies/big_red/big_red.json",
-  king_mole: "assets/sprites/enemies/king_mole/king_mole.json",
-  king_mole_angry: "assets/sprites/enemies/king_mole/king_mole_angry.json",
+  // King Mole: three layers per variant (hole and front are shared by both variants).
+  king_mole_hole: "assets/sprites/enemies/king_mole/king_mole_hole.json",
+  king_mole_body: "assets/sprites/enemies/king_mole/king_mole_body.json",
+  king_mole_angry_body: "assets/sprites/enemies/king_mole/king_mole_angry_body.json",
+  king_mole_front: "assets/sprites/enemies/king_mole/king_mole_front.json",
 };
 LST.sprites = new LST.SpriteLibrary(LST.SPRITE_MANIFEST);

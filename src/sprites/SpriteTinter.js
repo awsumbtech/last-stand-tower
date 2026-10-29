@@ -20,6 +20,7 @@ LST.SpriteTinter = class SpriteTinter {
 
   // Same placement as SpriteAtlas.drawFrame.
   drawFrame(ctx, atlas, frame, tint) {
+    if (frame.empty) return;
     const g = this.scratch(frame.w, frame.h);
     const { w, h } = frame;
     g.globalCompositeOperation = "source-over";

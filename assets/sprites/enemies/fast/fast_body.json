@@ -503,7 +503,7 @@
   },
   "meta": {
     "app": "game-art last-stand-tower enemy generator",
-    "version": "1.0",
+    "version": "1.1",
     "image": "fast_body.png",
     "format": "indexed8 (pngquant)",
     "size": {
@@ -511,6 +511,10 @@
       "h": 268
     },
     "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, frame = sourceSize, pivot at the centre."
+    },
     "frameTags": [
       {
         "name": "walk",
@@ -534,7 +538,7 @@
     "pivot": {
       "x": 44,
       "y": 44,
-      "note": "frame center = entity position"
+      "note": "in sourceSize px: frame centre = entity position"
     },
     "hitbox": {
       "r": 18,
@@ -563,16 +567,34 @@
       "of": "fast",
       "order": 0,
       "rotates": true,
-      "note": "dart, feet, shine and the death burst. The art points down (+y), so rotate it by (look - PI/2), look = atan2(tower.y - e.y, tower.x - e.x); that equals cartoon.js's rotate(look + PI/2) of its tip-up dart. Draw the layers in 'order' (0 first) with the same frame index, both at the entity position + frames[name].offset (screen space, frame px: the walk bob, applied after rotating); they share frame size, pivot and timing."
+      "set": [
+        {
+          "name": "body",
+          "atlas": "fast_body.json",
+          "order": 0,
+          "rotates": true
+        },
+        {
+          "name": "face",
+          "atlas": "fast_face.json",
+          "order": 1,
+          "rotates": false
+        }
+      ],
+      "note": "dart, feet, shine and the death burst. The art points down (+y), so rotate it by (look - PI/2), look = atan2(tower.y - e.y, tower.x - e.x); that equals cartoon.js's rotate(look + PI/2) of its tip-up dart. Draw every atlas in 'set' in 'order' (0 first) with the same animation and frame index, each at the entity position + frames[name].offset (screen space, frame px: the walk bob, applied after any rotation); they share sourceSize, pivot and timing."
     },
     "quantize": {
       "tool": "pngquant 3.0.3",
       "quality": "85-100",
       "dither": 0.5,
-      "before": 39331,
-      "after": 8997,
-      "psnr": 53.4,
-      "maxChannelError": 22
+      "before": 33417,
+      "after": 6772,
+      "psnr": 63.1,
+      "maxChannelError": 10
+    },
+    "memory": {
+      "decodedRGBA": 576736,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
     }
   }
 }

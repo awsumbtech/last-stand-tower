@@ -487,7 +487,7 @@ LST.KingMole = class KingMole extends LST.Enemy {
   }
 
   burrow(game) {
-    this.mode = "dig"; this.timer = 0.5; this.untargetable = true;
+    this.mode = "dig"; this.timer = this.digTime = 0.5; this.untargetable = true;
     this.windup = 0; this.stun = 0;
     if (game && game.onMoleBurrow) game.onMoleBurrow(this);
   }
@@ -508,7 +508,7 @@ LST.KingMole = class KingMole extends LST.Enemy {
       this.phase = next;
       this.pops = 0;
       this.burrow(game);
-      this.timer = 0.9; // a longer dig for the phase change
+      this.timer = this.digTime = 0.9; // a longer dig for the phase change
       if (game.onMolePhase) game.onMolePhase(this);
     }
   }

@@ -6,11 +6,11 @@
 - Rows (in order):
   - walk: 6 frames @ 10 fps, loops
   - idle: 4 frames @ 4 fps, loops
-  - death: 6 frames @ 12 fps, plays once
+  - death: 6 frames @ 12 fps, plays once (squint, X eyes + swell, then the body's own shards fly out and fade; no pow star, ring or sparks: the game draws its own kill burst)
 
 ## Notes
 - Rounded block roundRect(R, 0.45R) with the darker lid band, angry (cartoon.js) brows, eyes lowered 0.25R. Lid corner radius 0.4R is clamped to half the lid height (0.35R), the same as canvas does.
-- Death burst scaled to 0.82 so the pow star fits the 128 frame (the square body fills more of it than Basic's circle).
+- Death shard spread scaled to 0.82 so the shards stay in the 128 frame (the square body fills more of it than Basic's circle).
 - PNGs are 8-bit indexed (pngquant 3.0.3, quality 85-100, speed 1, light dither 0.5), alpha kept; meta.format = "indexed8 (pngquant)" and meta.quantize records tool, settings, bytes before/after, PSNR and max channel error. `node build.mjs <entity> --no-quantize` gives full RGBA.
 - Nothing is baked in: no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code still draws those).
 - JSON is hash style: frames{name:{frame,rotated,trimmed,spriteSourceSize,sourceSize,pivot,duration}}, animations{name:{frames[],fps,loop}}, meta.frameTags (Aseprite style), meta.hitbox, meta.body, meta.palette, meta.format, meta.quantize.

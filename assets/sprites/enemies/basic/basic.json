@@ -662,7 +662,7 @@
   },
   "meta": {
     "app": "game-art last-stand-tower enemy generator",
-    "version": "1.0",
+    "version": "1.1",
     "image": "basic.png",
     "format": "indexed8 (pngquant)",
     "size": {
@@ -670,6 +670,10 @@
       "h": 292
     },
     "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, frame = sourceSize, pivot at the centre."
+    },
     "frameTags": [
       {
         "name": "walk",
@@ -693,7 +697,7 @@
     "pivot": {
       "x": 48,
       "y": 48,
-      "note": "frame center = entity position"
+      "note": "in sourceSize px: frame centre = entity position"
     },
     "hitbox": {
       "r": 24,
@@ -730,17 +734,21 @@
       "r": 4.54,
       "maxOffset": 3.18,
       "units": "frame px",
-      "perFrame": "frames[name].eyes = [{x, y, whiteR, pupilR, maxOffset, authoredLook}] for the left then right eye, x/y relative to the pivot; [] when the eyes are shut or hidden (blink, hurt, death burst): draw no pupils then.",
+      "perFrame": "frames[name].eyes = [{x, y, whiteR, pupilR, maxOffset, authoredLook}] for the left then right eye, x/y relative to the pivot (layer sheets: before adding the frame offset); [] when the eyes are shut or hidden (blink, hurt, death burst): draw no pupils then.",
       "howTo": "Like cartoon.js eyes(): pupil centre = eye centre + (cos(look), sin(look)) * maxOffset, look = angle to the tower; draw the pupil sprite (scaled by pupilR / r) on top of the sprite. authoredLook is the -1..1 direction the frame was drawn for (idle glances), as a fallback."
     },
     "quantize": {
       "tool": "pngquant 3.0.3",
       "quality": "85-100",
       "dither": 0.5,
-      "before": 74597,
-      "after": 15738,
-      "psnr": 53.2,
-      "maxChannelError": 28
+      "before": 65561,
+      "after": 13081,
+      "psnr": 63.9,
+      "maxChannelError": 9
+    },
+    "memory": {
+      "decodedRGBA": 684448,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
     }
   }
 }

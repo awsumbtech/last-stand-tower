@@ -6,11 +6,11 @@
 - Rows (in order):
   - walk: 6 frames @ 10 fps, loops
   - idle: 4 frames @ 4 fps, loops
-  - death: 6 frames @ 12 fps, plays once
+  - death: 6 frames @ 12 fps, plays once (squint, X eyes + swell, then the body's own shards fly out and fade; no pow star, ring or sparks: the game draws its own kill burst)
 
 ## Layers: fast_body.png/json + fast_face.png/json (+ fast_pupil.png)
 - Same layout as fast.png (538x268, 16 frames of 88x88, same rows, fps and pivot). Frame names fast_body_<anim>_<i> / fast_face_<anim>_<i>; meta.layer = {name, of: "fast", order, rotates, note}.
-- fast_body (order 0, rotates: true): the dart only (body, shine, shade, feet, death pow/shards). Drawn tip-DOWN, so rotate it by (look - PI/2) about the pivot, look = atan2(tower.y - e.y, tower.x - e.x). (Same as cartoon.js's rotate(look + PI/2) on its tip-up dart.)
+- fast_body (order 0, rotates: true): the dart only (body, shine, shade, feet, death shards). Drawn tip-DOWN, so rotate it by (look - PI/2) about the pivot, look = atan2(tower.y - e.y, tower.x - e.x). (Same as cartoon.js's rotate(look + PI/2) on its tip-up dart.)
 - fast_face (order 1, rotates: false): eye whites, blink, hurt eyes and the death O mouth, always drawn upright on top.
 - Pupils: like Basic, drawn by the code from fast_pupil.png using frames[name].eyes on fast_face (see meta.pupils): pupil centre = eye centre + (cos(look), sin(look)) * maxOffset; eyes = [] means none (blink, hurt, death).
 - Walk bob: the layer sheets do NOT contain it. Each layer frame has offset {x: 0, y} (frame px, screen space); add it to the draw position of both layers (after rotating the body), and to the face's eye centres. Otherwise a rotated body would bob sideways and slide under the face.
