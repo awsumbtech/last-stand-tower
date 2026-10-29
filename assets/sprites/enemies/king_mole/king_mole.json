@@ -899,6 +899,156 @@
         "y": 0.5
       },
       "duration": 100
+    },
+    "king_mole_underground_travel_0": {
+      "frame": {
+        "x": 0,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "king_mole_underground_travel_1": {
+      "frame": {
+        "x": 354,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "king_mole_underground_travel_2": {
+      "frame": {
+        "x": 708,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "king_mole_underground_travel_3": {
+      "frame": {
+        "x": 1062,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "king_mole_underground_travel_4": {
+      "frame": {
+        "x": 1416,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "king_mole_underground_travel_5": {
+      "frame": {
+        "x": 1770,
+        "y": 2124,
+        "w": 352,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 352,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 352,
+        "h": 352
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
     }
   },
   "animations": {
@@ -973,16 +1123,28 @@
       ],
       "fps": 10,
       "loop": false
+    },
+    "underground_travel": {
+      "frames": [
+        "king_mole_underground_travel_0",
+        "king_mole_underground_travel_1",
+        "king_mole_underground_travel_2",
+        "king_mole_underground_travel_3",
+        "king_mole_underground_travel_4",
+        "king_mole_underground_travel_5"
+      ],
+      "fps": 12,
+      "loop": true
     }
   },
   "meta": {
     "app": "game-art last-stand-tower enemy generator",
     "version": "1.0",
     "image": "king_mole.png",
-    "format": "RGBA8888",
+    "format": "indexed8 (pngquant)",
     "size": {
       "w": 3538,
-      "h": 2122
+      "h": 2476
     },
     "scale": "1",
     "frameTags": [
@@ -1021,6 +1183,12 @@
         "from": 26,
         "to": 35,
         "direction": "forward"
+      },
+      {
+        "name": "underground_travel",
+        "from": 36,
+        "to": 41,
+        "direction": "forward"
       }
     ],
     "pivot": {
@@ -1056,7 +1224,18 @@
       "belly": "#bcaaa4",
       "nose": "#ff8fab",
       "crown": "#ffd23f",
-      "gem": "#ff4757"
+      "gem": "#ff4757",
+      "under": "#a1887f",
+      "underShade": "#8d6e63"
+    },
+    "quantize": {
+      "tool": "pngquant 3.0.3",
+      "quality": "85-100",
+      "dither": 0.5,
+      "before": 792145,
+      "after": 149960,
+      "psnr": 55.7,
+      "maxChannelError": 86
     }
   }
 }

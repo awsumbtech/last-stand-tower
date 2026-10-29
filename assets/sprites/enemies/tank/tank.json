@@ -441,7 +441,7 @@
     "app": "game-art last-stand-tower enemy generator",
     "version": "1.0",
     "image": "tank.png",
-    "format": "RGBA8888",
+    "format": "indexed8 (pngquant)",
     "size": {
       "w": 778,
       "h": 388
@@ -493,6 +493,15 @@
       "puff": "#ffffff",
       "body": "#ff9f43",
       "shade": "#e07b1c"
+    },
+    "quantize": {
+      "tool": "pngquant 3.0.3",
+      "quality": "85-100",
+      "dither": 0.5,
+      "before": 86521,
+      "after": 20379,
+      "psnr": 54.9,
+      "maxChannelError": 29
     }
   }
 }

@@ -1,0 +1,578 @@
+{
+  "frames": {
+    "fast_body_walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -0.69
+      }
+    },
+    "fast_body_walk_1": {
+      "frame": {
+        "x": 90,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -1.74
+      }
+    },
+    "fast_body_walk_2": {
+      "frame": {
+        "x": 180,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -1.04
+      }
+    },
+    "fast_body_walk_3": {
+      "frame": {
+        "x": 270,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -0.69
+      }
+    },
+    "fast_body_walk_4": {
+      "frame": {
+        "x": 360,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -1.74
+      }
+    },
+    "fast_body_walk_5": {
+      "frame": {
+        "x": 450,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "offset": {
+        "x": 0,
+        "y": -1.04
+      }
+    },
+    "fast_body_idle_0": {
+      "frame": {
+        "x": 0,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_idle_1": {
+      "frame": {
+        "x": 90,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_idle_2": {
+      "frame": {
+        "x": 180,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_idle_3": {
+      "frame": {
+        "x": 270,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_0": {
+      "frame": {
+        "x": 0,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_1": {
+      "frame": {
+        "x": 90,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_2": {
+      "frame": {
+        "x": 180,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_3": {
+      "frame": {
+        "x": 270,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_4": {
+      "frame": {
+        "x": 360,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "fast_body_death_5": {
+      "frame": {
+        "x": 450,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "offset": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "animations": {
+    "walk": {
+      "frames": [
+        "fast_body_walk_0",
+        "fast_body_walk_1",
+        "fast_body_walk_2",
+        "fast_body_walk_3",
+        "fast_body_walk_4",
+        "fast_body_walk_5"
+      ],
+      "fps": 10,
+      "loop": true
+    },
+    "idle": {
+      "frames": [
+        "fast_body_idle_0",
+        "fast_body_idle_1",
+        "fast_body_idle_2",
+        "fast_body_idle_3"
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "death": {
+      "frames": [
+        "fast_body_death_0",
+        "fast_body_death_1",
+        "fast_body_death_2",
+        "fast_body_death_3",
+        "fast_body_death_4",
+        "fast_body_death_5"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower enemy generator",
+    "version": "1.0",
+    "image": "fast_body.png",
+    "format": "indexed8 (pngquant)",
+    "size": {
+      "w": 538,
+      "h": 268
+    },
+    "scale": "1",
+    "frameTags": [
+      {
+        "name": "walk",
+        "from": 0,
+        "to": 5,
+        "direction": "forward"
+      },
+      {
+        "name": "idle",
+        "from": 6,
+        "to": 9,
+        "direction": "forward"
+      },
+      {
+        "name": "death",
+        "from": 10,
+        "to": 15,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 44,
+      "y": 44,
+      "note": "frame center = entity position"
+    },
+    "hitbox": {
+      "r": 18,
+      "units": "frame px",
+      "worldRadius": 9,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 24.3,
+      "outline": 6,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "drawn like cartoon.js: body radius = hitbox x drawScale"
+    },
+    "palette": {
+      "ink": "#2b1d3a",
+      "white": "#ffffff",
+      "pow": "#fff3b0",
+      "mouth": "#7a2840",
+      "puff": "#ffffff",
+      "body": "#ffd23f",
+      "shade": "#e8b417"
+    },
+    "layer": {
+      "name": "body",
+      "of": "fast",
+      "order": 0,
+      "rotates": true,
+      "note": "dart, feet, shine and the death burst. The art points down (+y), so rotate it by (look - PI/2), look = atan2(tower.y - e.y, tower.x - e.x); that equals cartoon.js's rotate(look + PI/2) of its tip-up dart. Draw the layers in 'order' (0 first) with the same frame index, both at the entity position + frames[name].offset (screen space, frame px: the walk bob, applied after rotating); they share frame size, pivot and timing."
+    },
+    "quantize": {
+      "tool": "pngquant 3.0.3",
+      "quality": "85-100",
+      "dither": 0.5,
+      "before": 39331,
+      "after": 8997,
+      "psnr": 53.4,
+      "maxChannelError": 22
+    }
+  }
+}

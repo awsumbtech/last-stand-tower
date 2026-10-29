@@ -23,7 +23,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_walk_1": {
       "frame": {
@@ -48,7 +72,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_walk_2": {
       "frame": {
@@ -73,7 +121,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_walk_3": {
       "frame": {
@@ -98,7 +170,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_walk_4": {
       "frame": {
@@ -123,7 +219,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_walk_5": {
       "frame": {
@@ -148,7 +268,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 100
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_idle_0": {
       "frame": {
@@ -173,7 +317,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 250
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
     },
     "basic_idle_1": {
       "frame": {
@@ -198,7 +366,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 250
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            -0.8,
+            0.2
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            -0.8,
+            0.2
+          ]
+        }
+      ]
     },
     "basic_idle_2": {
       "frame": {
@@ -223,7 +415,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 250
+      "duration": 250,
+      "eyes": []
     },
     "basic_idle_3": {
       "frame": {
@@ -248,7 +441,31 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 250
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0.8,
+            0.2
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0.8,
+            0.2
+          ]
+        }
+      ]
     },
     "basic_death_0": {
       "frame": {
@@ -273,7 +490,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     },
     "basic_death_1": {
       "frame": {
@@ -298,7 +516,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     },
     "basic_death_2": {
       "frame": {
@@ -323,7 +542,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     },
     "basic_death_3": {
       "frame": {
@@ -348,7 +568,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     },
     "basic_death_4": {
       "frame": {
@@ -373,7 +594,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     },
     "basic_death_5": {
       "frame": {
@@ -398,7 +620,8 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 83
+      "duration": 83,
+      "eyes": []
     }
   },
   "animations": {
@@ -441,7 +664,7 @@
     "app": "game-art last-stand-tower enemy generator",
     "version": "1.0",
     "image": "basic.png",
-    "format": "RGBA8888",
+    "format": "indexed8 (pngquant)",
     "size": {
       "w": 586,
       "h": 292
@@ -493,6 +716,31 @@
       "puff": "#ffffff",
       "body": "#ff6fb5",
       "shade": "#e04f98"
+    },
+    "pupils": {
+      "image": "basic_pupil.png",
+      "size": {
+        "w": 14,
+        "h": 14
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "r": 4.54,
+      "maxOffset": 3.18,
+      "units": "frame px",
+      "perFrame": "frames[name].eyes = [{x, y, whiteR, pupilR, maxOffset, authoredLook}] for the left then right eye, x/y relative to the pivot; [] when the eyes are shut or hidden (blink, hurt, death burst): draw no pupils then.",
+      "howTo": "Like cartoon.js eyes(): pupil centre = eye centre + (cos(look), sin(look)) * maxOffset, look = angle to the tower; draw the pupil sprite (scaled by pupilR / r) on top of the sprite. authoredLook is the -1..1 direction the frame was drawn for (idle glances), as a fallback."
+    },
+    "quantize": {
+      "tool": "pngquant 3.0.3",
+      "quality": "85-100",
+      "dither": 0.5,
+      "before": 74597,
+      "after": 15738,
+      "psnr": 53.2,
+      "maxChannelError": 28
     }
   }
 }

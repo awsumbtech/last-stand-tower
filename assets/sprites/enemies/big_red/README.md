@@ -14,8 +14,9 @@
 - Frame is 304 px, not the specified 256: the horns reach 1.65R (~134 px) above the pivot, so a centred pivot needs 304.
 - slam_windup = 4 frames @ 5 fps = exactly the code's 0.8 s windup; it does not loop. The code's telegraph ring / squash / charge flash are NOT baked in.
 - charge loops @12 fps. death knocks the horns off sideways and fades them.
+- PNGs are 8-bit indexed (pngquant 3.0.3, quality 85-100, speed 1, light dither 0.5), alpha kept; meta.format = "indexed8 (pngquant)" and meta.quantize records tool, settings, bytes before/after, PSNR and max channel error. `node build.mjs <entity> --no-quantize` gives full RGBA.
 - Nothing is baked in: no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code still draws those).
-- JSON is hash style: frames{name:{frame,rotated,trimmed,spriteSourceSize,sourceSize,pivot,duration}}, animations{name:{frames[],fps,loop}}, meta.frameTags (Aseprite style), meta.hitbox, meta.body, meta.palette.
+- JSON is hash style: frames{name:{frame,rotated,trimmed,spriteSourceSize,sourceSize,pivot,duration}}, animations{name:{frames[],fps,loop}}, meta.frameTags (Aseprite style), meta.hitbox, meta.body, meta.palette, meta.format, meta.quantize.
 
 ## Files
 - source/: one SVG per frame.
