@@ -267,6 +267,8 @@
     bossFlash: [{ color: "#ff8a95", alpha: 1, mode: "overlay" }, { color: "#ffffff", alpha: 0.5, mode: "overlay" }],
     frozen: [{ color: "#8fdcff", alpha: 0.8, mode: "color" }, { color: "#bfefff", alpha: 0.45, mode: "screen" }],
     charge: { color: "#ff1f3d", alpha: 0.8, mode: "overlay" },
+    // King Mole's hole is part of his sprite, so a full flash would light up the dirt too.
+    moleFlash: { color: "#ffffff", alpha: 0.8, mode: "overlay" },
   };
   function spriteTint(e, flash, frozen, charge) {
     if (flash) return e.isBoss ? TINT.bossFlash : TINT.flash;
@@ -283,7 +285,7 @@
     if (!clip) return false;
     const R = e.radius * 1.2;
     const lift = clip.codeMotion && e.windup > 0 ? 1 - e.windup / (e.windupMax || 1) : 0;
-    const tint = e.hitFlash > 0 ? TINT.flash : e.slowTimer > 0 ? TINT.frozen : null;
+    const tint = e.hitFlash > 0 ? TINT.moleFlash : e.slowTimer > 0 ? TINT.frozen : null;
     ctx.save();
     ctx.translate(e.x, e.y);
     S.drawBody(ctx, e, { sx: 1 - lift * 0.06, sy: 1 + lift * 0.1, anchorY: R * 0.55, tint }, clip);

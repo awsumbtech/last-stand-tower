@@ -178,7 +178,7 @@ LST.World = class World {
   spawnCorpse(e) {
     const theme = this.renderer && this.renderer.theme;
     const life = theme && theme.corpseLife ? theme.corpseLife(e) : 0;
-    if (life > 0) this.corpses.push(new LST.Corpse(e, life));
+    if (life > 0) this.corpses.push(e.corpse = new LST.Corpse(e, life));
   }
 
   onTowerHit(e) {

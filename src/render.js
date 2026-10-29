@@ -102,7 +102,7 @@ LST.Renderer = class Renderer {
     }
     for (const p of scene.particles) theme.particle(ctx, p, this);
     if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
-    for (const e of scene.enemies) theme.enemy(ctx, e, this);
+    for (const e of scene.enemies) if (!e.corpse) theme.enemy(ctx, e, this); // a Corpse now owns its look
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
