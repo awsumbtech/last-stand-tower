@@ -363,6 +363,28 @@ LST.Burst = class Burst {
   }
 };
 
+// What's left of a killed enemy for a moment: plays its death animation, then goes.
+// Pure visuals: not in the enemy list, can't be hit, never blocks a wave from ending.
+LST.Corpse = class Corpse {
+  constructor(e, life) {
+    this.type = e.type;
+    this.x = e.x;
+    this.y = e.y;
+    this.radius = e.radius;
+    this.phase = e.phase || 0;
+    this.isBoss = e.isBoss;
+    this.age = 0;
+    this.life = this.maxLife = life;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.age += dt;
+    this.life -= dt;
+    if (this.life <= 0) this.dead = true;
+  }
+};
+
 // Wave-clear confetti: spinning paper bits with gravity.
 LST.Confetti = class Confetti {
   constructor(x, y, color) {

@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v9";
+const VERSION = "v10"; // sprites-enemies branch only; main stays v9 until this ships
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -26,6 +26,12 @@ const PRECACHE = [
   "src/world.js",
   "src/waves.js",
   "src/render.js",
+  "src/sprites/SpriteAtlas.js",
+  "src/sprites/SpriteLibrary.js",
+  "src/sprites/AnimationPlayer.js",
+  "src/sprites/SpriteTinter.js",
+  "src/sprites/EnemyAnimationRules.js",
+  "src/sprites/EnemySpriteRenderer.js",
   "src/themes/neon.js",
   "src/themes/pixel.js",
   "src/themes/cartoon.js",
@@ -40,6 +46,19 @@ const PRECACHE = [
   "icons/apple-touch-icon.png",
   "icons/favicon-32.png",
   "fonts/Fredoka.woff2",
+  // Enemy sprite sheets (~2.3 MB unquantized; King Mole is most of it)
+  "assets/sprites/enemies/basic/basic.json",
+  "assets/sprites/enemies/basic/basic.png",
+  "assets/sprites/enemies/fast/fast.json",
+  "assets/sprites/enemies/fast/fast.png",
+  "assets/sprites/enemies/tank/tank.json",
+  "assets/sprites/enemies/tank/tank.png",
+  "assets/sprites/enemies/big_red/big_red.json",
+  "assets/sprites/enemies/big_red/big_red.png",
+  "assets/sprites/enemies/king_mole/king_mole.json",
+  "assets/sprites/enemies/king_mole/king_mole.png",
+  "assets/sprites/enemies/king_mole/king_mole_angry.json",
+  "assets/sprites/enemies/king_mole/king_mole_angry.png",
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

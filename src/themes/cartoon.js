@@ -238,6 +238,99 @@
     ctx.closePath();
   }
 
+  // ---------- Enemy pieces shared by the vector and sprite paths ----------
+  function shadow(ctx, R) {
+    ctx.beginPath();
+    ctx.ellipse(2, R * 0.85, R * 0.9, R * 0.35, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(43, 29, 58, 0.22)";
+    ctx.fill();
+  }
+
+  function hpBar(ctx, e, R) {
+    if (e.hp >= e.maxHp) return;
+    const bw = Math.max(26, R * 2);
+    const by = -R * (e.type === "boss" ? 1.85 : 1.5) - 10;
+    LST.draw.roundRect(ctx, -bw / 2, by, bw, 8, 4);
+    outlined(ctx, "#ffffff", 2.5);
+    const f = Math.max(0, e.hp / e.maxHp);
+    if (f > 0.05) {
+      LST.draw.roundRect(ctx, -bw / 2 + 1.5, by + 1.5, (bw - 3) * f, 5, 2.5);
+      ctx.fillStyle = f < 0.35 ? "#ff4757" : "#3ddc84";
+      ctx.fill();
+    }
+  }
+
+  // The same color cues as the vector fills, as a wash over the sprite.
+  function spriteTint(e, flash, frozen, charge) {
+    if (flash) return e.isBoss ? { color: "#ff8a95", alpha: 0.5 } : { color: "#ffffff", alpha: 0.75 };
+    if (frozen) return { color: "#bfefff", alpha: 0.5 };
+    if (charge) return { color: "#ff1f3d", alpha: 0.4 };
+    return null;
+  }
+
+  // King Mole from his sheet. Rise/dig/slam motion is in the frames; only the slam
+  // wind-up (idle clip) gets the code's rear-up stretch, planted on the hole.
+  function moleSprite(ctx, e) {
+    const S = LST.enemySprites;
+    const clip = S && S.clip(e);
+    if (!clip) return false;
+    const R = e.radius * 1.2;
+    const lift = clip.codeMotion && e.windup > 0 ? 1 - e.windup / (e.windupMax || 1) : 0;
+    const tint = e.hitFlash > 0 ? { color: "#ffffff", alpha: 0.4 } : e.slowTimer > 0 ? { color: "#bfefff", alpha: 0.45 } : null;
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    S.drawBody(ctx, e, { sx: 1 - lift * 0.06, sy: 1 + lift * 0.1, anchorY: R * 0.55, tint }, clip);
+    ctx.restore();
+    return true;
+  }
+
+  // Today's procedural bodies (also the fallback while sprites load).
+  function vectorBody(ctx, e, R, fill, flash, c, look) {
+    ctx.lineJoin = "round";
+    if (e.type === "basic") {
+      ctx.beginPath();
+      ctx.arc(0, 0, R, 0, Math.PI * 2);
+      outlined(ctx, fill, 3.5);
+      eyes(ctx, R * 0.38, R * 0.28, look, false);
+    } else if (e.type === "fast") {
+      ctx.save();
+      ctx.rotate(look + Math.PI / 2);
+      ctx.beginPath();
+      ctx.moveTo(0, -R * 1.5);
+      ctx.quadraticCurveTo(R * 1.2, R * 0.2, 0, R);
+      ctx.quadraticCurveTo(-R * 1.2, R * 0.2, 0, -R * 1.5);
+      outlined(ctx, fill, 3);
+      ctx.restore();
+      eyes(ctx, R * 0.35, R * 0.3, look, false);
+    } else if (e.type === "tank") {
+      LST.draw.roundRect(ctx, -R, -R, R * 2, R * 2, R * 0.45);
+      outlined(ctx, fill, 4);
+      LST.draw.roundRect(ctx, -R, -R, R * 2, R * 0.7, R * 0.4);
+      outlined(ctx, flash ? "#ffffff" : c.shade, 3.5);
+      ctx.save();
+      ctx.translate(0, R * 0.25);
+      eyes(ctx, R * 0.4, R * 0.22, look, true);
+      ctx.restore();
+    } else {
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(side * R * 0.45, -R * 0.75);
+        ctx.quadraticCurveTo(side * R * 1.1, -R * 1.2, side * R * 0.95, -R * 1.65);
+        ctx.quadraticCurveTo(side * R * 0.65, -R * 1.05, side * R * 0.15, -R * 0.9);
+        outlined(ctx, "#fff3d6", 3.5);
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, R, 0, Math.PI * 2);
+      outlined(ctx, fill, 5);
+      eyes(ctx, R * 0.36, R * 0.22, look, true);
+      ctx.beginPath();
+      ctx.moveTo(-R * 0.45, R * 0.35);
+      ctx.quadraticCurveTo(0, R * 0.7, R * 0.45, R * 0.35);
+      ctx.closePath();
+      outlined(ctx, "#ffffff", 3);
+    }
+  }
+
   // ---------- Ground (drawn once per screen size into a cached canvas) ----------
   const ground = { canvas: null, key: "" };
 
@@ -332,6 +425,11 @@
     id: "cartoon",
     name: "Cartoon",
     label: "Chunky cartoon: thick outlines, flat colors, squash & stretch",
+
+    // Enemy sprite sheets load in the background; vector art covers until they're in.
+    init() {
+      if (LST.sprites) LST.sprites.preload();
+    },
 
     background(ctx, r) {
       const key = [r.width, r.height, r.dpr, r.scale].join("x");
@@ -491,7 +589,11 @@
 
     enemy(ctx, e, r) {
       if (e.windup > 0) telegraph(ctx, e, r);
-      if (e.type === "mole") { drawMole(ctx, e, r); if (e.stun > 0 && e.mode === "up") dizzy(ctx, { x: e.x, y: e.y - e.radius * 1.5, radius: e.radius }, r); return; }
+      if (e.type === "mole") {
+        if (!moleSprite(ctx, e)) drawMole(ctx, e, r);
+        if (e.stun > 0 && e.mode === "up") dizzy(ctx, { x: e.x, y: e.y - e.radius * 1.5, radius: e.radius }, r);
+        return;
+      }
       if (e.stun > 0) dizzy(ctx, e, r);
       const c = COLORS[e.type];
       const look = Math.atan2(-e.y, -e.x); // toward the tower at 0,0
@@ -505,76 +607,38 @@
       const R = e.radius * 1.35;
       const flash = e.hitFlash > 0;
       const frozen = e.slowTimer > 0; // Frost Shots: icy blue tint
-      const fill = flash ? (e.isBoss ? "#ff8a95" : "#ffffff") : frozen ? "#bfefff" : e.charging && Math.floor(e.age * 10) % 2 ? "#ff1f3d" : c.body;
+      const charge = e.charging && Math.floor(e.age * 10) % 2;
+      const fill = flash ? (e.isBoss ? "#ff8a95" : "#ffffff") : frozen ? "#bfefff" : charge ? "#ff1f3d" : c.body;
 
       ctx.save();
       ctx.translate(e.x, e.y);
-      ctx.beginPath();
-      ctx.ellipse(2, R * 0.85, R * 0.9, R * 0.35, 0, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(43, 29, 58, 0.22)";
-      ctx.fill();
-
-      ctx.save();
+      shadow(ctx, R);
       // Squash a bit harder on the frame it gets hit
       const sq = e.isBoss ? 0.04 : 0.12;
-      ctx.scale(sx * (flash ? 1 + sq : 1), sy * (flash ? 1 - sq : 1));
-      ctx.lineJoin = "round";
-      if (e.type === "basic") {
-        ctx.beginPath();
-        ctx.arc(0, 0, R, 0, Math.PI * 2);
-        outlined(ctx, fill, 3.5);
-        eyes(ctx, R * 0.38, R * 0.28, look, false);
-      } else if (e.type === "fast") {
+      const bx = sx * (flash ? 1 + sq : 1), by = sy * (flash ? 1 - sq : 1);
+      const fx = { sx: bx, sy: by, rot: e.type === "fast" ? look - Math.PI / 2 : 0, tint: spriteTint(e, flash, frozen, charge) };
+      if (!(LST.enemySprites && LST.enemySprites.drawBody(ctx, e, fx))) {
         ctx.save();
-        ctx.rotate(look + Math.PI / 2);
-        ctx.beginPath();
-        ctx.moveTo(0, -R * 1.5);
-        ctx.quadraticCurveTo(R * 1.2, R * 0.2, 0, R);
-        ctx.quadraticCurveTo(-R * 1.2, R * 0.2, 0, -R * 1.5);
-        outlined(ctx, fill, 3);
+        ctx.scale(bx, by);
+        vectorBody(ctx, e, R, fill, flash, c, look);
         ctx.restore();
-        eyes(ctx, R * 0.35, R * 0.3, look, false);
-      } else if (e.type === "tank") {
-        LST.draw.roundRect(ctx, -R, -R, R * 2, R * 2, R * 0.45);
-        outlined(ctx, fill, 4);
-        LST.draw.roundRect(ctx, -R, -R, R * 2, R * 0.7, R * 0.4);
-        outlined(ctx, flash ? "#ffffff" : c.shade, 3.5);
-        ctx.save();
-        ctx.translate(0, R * 0.25);
-        eyes(ctx, R * 0.4, R * 0.22, look, true);
-        ctx.restore();
-      } else {
-        for (const side of [-1, 1]) {
-          ctx.beginPath();
-          ctx.moveTo(side * R * 0.45, -R * 0.75);
-          ctx.quadraticCurveTo(side * R * 1.1, -R * 1.2, side * R * 0.95, -R * 1.65);
-          ctx.quadraticCurveTo(side * R * 0.65, -R * 1.05, side * R * 0.15, -R * 0.9);
-          outlined(ctx, "#fff3d6", 3.5);
-        }
-        ctx.beginPath();
-        ctx.arc(0, 0, R, 0, Math.PI * 2);
-        outlined(ctx, fill, 5);
-        eyes(ctx, R * 0.36, R * 0.22, look, true);
-        ctx.beginPath();
-        ctx.moveTo(-R * 0.45, R * 0.35);
-        ctx.quadraticCurveTo(0, R * 0.7, R * 0.45, R * 0.35);
-        ctx.closePath();
-        outlined(ctx, "#ffffff", 3);
       }
+      hpBar(ctx, e, R);
       ctx.restore();
+    },
 
-      if (e.hp < e.maxHp) {
-        const bw = Math.max(26, R * 2);
-        const by = -R * (e.type === "boss" ? 1.85 : 1.5) - 10;
-        LST.draw.roundRect(ctx, -bw / 2, by, bw, 8, 4);
-        outlined(ctx, "#ffffff", 2.5);
-        const f = Math.max(0, e.hp / e.maxHp);
-        if (f > 0.05) {
-          LST.draw.roundRect(ctx, -bw / 2 + 1.5, by + 1.5, (bw - 3) * f, 5, 2.5);
-          ctx.fillStyle = f < 0.35 ? "#ff4757" : "#3ddc84";
-          ctx.fill();
-        }
-      }
+    // Death animations (sprites only). A kill leaves a Corpse for exactly the clip length.
+    corpseLife(e) {
+      return LST.enemySprites ? LST.enemySprites.deathDuration(e) : 0;
+    },
+
+    corpse(ctx, c) {
+      const look = Math.atan2(-c.y, -c.x);
+      const R = c.radius * 1.35;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      if (c.type !== "mole") { ctx.globalAlpha = Math.max(0, c.life / c.maxLife); shadow(ctx, R); ctx.globalAlpha = 1; }
+      LST.enemySprites.drawDeath(ctx, c, { sx: 1, sy: 1, rot: c.type === "fast" ? look - Math.PI / 2 : 0, tint: null });
       ctx.restore();
     },
 
