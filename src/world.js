@@ -15,6 +15,7 @@ LST.World = class World {
     this.texts = [];
     this.bursts = [];
     this.confetti = [];
+    this.corpses = []; // death animations (only if the theme draws them)
     this.vignette = 0; // red screen-edge pulse, 0..1
     this.flash = 0;    // white screen flash, 0..1
     this.lowHpActive = false;
@@ -30,6 +31,7 @@ LST.World = class World {
     this.updateList(this.texts, dt);
     this.updateList(this.bursts, dt);
     this.updateList(this.confetti, dt);
+    this.updateList(this.corpses, dt);
     this.vignette = Math.max(0, this.vignette - dt * 0.9);
     this.flash = Math.max(0, this.flash - dt * 3);
     this.bossIntro = Math.max(0, this.bossIntro - dt);
@@ -166,9 +168,17 @@ LST.World = class World {
   }
 
   onEnemyKilled(e) {
+    this.spawnCorpse(e);
     this.spawnHitSparks(e.x, e.y, e.color, 14, 160);
     this.bursts.push(new LST.Burst(e.x, e.y, e.color, e.radius * 1.8, "kill"));
     this.texts.push(new LST.FloatText(e.x, e.y - e.radius, "+" + e.coins, "#ffd93d", "coin"));
+  }
+
+  // The active theme decides whether a kill leaves a death animation, and for how long.
+  spawnCorpse(e) {
+    const theme = this.renderer && this.renderer.theme;
+    const life = theme && theme.corpseLife ? theme.corpseLife(e) : 0;
+    if (life > 0) this.corpses.push(e.corpse = new LST.Corpse(e, life));
   }
 
   onTowerHit(e) {

@@ -363,6 +363,28 @@ LST.Burst = class Burst {
   }
 };
 
+// What's left of a killed enemy for a moment: plays its death animation, then goes.
+// Pure visuals: not in the enemy list, can't be hit, never blocks a wave from ending.
+LST.Corpse = class Corpse {
+  constructor(e, life) {
+    this.type = e.type;
+    this.x = e.x;
+    this.y = e.y;
+    this.radius = e.radius;
+    this.phase = e.phase || 0;
+    this.isBoss = e.isBoss;
+    this.age = 0;
+    this.life = this.maxLife = life;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.age += dt;
+    this.life -= dt;
+    if (this.life <= 0) this.dead = true;
+  }
+};
+
 // Wave-clear confetti: spinning paper bits with gravity.
 LST.Confetti = class Confetti {
   constructor(x, y, color) {
@@ -465,7 +487,7 @@ LST.KingMole = class KingMole extends LST.Enemy {
   }
 
   burrow(game) {
-    this.mode = "dig"; this.timer = 0.5; this.untargetable = true;
+    this.mode = "dig"; this.timer = this.digTime = 0.5; this.untargetable = true;
     this.windup = 0; this.stun = 0;
     if (game && game.onMoleBurrow) game.onMoleBurrow(this);
   }
@@ -486,7 +508,7 @@ LST.KingMole = class KingMole extends LST.Enemy {
       this.phase = next;
       this.pops = 0;
       this.burrow(game);
-      this.timer = 0.9; // a longer dig for the phase change
+      this.timer = this.digTime = 0.9; // a longer dig for the phase change
       if (game.onMolePhase) game.onMolePhase(this);
     }
   }

@@ -1,0 +1,754 @@
+{
+  "frames": {
+    "basic_walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_walk_1": {
+      "frame": {
+        "x": 98,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_walk_2": {
+      "frame": {
+        "x": 196,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_walk_3": {
+      "frame": {
+        "x": 294,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -3.65,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_walk_4": {
+      "frame": {
+        "x": 392,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -5.04,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_walk_5": {
+      "frame": {
+        "x": 490,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -4.11,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_idle_0": {
+      "frame": {
+        "x": 0,
+        "y": 98,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0,
+            0.35
+          ]
+        }
+      ]
+    },
+    "basic_idle_1": {
+      "frame": {
+        "x": 98,
+        "y": 98,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            -0.8,
+            0.2
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            -0.8,
+            0.2
+          ]
+        }
+      ]
+    },
+    "basic_idle_2": {
+      "frame": {
+        "x": 196,
+        "y": 98,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "eyes": []
+    },
+    "basic_idle_3": {
+      "frame": {
+        "x": 294,
+        "y": 98,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250,
+      "eyes": [
+        {
+          "x": -12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0.8,
+            0.2
+          ]
+        },
+        {
+          "x": 12.31,
+          "y": -2.72,
+          "whiteR": 9.07,
+          "pupilR": 4.54,
+          "maxOffset": 3.18,
+          "authoredLook": [
+            0.8,
+            0.2
+          ]
+        }
+      ]
+    },
+    "basic_death_0": {
+      "frame": {
+        "x": 0,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    },
+    "basic_death_1": {
+      "frame": {
+        "x": 98,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    },
+    "basic_death_2": {
+      "frame": {
+        "x": 196,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    },
+    "basic_death_3": {
+      "frame": {
+        "x": 294,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    },
+    "basic_death_4": {
+      "frame": {
+        "x": 392,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    },
+    "basic_death_5": {
+      "frame": {
+        "x": 490,
+        "y": 196,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83,
+      "eyes": []
+    }
+  },
+  "animations": {
+    "walk": {
+      "frames": [
+        "basic_walk_0",
+        "basic_walk_1",
+        "basic_walk_2",
+        "basic_walk_3",
+        "basic_walk_4",
+        "basic_walk_5"
+      ],
+      "fps": 10,
+      "loop": true
+    },
+    "idle": {
+      "frames": [
+        "basic_idle_0",
+        "basic_idle_1",
+        "basic_idle_2",
+        "basic_idle_3"
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "death": {
+      "frames": [
+        "basic_death_0",
+        "basic_death_1",
+        "basic_death_2",
+        "basic_death_3",
+        "basic_death_4",
+        "basic_death_5"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower enemy generator",
+    "version": "1.1",
+    "image": "basic.png",
+    "format": "indexed8 (pngquant)",
+    "size": {
+      "w": 586,
+      "h": 292
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, frame = sourceSize, pivot at the centre."
+    },
+    "frameTags": [
+      {
+        "name": "walk",
+        "from": 0,
+        "to": 5,
+        "direction": "forward"
+      },
+      {
+        "name": "idle",
+        "from": 6,
+        "to": 9,
+        "direction": "forward"
+      },
+      {
+        "name": "death",
+        "from": 10,
+        "to": 15,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 48,
+      "y": 48,
+      "note": "in sourceSize px: frame centre = entity position"
+    },
+    "hitbox": {
+      "r": 24,
+      "units": "frame px",
+      "worldRadius": 12,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 32.4,
+      "outline": 7,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "drawn like cartoon.js: body radius = hitbox x drawScale"
+    },
+    "palette": {
+      "ink": "#2b1d3a",
+      "white": "#ffffff",
+      "pow": "#fff3b0",
+      "mouth": "#7a2840",
+      "puff": "#ffffff",
+      "body": "#ff6fb5",
+      "shade": "#e04f98"
+    },
+    "pupils": {
+      "image": "basic_pupil.png",
+      "size": {
+        "w": 14,
+        "h": 14
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "r": 4.54,
+      "maxOffset": 3.18,
+      "units": "frame px",
+      "perFrame": "frames[name].eyes = [{x, y, whiteR, pupilR, maxOffset, authoredLook}] for the left then right eye, x/y relative to the pivot (layer sheets: before adding the frame offset); [] when the eyes are shut or hidden (blink, hurt, death burst): draw no pupils then.",
+      "howTo": "Like cartoon.js eyes(): pupil centre = eye centre + (cos(look), sin(look)) * maxOffset, look = angle to the tower; draw the pupil sprite (scaled by pupilR / r) on top of the sprite. authoredLook is the -1..1 direction the frame was drawn for (idle glances), as a fallback."
+    },
+    "quantize": {
+      "tool": "pngquant 3.0.3",
+      "quality": "85-100",
+      "dither": 0.5,
+      "before": 65561,
+      "after": 13081,
+      "psnr": 63.9,
+      "maxChannelError": 9
+    },
+    "memory": {
+      "decodedRGBA": 684448,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    }
+  }
+}

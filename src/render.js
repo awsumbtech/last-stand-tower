@@ -12,6 +12,7 @@
 //   banner(ctx, text, alpha, r)- screen space (CSS px), e.g. "WAVE 3"
 //   burst(ctx, burst, r)       - optional, world space impact effect
 //   bossBanner(ctx, t, r)      - optional, screen space; t counts down from 2.4
+//   corpseLife(enemy) / corpse(ctx, corpse, r) - optional death animations (seconds; 0 = none)
 // `r` is the renderer: r.time, r.halfW, r.halfH, r.px (world units per art pixel).
 
 LST.themes = LST.themes || {};
@@ -100,7 +101,8 @@ LST.Renderer = class Renderer {
       ctx.restore();
     }
     for (const p of scene.particles) theme.particle(ctx, p, this);
-    for (const e of scene.enemies) theme.enemy(ctx, e, this);
+    if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
+    for (const e of scene.enemies) if (!e.corpse) theme.enemy(ctx, e, this); // a Corpse now owns its look
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
