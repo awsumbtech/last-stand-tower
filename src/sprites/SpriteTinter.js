@@ -1,5 +1,10 @@
-// SpriteTinter: draws an atlas frame washed with a flat color (hit flash, frost, charge
-// flicker) without baking tinted copies of whole sheets. Uses one reusable scratch canvas.
+// SpriteTinter: draws an atlas frame with a colour effect (hit flash, frost, charge
+// flicker) without baking tinted copies of whole sheets. One reusable scratch canvas.
+// The colour is blended *into* the art (keeping the ink outlines and shading) and then
+// clipped back to the sprite's own alpha, so a flashed enemy reads as "lit up" rather
+// than as a ghostly white silhouette. Plain canvas composite modes only (no ctx.filter,
+// which older iOS Safari lacks).
+//   tint = { color, alpha, mode }  mode: a globalCompositeOperation blend, default "overlay"
 LST.SpriteTinter = class SpriteTinter {
   constructor() { this.canvas = null; this.ctx = null; }
 
@@ -12,18 +17,23 @@ LST.SpriteTinter = class SpriteTinter {
     return this.ctx;
   }
 
-  // Same placement as SpriteAtlas.drawFrame; tint = { color, alpha }.
+  // Same placement as SpriteAtlas.drawFrame.
   drawFrame(ctx, atlas, frame, tint) {
     const g = this.scratch(frame.w, frame.h);
+    const { w, h } = frame;
     g.globalCompositeOperation = "source-over";
     g.globalAlpha = 1;
-    g.clearRect(0, 0, frame.w, frame.h);
-    g.drawImage(atlas.image, frame.sx, frame.sy, frame.w, frame.h, 0, 0, frame.w, frame.h);
-    g.globalCompositeOperation = "source-atop"; // only where the sprite has paint
+    g.clearRect(0, 0, w, h);
+    g.drawImage(atlas.image, frame.sx, frame.sy, w, h, 0, 0, w, h);
+    g.globalCompositeOperation = tint.mode || "overlay";
     g.globalAlpha = tint.alpha;
     g.fillStyle = tint.color;
-    g.fillRect(0, 0, frame.w, frame.h);
+    g.fillRect(0, 0, w, h);
+    g.globalCompositeOperation = "destination-in"; // back to the sprite's silhouette
+    g.globalAlpha = 1;
+    g.drawImage(atlas.image, frame.sx, frame.sy, w, h, 0, 0, w, h);
+    g.globalCompositeOperation = "source-over";
     const k = 1 / atlas.pxPerUnit;
-    ctx.drawImage(this.canvas, 0, 0, frame.w, frame.h, -frame.px * k, -frame.py * k, frame.w * k, frame.h * k);
+    ctx.drawImage(this.canvas, 0, 0, w, h, -frame.px * k, -frame.py * k, w * k, h * k);
   }
 };

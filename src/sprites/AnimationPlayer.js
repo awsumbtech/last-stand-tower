@@ -5,6 +5,7 @@
 LST.AnimationPlayer = class AnimationPlayer {
   constructor() {
     this.atlas = null;
+    this.clip = null;   // the clip being played (renderers keep its layers here)
     this.anim = null;
     this.key = "";
     this.t = 0;
@@ -17,10 +18,11 @@ LST.AnimationPlayer = class AnimationPlayer {
   // swapping to the same-named clip on another atlas (e.g. the angry sheet) keeps time.
   play(clip) {
     const key = clip.atlas.name + ":" + clip.anim;
-    if (key === this.key) { if (clip.time != null) this.t = clip.time; return; }
+    if (key === this.key) { this.clip = clip; if (clip.time != null) this.t = clip.time; return; }
     if (this.finish && !this.done && clip.anim !== this.anim.name) return;
     const sameAnim = this.anim && this.anim.name === clip.anim;
     this.atlas = clip.atlas;
+    this.clip = clip;
     this.anim = clip.atlas.animation(clip.anim);
     this.key = key;
     this.finish = !!clip.finish;
@@ -36,10 +38,16 @@ LST.AnimationPlayer = class AnimationPlayer {
 
   get done() { return !this.anim || (!this.anim.loop && this.t >= this.anim.duration); }
 
-  frame() {
+  // Current frame index into the clip (layered sheets use it to pick matching frames).
+  index() {
     const a = this.anim;
-    if (!a || !a.frames.length) return null;
+    if (!a || !a.frames.length) return -1;
     const i = Math.floor(this.t * a.fps);
-    return a.frames[a.loop ? i % a.frames.length : Math.min(a.frames.length - 1, i)];
+    return a.loop ? i % a.frames.length : Math.min(a.frames.length - 1, i);
+  }
+
+  frame() {
+    const i = this.index();
+    return i < 0 ? null : this.anim.frames[i];
   }
 };

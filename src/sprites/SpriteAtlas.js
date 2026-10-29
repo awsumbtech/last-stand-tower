@@ -4,12 +4,15 @@
 // JSON shape (Game Art & Motion generator / TexturePacker "hash"):
 //   frames{name:{frame{x,y,w,h}, pivot{x,y} (0..1), duration}}
 //   animations{name:{frames[], fps, loop}}
-//   meta{image, hitbox{pxPerWorldUnit}, ...}
+//   meta{image, hitbox{pxPerWorldUnit}, pupils{image, r}?, layer?, ...}
+//   frames[].eyes [{x,y,pupilR,maxOffset}] and frames[].offset {x,y} are optional extras
+//   (pupil anchors and the walk bob for layered sheets), all in frame px from the pivot.
 LST.SpriteAtlas = class SpriteAtlas {
   constructor(name, jsonUrl) {
     this.name = name;
     this.jsonUrl = jsonUrl;
     this.image = null;
+    this.pupil = null;     // { image, r, px, py } when the sheet leaves its pupils to the code
     this.frames = {};      // name -> { sx, sy, w, h, px, py } (pivot in sheet px)
     this.animations = {};  // name -> { name, frames[], fps, loop, duration }
     this.pxPerUnit = 2;    // sheet pixels per world unit
@@ -26,9 +29,21 @@ LST.SpriteAtlas = class SpriteAtlas {
       .then((res) => { if (!res.ok) throw new Error(`${this.jsonUrl}: ${res.status}`); return res.json(); })
       .then((data) => {
         this.parse(data);
-        return LST.SpriteAtlas.loadImage(base + data.meta.image);
+        const pupils = data.meta.pupils;
+        return Promise.all([
+          LST.SpriteAtlas.loadImage(base + data.meta.image),
+          pupils ? LST.SpriteAtlas.loadImage(base + pupils.image) : null,
+        ]);
       })
-      .then((img) => { this.image = img; this.ready = true; return this; })
+      .then(([img, pupilImg]) => {
+        this.image = img;
+        if (pupilImg) {
+          const p = this.meta.pupils, pv = p.pivot || { x: 0.5, y: 0.5 };
+          this.pupil = { image: pupilImg, r: p.r, px: pv.x * pupilImg.width, py: pv.y * pupilImg.height };
+        }
+        this.ready = true;
+        return this;
+      })
       .catch((err) => { this.failed = true; throw err; });
     return this._loading;
   }
@@ -39,13 +54,20 @@ LST.SpriteAtlas = class SpriteAtlas {
     this.meta = meta;
     for (const [name, f] of Object.entries(data.frames)) {
       const r = f.frame, p = f.pivot || { x: 0.5, y: 0.5 };
-      this.frames[name] = { name, sx: r.x, sy: r.y, w: r.w, h: r.h, px: p.x * r.w, py: p.y * r.h };
+      this.frames[name] = { name, sx: r.x, sy: r.y, w: r.w, h: r.h, px: p.x * r.w, py: p.y * r.h,
+        eyes: f.eyes || null, offset: f.offset || null };
     }
     for (const [name, a] of Object.entries(data.animations || {})) {
       const frames = a.frames.map((n) => this.frames[n]).filter(Boolean);
       const fps = a.fps || 10;
       this.animations[name] = { name, frames, fps, loop: !!a.loop, duration: frames.length / fps };
     }
+  }
+
+  // Same row on another sheet with this layout (layered sheets share frame indexes).
+  frameAt(anim, i) {
+    const a = this.animations[anim];
+    return a ? a.frames[Math.min(a.frames.length - 1, i)] : null;
   }
 
   has(anim) { return !!this.animations[anim]; }

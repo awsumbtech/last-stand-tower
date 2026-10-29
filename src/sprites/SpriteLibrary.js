@@ -27,17 +27,13 @@ LST.SpriteLibrary = class SpriteLibrary {
     return a && a.ready ? a : null;
   }
 
-  // Every URL the PWA should precache (kept next to the manifest so they can't drift).
-  static urls(manifest) {
-    const out = [];
-    for (const url of Object.values(manifest)) out.push(url, url.replace(/\.json$/, ".png"));
-    return out;
-  }
 };
 
 LST.SPRITE_MANIFEST = {
   basic: "assets/sprites/enemies/basic/basic.json",
-  fast: "assets/sprites/enemies/fast/fast.json",
+  fast: "assets/sprites/enemies/fast/fast.json",           // merged fallback (no rotation)
+  fast_body: "assets/sprites/enemies/fast/fast_body.json", // layer 0, turns toward the tower
+  fast_face: "assets/sprites/enemies/fast/fast_face.json", // layer 1, upright + pupils
   tank: "assets/sprites/enemies/tank/tank.json",
   big_red: "assets/sprites/enemies/big_red/big_red.json",
   king_mole: "assets/sprites/enemies/king_mole/king_mole.json",

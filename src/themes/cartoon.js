@@ -260,11 +260,18 @@
     }
   }
 
-  // The same color cues as the vector fills, as a wash over the sprite.
+  // The same color cues as the vector fills, blended into the sprite (SpriteTinter keeps
+  // the ink outlines): flash lights it up, frost turns it icy blue, charge flickers red.
+  const TINT = {
+    flash: { color: "#ffffff", alpha: 0.85, mode: "overlay" },
+    bossFlash: { color: "#ff8a95", alpha: 0.8, mode: "overlay" },
+    frozen: { color: "#8fdcff", alpha: 0.75, mode: "color" },
+    charge: { color: "#ff1f3d", alpha: 0.7, mode: "overlay" },
+  };
   function spriteTint(e, flash, frozen, charge) {
-    if (flash) return e.isBoss ? { color: "#ff8a95", alpha: 0.5 } : { color: "#ffffff", alpha: 0.75 };
-    if (frozen) return { color: "#bfefff", alpha: 0.5 };
-    if (charge) return { color: "#ff1f3d", alpha: 0.4 };
+    if (flash) return e.isBoss ? TINT.bossFlash : TINT.flash;
+    if (frozen) return TINT.frozen;
+    if (charge) return TINT.charge;
     return null;
   }
 
@@ -276,7 +283,7 @@
     if (!clip) return false;
     const R = e.radius * 1.2;
     const lift = clip.codeMotion && e.windup > 0 ? 1 - e.windup / (e.windupMax || 1) : 0;
-    const tint = e.hitFlash > 0 ? { color: "#ffffff", alpha: 0.4 } : e.slowTimer > 0 ? { color: "#bfefff", alpha: 0.45 } : null;
+    const tint = e.hitFlash > 0 ? TINT.flash : e.slowTimer > 0 ? TINT.frozen : null;
     ctx.save();
     ctx.translate(e.x, e.y);
     S.drawBody(ctx, e, { sx: 1 - lift * 0.06, sy: 1 + lift * 0.1, anchorY: R * 0.55, tint }, clip);
@@ -616,7 +623,8 @@
       // Squash a bit harder on the frame it gets hit
       const sq = e.isBoss ? 0.04 : 0.12;
       const bx = sx * (flash ? 1 + sq : 1), by = sy * (flash ? 1 - sq : 1);
-      const fx = { sx: bx, sy: by, rot: e.type === "fast" ? look - Math.PI / 2 : 0, tint: spriteTint(e, flash, frozen, charge) };
+      // rot only turns sprite layers flagged to rotate (Fast's dart); look aims the pupils.
+      const fx = { sx: bx, sy: by, rot: look - Math.PI / 2, look, tint: spriteTint(e, flash, frozen, charge) };
       if (!(LST.enemySprites && LST.enemySprites.drawBody(ctx, e, fx))) {
         ctx.save();
         ctx.scale(bx, by);
@@ -638,7 +646,7 @@
       ctx.save();
       ctx.translate(c.x, c.y);
       if (c.type !== "mole") { ctx.globalAlpha = Math.max(0, c.life / c.maxLife); shadow(ctx, R); ctx.globalAlpha = 1; }
-      LST.enemySprites.drawDeath(ctx, c, { sx: 1, sy: 1, rot: c.type === "fast" ? look - Math.PI / 2 : 0, tint: null });
+      LST.enemySprites.drawDeath(ctx, c, { sx: 1, sy: 1, rot: look - Math.PI / 2, look, tint: null });
       ctx.restore();
     },
 
