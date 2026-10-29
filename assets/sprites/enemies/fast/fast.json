@@ -1,0 +1,498 @@
+{
+  "frames": {
+    "fast_walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_walk_1": {
+      "frame": {
+        "x": 90,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_walk_2": {
+      "frame": {
+        "x": 180,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_walk_3": {
+      "frame": {
+        "x": 270,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_walk_4": {
+      "frame": {
+        "x": 360,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_walk_5": {
+      "frame": {
+        "x": 450,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "fast_idle_0": {
+      "frame": {
+        "x": 0,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250
+    },
+    "fast_idle_1": {
+      "frame": {
+        "x": 90,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250
+    },
+    "fast_idle_2": {
+      "frame": {
+        "x": 180,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250
+    },
+    "fast_idle_3": {
+      "frame": {
+        "x": 270,
+        "y": 90,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 250
+    },
+    "fast_death_0": {
+      "frame": {
+        "x": 0,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "fast_death_1": {
+      "frame": {
+        "x": 90,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "fast_death_2": {
+      "frame": {
+        "x": 180,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "fast_death_3": {
+      "frame": {
+        "x": 270,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "fast_death_4": {
+      "frame": {
+        "x": 360,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "fast_death_5": {
+      "frame": {
+        "x": 450,
+        "y": 180,
+        "w": 88,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "walk": {
+      "frames": [
+        "fast_walk_0",
+        "fast_walk_1",
+        "fast_walk_2",
+        "fast_walk_3",
+        "fast_walk_4",
+        "fast_walk_5"
+      ],
+      "fps": 10,
+      "loop": true
+    },
+    "idle": {
+      "frames": [
+        "fast_idle_0",
+        "fast_idle_1",
+        "fast_idle_2",
+        "fast_idle_3"
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "death": {
+      "frames": [
+        "fast_death_0",
+        "fast_death_1",
+        "fast_death_2",
+        "fast_death_3",
+        "fast_death_4",
+        "fast_death_5"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower enemy generator",
+    "version": "1.0",
+    "image": "fast.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 538,
+      "h": 268
+    },
+    "scale": "1",
+    "frameTags": [
+      {
+        "name": "walk",
+        "from": 0,
+        "to": 5,
+        "direction": "forward"
+      },
+      {
+        "name": "idle",
+        "from": 6,
+        "to": 9,
+        "direction": "forward"
+      },
+      {
+        "name": "death",
+        "from": 10,
+        "to": 15,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 44,
+      "y": 44,
+      "note": "frame center = entity position"
+    },
+    "hitbox": {
+      "r": 18,
+      "units": "frame px",
+      "worldRadius": 9,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 24.3,
+      "outline": 6,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "drawn like cartoon.js: body radius = hitbox x drawScale"
+    },
+    "palette": {
+      "ink": "#2b1d3a",
+      "white": "#ffffff",
+      "pow": "#fff3b0",
+      "mouth": "#7a2840",
+      "puff": "#ffffff",
+      "body": "#ffd23f",
+      "shade": "#e8b417"
+    }
+  }
+}
