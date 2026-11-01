@@ -10,6 +10,13 @@
   const game = new LST.Game(renderer);
   window.game = game; // handy for debugging in the console
 
+  // Effects listen to the game's events (?fx=off turns them off, for A/B checks).
+  const fxOff = new URLSearchParams(location.search).get("fx") === "off";
+  const fx = fxOff || !LST.FxDirector ? null : new LST.FxDirector({ bus: game.events, audio: LST.audio, settings: LST.settings, win: window });
+  if (fx) fx.onRunStart(game);
+  renderer.fx = fx;
+  LST.fxDirector = fx;
+
   // Browsers (especially iOS) only allow audio after a user gesture.
   // The first tap/click/key unlocks it and starts the music.
   LST.audio.startMusic();
@@ -58,10 +65,14 @@
 
   let last = performance.now();
   function frame(now) {
-    const dt = Math.min(LST.CONFIG.MAX_DT, (now - last) / 1000);
+    const frameMs = now - last;
+    const dt = Math.min(LST.CONFIG.MAX_DT, frameMs / 1000);
     last = now;
     game.update(dt);
+    if (fx) fx.update(dt, game, frameMs);
+    const t0 = performance.now();
     renderer.draw(game, dt);
+    if (fx) fx.endFrame(frameMs, performance.now() - t0);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);

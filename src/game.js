@@ -7,6 +7,7 @@
 LST.Game = class Game extends LST.World {
   constructor(renderer) {
     super(renderer);
+    this.events = new LST.EventBus(); // game events; effects and other parts subscribe (src/core/EventBus.js)
     this.state = "menu";
     this.speed = 1; // 1x or 2x game speed
     this.bestWave = LST.utils.storage.get("lst.bestWave", 0);
@@ -56,6 +57,7 @@ LST.Game = class Game extends LST.World {
     this.phaseBanner = null;  // { text, sub, t } canvas banner for finale phases
     const ab = LST.meta ? LST.meta.state.ability : "shockwave";
     this.ability = { id: ab || "shockwave", cd: 0, max: LST.CONFIG.abilities[ab || "shockwave"].cooldown, flash: 0 };
+    if (this.events) this.events.emit(LST.EVENTS.RUN_START, { game: this });
   }
 
   // ---------- Flow ----------
@@ -65,6 +67,7 @@ LST.Game = class Game extends LST.World {
     this.reset();
     LST.audio.startMusic();
     LST.meta.applyToRun(this);
+    this.events.emit(LST.EVENTS.RUN_START, { game: this }); // again, now with Workshop upgrades applied
     const skip = LST.meta.headStartWave(this.bestWave);
     if (skip > 0) this.beginHeadStart(skip);
     else this.startNextWave();
@@ -126,6 +129,7 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("epic");
     this.ui.renderShop({ deal: true });
     this.ui.updateHud();
+    this.events.emit(LST.EVENTS.CARD_TAKEN, { index: -1, card: null, levels: this.upgradeLevels, paid: 0, epic: true });
   }
 
   startNextWave() {
@@ -152,6 +156,7 @@ LST.Game = class Game extends LST.World {
       LST.audio.setTension(this.endless ? 1 : 0);
       LST.audio.play("waveStart");
     }
+    this.events.emit(LST.EVENTS.WAVE_START, { wave: this.wave, finale: !!this.finale });
   }
 
   // ---------- Active ability ----------
@@ -212,6 +217,7 @@ LST.Game = class Game extends LST.World {
     this.texts.push(new LST.FloatText(this.tower.x, this.tower.y - 60, `+${bonus} bonus`, "#3ddc84", "bonus"));
     LST.audio.play("waveClear");
     this.ui.updateHud();
+    this.events.emit(LST.EVENTS.WAVE_END, { wave: this.wave, bonus });
   }
 
   finishCelebration() {
@@ -292,6 +298,7 @@ LST.Game = class Game extends LST.World {
     LST.haptics.buzz(slot.card.rarity === "epic" ? [20, 30, 40] : 15);
     this.ui.renderShop({ took: index });
     this.ui.updateHud();
+    this.events.emit(LST.EVENTS.CARD_TAKEN, { index, card: slot.card, levels: this.upgradeLevels, paid, epic: slot.card.rarity === "epic" });
     return true;
   }
 
@@ -456,6 +463,7 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("upgrade", { pitch: 1 + Math.min(0.6, LST.meta.level(id) * 0.02) });
     LST.haptics.buzz(20);
     this.ui.renderWorkshop({ bought: id });
+    this.events.emit(LST.EVENTS.WORKSHOP_UPGRADE, { id, level: LST.meta.level(id) });
     return true;
   }
 
@@ -470,6 +478,7 @@ LST.Game = class Game extends LST.World {
       if (!m.unlockAbility(id)) { LST.audio.play("deny"); return false; }
       LST.audio.play("unlock");
       LST.haptics.buzz([20, 40, 60]);
+      this.events.emit(LST.EVENTS.UNLOCK, { kind: "ability", id });
     }
     this.ability = { id, cd: 0, max: LST.CONFIG.abilities[id].cooldown, flash: 0 };
     this.ui.renderWorkshop({ ability: id });
@@ -494,6 +503,7 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("unlock");
     LST.haptics.buzz([20, 40, 60]);
     this.ui.renderWorkshop({ unlocked: id });
+    this.events.emit(LST.EVENTS.UNLOCK, { kind: "card", id });
     return true;
   }
 
@@ -644,6 +654,7 @@ LST.Game = class Game extends LST.World {
   onHit(e, damage, crit) {
     super.onHit(e, damage, crit);
     LST.audio.play("hit", { crit });
+    if (crit) this.events.emit(LST.EVENTS.CRIT, { x: e.x, y: e.y, damage });
   }
 
   onEnemyKilled(e) {
@@ -663,6 +674,7 @@ LST.Game = class Game extends LST.World {
       this.coinsEarned += bonus;
       this.texts.push(new LST.FloatText(e.x, e.y - e.radius * 2.2, `+${bonus} BOSS BONUS`, "#ffd93d", "bonus"));
     }
+    this.events.emit(LST.EVENTS.KILL, { enemy: e });
     if (e.type === "mole") { this.onFinaleWon(e); return; }
     if (e.type === "boss") {
       this.hitStop = 0.16;
@@ -671,6 +683,7 @@ LST.Game = class Game extends LST.World {
       this.spawnHitSparks(e.x, e.y, "#ffd23f", 30, 280);
       LST.audio.play("bossDown");
       LST.haptics.buzz(90);
+      this.events.emit(LST.EVENTS.BOSS_KILLED, { x: e.x, y: e.y, type: e.type, radius: e.radius });
     }
   }
 
@@ -681,6 +694,7 @@ LST.Game = class Game extends LST.World {
 
   onBossSlam(e, damage) {
     super.onBossSlam(e, damage);
+    this.events.emit(LST.EVENTS.BOSS_SLAM, { boss: e, damage });
     LST.audio.play("slam");
     LST.audio.play("towerHit");
     LST.haptics.buzz(e.type === "mole" ? 140 : 90);
@@ -739,6 +753,7 @@ LST.Game = class Game extends LST.World {
     LST.audio.play("victory");
     LST.haptics.buzz([100, 50, 100, 50, 300]);
     this.ui.updateHud();
+    this.events.emit(LST.EVENTS.FINALE_WON, { x: m.x, y: m.y, radius: m.radius });
   }
 
   // From the World cleared! screen.
