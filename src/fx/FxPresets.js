@@ -10,49 +10,49 @@ LST.FX_PRESETS = {
   streakBurst: {
     shape: "streak",
     count: 48,
-    speed: [240, 640],     // world units / s
-    life: [0.32, 0.7],
-    width: [2.6, 4.6],     // stroke width (world units)
-    drag: 3.4,             // velocity decay per second (exponential)
+    speed: [420, 1050],    // world units / s
+    life: [0.4, 0.85],
+    width: [3.4, 6],     // stroke width (world units)
+    drag: 2.3,             // velocity decay per second (exponential)
     gravity: 0,
-    stretch: 0.05,         // streak length = speed x stretch (seconds of travel)
-    minLength: 4,
+    stretch: 0.06,         // streak length = speed x stretch (seconds of travel)
+    minLength: 6,
     jitter: 0.12,          // random angle wobble (radians) around evenly spaced spokes
     colors: ["#ffffff", "#fff3a0", "#ffd23f"],
   },
   // Soft motes drifting up from the tower; rate and size scale with tower power (0..1).
   aura: {
     shape: "soft",
-    rate: [3, 26],          // particles / s at power 0 and 1
-    speed: [8, 24],
-    rise: [22, 46],         // upward drift speed
-    life: [1.2, 2.2],
-    size: [5, 11],          // glow radius at power 0 -> grows up to x1.6 at power 1
+    rate: [4, 34],          // particles / s at power 0 and 1
+    speed: [10, 30],
+    rise: [45, 90],         // upward drift speed
+    life: [1.3, 2.3],
+    size: [7, 13],          // glow radius at power 0 -> grows up to x1.6 at power 1
     drag: 0.4,
-    gravity: -10,           // keeps accelerating upward a little
-    spawnRadius: [0.6, 1.25], // x tower radius
+    gravity: -18,           // keeps accelerating upward a little
+    spawnRadius: [0.8, 1.45], // x tower radius
     colorsByTier: [
-      ["#fff8d6", "#fff3a0"],
-      ["#fff3a0", "#ffe14d"],
-      ["#ffe14d", "#ffd23f", "#fff8d6"],
-      ["#ffd23f", "#ffb347", "#fff8d6"],
-      ["#ffd23f", "#ff9fd0", "#9fe7ff", "#fff8d6"],
+      ["#ffe680", "#fff3a0"],
+      ["#ffd23f", "#ffe14d"],
+      ["#ffd23f", "#ffb347", "#ffe14d"],
+      ["#ffb347", "#ffd23f", "#ff8a3d"],
+      ["#ffd23f", "#ff7ac8", "#59c8ff", "#b06bff"],
     ],
-    groundGlow: [0.0, 0.42], // alpha of the soft glow under the tower at power 0 and 1
+    groundGlow: [0.08, 0.55], // alpha of the soft glow under the tower at power 0 and 1
     tierPower: [1, 5, 11, 18], // power needed for tiers 1..4 (power = weighted cards this run + Workshop)
     maxPower: 24,
   },
   // Projectile comet tail + additive glow.
   trail: {
-    stretch: 0.03,   // tail length in seconds of travel
-    maxLength: 30,
-    width: 7,        // soft outer stroke
-    core: 3,         // bright inner stroke
-    glowRadius: 15,
-    glowAlpha: 0.5,
-    critGlowRadius: 24,
-    color: "#fff3a0",
-    critColor: "#ffb347",
+    stretch: 0.05,   // tail length in seconds of travel
+    maxLength: 48,
+    width: 9,        // soft outer stroke
+    core: 3.5,       // bright inner stroke
+    glowRadius: 19,
+    glowAlpha: 0.75,
+    critGlowRadius: 28,
+    color: "#ffcf3a",
+    critColor: "#ff9a3a",
   },
   // One-shot soft glows (crits) and glows behind bright pickups (coin popups, crit numbers).
   glow: {
@@ -66,25 +66,25 @@ LST.FX_PRESETS = {
     critTextAlpha: 0.38,
   },
   // Expanding ring + soft bloom that goes with every impact.
-  ring: { life: 0.42, width: 7 },
+  ring: { life: 0.45, width: 9 },
 };
 
 LST.FX_IMPACTS = {
   // Big Red down
   bossKill: { space: "world", burst: { count: 64, speedMul: 1.0 }, colors: ["#ffffff", "#fff3a0", "#ffd23f", "#ff6b6b"],
-              ring: 190, bloom: 0.55, flash: 0.35, shake: 0.55, thump: 1.0, hold: 0.06 },
+              ring: 210, bloom: 0.5, flash: 0.16, shake: 0.55, thump: 1.0, hold: 0.06 },
   // King Mole down (the finale)
   finaleWon: { space: "world", burst: { count: 96, speedMul: 1.25 }, colors: ["#ffffff", "#fff3a0", "#ffd23f", "#ff9fd0", "#9fe7ff"],
-               ring: 300, bloom: 0.7, flash: 0.45, shake: 0.8, thump: 1.25, hold: 0.1 },
+               ring: 320, bloom: 0.6, flash: 0.2, shake: 0.8, thump: 1.25, hold: 0.1 },
   // Card picked in the shop (drawn above the shop panel, at the card)
-  cardPick: { space: "screen", burst: { count: 34, speedMul: 0.75 }, colors: ["#ffffff", "#fff3a0"],
-              ring: 110, bloom: 0.35, flash: 0, shake: 0, thump: 0.45, throttle: 0.05 },
-  cardPickEpic: { space: "screen", burst: { count: 52, speedMul: 0.95 }, colors: ["#ffffff", "#fff3a0", "#ff9fd0", "#9fe7ff"],
-                  ring: 150, bloom: 0.5, flash: 0.12, shake: 0, thump: 0.7, throttle: 0.05 },
+  cardPick: { space: "screen", burst: { count: 34, speedMul: 1.0 }, colors: ["#ffd23f", "#ffb347", "#ffe14d"],
+              ring: 120, bloom: 0.35, flash: 0, shake: 0, thump: 0.45, throttle: 0.05 },
+  cardPickEpic: { space: "screen", burst: { count: 52, speedMul: 1.25 }, colors: ["#b06bff", "#ff6bd6", "#ffd23f", "#59c8ff"],
+                  ring: 170, bloom: 0.5, flash: 0.12, shake: 0, thump: 0.7, throttle: 0.05 },
   // Workshop purchase / unlock (screen space, at the button)
-  workshop: { space: "screen", burst: { count: 22, speedMul: 0.6 }, colors: ["#ffffff", "#ffd23f"],
+  workshop: { space: "screen", burst: { count: 24, speedMul: 0.8 }, colors: ["#ffd23f", "#ffb347", "#ffe14d"],
               ring: 80, bloom: 0.3, flash: 0, shake: 0, thump: 0.35, throttle: 0.08 },
-  unlock: { space: "screen", burst: { count: 40, speedMul: 0.85 }, colors: ["#ffffff", "#fff3a0", "#ffd23f"],
+  unlock: { space: "screen", burst: { count: 40, speedMul: 1.0 }, colors: ["#ffd23f", "#ffb347", "#59c8ff"],
             ring: 130, bloom: 0.45, flash: 0.1, shake: 0, thump: 0.65, throttle: 0.08 },
   // The tower's aura reaches a new tier (fires as the next wave starts, on the lawn)
   tierUp: { space: "world", burst: { count: 44, speedMul: 0.8 }, colors: ["#ffffff", "#fff3a0", "#ffd23f"],
@@ -106,7 +106,7 @@ LST.FX_QUALITY = {
   lowScale: 0.45,    // low quality: fraction of the cap and of every emitter count
   reducedScale: 0.35, // reduced motion: fewer particles (and no shake / flash)
   slowFrameMs: 21,   // frame-time EMA above this for slowHoldS seconds -> low quality
-  slowHoldS: 1.0,
+  slowHoldS: 0.5,
   okFrameMs: 17.5,   // ...back to high after okHoldS seconds under this
   okHoldS: 4.0,
 };

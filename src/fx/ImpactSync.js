@@ -51,18 +51,23 @@ LST.ImpactSync = class ImpactSync {
     if (!reduced && cfg.shake) this.camera.addShake(cfg.shake);
 
     const rec = { name, frame: visualFrame, audioFrame, visualFrame, audioTime, particles: made, pulse, firstDrawFrame: -1 };
+    if (pulse) pulse.rec = rec;
     this.log.push(rec);
     if (this.log.length > 16) this.log.shift();
     return rec;
   }
 
   // Called by the renderer the first time a pulse is drawn.
-  static stampDraw(pulse, frame) { if (pulse.drawnFrame < 0) pulse.drawnFrame = frame; }
+  static stampDraw(pulse, frame) {
+    if (pulse.drawnFrame >= 0) return;
+    pulse.drawnFrame = frame;
+    if (pulse.rec) pulse.rec.firstDrawFrame = frame;
+  }
 
   // For QA: every logged fire had audio and visuals on the same frame, and drew on it too.
   syncReport() {
     return this.log.map((r) => ({ name: r.name, audioFrame: r.audioFrame, visualFrame: r.visualFrame,
-      firstDrawFrame: r.pulse && r.pulse.bornFrame === r.visualFrame ? r.pulse.drawnFrame : r.firstDrawFrame,
+      firstDrawFrame: r.firstDrawFrame,
       audioTime: r.audioTime, particles: r.particles }));
   }
 };

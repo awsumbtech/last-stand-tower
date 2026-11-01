@@ -34,8 +34,8 @@ LST.FxDirector = class FxDirector {
       presets: LST.FX_PRESETS, impacts: LST.FX_IMPACTS,
     });
     this.drawScreenLayer = (ctx) => { // made once, reused by FxOverlay every frame
-      this.renderer.drawPulses(ctx, this.camera, "screen", this.frame, 1);
-      this.renderer.drawPool(ctx, this.pools.screen, 1);
+      this.renderer.drawPulses(ctx, this.camera, "screen", this.frame, 1, this.quality.low);
+      this.renderer.drawPool(ctx, this.pools.screen, 1, this.quality.low);
     };
     this.offs = [];
     if (bus) this.subscribe(bus);
@@ -74,8 +74,12 @@ LST.FxDirector = class FxDirector {
     if (e.index < 0) return; // auto-draft: the aura catches up, the next wave plays the tier-up
     const card = e.card;
     const at = this.anchors.card(e.index) || this.anchors.screenCenter();
-    const colors = card && card.color ? ["#ffffff", card.color, "#fff3a0"] : null;
-    this.impacts.fire(e.epic ? "cardPickEpic" : "cardPick", at.x, at.y, { colors, tint: "#fff3a0" });
+    const name = e.epic ? "cardPickEpic" : "cardPick";
+    const base = LST.FX_IMPACTS[name].colors;
+    const colors = card && card.color ? [card.color, base[0], base[1], card.color] : base;
+    const rar = card && LST.RARITY && LST.RARITY[card.rarity];
+    const tint = (e.epic && rar && rar.color) || (card && card.color) || base[0]; // ring: epic purple, else the card's own color
+    this.impacts.fire(name, at.x, at.y, { colors, tint });
   }
 
   onWaveStart() {
@@ -119,11 +123,11 @@ LST.FxDirector = class FxDirector {
   }
   drawProjectiles(ctx, scene) { this.renderer.drawProjectiles(ctx, scene.projectiles, this.quality.low); }
   drawWorld(ctx) {
-    this.renderer.drawPulses(ctx, this.camera, "world", this.frame, 1);
-    this.renderer.drawPool(ctx, this.pools.world, 1);
+    this.renderer.drawPulses(ctx, this.camera, "world", this.frame, 1, this.quality.low);
+    this.renderer.drawPool(ctx, this.pools.world, 1, this.quality.low);
   }
   drawTextGlows(ctx, scene) { this.renderer.drawTextGlows(ctx, scene.texts); }
-  drawScreen(ctx, r) { this.renderer.drawFlashes(ctx, this.camera, r); } // screen px, inside the game canvas
+  drawScreen(ctx, r) { if (!this.quality.low) this.renderer.drawFlashes(ctx, this.camera, r); } // screen px, inside the game canvas
 
   // After the game canvas is drawn: the over-the-menus layer, stats, frame counter.
   endFrame(frameMs, drawMs) {

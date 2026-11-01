@@ -170,8 +170,8 @@ LST.Renderer = class Renderer {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-    if (scene.flash > 0.01 && !reduced) {
-      ctx.fillStyle = `rgba(255, 255, 255, ${scene.flash * 0.55})`;
+    if (scene.flash > 0.01 && !reduced) { // softer when FX add their own bloom
+      ctx.fillStyle = `rgba(255, 255, 255, ${scene.flash * (this.fx ? 0.28 : 0.55)})`;
       ctx.fillRect(0, 0, this.width, this.height);
     }
   }
