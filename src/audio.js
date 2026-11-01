@@ -315,6 +315,14 @@ LST.audio = (function () {
         noise({ start: s, dur: 0.12, vol: 0.15, type: "lowpass", freq: 1200 });
       }
     } },
+    thump: { priority: true, play(o) {
+      // Heavy bass hit for big moments (boss kills, level-ups). Started at currentTime with
+      // no delay so it lands on the same frame as the visual burst (src/fx/ImpactSync.js).
+      const k = Math.max(0.2, Math.min(1.3, o.intensity == null ? 1 : o.intensity));
+      tone({ type: "sine", freq: 150, to: 42, dur: 0.16 + 0.24 * k, vol: 0.62 * k, attack: 0.002 });
+      tone({ type: "triangle", freq: 62, to: 34, dur: 0.22 + 0.3 * k, vol: 0.3 * k, attack: 0.004, filter: { freq: 240 } });
+      noise({ dur: 0.03, vol: 0.22 * k, type: "lowpass", freq: 2600 });
+    } },
     bossDown: { priority: true, play() {
       tone({ type: "sine", freq: 90, to: 30, dur: 0.6, vol: 0.5 });
       noise({ dur: 0.5, vol: 0.3, type: "lowpass", freq: 2000, to: 150 });
@@ -499,6 +507,7 @@ LST.audio = (function () {
     get tension() { return tension; },
     duckMusic,
     get unlocked() { return !!ctx && ctx.state === "running"; },
+    get now() { return ctx ? ctx.currentTime : null; }, // audio clock (s), for frame-sync checks
     get voices() { return voices; },
     get musicPlaying() { return !!timer; },
   };

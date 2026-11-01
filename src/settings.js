@@ -1,7 +1,7 @@
 // Player settings saved in localStorage: sound effects, music, vibration.
 // Other modules subscribe with LST.settings.onChange(fn).
 LST.settings = (function () {
-  const DEFAULTS = { sfx: true, music: true, haptics: true };
+  const DEFAULTS = { sfx: true, music: true, haptics: true, motion: true }; // motion: screen shake & flashes
   const values = {};
   for (const key of Object.keys(DEFAULTS)) values[key] = LST.utils.storage.get("lst." + key, DEFAULTS[key]);
   const listeners = [];

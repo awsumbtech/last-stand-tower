@@ -80,8 +80,12 @@ LST.Renderer = class Renderer {
     }
 
     // World transform: origin at the center, plus screen shake.
+    // Effects (src/fx) are optional: this.fx is an FxDirector or null (styles.html demo).
+    const fx = this.fx;
+    const reduced = fx ? fx.reducedMotion : false;
     const snap = (v) => (ps ? Math.round(v / ps) * ps : v);
-    const shake = scene.shake > 0 ? scene.shake * 8 : 0;
+    const shakeAmt = reduced ? 0 : Math.max(scene.shake || 0, fx ? fx.shake : 0);
+    const shake = shakeAmt > 0 ? shakeAmt * 8 : 0;
     ctx.save();
     ctx.translate(
       snap(this.width / 2 + (Math.random() - 0.5) * shake),
@@ -91,6 +95,7 @@ LST.Renderer = class Renderer {
 
     theme.background(ctx, this, scene);
     theme.range(ctx, scene.tower, this);
+    if (fx) fx.drawUnder(ctx, scene, this);
     if (scene.tower.overdrive > 0) {
       // Overdrive: a hot orange pulse around the tower
       ctx.save();
@@ -103,10 +108,13 @@ LST.Renderer = class Renderer {
     for (const p of scene.particles) theme.particle(ctx, p, this);
     if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
     for (const e of scene.enemies) if (!e.corpse) theme.enemy(ctx, e, this); // a Corpse now owns its look
+    if (fx) fx.drawProjectiles(ctx, scene);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
+    if (fx) fx.drawWorld(ctx);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
     if (scene.confetti) for (const c of scene.confetti) (theme.confetti || LST.draw.confetti)(ctx, c, this);
+    if (fx) fx.drawTextGlows(ctx, scene);
     for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
@@ -138,7 +146,8 @@ LST.Renderer = class Renderer {
       }
     }
 
-    this.drawOverlays(ctx, scene);
+    this.drawOverlays(ctx, scene, reduced);
+    if (fx) fx.drawScreen(ctx, this);
 
     if (ps) {
       const main = this.ctx;
@@ -149,7 +158,8 @@ LST.Renderer = class Renderer {
   }
 
   // Screen-space feedback shared by every theme: red low-HP vignette and white flash.
-  drawOverlays(ctx, scene) {
+  // reduced (reduced motion): no white flash.
+  drawOverlays(ctx, scene, reduced = false) {
     const low = scene.lowHpActive && scene.state === "playing" ? 0.22 + 0.1 * Math.sin(this.time * 6) : 0;
     const v = Math.max(scene.vignette || 0, low);
     if (v > 0.01) {
@@ -160,7 +170,7 @@ LST.Renderer = class Renderer {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-    if (scene.flash > 0.01) {
+    if (scene.flash > 0.01 && !reduced) {
       ctx.fillStyle = `rgba(255, 255, 255, ${scene.flash * 0.55})`;
       ctx.fillRect(0, 0, this.width, this.height);
     }

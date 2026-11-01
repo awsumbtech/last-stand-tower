@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v11"; // enemy sprite sheets (Game Art & Motion v1.1)
+const VERSION = "v12"; // FX pass (fx-juice branch): glow, streak bursts, tower aura, bass-synced impacts
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -18,6 +18,7 @@ const PRECACHE = [
   "src/config.js",
   "src/utils.js",
   "src/settings.js",
+  "src/core/EventBus.js",
   "src/audio.js",
   "src/upgrades.js",
   "src/traps.js",
@@ -36,6 +37,18 @@ const PRECACHE = [
   "src/themes/neon.js",
   "src/themes/pixel.js",
   "src/themes/cartoon.js",
+  "src/fx/FxPresets.js",
+  "src/fx/ParticlePool.js",
+  "src/fx/Emitter.js",
+  "src/fx/FxCamera.js",
+  "src/fx/FxQuality.js",
+  "src/fx/FrameStats.js",
+  "src/fx/TowerAura.js",
+  "src/fx/ImpactSync.js",
+  "src/fx/ScreenAnchors.js",
+  "src/fx/FxRenderer.js",
+  "src/fx/FxOverlay.js",
+  "src/fx/FxDirector.js",
   "src/ui.js",
   "src/game.js",
   "src/demo.js",
