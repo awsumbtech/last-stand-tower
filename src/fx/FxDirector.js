@@ -48,14 +48,18 @@ LST.FxDirector = class FxDirector {
     const E = LST.EVENTS;
     const on = (type, fn) => this.offs.push(bus.on(type, fn));
     on(E.RUN_START, (e) => this.onRunStart(e.game));
-    on(E.BOSS_KILLED, (e) => this.impacts.fire("bossKill", e.x, e.y, { ringMul: Math.max(1, e.radius / 40) }));
-    on(E.FINALE_WON, (e) => this.impacts.fire("finaleWon", e.x, e.y));
+    on(E.BOSS_KILLED, (e) => this.fireRoute("bossKilled", e.x, e.y, { ringMul: Math.max(1, e.radius / 40) }));
+    on(E.FINALE_WON, (e) => this.fireRoute("finaleWon", e.x, e.y));
     on(E.CRIT, (e) => this.critGlow(e.x, e.y));
     on(E.CARD_TAKEN, (e) => this.onCardTaken(e));
     on(E.WAVE_START, () => this.onWaveStart());
-    on(E.WORKSHOP_UPGRADE, (e) => this.screenImpact("workshop", this.anchors.workshop(e.id)));
-    on(E.UNLOCK, (e) => this.screenImpact("unlock", this.anchors.workshop(e.id)));
+    on(E.WORKSHOP_UPGRADE, (e) => this.screenImpact("workshopUpgrade", e.id));
+    on(E.UNLOCK, (e) => this.screenImpact("unlock", e.id));
   }
+
+  // Event -> impact routing is data (LST.FX_ROUTES); a null route plays nothing.
+  route(key) { return LST.FX_ROUTES ? LST.FX_ROUTES[key] || null : null; }
+  fireRoute(key, x, y, opts) { const name = this.route(key); return name ? this.impacts.fire(name, x, y, opts) : null; }
 
   dispose() { for (const off of this.offs) off(); this.offs = []; }
 
@@ -72,9 +76,10 @@ LST.FxDirector = class FxDirector {
   onCardTaken(e) {
     this.aura.setRunLevels(e.levels);
     if (e.index < 0) return; // auto-draft: the aura catches up, the next wave plays the tier-up
+    const name = this.route(e.epic ? "cardTakenEpic" : "cardTaken");
+    if (!name) return;
     const card = e.card;
     const at = this.anchors.card(e.index) || this.anchors.screenCenter();
-    const name = e.epic ? "cardPickEpic" : "cardPick";
     const base = LST.FX_IMPACTS[name].colors;
     const colors = card && card.color ? [card.color, base[0], base[1], card.color] : base;
     const rar = card && LST.RARITY && LST.RARITY[card.rarity];
@@ -86,11 +91,15 @@ LST.FxDirector = class FxDirector {
     // The shop hid the tower; the new power shows as the wave starts.
     if (this.aura.takeTierUp() && this.scene) {
       const t = this.scene.tower;
-      this.impacts.fire("tierUp", t.x, t.y);
+      this.fireRoute("towerTierUp", t.x, t.y);
     }
   }
 
-  screenImpact(name, at) { if (at) this.impacts.fire(name, at.x, at.y); }
+  screenImpact(key, id) {
+    const name = this.route(key);
+    const at = name ? this.anchors.workshop(id) : null;
+    if (at) this.impacts.fire(name, at.x, at.y);
+  }
 
   critGlow(x, y) {
     const pool = this.pools.world, G = LST.FX_PRESETS.glow;

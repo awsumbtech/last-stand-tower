@@ -91,6 +91,20 @@ LST.FX_IMPACTS = {
             ring: 140, bloom: 0.45, flash: 0.15, shake: 0.25, thump: 0.7, hold: 0 },
 };
 
+// Which impact (from LST.FX_IMPACTS) each game moment plays; null = no impact for it.
+// Brian, Nov 1 2026: "Not on the card purchases or gear upgrades. But the enemy kills are good".
+// So shop card picks (every rarity) and Gear spending (Workshop upgrades, card / ability unlocks)
+// play no burst, bass hit or flash; their own pre-FX sounds and UI animation are unchanged.
+LST.FX_ROUTES = {
+  bossKilled: "bossKill",
+  finaleWon: "finaleWon",
+  towerTierUp: "tierUp",
+  cardTaken: null,       // was "cardPick"
+  cardTakenEpic: null,   // was "cardPickEpic"
+  workshopUpgrade: null, // was "workshop"
+  unlock: null,          // was "unlock"
+};
+
 LST.FX_THEMES = {
   // Lawn: "screen" blending glows without blowing the grass out to white; ink outlines on streaks.
   cartoon: { blend: "screen", glow: 1, ink: "#2b1d3a", inkStreaks: true, trailAlpha: 0.75, bloomBlend: "screen" },

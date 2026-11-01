@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v12"; // FX pass (fx-juice branch): glow, streak bursts, tower aura, bass-synced impacts
+const VERSION = "v12"; // FX pass: glow, streak bursts on kills, tower aura, bass-synced boss impacts
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [

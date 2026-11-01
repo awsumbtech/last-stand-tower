@@ -22,3 +22,11 @@ seeded A/B sims are byte-identical to main).
 | `fx/FrameStats.js` | Frame and draw time log: `LST.fxDirector.report()` |
 
 `?fx=off` runs the game with no effects (A/B checks).
+
+## Event routes (`LST.FX_ROUTES`)
+
+Which game events fire an impact is data in `src/fx/FxPresets.js`. Card picks
+(all rarities), Workshop upgrades and unlocks are routed to `null`: no burst,
+bass hit or flash (Brian, Nov 1 2026). Their original UI sounds in game.js are
+unchanged. Kills, boss kills, projectile glow/streaks and the tower aura stay on.
+Set a route back to a preset name in `FX_IMPACTS` to re-enable it.
