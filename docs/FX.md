@@ -14,7 +14,7 @@ seeded A/B sims are byte-identical to main).
 | `fx/FxPresets.js` | Data only: emitter presets (`streakBurst`, `aura`, `trail`, `glow`), impacts, per-theme looks, quality caps |
 | `fx/Emitter.js` | Burst (radial spokes) and rate stream |
 | `fx/ImpactSync.js` | One call = bass thump + streak burst + ring/bloom + flash + shake, same frame; logs frames for QA |
-| `fx/TowerAura.js` | Motes drifting up from the tower, scaled by run cards (rarity-weighted) + Workshop levels |
+| `fx/TowerAura.js` | Tower power/tier (idle motes off by preset), scaled by run cards (rarity-weighted) + Workshop levels |
 | `fx/FxRenderer.js` | Theme-aware drawing (cartoon: screen blend + ink; neon: additive; pixel: square motes) |
 | `fx/FxCamera.js` | Shake + impact pulse slots |
 | `fx/FxOverlay.js`, `fx/ScreenAnchors.js` | Click-through canvas above the shop / Workshop, bursts at the card or button |
@@ -28,5 +28,13 @@ seeded A/B sims are byte-identical to main).
 Which game events fire an impact is data in `src/fx/FxPresets.js`. Card picks
 (all rarities), Workshop upgrades and unlocks are routed to `null`: no burst,
 bass hit or flash (Brian, Nov 1 2026). Their original UI sounds in game.js are
-unchanged. Kills, boss kills, projectile glow/streaks and the tower aura stay on.
+unchanged. Kills, boss kills and projectile glow/streaks stay on.
 Set a route back to a preset name in `FX_IMPACTS` to re-enable it.
+
+## Tower aura: no idle sparkle
+
+`FX_PRESETS.aura.idleEmission` is `false` (Brian, Nov 4 2026: "the sparkling over the
+turret is constant. I don't like it."). TowerAura still tracks tower power and tier, which
+drive the soft ground glow under the tower and the one-shot `tierUp` burst when the next
+wave starts after a tier is crossed. Nothing sparkles on a loop. Set `idleEmission: true`
+to bring the drifting motes back.

@@ -22,6 +22,10 @@ LST.FX_PRESETS = {
   },
   // Soft motes drifting up from the tower; rate and size scale with tower power (0..1).
   aura: {
+    // Brian, Nov 4 2026: "the sparkling over the turret is constant. I don't like it."
+    // No looping idle motes. Tower power still drives the ground glow and the one-shot
+    // tierUp burst (an event, not a loop). Set true to bring the drifting motes back.
+    idleEmission: false,
     shape: "soft",
     rate: [4, 34],          // particles / s at power 0 and 1
     speed: [10, 30],
