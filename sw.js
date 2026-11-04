@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v14"; // No idle tower sparkle (aura motes off)
+const VERSION = "v15"; // Cartoon theme split into src/themes/cartoon/ (no visual change)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -36,7 +36,19 @@ const PRECACHE = [
   "src/sprites/EnemySpriteRenderer.js",
   "src/themes/neon.js",
   "src/themes/pixel.js",
-  "src/themes/cartoon.js",
+  "src/themes/cartoon/palette.js",
+  "src/themes/cartoon/primitives.js",
+  "src/themes/cartoon/enemy-fx.js",
+  "src/themes/cartoon/enemy-parts.js",
+  "src/themes/cartoon/enemy-mole.js",
+  "src/themes/cartoon/enemy-bodies.js",
+  "src/themes/cartoon/enemies.js",
+  "src/themes/cartoon/lawn.js",
+  "src/themes/cartoon/tower.js",
+  "src/themes/cartoon/projectiles.js",
+  "src/themes/cartoon/effects.js",
+  "src/themes/cartoon/text.js",
+  "src/themes/cartoon/index.js",
   "src/fx/FxPresets.js",
   "src/fx/ParticlePool.js",
   "src/fx/Emitter.js",
