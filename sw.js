@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v12"; // FX pass: glow, streak bursts on kills, tower aura, bass-synced boss impacts
+const VERSION = "v13"; // UI polish: dev-only Art style link, equal start pills
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -53,6 +53,7 @@ const PRECACHE = [
   "src/game.js",
   "src/demo.js",
   "src/main.js",
+  "src/core/DevFlags.js",
   "src/pwa.js",
   "icons/icon-192.png",
   "icons/icon-512.png",

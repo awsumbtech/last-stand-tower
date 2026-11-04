@@ -47,6 +47,8 @@ canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; display: blo
 canvas.fx-overlay { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
 
 .hidden { display: none !important; }
+/* Dev-only UI: shown only with ?debug=1 or ?dev=1 (src/core/DevFlags.js). */
+html:not(.dev) .dev-only { display: none !important; }
 
 /* ---------- Shared bits ---------- */
 .coin {
@@ -477,7 +479,9 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
   font-style: normal; font-size: 16px; line-height: 20px; font-weight: 700;
   animation: wiggle 1s ease-in-out infinite;
 }
-.start-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+/* Start-screen stat pills: one equal-width column per visible pill (sized to the widest). */
+.start-pills { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; width: max-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+.start-pills > .pill { justify-content: center; min-width: 0; }
 .workshop-btn, #btn-res-workshop { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .workshop-btn { min-width: 0; font-size: 19px; padding: 8px 24px 10px; margin-top: -4px; }
 .workshop-btn svg.gear, #btn-res-workshop svg.gear { width: 26px; height: 26px; transition: transform 0.6s var(--bouncy); }
@@ -690,6 +694,8 @@ svg.gear { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #a9c4dc; fill-ru
 /* Tabs */
 .tabs { display: flex; gap: 6px; width: 100%; max-width: 440px; padding: 4px; border: 3px solid var(--ink); border-radius: 999px; background: #efe7da; }
 .tab { position: relative; flex: 1 1 0; padding: 6px 4px 7px; border-radius: 999px; font-size: 17px; font-weight: 700; color: #6a5a7c; transition: transform 0.18s var(--bouncy), background 0.15s; }
+/* Tab hit area: always at least 44px tall (I4), filling the tab bar, without changing the look. */
+.tab::before { content: ""; position: absolute; left: -3px; right: -3px; top: 50%; height: max(44px, 100%); transform: translateY(-50%); border-radius: 999px; }
 .tab.active { background: var(--yellow); color: var(--ink); box-shadow: 0 0 0 2.5px var(--ink), 0 3px 0 2.5px var(--ink); }
 .tab:active { transform: scale(1.06, 0.92); }
 .tab .dot { position: absolute; top: 2px; right: 10%; width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid var(--ink); background: var(--red); animation: wiggle 1s ease-in-out infinite; }
