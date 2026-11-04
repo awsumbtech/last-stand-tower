@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v13"; // UI polish: dev-only Art style link, equal start pills
+const VERSION = "v14"; // No idle tower sparkle (aura motes off)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [

@@ -1,4 +1,4 @@
-// TowerAura: soft motes drifting up from the tower. Its strength follows "tower power":
+// TowerAura: tower power and tier (and, if preset.idleEmission, soft motes drifting up). Its strength follows "tower power":
 // cards taken this run (weighted by rarity) plus a little for permanent Workshop levels,
 // so a stronger tower visibly glows more. Crossing a tier queues a tier-up moment, which
 // the director plays when the next wave starts (the shop panel hides the tower).
@@ -62,7 +62,7 @@ LST.TowerAura = class TowerAura {
   update(dt, tower, pool, rng, scale) {
     const P = this.preset;
     const k = this.intensity;
-    if (this.power <= 0 || !tower) return;
+    if (!P.idleEmission || this.power <= 0 || !tower) return; // idle motes are off by preset
     const rate = (P.rate[0] + (P.rate[1] - P.rate[0]) * k) * scale;
     const n = this.stream.take(dt, rate);
     if (!n) return;
