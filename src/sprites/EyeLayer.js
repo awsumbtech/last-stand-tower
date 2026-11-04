@@ -1,5 +1,5 @@
 // EyeLayer: draws code-placed pupils on sheets whose eye whites are left empty
-// (Basic, Fast's face layer). Like cartoon.js eyes(): each pupil sits at the eye centre
+// (Basic, Fast's face layer). Like cartoon eyes() (src/themes/cartoon/primitives.js): each pupil sits at the eye centre
 // plus (cos look, sin look) * maxOffset, so the enemy keeps staring at the tower.
 // A frame with eyes = [] (blink, hurt, death) gets no pupils.
 LST.EyeLayer = class EyeLayer {
