@@ -37,6 +37,7 @@ LST.ImpactSync = class ImpactSync {
       this.audio.play("thump", { intensity: cfg.thump });
       audioTime = this.audio.now;
     }
+    if (this.audio && cfg.sfx) { this.audio.play(cfg.sfx, opts.sfx || {}); audioTime = this.audio.now; }
 
     // 2) Visuals, same frame.
     const visualFrame = this.clock.frame;

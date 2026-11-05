@@ -10,8 +10,9 @@ LST.CardFlip = class CardFlip {
   static HALF_MS = 150;
 
   // Markup for the back face. title: card name · body: the explanation · note: optional tip.
-  static backHTML({ title, label = "The catch", body, note = "" }) {
-    return `<span class="card-back" aria-hidden="true" aria-live="polite">
+  // kind "info": a "How it works" back for cards whose rules need more room (elemental cards).
+  static backHTML({ title, label = "The catch", body, note = "", kind = "" }) {
+    return `<span class="card-back${kind ? " " + kind : ""}" aria-hidden="true" aria-live="polite">
         <span class="back-label">${label}</span>
         <span class="back-title">${title}</span>
         <span class="back-body">${body}</span>
@@ -21,7 +22,8 @@ LST.CardFlip = class CardFlip {
   }
 
   // Small corner marker on the front that says "there's more on the back".
-  static markerHTML(known) {
+  static markerHTML(known, kind) {
+    if (kind === "info") return `<button type="button" class="flip-marker info" aria-expanded="false" aria-label="How it works">i</button>`;
     return `<button type="button" class="flip-marker${known ? " known" : ""}" aria-expanded="false" aria-label="${known ? "Known trap: read the catch" : "Read the catch"}">${known ? CardFlip.EYE : "!"}</button>`;
   }
 

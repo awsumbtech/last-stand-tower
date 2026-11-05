@@ -1143,3 +1143,17 @@ svg.eye-ico circle { fill: var(--ink); }
 .card button.flip-marker { padding: 0; cursor: pointer; font-family: inherit; z-index: 2; }
 .card button.flip-marker::before { content: ""; position: absolute; inset: -11px; }
 .card button.flip-marker:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+
+/* Elemental cards: an "i" marker and a "How it works" back tinted with the card's element color. */
+.card .flip-marker.info { background: #fff; color: var(--ink); font-family: Georgia, serif; font-style: italic; }
+.card .card-back.info {
+  background: linear-gradient(180deg, #fffdf6, #fff6e6);
+  box-shadow: inset 0 0 0 5px var(--accent);
+}
+.card-back.info .back-label { background: var(--accent); color: var(--ink); }
+.card-back.info .back-body { color: #3a2a4c; font-size: 11.5px; line-height: 1.2; }
+@media (max-width: 560px) {
+  .card-back.info { padding: 12px 6px 8px; gap: 3px; }
+  .card-back.info .back-title { font-size: 13.5px; }
+  .card-back.info .back-body { font-size: 10.5px; line-height: 1.16; }
+}

@@ -82,14 +82,101 @@ LST.FxRenderer = class FxRenderer {
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = T.core;
     ctx.stroke();
+    // Elemental shots: a colored tail over the plain one (one path per color, usually 1-4).
+    let tints = null;
+    for (const p of list) if (p.tint) (tints || (tints = {}))[p.tint] = true;
+    if (tints) for (const color in tints) {
+      ctx.beginPath();
+      for (const p of list) {
+        if (p.tint !== color) continue;
+        const sp = Math.hypot(p.vx, p.vy);
+        if (!sp) continue;
+        const len = Math.min(T.maxLength, sp * T.stretch) * 1.15;
+        ctx.moveTo(p.x - (p.vx / sp) * len, p.y - (p.vy / sp) * len);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.globalAlpha = 0.85 * th.trailAlpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = T.width * 0.8;
+      ctx.stroke();
+    }
     if (!low) {
       ctx.globalCompositeOperation = th.blend;
       ctx.globalAlpha = Math.min(1, T.glowAlpha * th.glow);
       const g = this.glow(T.color), gc = this.glow(T.critColor);
       for (let i = 0; i < list.length; i++) {
         const p = list[i];
-        const R = p.crit ? T.critGlowRadius : T.glowRadius;
-        ctx.drawImage(p.crit ? gc : g, p.x - R, p.y - R, R * 2, R * 2);
+        const R = (p.crit ? T.critGlowRadius : T.glowRadius) * (p.tint ? 1.25 : 1);
+        ctx.drawImage(p.crit ? gc : p.tint ? this.glow(p.tint) : g, p.x - R, p.y - R, R * 2, R * 2);
+      }
+    }
+    ctx.restore();
+  }
+
+  // Status rings on affected enemies (burn / venom / frozen): only drawn while an effect is
+  // active, so nothing animates on an idle lawn. Reduced motion: steady rings, no flicker.
+  drawStatusRings(ctx, enemies, time, reduced, low) {
+    const S = LST.StatusEffects;
+    ctx.save();
+    ctx.lineCap = "round";
+    for (const e of enemies) {
+      if (!e.status || e.dead) continue;
+      const fz = S.get(e, "frozen"), burn = S.get(e, "burn"), ven = S.get(e, "venom");
+      if (!fz && !burn && !ven) continue;
+      const r = e.radius;
+      if (fz) {
+        ctx.globalAlpha = 0.38; ctx.fillStyle = "#bff3ff";
+        ctx.beginPath(); ctx.arc(e.x, e.y, r * 1.08, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.95; ctx.strokeStyle = "#e9fbff"; ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+      if (burn) {
+        const fl = reduced ? 0.8 : 0.65 + 0.35 * Math.sin(time * 18 + e.x * 0.05);
+        ctx.globalAlpha = fl; ctx.strokeStyle = "#ff7a1a"; ctx.lineWidth = 3.5;
+        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
+        ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (ven) {
+        const n = ven.count;
+        ctx.globalAlpha = 0.95; ctx.fillStyle = "#8be04a"; ctx.strokeStyle = "#2b3a12"; ctx.lineWidth = 1.5;
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42;
+          const px = e.x + Math.cos(a) * (r + 11), py = e.y + Math.sin(a) * (r + 11);
+          ctx.beginPath(); ctx.arc(px, py, 3.6, 0, Math.PI * 2); ctx.fill(); if (!low) ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  // Chain Spark bolts: jagged lines between the hit enemy and each arc target, fading over ~0.2s.
+  drawArcs(ctx, arcs, low) {
+    const th = this.theme;
+    ctx.save();
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (const a of arcs) {
+      const f = 1 - a.t / a.life;
+      ctx.beginPath();
+      let j = 0;
+      for (let i = 1; i < a.pts.length; i++) {
+        const [x0, y0] = a.pts[0 + (i === 1 ? 0 : i - 1)], [x1, y1] = a.pts[i];
+        const nx = -(y1 - y0), ny = x1 - x0, L = Math.hypot(nx, ny) || 1;
+        ctx.moveTo(x0, y0);
+        for (let k = 1; k < 4; k++) {
+          const off = a.jag[j++] * 22;
+          ctx.lineTo(x0 + (x1 - x0) * k / 4 + nx / L * off, y0 + (y1 - y0) * k / 4 + ny / L * off);
+        }
+        ctx.lineTo(x1, y1);
+      }
+      if (th.ink) { ctx.globalAlpha = 0.6 * f; ctx.strokeStyle = th.ink; ctx.lineWidth = 7; ctx.stroke(); }
+      ctx.globalAlpha = f; ctx.strokeStyle = a.color || "#ffe14d"; ctx.lineWidth = 4.5; ctx.stroke();
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.8; ctx.stroke();
+      if (!low) {
+        ctx.globalCompositeOperation = th.blend; ctx.globalAlpha = 0.5 * f;
+        const g = this.glow(a.color || "#ffe14d");
+        for (const [x, y] of a.pts) ctx.drawImage(g, x - 24, y - 24, 48, 48);
+        ctx.globalCompositeOperation = "source-over";
       }
     }
     ctx.restore();

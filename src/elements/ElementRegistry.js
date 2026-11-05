@@ -19,7 +19,7 @@ LST.ElementRegistry = {
     for (const p of this.pairs) {
       if (!p.owned(game.tower)) continue;
       const m = p.modify({ proj, enemy: e, game, tower: game.tower });
-      if (m !== 1) { mult *= m; this.emit(game, p, e, { kind: "pair" }); }
+      if (m !== 1) { mult *= m; const c = game.pairHits || (game.pairHits = {}); c[p.id] = (c[p.id] || 0) + 1; this.emit(game, p, e, { kind: "pair" }); }
     }
     return proj.damage * mult;
   },
