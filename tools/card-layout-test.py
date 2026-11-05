@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""Shop card layout test (Playwright, Chromium).
+
+Renders every card (normal cards and traps, front and flipped back) three at a time in the
+card-pick screen at 390x844, 360x740 and 768x1024 and checks:
+  * the three offered cards are the same height (a long card never stretches its row);
+  * no card text, take button or back-face text overflows its card;
+  * the Reroll / Repair buttons fit their label and price (Repair at 289/370 HP);
+  * a flippable card's take button has a >= 44 px tap area;
+  * tapping a flippable card flips it and never takes it; its take button takes it.
+
+Usage: python3 tools/card-layout-test.py [http://127.0.0.1:8000/index.html]
+Serve the repo first, e.g.  python3 -m http.server 8000
+Set CHROME=/path/to/chromium to use a specific browser binary.
+Exit code 0 = pass, 1 = failures (listed).
+"""
+import os, sys
+from playwright.sync_api import sync_playwright
+
+BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000/index.html"
+VIEWPORTS = [(390, 844), (360, 740), (768, 1024)]
+
+CHECK = r"""async ({ flipAll }) => {
+  const g = window.game, fails = [];
+  const ids = LST.CARDS.concat(LST.TRAPS || []).map((c) => c.id).filter((id, i, a) => a.indexOf(id) === i);
+  let backs = 0;
+  for (const id of ids) if (LST.cardById(id).trap) LST.meta.discoverTrap(id);
+  g.coins = 401; g.wave = 19; g.tower.maxHp = 370; g.tower.hp = 289;
+  const inside = (r, box, pad = 0.5) => r.left >= box.left - pad && r.right <= box.right + pad && r.top >= box.top - pad && r.bottom <= box.bottom + pad;
+  // Every card in sequence, then every flippable card next to the two shortest plain cards
+  // (the row is as tall as its tallest card, so that's the tightest a back face gets).
+  const plain = LST.CARDS.filter((c) => !c.trap && !c.details).map((c) => c.id);
+  const groups = [];
+  for (let i = 0; i < ids.length; i += 3) groups.push([ids[i], ids[(i + 1) % ids.length], ids[(i + 2) % ids.length]]);
+  for (const id of ids) { const c = LST.cardById(id); if (c.trap || c.details) groups.push([id, plain[0], plain[1]]); }
+  for (const group of groups) {
+    g.shop.picked = true;
+    g.shop.cards = group.map((id) => ({ card: LST.cardById(id), taken: false }));
+    g.ui.renderShop();
+    const cards = [...document.querySelectorAll("#card-row [data-slot]")];
+    backs += cards.filter((c) => LST.CardFlip.canFlip(c)).length;
+    if (flipAll) cards.forEach((c) => LST.CardFlip.toggle(c, { instant: true }));
+    const hs = cards.map((c) => c.getBoundingClientRect().height);
+    if (Math.max(...hs) - Math.min(...hs) > 1) fails.push(`unequal heights ${group.join(",")}: ${hs.map(Math.round).join("/")}`);
+    for (const c of cards) {
+      const box = c.getBoundingClientRect(), name = c.querySelector(".name").textContent;
+      const flipped = c.classList.contains("flipped");
+      const parts = flipped ? c.querySelectorAll(".card-back > *") : c.querySelectorAll(":scope > :not(.ribbon):not(.card-back)");
+      for (const el of parts) {
+        const r = el.getBoundingClientRect();
+        if (!r.width) continue;
+        if (!inside(r, box)) fails.push(`${name}${flipped ? " (back)" : ""}: .${el.className} outside card`);
+        if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflow !== "visible") fails.push(`${name}: .${el.className} clipped`);
+      }
+      const back = c.querySelector(".card-back");
+      if (back && flipped && back.scrollHeight > back.clientHeight + 1) fails.push(`${name} (back): text taller than card (${back.scrollHeight}>${back.clientHeight})`);
+      const take = c.querySelector("button.tag");
+      if (take && !flipped) {
+        const r = take.getBoundingClientRect(), cx = r.left + r.width / 2;
+        for (const dy of [-21, 21]) {
+          const hit = document.elementFromPoint(cx, r.top + r.height / 2 + dy);
+          if (!hit || !hit.closest("button.tag")) fails.push(`${name}: take button tap area < 44px (dy ${dy})`);
+        }
+      }
+    }
+  }
+  for (const b of document.querySelectorAll(".shop-actions .btn:not(.hidden)")) {
+    const box = b.getBoundingClientRect();
+    for (const el of b.children) {
+      const r = el.getBoundingClientRect();
+      if (r.width && !inside(r, box)) fails.push(`#${b.id}: ${el.className || el.tagName} outside button`);
+    }
+    if (b.scrollWidth > b.clientWidth + 1) fails.push(`#${b.id}: content wider than button`);
+  }
+  if (!backs) fails.push("no flippable cards were rendered");
+  return fails;
+}"""
+
+CLICKS = r"""async () => {
+  const g = window.game, fails = [];
+  g.shop.picked = true; g.coins = 401; LST.meta.discoverTrap("thorns");
+  g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: LST.cardById("thorns"), taken: false }];
+  g.ui.renderShop();
+  const card = () => document.querySelector('#card-row [data-slot="2"]');
+  if (!card().classList.contains("has-back")) fails.push("thorns not flippable: " + LST.meta.knowsTrap("thorns") + " " + JSON.stringify(LST.meta.state.codex.traps));
+  card().querySelector(".desc").click();
+  await new Promise((r) => setTimeout(r, 400));
+  if (g.shop.cards[2].taken || g.coins !== 401) fails.push("tapping a flippable card took it");
+  if (!card().classList.contains("flipped")) fails.push("tapping a flippable card did not flip it");
+  if (!card() || !card().querySelector(".card-back")) return fails.concat(["no back face: " + (card() ? card().outerHTML.slice(0, 300) : "no card")]);
+  card().querySelector(".card-back").click();
+  await new Promise((r) => setTimeout(r, 400));
+  if (card().classList.contains("flipped") || g.shop.cards[2].taken) fails.push("tapping the back did not flip back (or took it)");
+  card().querySelector("button.tag").click();
+  if (!g.shop.cards[2].taken) fails.push("take button did not take the card");
+
+  // Free pick (nothing taken yet): the take button keeps the "free" pill look and valid markup.
+  g.shop.picked = false;
+  const trap2 = LST.TRAPS.find((t) => t.id !== "thorns" && LST.shopRules.available(t, g.upgradeLevels));
+  LST.meta.discoverTrap(trap2.id);
+  g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: trap2, taken: false }];
+  g.ui.renderShop();
+  const btn = card().querySelector("button.tag");
+  if (!btn) fails.push("free pick: no take button");
+  else {
+    if (!btn.classList.contains("free")) fails.push(`free pick: take button lost its "free" class (${btn.outerHTML.slice(0, 120)})`);
+    const names = [...btn.attributes].map((a) => a.name).sort().join(",");
+    if (names !== "aria-label,class,type") fails.push("free pick: unexpected button attributes: " + names);
+    if (btn.textContent.trim() !== "FREE") fails.push("free pick: button text is " + JSON.stringify(btn.textContent));
+    const ref = document.createElement("span"); ref.className = "tag free"; card().appendChild(ref);
+    const bg = getComputedStyle(btn).backgroundColor, want = getComputedStyle(ref).backgroundColor; ref.remove();
+    if (bg !== want) fails.push(`free pick: .tag.free style not applied (${bg} vs ${want})`);
+    if (getComputedStyle(btn).animationName === "none" && !matchMedia("(prefers-reduced-motion: reduce)").matches) fails.push("free pick: free wiggle missing");
+  }
+  // No interactive element nested inside another button.
+  for (const b of document.querySelectorAll("#card-row button, #card-row [role=button]")) {
+    if (b.parentElement.closest("#card-row button, #card-row [role=button]")) fails.push("nested interactive control: " + b.className);
+  }
+  btn && btn.click();
+  if (!g.shop.cards[2].taken) fails.push("free pick: take button did not take the card");
+  return fails;
+}"""
+
+KEY_SETUP = r"""() => {
+  const g = window.game; g.shop.picked = true; g.coins = 401; LST.meta.discoverTrap("thorns");
+  g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: LST.cardById("thorns"), taken: false }];
+  g.ui.renderShop();
+  document.querySelector('#card-row [data-slot="2"] .flip-marker').focus();
+}"""
+KEY_STATE = r"""() => {
+  const card = document.querySelector('#card-row [data-slot="2"]'), a = document.activeElement;
+  const visible = a && a !== document.body && getComputedStyle(a).visibility !== "hidden" && a.getClientRects().length > 0;
+  const tag = card.querySelector(":scope > button.tag");
+  return { flipped: card.classList.contains("flipped"), inCard: card.contains(a), visible, focus: a ? a.className : null,
+    tagTabbable: !!tag && tag.tabIndex >= 0, coins: game.coins, taken: game.shop.cards[2].taken };
+}"""
+
+def keyboard_case(p):
+    # Enter on the marker flips, focus stays in the card on a visible control, the hidden take
+    # button leaves the tab order, Enter and Space flip back, nothing is bought.
+    fails = []
+    p.evaluate(KEY_SETUP)
+    def step(key, want_flip, label):
+        p.keyboard.press(key); p.wait_for_timeout(400)
+        st = p.evaluate(KEY_STATE)
+        if st["flipped"] != want_flip: fails.append(f"keyboard {label}: flipped={st['flipped']}")
+        if not (st["inCard"] and st["visible"]): fails.append(f"keyboard {label}: focus left the card or is on a hidden control ({st['focus']})")
+        if want_flip and st["tagTabbable"]: fails.append(f"keyboard {label}: take button under the back is still tabbable")
+        if st["coins"] != 401 or st["taken"]: fails.append(f"keyboard {label}: bought the card (coins {st['coins']})")
+        return st
+    step("Enter", True, "Enter on marker")
+    p.keyboard.press("Tab"); p.wait_for_timeout(50)
+    if p.evaluate("() => document.activeElement.matches('#card-row [data-slot=\"2\"] button.tag')"): fails.append("keyboard: Tab reached the hidden take button")
+    p.keyboard.press("Shift+Tab"); p.wait_for_timeout(50)
+    if not p.evaluate("() => { const b = document.querySelector('#card-row [data-slot=\"2\"] .flip-back'); if (b) b.focus(); return !!b; }"):
+        fails.append("keyboard: the back has no flip-back button"); return fails
+    st = step("Enter", False, "Enter flip back")
+    if "flip-marker" not in (st["focus"] or ""): fails.append(f"keyboard: focus did not return to the marker ({st['focus']})")
+    step(" ", True, "Space on marker")
+    step(" ", False, "Space flip back")
+    return fails
+
+def main():
+    fails = []
+    with sync_playwright() as pw:
+        b = pw.chromium.launch(executable_path=os.environ.get("CHROME") or None)
+        for w, h in VIEWPORTS:
+            ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2, service_workers="block")
+            p = ctx.new_page()
+            p.on("pageerror", lambda e: fails.append(f"{w}: page error {e}"))
+            p.goto(BASE)
+            p.wait_for_function("window.game && window.LST")
+            p.evaluate("""() => { const g = game; g.newGame(); if (g.state !== 'playing') { g.wave = 0; g.startNextWave(); }
+              g.enemies.length = 0; g.spawnQueue = []; g.endWave(); g.celebrateTimer = 0; g.gotchaQueue = []; g.finishCelebration(); g.ui.show('upgrade'); }""")
+            p.wait_for_timeout(700)  # let deal-in animations settle
+            for flip in (False, True):
+                fails += [f"{w}x{h}: {f}" for f in p.evaluate(CHECK, {"flipAll": flip})]
+            fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]
+            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]
+            ctx.close()
+        b.close()
+    for f in fails: print("FAIL", f)
+    print("card-layout-test:", "PASS" if not fails else f"{len(fails)} failure(s)")
+    sys.exit(1 if fails else 0)
+
+if __name__ == "__main__":
+    main()

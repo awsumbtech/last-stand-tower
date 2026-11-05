@@ -150,11 +150,28 @@ LST.UI = class UI {
     });
 
     // One delegated listener for the shop cards.
+    // Cards with a back face (CardFlip) only flip when tapped; their take button is the only
+    // way to take them. Plain cards still take on a tap anywhere, as before.
+    const take = (card) => {
+      if (card.classList.contains("locked")) { LST.audio.play("deny"); LST.UI.pop(card, "shake"); return; }
+      game.takeCard(+card.dataset.slot);
+    };
+    const tapCard = (card, onTakeButton) => {
+      if (onTakeButton || !LST.CardFlip.canFlip(card)) take(card);
+      else { LST.CardFlip.toggle(card); LST.audio.play("tap"); }
+    };
     this.el.cardRow.addEventListener("click", (ev) => {
       const card = ev.target.closest("[data-slot]");
       if (!card) return;
-      if (card.classList.contains("locked")) { LST.audio.play("deny"); LST.UI.pop(card, "shake"); return; }
-      game.takeCard(+card.dataset.slot);
+      tapCard(card, !!ev.target.closest(".tag"));
+    });
+    this.el.cardRow.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      const card = ev.target.closest("[data-slot]");
+      if (!card) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      tapCard(card, !!ev.target.closest(".tag"));
     });
   }
 
@@ -588,7 +605,10 @@ LST.UI = class UI {
       const shownLvl = taken ? lvl : lvl + 1; // level after taking it
       const rar = LST.RARITY[card.rarity];
       const locked = !taken && s.picked && g.coins < extraPrice;
-      const el = document.createElement("button");
+      const flips = !!card.trap && (appraisal >= 2 || known); // the catch is known: it goes on the back
+      const el = document.createElement("div");
+      el.setAttribute("role", "button");
+      el.tabIndex = 0;
       el.className = `card ${card.rarity}` + (taken ? " taken" : "") + (locked ? " locked" : "") +
         (opts.took === i ? " bought" : "") + (slot.from && opts.took === i ? " mystery" : "") +
         (card.trap && appraisal >= 1 && !["dud", "build", "weak"].includes(card.kind) ? " cursed" : "") +
@@ -598,18 +618,29 @@ LST.UI = class UI {
       el.style.setProperty("--i", i);
       el.dataset.slot = i;
       el.setAttribute("aria-label", `${card.name}, ${rar.label}: ${card.desc}`);
-      const tag = taken ? '<span class="tag done">&#10003; Taken</span>'
-        : !s.picked ? '<span class="tag free">FREE</span>'
-        : `<span class="tag"><i class="coin"></i>${extraPrice}</span>`;
+      // Price pill. On a flippable card it is a real <button> (the only way to take it), so a
+      // flip tap never buys; on a plain card the whole card is the button and this is a span.
+      const tagCls = taken ? "tag done" : !s.picked ? "tag free" : "tag";
+      const tagBody = taken ? "&#10003; Taken" : !s.picked ? "FREE" : `<i class="coin"></i>${extraPrice}`;
+      const takeBtn = flips && !taken
+        ? `<button type="button" class="${tagCls}" aria-label="Take ${card.name}${s.picked ? ` for ${extraPrice} coins` : ", free"}">${tagBody}</button>`
+        : `<span class="${tagCls}">${tagBody}</span>`;
       el.innerHTML = `
         <span class="ribbon">${rar.label}</span>
         <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${card.icon}</svg></span>
         <span class="name">${card.name}</span>
-        ${known ? `<span class="eye" title="Known trap">${EYE_SVG}</span>` : ""}
+        ${flips ? LST.CardFlip.markerHTML(known) : ""}
         <span class="level">${slot.from ? "from Mystery Box" : card.trap ? "NEW" : (shownLvl === 1 && !taken ? "NEW" : "Lv " + shownLvl) + (card.maxLevel ? " / " + card.maxLevel : "")}</span>
         <span class="desc">${card.desc}</span>
-        ${card.trap ? `<span class="fine${appraisal >= 2 || known ? " full" : ""}">${appraisal >= 2 || known ? card.truth : card.fine}</span>` : `<span class="stat">${card.stat(g.tower)}</span>`}
-        ${tag}`;
+        ${card.trap ? `<span class="fine">${card.fine}</span>` : `<span class="stat">${card.stat(g.tower)}</span>`}
+        ${takeBtn}
+        ${flips ? LST.CardFlip.backHTML({ title: card.name, body: card.truth }) : ""}`;
+      if (flips) {
+        // Holds its own buttons (flip marker + take), so the card itself is a group, not a button.
+        el.classList.add("has-back");
+        el.setAttribute("role", "group");
+        el.removeAttribute("tabindex");
+      }
       this.el.cardRow.appendChild(el);
     });
 

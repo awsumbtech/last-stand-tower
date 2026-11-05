@@ -64,7 +64,7 @@ LST.TRAPS = [
     id: "hotStreak", trap: true, kind: "build", rarity: "common", color: "#ffa726",
     icon: '<path d="M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3-1-3 0-6 1-9z"/>',
     name: "Hot Streak", desc: "Crits hit x3!", fine: "*cools your other shots",
-    truth: "Crits hit x3 instead of x2, but every shot does -15% damage. At the base 10% crit chance that's about -7% damage per second; with Lucky Shot stacked it pays off.",
+    truth: "Crits hit x3 (not x2), but every shot does -15% damage: a net loss at base crit. Pays off with Lucky Shot.",
     lesson: "A bonus to crits is only as good as your crit chance. Stack Lucky Shot or Sharp Eye first.",
     apply: (t) => { t.critMult += 1; t.damageMult *= 0.85; },
     remove: (t) => { t.critMult -= 1; t.damageMult /= 0.85; },
