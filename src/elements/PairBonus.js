@@ -4,4 +4,6 @@ LST.PairBonus = class PairBonus {
   constructor(def) { Object.assign(this, def); }
   owned(tower) { return !!tower.elements && this.needs.every((id) => (tower.elements[id] || 0) > 0); }
   modify() { return 1; }
+  desc() { return ""; }
+  short() { return ""; } // one short line for the card backs of the elements it needs
 };

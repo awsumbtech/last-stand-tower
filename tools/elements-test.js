@@ -113,5 +113,45 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
     ok(c && c.unlockCost > 0 && c.details({ elements: null }).length > 40 && !LST.meta.isUnlocked(id), `${id} card: Workshop-locked (${c.unlockCost} Gears), has details`);
   }
 }
+
+// Card text is built from the stats: the front desc and the back text carry the stats' numbers,
+// the front has no other numbers, and a retune (changed stats) changes the text with it.
+{
+  const pct = (x) => `${Math.round(x * 100)}%`, sec = (x) => `${x.toFixed(2).replace(/0$/, "")}s`;
+  const R = (LST) => LST.ElementRegistry;
+  const expect = {
+    ember: (S, L) => ({ front: [`${S.time}s`], back: [`${S.time}s`, pct(S.dpsShare[0]), pct(S.bossShare)] }),
+    frostbite: (S, L) => ({ front: [L.ordinal(S.every)], back: [L.ordinal(S.every), sec(S.freeze[0]), `${S.bossFreeze}s`, `${S.bossCooldown}s`] }),
+    chainSpark: (S, L) => ({ front: [pct(S.chance), `${S.jumps[0]} more`], back: [pct(S.chance), `${S.jumps[0]} nearest`, `${S.radius}`, pct(S.share)] }),
+    venom: (S, L) => ({ front: [`${S.maxStacks}`], back: [`${S.maxStacks}`, pct(S.stackShare[0]), `${S.time}s`, pct(S.stackShare[0] * S.maxStacks)] }),
+  };
+  const nums = (t) => (t.match(/\d+(\.\d+)?/g) || []);
+  const check = (LST, tag) => {
+    for (const id of ELEMENTS) {
+      const el = R(LST).byId(id), c = LST.CARDS.find((x) => x.id === id), want = expect[id](el.stats, LST);
+      const front = c.desc, back = c.details({ elements: null });
+      const miss = [...want.front.filter((w) => !front.includes(w)), ...want.back.filter((w) => !back.includes(w))];
+      const allowed = want.front.join(" ");
+      const stray = nums(front).filter((n) => !nums(allowed).includes(n));
+      ok(!miss.length && !stray.length, `${tag} ${id} card text matches stats (front "${front}")${miss.length ? " missing " + miss : ""}${stray.length ? " stray " + stray : ""}`);
+    }
+    const sh = R(LST).pairs.find((p) => p.id === "shatter");
+    for (const id of sh.needs) {
+      const back = LST.CARDS.find((x) => x.id === id).details({ elements: null });
+      ok(back.includes(`+${pct(sh.bonus)}`) && sh.desc().includes(`+${pct(sh.bonus)}`), `${tag} Shatter text on ${id} back shows +${pct(sh.bonus)}`);
+    }
+  };
+  const { LST } = load(1);
+  check(LST, "current:");
+  // Retune every number and check the text follows (guards against hard-coded copy).
+  const st = (id) => R(LST).byId(id).stats;
+  Object.assign(st("ember"), { time: 5, dpsShare: [0.61, 0.2], bossShare: 0.27 });
+  Object.assign(st("frostbite"), { every: 2, freeze: [0.45, 0.1], bossFreeze: 0.3, bossCooldown: 6 });
+  Object.assign(st("chainSpark"), { chance: 0.17, jumps: [3, 1], share: 0.55, radius: 144 });
+  Object.assign(st("venom"), { time: 6, stackShare: [0.21, 0.1], maxStacks: 7 });
+  R(LST).pairs.find((p) => p.id === "shatter").bonus = 0.42;
+  check(LST, "retuned:");
+  ok(["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"].join() === [1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(LST.ordinal).join(), "ordinal helper: 1st 2nd 3rd 4th 11th 12th 13th 21st 22nd 23rd");
+}
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);

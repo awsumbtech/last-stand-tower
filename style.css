@@ -1153,7 +1153,7 @@ svg.eye-ico circle { fill: var(--ink); }
 .card-back.info .back-label { background: var(--accent); color: var(--ink); font-size: 10px; letter-spacing: 0; padding: 0 6px 1px; max-width: 100%; }
 .card-back.info .back-body { color: #3a2a4c; font-size: 11.5px; line-height: 1.2; }
 @media (max-width: 560px) {
-  .card-back.info { padding: 12px 6px 8px; gap: 3px; }
+  .card .card-back.info { padding: 15px 7px 8px; gap: 3px; } /* pill clears the 5px inner border */
   .card-back.info .back-title { font-size: 13.5px; }
   .card-back.info .back-body { font-size: 10.5px; line-height: 1.16; }
 }
