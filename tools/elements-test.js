@@ -153,5 +153,42 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   check(LST, "retuned:");
   ok(["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"].join() === [1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(LST.ordinal).join(), "ordinal helper: 1st 2nd 3rd 4th 11th 12th 13th 21st 22nd 23rd");
 }
+
+// Ember burn-ring styles (src/fx/FxPresets.js LST.FX_EMBER_STYLES) and FxRenderer.drawBurnRing, with a stub canvas.
+{
+  const { LST } = load(1);
+  const sb = { LST, Math, console }; sb.window = sb; vm.createContext(sb);
+  for (const f of ["fx/FxPresets.js", "fx/FxRenderer.js"]) vm.runInContext(fs.readFileSync(path.join(ROOT, "src", f), "utf8"), sb, { filename: f });
+  const S = LST.FX_EMBER_STYLES, ids = Object.keys(S);
+  ok(["a", "b", "c"].every((id) => ids.includes(id)) && S[LST.FX_EMBER_STYLE], `Ember styles a/b/c exist, selected "${LST.FX_EMBER_STYLE}" is one of them`);
+  const hex = (c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c);
+  for (const id of ids) {
+    const st = S[id], R = st.ring || {};
+    ok(Array.isArray(st.colors) && st.colors.length >= 2 && st.colors.every(hex) &&
+       R.under && hex(R.under.color) && R.under.width > 0 && R.under.alpha > 0 &&
+       R.main && hex(R.main.color) && R.main.width > 0 && Array.isArray(R.main.dash) && R.main.dash.length === 2,
+       `Ember style ${id}: has burst colors, ring.under and ring.main`);
+  }
+  const before = LST.FX_IMPACTS.elemEmber.colors.slice(), sel = LST.FX_EMBER_STYLE;
+  ok(LST.applyEmberStyle("nope") === false && LST.FX_EMBER_STYLE === sel && LST.FX_IMPACTS.elemEmber.colors.join() === before.join(),
+     "applyEmberStyle rejects an unknown id and changes nothing");
+  // stub ctx: records calls, tracks the current line dash
+  const ctx = { dash: [], calls: [], setLineDash(d) { this.dash = d.slice(); this.calls.push("dash"); },
+    beginPath() {}, arc() {}, fill() { this.calls.push("fill"); }, stroke() { this.calls.push("stroke:" + this.strokeStyle); }, save() {}, restore() {} };
+  const draw = LST.FxRenderer.prototype.drawBurnRing;
+  for (const id of ids) {
+    ok(LST.applyEmberStyle(id) === true && LST.FX_EMBER_STYLE === id && LST.FX_IMPACTS.elemEmber.colors.join() === S[id].colors.join() &&
+       LST.FX_IMPACTS.elemEmber.colors !== S[id].colors, `applyEmberStyle("${id}") copies its burst colors into FX_IMPACTS.elemEmber`);
+    for (const reduced of [false, true]) {
+      ctx.calls = []; ctx.dash = [9, 9]; let err = null;
+      try { draw.call({}, ctx, { x: 10, y: 20 }, 26, 0.8, 1.5, reduced); } catch (e) { err = e; }
+      const R = S[id].ring, strokes = ctx.calls.filter((c) => c.startsWith("stroke")).length;
+      ok(!err && ctx.dash.length === 0 && strokes === 2 + (R.core ? 1 : 0) && ctx.calls.includes("fill") === !!R.halo &&
+         (!reduced || ctx.lineDashOffset === 0),
+         `drawBurnRing style ${id}${reduced ? " (reduced motion)" : ""}: runs, ${strokes} strokes, halo ${!!R.halo}, line dash reset${err ? " ERR " + err.message : ""}`);
+    }
+  }
+  LST.applyEmberStyle(sel);
+}
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);

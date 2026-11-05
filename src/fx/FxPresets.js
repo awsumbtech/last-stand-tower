@@ -147,3 +147,33 @@ LST.FX_QUALITY = {
   okFrameMs: 17.5,   // ...back to high after okHoldS seconds under this
   okHoldS: 4.0,
 };
+
+// Ember Rounds look on orange enemies (tank body #ff9f43): three candidate styles, all data.
+// Each style sets the hit burst colors (elemEmber) and the burn ring the renderer draws while an
+// enemy is burning (never otherwise). LST.FX_EMBER_STYLE picks one; LST.applyEmberStyle(id) swaps
+// at runtime (the QA scripts use it to shoot every variant from the same frame).
+//   ring.halo  optional soft disc under the enemy ring ({ color, alpha, pad })
+//   ring.under dark contrast stroke ({ color, width, alpha })
+//   ring.main  dashed flickering stroke ({ color, width, dash })
+//   ring.core  optional thin hot center line on top of main ({ color, width })
+LST.FX_EMBER_STYLES = {
+  // A: white-hot core on a gold dashed ring, near-black outline; white/gold sparks with a few dark embers.
+  a: { colors: ["#ffffff", "#fff3a0", "#ffd23a", "#2a0d00"],
+       ring: { under: { color: "#1f0900", width: 7.5, alpha: 0.9 }, main: { color: "#ffd23a", width: 4, dash: [8, 5] },
+               core: { color: "#ffffff", width: 1.5 } } },
+  // B: hue shifted to crimson (away from the tank's orange) on a dark wine outline.
+  b: { colors: ["#ffe3e3", "#ff4d5e", "#c8102e", "#2b0008"],
+       ring: { under: { color: "#2b0008", width: 7.5, alpha: 0.9 }, main: { color: "#ff2e45", width: 5, dash: [8, 5] },
+               core: { color: "#ffd0d6", width: 1.2 } } },
+  // C: dark ember-red smoke disc under white-hot sparks and a white dashed ring.
+  c: { colors: ["#ffffff", "#fff8e0", "#ffe6a0", "#4a1000"],
+       ring: { halo: { color: "#5a1200", alpha: 0.5, pad: 9 }, under: { color: "#3a0a00", width: 6, alpha: 0.8 },
+               main: { color: "#ffffff", width: 3, dash: [7, 6] } } },
+};
+LST.FX_EMBER_STYLE = "b"; // B scored best: author 11/12, independent checker 9/12 (PR #3); both picked B
+LST.applyEmberStyle = (id) => {
+  const st = LST.FX_EMBER_STYLES[id]; if (!st) return false;
+  LST.FX_EMBER_STYLE = id; LST.FX_IMPACTS.elemEmber.colors = st.colors.slice(); return true;
+};
+LST.applyEmberStyle(LST.FX_EMBER_STYLE);
+

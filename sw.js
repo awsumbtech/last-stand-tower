@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v17"; // Elemental cards: Ember Rounds, Frostbite, Chain Spark, Venom (+ Shatter)
+const VERSION = "v18"; // Ember Rounds: readable burn ring + burst on orange tanks (style B, crimson)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
