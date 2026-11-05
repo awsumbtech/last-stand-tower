@@ -618,11 +618,13 @@ LST.UI = class UI {
       el.style.setProperty("--i", i);
       el.dataset.slot = i;
       el.setAttribute("aria-label", `${card.name}, ${rar.label}: ${card.desc}`);
-      const tag = taken ? '<span class="tag done">&#10003; Taken</span>'
-        : !s.picked ? '<span class="tag free">FREE</span>'
-        : `<span class="tag"><i class="coin"></i>${extraPrice}</span>`;
-      // The take button: its own control on cards that flip, so a flip tap never buys.
-      const takeBtn = flips && !taken ? tag.replace('<span class="tag', `<button type="button" class="tag" aria-label="Take ${card.name}"`).replace(/<\/span>$/, "</button>") : tag;
+      // Price pill. On a flippable card it is a real <button> (the only way to take it), so a
+      // flip tap never buys; on a plain card the whole card is the button and this is a span.
+      const tagCls = taken ? "tag done" : !s.picked ? "tag free" : "tag";
+      const tagBody = taken ? "&#10003; Taken" : !s.picked ? "FREE" : `<i class="coin"></i>${extraPrice}`;
+      const takeBtn = flips && !taken
+        ? `<button type="button" class="${tagCls}" aria-label="Take ${card.name}${s.picked ? ` for ${extraPrice} coins` : ", free"}">${tagBody}</button>`
+        : `<span class="${tagCls}">${tagBody}</span>`;
       el.innerHTML = `
         <span class="ribbon">${rar.label}</span>
         <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${card.icon}</svg></span>
@@ -633,7 +635,12 @@ LST.UI = class UI {
         ${card.trap ? `<span class="fine">${card.fine}</span>` : `<span class="stat">${card.stat(g.tower)}</span>`}
         ${takeBtn}
         ${flips ? LST.CardFlip.backHTML({ title: card.name, body: card.truth }) : ""}`;
-      if (flips) { el.classList.add("has-back"); el.setAttribute("aria-expanded", "false"); el.setAttribute("aria-label", `${card.name}, ${rar.label}: ${card.desc}. Tap to read the catch: ${card.truth}`); }
+      if (flips) {
+        // Holds its own buttons (flip marker + take), so the card itself is a group, not a button.
+        el.classList.add("has-back");
+        el.setAttribute("role", "group");
+        el.removeAttribute("tabindex");
+      }
       this.el.cardRow.appendChild(el);
     });
 

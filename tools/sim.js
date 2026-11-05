@@ -11,6 +11,7 @@
 //   node tools/sim.js --favor                 # dominance check: skilled player who always takes card X
 //   node tools/sim.js --unlocked starter      # card pool: all (default) | starter | multishot,crit,...
 //   node tools/sim.js --campaign [--hours 10] # meta model: real Gears, card unlocks, Workshop upgrades, Head Start
+//   node tools/sim.js --strategy-seed 7       # reseed the bots' own choices (runs are always fully seeded)
 //
 // Notes: the sim steps at a fixed 1/60 s, 1x speed, desktop view (1280x800),
 // and skips hit-stop / slow-mo (a few seconds per run at most).
@@ -140,7 +141,16 @@ function reroll(game, stats) {
   stats.spent += price; stats.rerolls += 1;
   return true;
 }
-const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+// Strategy dice (which of several equal cards a casual bot grabs, etc.) come from their own
+// seeded generator, separate from each run's game RNG, so a whole sim is reproducible:
+// the same args give byte-identical JSON. --strategy-seed N picks another sequence.
+// (987654321 matches the old `node -r seed.js` preload used for the A/B checks.)
+class StrategyRandom {
+  constructor(seed) { this.next = mulberry32(seed); }
+  pick(arr) { return arr[Math.floor(this.next() * arr.length)]; }
+}
+const STRATEGY_RNG = new StrategyRandom(+opt("strategy-seed", 987654321));
+const rand = (arr) => STRATEGY_RNG.pick(arr);
 
 // Skilled: ranks cards by estimated value, rerolls weak shops, buys extras that are
 // worth it while keeping a repair reserve.
