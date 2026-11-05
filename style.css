@@ -1143,3 +1143,7 @@ svg.eye-ico circle { fill: var(--ink); }
 .card button.flip-marker { padding: 0; cursor: pointer; font-family: inherit; z-index: 2; }
 .card button.flip-marker::before { content: ""; position: absolute; inset: -11px; }
 .card button.flip-marker:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+
+/* The back's "flip back" control is a real button (keyboard users can always flip back). */
+.card-back button.flip-back { border: 0; background: none; padding: 4px 8px; margin: -4px 0; font-family: inherit; cursor: pointer; }
+.card-back button.flip-back:focus-visible { outline: 3px solid var(--purple); outline-offset: 1px; border-radius: 8px; }
