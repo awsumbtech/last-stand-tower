@@ -264,6 +264,28 @@ LST.audio = (function () {
       [88, 91, 95, 100].forEach((n, i) => tone({ type: "sine", freq: midi(n), start: i * 0.05, dur: 0.3, vol: 0.08 }));
       noise({ dur: 0.6, vol: 0.15, type: "highpass", freq: 6000 });
     } },
+    // Elemental hits (src/elements, fired by ImpactSync with the burst): short and quiet, throttled.
+    sizzle: { throttle: 0.09, play() {
+      noise({ dur: 0.14, vol: 0.07, type: "highpass", freq: 3200, to: 6500, q: 0.6 });
+      tone({ type: "sawtooth", freq: 180 * jitter(0.1), to: 90, dur: 0.08, vol: 0.03, filter: { freq: 900 } });
+    } },
+    frostCrack: { throttle: 0.08, play() {
+      tone({ type: "sine", freq: midi(96) * jitter(0.04), dur: 0.12, vol: 0.07 });
+      tone({ type: "triangle", freq: midi(103), start: 0.02, dur: 0.1, vol: 0.04 });
+      noise({ dur: 0.07, vol: 0.09, type: "highpass", freq: 7000, q: 1.2 });
+    } },
+    zap: { throttle: 0.07, play() {
+      tone({ type: "square", freq: 1800 * jitter(0.15), to: 300, dur: 0.06, vol: 0.04, filter: { freq: 4000 } });
+      noise({ dur: 0.05, vol: 0.07, type: "bandpass", freq: 5200, q: 3 });
+    } },
+    venom: { throttle: 0.1, play() {
+      tone({ type: "sine", freq: 300 * jitter(0.1), to: 140, dur: 0.1, vol: 0.06 });
+      noise({ dur: 0.06, vol: 0.04, type: "lowpass", freq: 1200, q: 0.8 });
+    } },
+    shatter: { throttle: 0.15, priority: true, play() {
+      noise({ dur: 0.22, vol: 0.16, type: "highpass", freq: 4500, q: 0.9 });
+      [91, 96, 98].forEach((n, i) => tone({ type: "triangle", freq: midi(n), start: i * 0.025, dur: 0.12, vol: 0.05 }));
+    } },
     overdrive: { priority: true, play() {
       tone({ type: "sawtooth", freq: 110, to: 880, dur: 0.45, vol: 0.09, filter: { freq: 2500, q: 5 } });
       tone({ type: "square", freq: 220, to: 1320, start: 0.05, dur: 0.4, vol: 0.05, filter: { freq: 3000 } });

@@ -31,6 +31,7 @@ LST.Tower = class Tower {
     this.recoil = 0; // 1 right after firing, eases back to 0 (for animation)
     this.thorns = 0;    // Thorns trap: share of boss slam damage reflected
     this.overdrive = 0; // Overdrive ability: seconds left
+    this.elements = null; // elemental cards: { ember: level, ... } (src/elements), null = none
   }
 
   update(dt, game) {
@@ -59,6 +60,7 @@ LST.Tower = class Tower {
       p.slowTime = this.slowTime;
       p.splash = this.splash;
       p.splashRadius = this.splashRadius;
+      if (this.elements) { p.elements = this.elements; p.tint = LST.ElementRegistry.shotTint(this, this.shots = (this.shots || 0) + 1); }
       game.projectiles.push(p);
     }
     this.cooldown = 1 / (this.fireRate * (this.overdrive > 0 ? LST.CONFIG.abilities.overdrive.mult : 1));
@@ -244,9 +246,11 @@ LST.Projectile = class Projectile {
 
   // Deal damage to one enemy, apply card effects, and decide whether to keep flying.
   strike(e, game) {
-    e.takeDamage(this.damage, game);
-    game.onHit(e, this.damage, this.crit);
+    const dmg = this.elements ? LST.ElementRegistry.hitDamage(this, e, game) : this.damage; // Shatter
+    e.takeDamage(dmg, game);
+    game.onHit(e, dmg, this.crit);
     if (this.slow > 0 && !e.dead) e.applySlow(this.slow, this.slowTime);
+    if (this.elements) LST.ElementRegistry.onHit(this, e, dmg, game); // elemental cards (src/elements)
     if (this.splash > 0) game.splashDamage(e, this.damage * this.splash, this.splashRadius);
     if (this.pierce > 0) {
       this.pierce -= 1;

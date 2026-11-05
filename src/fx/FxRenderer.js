@@ -82,14 +82,117 @@ LST.FxRenderer = class FxRenderer {
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = T.core;
     ctx.stroke();
+    // Elemental shots: a colored tail over the plain one (one path per color, usually 1-4).
+    let tints = null;
+    for (const p of list) if (p.tint) (tints || (tints = {}))[p.tint] = true;
+    if (tints) for (const color in tints) {
+      ctx.beginPath();
+      for (const p of list) {
+        if (p.tint !== color) continue;
+        const sp = Math.hypot(p.vx, p.vy);
+        if (!sp) continue;
+        const len = Math.min(T.maxLength, sp * T.stretch) * 1.15;
+        ctx.moveTo(p.x - (p.vx / sp) * len, p.y - (p.vy / sp) * len);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.globalAlpha = 0.85 * th.trailAlpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = T.width * 0.8;
+      ctx.stroke();
+    }
     if (!low) {
       ctx.globalCompositeOperation = th.blend;
       ctx.globalAlpha = Math.min(1, T.glowAlpha * th.glow);
       const g = this.glow(T.color), gc = this.glow(T.critColor);
       for (let i = 0; i < list.length; i++) {
         const p = list[i];
-        const R = p.crit ? T.critGlowRadius : T.glowRadius;
-        ctx.drawImage(p.crit ? gc : g, p.x - R, p.y - R, R * 2, R * 2);
+        const R = (p.crit ? T.critGlowRadius : T.glowRadius) * (p.tint ? 1.25 : 1);
+        ctx.drawImage(p.crit ? gc : p.tint ? this.glow(p.tint) : g, p.x - R, p.y - R, R * 2, R * 2);
+      }
+    }
+    ctx.restore();
+  }
+
+  // Status rings on affected enemies (burn / venom / frozen): only drawn while an effect is
+  // active, so nothing animates on an idle lawn. Reduced motion: steady rings, no flicker.
+  drawStatusRings(ctx, enemies, time, reduced, low) {
+    const S = LST.StatusEffects;
+    ctx.save();
+    ctx.lineCap = "round";
+    for (const e of enemies) {
+      if (!e.status || e.dead) continue;
+      const fz = S.get(e, "frozen"), burn = S.get(e, "burn"), ven = S.get(e, "venom");
+      if (!fz && !burn && !ven) continue;
+      const r = e.radius;
+      if (fz) {
+        ctx.globalAlpha = 0.38; ctx.fillStyle = "#bff3ff";
+        ctx.beginPath(); ctx.arc(e.x, e.y, r * 1.08, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.95; ctx.strokeStyle = "#e9fbff"; ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+      if (burn) {
+        const fl = reduced ? 0.8 : 0.65 + 0.35 * Math.sin(time * 18 + e.x * 0.05);
+        // Dark underlay keeps the fire ring readable on orange enemies (tanks).
+        ctx.globalAlpha = 0.85; ctx.strokeStyle = "#2a0d00"; ctx.lineWidth = 6.5;
+        ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = fl; ctx.strokeStyle = "#ffd23a"; ctx.lineWidth = 3.5;
+        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (ven) {
+        const n = ven.count;
+        ctx.globalAlpha = 0.95; ctx.fillStyle = "#8be04a"; ctx.strokeStyle = "#2b3a12"; ctx.lineWidth = 1.5;
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42;
+          const px = e.x + Math.cos(a) * (r + 11), py = e.y + Math.sin(a) * (r + 11);
+          ctx.beginPath(); ctx.arc(px, py, 3.6, 0, Math.PI * 2); ctx.fill(); if (!low) ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  // Chain Spark bolts: jagged lines between the hit enemy and each arc target, fading over ~0.2s.
+  drawArcs(ctx, arcs, low) {
+    const th = this.theme;
+    ctx.save();
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (const a of arcs) {
+      const f = 1 - a.t / a.life;
+      ctx.beginPath();
+      let j = 0;
+      for (let i = 1; i < a.pts.length; i++) {
+        const [x0, y0] = a.pts[i - 1];
+        let [x1, y1] = a.pts[i];
+        let L = Math.hypot(x1 - x0, y1 - y0);
+        if (L < 56) { // bunched targets: draw the hop at least 56px long so it never collapses to a dot
+          const ux = L > 1 ? (x1 - x0) / L : Math.cos(i * 2.1), uy = L > 1 ? (y1 - y0) / L : Math.sin(i * 2.1);
+          x1 = x0 + ux * 56; y1 = y0 + uy * 56; L = 56;
+        }
+        const nx = -(y1 - y0), ny = x1 - x0;
+        // Bunched targets: bow short bolts outward (alternating sides) so each hop reads as its own arc.
+        const bow = L < 90 ? (90 - L) * 0.55 * (i % 2 ? 1 : -1) : 0;
+        ctx.moveTo(x0, y0);
+        for (let k = 1; k < 4; k++) {
+          const off = a.jag[j++] * 22 + bow * Math.sin(Math.PI * k / 4);
+          ctx.lineTo(x0 + (x1 - x0) * k / 4 + nx / L * off, y0 + (y1 - y0) * k / 4 + ny / L * off);
+        }
+        ctx.lineTo(x1, y1);
+      }
+      ctx.globalAlpha = Math.min(1, 1.6 * f); ctx.strokeStyle = th.ink || "#2a2410"; ctx.lineWidth = 7.5; ctx.stroke(); // dark underlay: reads on white hit-flash
+      ctx.globalAlpha = Math.min(1, 1.4 * f); ctx.strokeStyle = a.color || "#ffe14d"; ctx.lineWidth = 4.5; ctx.stroke();
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.8; ctx.stroke();
+      // Arc flash: a bright ring on every struck enemy for the first part of the bolt's life.
+      if (f > 0.45) {
+        ctx.globalAlpha = (f - 0.45) / 0.55; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2.5;
+        for (const [x, y] of a.pts) { ctx.beginPath(); ctx.arc(x, y, 10 + (1 - f) * 22, 0, Math.PI * 2); ctx.stroke(); }
+      }
+      if (!low) {
+        ctx.globalCompositeOperation = th.blend; ctx.globalAlpha = 0.5 * f;
+        const g = this.glow(a.color || "#ffe14d");
+        for (const [x, y] of a.pts) ctx.drawImage(g, x - 24, y - 24, 48, 48);
+        ctx.globalCompositeOperation = "source-over";
       }
     }
     ctx.restore();

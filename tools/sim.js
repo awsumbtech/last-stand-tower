@@ -21,7 +21,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
-const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
+const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "elements/StatusEffect.js", "elements/Element.js", "elements/PairBonus.js", "elements/ElementRegistry.js", "elements/Ember.js", "elements/Frostbite.js", "elements/ChainSpark.js", "elements/Venom.js", "elements/Shatter.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
 const SOURCES = FILES.map((f) => [f, fs.readFileSync(path.join(ROOT, "src", f), "utf8")]);
 
 // ---------- CLI ----------
@@ -63,6 +63,10 @@ function deepMerge(target, src) {
 // ---------- Load the game into a sandbox ----------
 // Which Workshop cards are unlocked: "all", "starter" (none), or a list of ids.
 const UNLOCKED = opt("unlocked", "all");
+// Element cards (src/elements) are left out of "all", the campaign unlock order and the
+// upgrade check unless --elements is passed, so default sims stay byte-identical to main.
+const ELEMENTS = !!opt("elements", false);
+const lockableIds = (LST) => LST.CARDS.filter((c) => c.unlockCost && (ELEMENTS || !c.element)).map((c) => c.id);
 const USE_ABILITY = !opt("no-ability", false); // bots fire the ability when something is close or a boss winds up
 
 function loadGame(seed, unlocked = UNLOCKED) {
@@ -85,12 +89,15 @@ function loadGame(seed, unlocked = UNLOCKED) {
   LST.audio = { play() {}, startMusic() {}, stopMusic() {}, duckMusic() {}, setTension() {} };
   LST.haptics = { buzz() {} };
 
-  LST.meta.state.unlocked = unlocked === "all" ? LST.CARDS.filter((c) => c.unlockCost).map((c) => c.id)
+  LST.meta.state.unlocked = unlocked === "all" ? lockableIds(LST)
     : unlocked === "starter" ? [] : Array.isArray(unlocked) ? unlocked.slice() : String(unlocked).split(",");
 
   // Balance overrides: { config: { ...deep-merged into LST.CONFIG } }
   if (OVERRIDES.config) deepMerge(LST.CONFIG, OVERRIDES.config);
+  // Element tuning: { elements: { ember: { dpsShare: [0.5, 0.2] }, ... } } merged into each element's stats.
+  if (OVERRIDES.elements && LST.ElementRegistry) for (const id in OVERRIDES.elements) Object.assign(LST.ElementRegistry.byId(id).stats, OVERRIDES.elements[id]);
 
+  ELEMENT_WORTH = elementWorth(LST);
   const renderer = VIEW;
   const game = new LST.Game(renderer);
   return { LST, game };
@@ -102,7 +109,34 @@ const towerDps = (t) => t.damage * t.fireRate * t.targets * (1 + t.critChance * 
 // Rough "how strong is this tower" estimate the skilled bot uses to rank cards.
 function offense(t) {
   return t.damage * t.fireRate * (1 + t.critChance * (t.critMult - 1)) * Math.pow(Math.min(t.targets, 5), 0.75) *
-    (1 + 0.6 * t.pierce) * (1 + 2.2 * t.splash) * (1 + 0.7 * t.slow) * Math.pow(t.range / 220, 0.7);
+    (1 + 0.6 * t.pierce) * (1 + 2.2 * t.splash) * (1 + 0.7 * t.slow) * Math.pow(t.range / 220, 0.7) * elementValue(t);
+}
+// Rough steady-state worth of element cards as an offense multiplier (1 when none are owned,
+// so element-free runs score exactly as before).
+// Read from the element's live stats, so the bot's opinion follows any retune. Uptime guesses:
+// an enemy lives ~1.5 s under fire (DoT past that is wasted), ~3 venom stacks on average,
+// a freeze is worth about half its length in extra hits on the frozen target.
+let ELEMENT_WORTH = null;
+function elementWorth(LST) {
+  const R = LST.ElementRegistry, w = {};
+  if (!R) return w;
+  for (const el of R.elements) {
+    const S = el.stats;
+    w[el.id] = (l) => el.id === "ember" ? el.at("dpsShare", l) * Math.min(S.time, 1.5)
+      : el.id === "venom" ? el.at("stackShare", l) * Math.min(3, S.maxStacks) * Math.min(S.time, 1.5)
+      : el.id === "chainSpark" ? S.chance * S.share * el.at("jumps", l) * 0.7
+      : el.id === "frostbite" ? 0.5 * el.at("freeze", l) / (S.every / 3) : 0;
+  }
+  const sh = R.pairs.find((p) => p.id === "shatter");
+  w.shatter = sh ? sh.bonus * 0.3 : 0;
+  return w;
+}
+function elementValue(t) {
+  if (!t.elements) return 1;
+  let v = 1;
+  for (const id in t.elements) { const l = t.elements[id], f = ELEMENT_WORTH && ELEMENT_WORTH[id]; if (l && f) v += f(l); }
+  if (t.elements.ember && t.elements.frostbite && ELEMENT_WORTH) v += ELEMENT_WORTH.shatter;
+  return v;
 }
 function defense(t) { return t.maxHp * (1 + t.regen * 16 + t.lifesteal * 25); }
 function cardValue(card, game, last) {
@@ -326,7 +360,7 @@ function playRun(strategyName, seed, meta, unlocked) {
 function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5)) {
   const { LST } = loadGame(1);
   const cfg = LST.CONFIG.meta;
-  const order = LST.meta.lockable().map((c) => [c.id, c.unlockCost]);
+  const order = LST.meta.lockable().filter((c) => ELEMENTS || !c.element).map((c) => [c.id, c.unlockCost]);
   const cost = (id, n) => { const u = cfg.upgrades[id]; return n >= u.max ? Infinity : u.costs ? u.costs[n] : Math.round(u.base * Math.pow(u.growth, n)); };
   const meta = { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0, codex: { seen: [], traps: [] } };
   let gears = 0, minutes = 0;
@@ -410,7 +444,7 @@ if (require.main === module) {
         if (!opts.length || opts[0][1] > g) break;
         g -= opts[0][1]; up[opts[0][0]] = (up[opts[0][0]] || 0) + 1;
       }
-      const meta = { unlocked: LST.CARDS.filter((c) => c.unlockCost).map((c) => c.id), upgrades: up, benched: [], headStartPick: 0, best: 0 };
+      const meta = { unlocked: lockableIds(LST), upgrades: up, benched: [], headStartPick: 0, best: 0 };
       const rs = []; for (let s = 1; s <= runs; s++) rs.push(playRun("skilled", s, meta));
       rows[plan] = { levels: JSON.stringify(up), medianWave: q(rs.map((r) => r.deathWave), 0.5), p25: q(rs.map((r) => r.deathWave), 0.25), minutes: +q(rs.map((r) => r.realMinutes), 0.5).toFixed(1) };
     }

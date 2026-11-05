@@ -21,6 +21,7 @@ LST.EVENTS = Object.freeze({
   CARD_TAKEN: "cardTaken",             // { index, card, levels, paid, epic }
   WORKSHOP_UPGRADE: "workshopUpgrade", // { id, level }
   UNLOCK: "unlock",                    // { kind: "card" | "ability", id }
+  ELEMENT_HIT: "elementHit",           // { element, color, x, y, radius, ... } elemental card proc (src/elements)
 });
 
 LST.EventBus = class EventBus {

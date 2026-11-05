@@ -111,7 +111,7 @@ LST.Renderer = class Renderer {
     if (fx) fx.drawProjectiles(ctx, scene);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
-    if (fx) fx.drawWorld(ctx);
+    if (fx) fx.drawWorld(ctx, scene);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
     if (scene.confetti) for (const c of scene.confetti) (theme.confetti || LST.draw.confetti)(ctx, c, this);
     if (fx) fx.drawTextGlows(ctx, scene);

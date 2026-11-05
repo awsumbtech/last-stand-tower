@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v16"; // Shop cards flip to read the catch; Repair button fits on phones
+const VERSION = "v17"; // Elemental cards: Ember Rounds, Frostbite, Chain Spark, Venom (+ Shatter)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -22,6 +22,15 @@ const PRECACHE = [
   "src/audio.js",
   "src/upgrades.js",
   "src/traps.js",
+  "src/elements/StatusEffect.js",
+  "src/elements/Element.js",
+  "src/elements/PairBonus.js",
+  "src/elements/ElementRegistry.js",
+  "src/elements/Ember.js",
+  "src/elements/Frostbite.js",
+  "src/elements/ChainSpark.js",
+  "src/elements/Venom.js",
+  "src/elements/Shatter.js",
   "src/meta.js",
   "src/entities.js",
   "src/world.js",

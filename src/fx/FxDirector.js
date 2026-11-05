@@ -15,6 +15,7 @@
 // endFrame() once per animation frame.
 
 LST.FxDirector = class FxDirector {
+  static get ARC_CAP() { return 8; }
   constructor({ bus, audio, settings, win }) {
     const doc = win.document;
     this.win = win;
@@ -37,6 +38,7 @@ LST.FxDirector = class FxDirector {
       this.renderer.drawPulses(ctx, this.camera, "screen", this.frame, 1, this.quality.low);
       this.renderer.drawPool(ctx, this.pools.screen, 1, this.quality.low);
     };
+    this.arcs = [];      // Chain Spark bolts: short-lived, max ARC_CAP, only exist after a hit
     this.offs = [];
     if (bus) this.subscribe(bus);
   }
@@ -55,6 +57,7 @@ LST.FxDirector = class FxDirector {
     on(E.WAVE_START, () => this.onWaveStart());
     on(E.WORKSHOP_UPGRADE, (e) => this.screenImpact("workshopUpgrade", e.id));
     on(E.UNLOCK, (e) => this.screenImpact("unlock", e.id));
+    if (E.ELEMENT_HIT) on(E.ELEMENT_HIT, (e) => this.onElementHit(e));
   }
 
   // Event -> impact routing is data (LST.FX_ROUTES); a null route plays nothing.
@@ -101,6 +104,19 @@ LST.FxDirector = class FxDirector {
     if (at) this.impacts.fire(name, at.x, at.y);
   }
 
+  // Elemental hit: colored burst + its sound on the same frame (ImpactSync), plus the bolt for
+  // Chain Spark. Freeze/Shatter only fire on the hit that froze/shattered, so nothing loops.
+  onElementHit(e) {
+    if (e.element === "frostbite" && !e.freeze) return;
+    this.fireRoute("element:" + e.element, e.x, e.y, { ringMul: Math.max(0.8, Math.min(2.2, (e.radius || 20) / 22)) });
+    if (e.points && e.points.length > 1) {
+      if (this.arcs.length >= LST.FxDirector.ARC_CAP) this.arcs.shift();
+      const pts = e.points.map((p) => p.slice()), jag = [];
+      for (let i = 1; i < pts.length; i++) for (let k = 1; k < 4; k++) jag.push((this.rng.next ? this.rng.next() : Math.random()) - 0.5);
+      this.arcs.push({ pts, jag, t: 0, life: 0.28, color: e.color });
+    }
+  }
+
   critGlow(x, y) {
     const pool = this.pools.world, G = LST.FX_PRESETS.glow;
     const i = pool.spawn(false);
@@ -122,6 +138,7 @@ LST.FxDirector = class FxDirector {
     this.pools.world.update(dt);
     this.pools.screen.update(dt);
     this.camera.update(dt);
+    if (this.arcs.length) { for (const a of this.arcs) a.t += dt; this.arcs = this.arcs.filter((a) => a.t < a.life); }
   }
 
   // Renderer hooks (world transform active unless noted).
@@ -131,7 +148,9 @@ LST.FxDirector = class FxDirector {
     this.renderer.drawUnder(ctx, scene.tower, this.aura, r.time);
   }
   drawProjectiles(ctx, scene) { this.renderer.drawProjectiles(ctx, scene.projectiles, this.quality.low); }
-  drawWorld(ctx) {
+  drawWorld(ctx, scene) {
+    if (scene && scene.hasStatus) this.renderer.drawStatusRings(ctx, scene.enemies, this.time, this.quality.reduced, this.quality.low);
+    if (this.arcs.length) this.renderer.drawArcs(ctx, this.arcs, this.quality.low);
     this.renderer.drawPulses(ctx, this.camera, "world", this.frame, 1, this.quality.low);
     this.renderer.drawPool(ctx, this.pools.world, 1, this.quality.low);
   }

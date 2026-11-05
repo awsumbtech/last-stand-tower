@@ -605,7 +605,8 @@ LST.UI = class UI {
       const shownLvl = taken ? lvl : lvl + 1; // level after taking it
       const rar = LST.RARITY[card.rarity];
       const locked = !taken && s.picked && g.coins < extraPrice;
-      const flips = !!card.trap && (appraisal >= 2 || known); // the catch is known: it goes on the back
+      const info = !card.trap && typeof card.details === "function"; // elemental cards: "How it works" back
+      const flips = info || (!!card.trap && (appraisal >= 2 || known)); // the catch is known: it goes on the back
       const el = document.createElement("div");
       el.setAttribute("role", "button");
       el.tabIndex = 0;
@@ -629,12 +630,14 @@ LST.UI = class UI {
         <span class="ribbon">${rar.label}</span>
         <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">${card.icon}</svg></span>
         <span class="name">${card.name}</span>
-        ${flips ? LST.CardFlip.markerHTML(known) : ""}
+        ${flips ? LST.CardFlip.markerHTML(known, info ? "info" : "") : ""}
         <span class="level">${slot.from ? "from Mystery Box" : card.trap ? "NEW" : (shownLvl === 1 && !taken ? "NEW" : "Lv " + shownLvl) + (card.maxLevel ? " / " + card.maxLevel : "")}</span>
         <span class="desc">${card.desc}</span>
         ${card.trap ? `<span class="fine">${card.fine}</span>` : `<span class="stat">${card.stat(g.tower)}</span>`}
         ${takeBtn}
-        ${flips ? LST.CardFlip.backHTML({ title: card.name, body: card.truth }) : ""}`;
+        ${flips ? LST.CardFlip.backHTML(info
+          ? { title: card.name, label: "How it works", body: card.details(g.tower), kind: "info" }
+          : { title: card.name, body: card.truth }) : ""}`;
       if (flips) {
         // Holds its own buttons (flip marker + take), so the card itself is a group, not a button.
         el.classList.add("has-back");

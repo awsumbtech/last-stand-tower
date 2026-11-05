@@ -93,6 +93,19 @@ LST.FX_IMPACTS = {
   // The tower's aura reaches a new tier (fires as the next wave starts, on the lawn)
   tierUp: { space: "world", burst: { count: 44, speedMul: 0.8 }, colors: ["#ffffff", "#fff3a0", "#ffd23f"],
             ring: 140, bloom: 0.45, flash: 0.15, shake: 0.25, thump: 0.7, hold: 0 },
+  // Elemental cards (src/elements): small, frequent hits, so each is a short colored burst with
+  // its own sound (sfx) instead of the bass thump, no flash or shake, and a throttle so a fast
+  // tower doesn't spray past the particle caps. Shatter is the one with a little punch.
+  elemEmber: { space: "world", burst: { count: 9, speedMul: 0.35 }, colors: ["#fff3a0", "#ffd23a", "#3a1200"],
+               ring: 34, bloom: 0.22, flash: 0, shake: 0, thump: 0, sfx: "sizzle", throttle: 0.09 },
+  elemFrost: { space: "world", burst: { count: 14, speedMul: 0.4 }, colors: ["#ffffff", "#c8f4ff", "#7fe3ff"],
+               ring: 52, bloom: 0.3, flash: 0, shake: 0, thump: 0, sfx: "frostCrack", throttle: 0.08 },
+  elemSpark: { space: "world", burst: { count: 10, speedMul: 0.45 }, colors: ["#ffffff", "#fff6a8", "#ffe14d"],
+               ring: 30, bloom: 0.28, flash: 0, shake: 0, thump: 0, sfx: "zap", throttle: 0.07 },
+  elemVenom: { space: "world", burst: { count: 8, speedMul: 0.3 }, colors: ["#e4ffb8", "#b4f06a", "#8be04a"],
+               ring: 30, bloom: 0.2, flash: 0, shake: 0, thump: 0, sfx: "venom", throttle: 0.1 },
+  elemShatter: { space: "world", burst: { count: 20, speedMul: 0.6 }, colors: ["#ffffff", "#c8f4ff", "#ff9a4a", "#7fe3ff"],
+                 ring: 70, bloom: 0.4, flash: 0, shake: 0.06, thump: 0.25, sfx: "shatter", throttle: 0.15 },
 };
 
 // Which impact (from LST.FX_IMPACTS) each game moment plays; null = no impact for it.
@@ -107,6 +120,12 @@ LST.FX_ROUTES = {
   cardTakenEpic: null,   // was "cardPickEpic"
   workshopUpgrade: null, // was "workshop"
   unlock: null,          // was "unlock"
+  // ELEMENT_HIT events, keyed "element:<id>"
+  "element:ember": "elemEmber",
+  "element:frostbite": "elemFrost",
+  "element:chainSpark": "elemSpark",
+  "element:venom": "elemVenom",
+  "element:shatter": "elemShatter",
 };
 
 LST.FX_THEMES = {
