@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v15"; // Cartoon theme split into src/themes/cartoon/ (no visual change)
+const VERSION = "v16"; // Shop cards flip to read the catch; Repair button fits on phones
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -61,6 +61,7 @@ const PRECACHE = [
   "src/fx/FxRenderer.js",
   "src/fx/FxOverlay.js",
   "src/fx/FxDirector.js",
+  "src/ui/CardFlip.js",
   "src/ui.js",
   "src/game.js",
   "src/demo.js",
