@@ -88,6 +88,31 @@ CLICKS = r"""async () => {
   if (card().classList.contains("flipped") || g.shop.cards[2].taken) fails.push("tapping the back did not flip back (or took it)");
   card().querySelector("button.tag").click();
   if (!g.shop.cards[2].taken) fails.push("take button did not take the card");
+
+  // Free pick (nothing taken yet): the take button keeps the "free" pill look and valid markup.
+  g.shop.picked = false;
+  const trap2 = LST.TRAPS.find((t) => t.id !== "thorns" && LST.shopRules.available(t, g.upgradeLevels));
+  LST.meta.discoverTrap(trap2.id);
+  g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: trap2, taken: false }];
+  g.ui.renderShop();
+  const btn = card().querySelector("button.tag");
+  if (!btn) fails.push("free pick: no take button");
+  else {
+    if (!btn.classList.contains("free")) fails.push(`free pick: take button lost its "free" class (${btn.outerHTML.slice(0, 120)})`);
+    const names = [...btn.attributes].map((a) => a.name).sort().join(",");
+    if (names !== "aria-label,class,type") fails.push("free pick: unexpected button attributes: " + names);
+    if (btn.textContent.trim() !== "FREE") fails.push("free pick: button text is " + JSON.stringify(btn.textContent));
+    const ref = document.createElement("span"); ref.className = "tag free"; card().appendChild(ref);
+    const bg = getComputedStyle(btn).backgroundColor, want = getComputedStyle(ref).backgroundColor; ref.remove();
+    if (bg !== want) fails.push(`free pick: .tag.free style not applied (${bg} vs ${want})`);
+    if (getComputedStyle(btn).animationName === "none" && !matchMedia("(prefers-reduced-motion: reduce)").matches) fails.push("free pick: free wiggle missing");
+  }
+  // No interactive element nested inside another button.
+  for (const b of document.querySelectorAll("#card-row button, #card-row [role=button]")) {
+    if (b.parentElement.closest("#card-row button, #card-row [role=button]")) fails.push("nested interactive control: " + b.className);
+  }
+  btn && btn.click();
+  if (!g.shop.cards[2].taken) fails.push("free pick: take button did not take the card");
   return fails;
 }"""
 

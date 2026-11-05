@@ -11,7 +11,7 @@ LST.CardFlip = class CardFlip {
 
   // Markup for the back face. title: card name · body: the explanation · note: optional tip.
   static backHTML({ title, label = "The catch", body, note = "" }) {
-    return `<span class="card-back" aria-hidden="true">
+    return `<span class="card-back" aria-hidden="true" aria-live="polite">
         <span class="back-label">${label}</span>
         <span class="back-title">${title}</span>
         <span class="back-body">${body}</span>
@@ -22,7 +22,7 @@ LST.CardFlip = class CardFlip {
 
   // Small corner marker on the front that says "there's more on the back".
   static markerHTML(known) {
-    return `<span class="flip-marker${known ? " known" : ""}" title="${known ? "Known trap: tap to read" : "Tap to read the catch"}">${known ? CardFlip.EYE : "!"}</span>`;
+    return `<button type="button" class="flip-marker${known ? " known" : ""}" aria-expanded="false" aria-label="${known ? "Known trap: read the catch" : "Read the catch"}">${known ? CardFlip.EYE : "!"}</button>`;
   }
 
   static canFlip(el) { return !!(el && el.querySelector(":scope > .card-back")); }
@@ -40,7 +40,8 @@ LST.CardFlip = class CardFlip {
     const set = () => {
       el.classList.toggle("flipped", to);
       el.querySelector(":scope > .card-back").setAttribute("aria-hidden", String(!to));
-      el.setAttribute("aria-expanded", String(to));
+      const marker = el.querySelector(":scope > .flip-marker");
+      if (marker) marker.setAttribute("aria-expanded", String(to));
     };
     if (opts.instant || CardFlip.reducedMotion()) { set(); return to; }
     el.dataset.flipping = "1";

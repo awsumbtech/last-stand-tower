@@ -1140,3 +1140,6 @@ svg.eye-ico circle { fill: var(--ink); }
   #card-row .card.flip-out, #card-row .card.flip-in { animation: none !important; }
 }
 .card.has-back .ribbon { z-index: 4; }
+.card button.flip-marker { padding: 0; cursor: pointer; font-family: inherit; z-index: 2; }
+.card button.flip-marker::before { content: ""; position: absolute; inset: -11px; }
+.card button.flip-marker:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
