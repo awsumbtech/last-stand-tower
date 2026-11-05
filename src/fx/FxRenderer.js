@@ -115,6 +115,22 @@ LST.FxRenderer = class FxRenderer {
 
   // Status rings on affected enemies (burn / venom / frozen): only drawn while an effect is
   // active, so nothing animates on an idle lawn. Reduced motion: steady rings, no flicker.
+  // Burn ring from the selected Ember style (LST.FX_EMBER_STYLES): halo, dark outline, dashed ring, hot core.
+  drawBurnRing(ctx, e, r, fl, time, reduced) {
+    const R = (LST.FX_EMBER_STYLES[LST.FX_EMBER_STYLE] || LST.FX_EMBER_STYLES.a).ring;
+    if (R.halo) {
+      ctx.globalAlpha = R.halo.alpha; ctx.fillStyle = R.halo.color;
+      ctx.beginPath(); ctx.arc(e.x, e.y, r + R.halo.pad, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2);
+    ctx.globalAlpha = R.under.alpha; ctx.strokeStyle = R.under.color; ctx.lineWidth = R.under.width; ctx.stroke();
+    ctx.globalAlpha = fl; ctx.strokeStyle = R.main.color; ctx.lineWidth = R.main.width;
+    ctx.setLineDash(R.main.dash); ctx.lineDashOffset = reduced ? 0 : -time * 30;
+    ctx.stroke();
+    if (R.core) { ctx.strokeStyle = R.core.color; ctx.lineWidth = R.core.width; ctx.stroke(); }
+    ctx.setLineDash([]);
+  }
+
   drawStatusRings(ctx, enemies, time, reduced, low) {
     const S = LST.StatusEffects;
     ctx.save();
@@ -132,12 +148,7 @@ LST.FxRenderer = class FxRenderer {
       }
       if (burn) {
         const fl = reduced ? 0.8 : 0.65 + 0.35 * Math.sin(time * 18 + e.x * 0.05);
-        // Dark underlay keeps the fire ring readable on orange enemies (tanks).
-        ctx.globalAlpha = 0.85; ctx.strokeStyle = "#2a0d00"; ctx.lineWidth = 6.5;
-        ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = fl; ctx.strokeStyle = "#ffd23a"; ctx.lineWidth = 3.5;
-        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
-        ctx.stroke();
+        this.drawBurnRing(ctx, e, r, fl, time, reduced);
         ctx.setLineDash([]);
       }
       if (ven) {
