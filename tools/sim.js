@@ -20,7 +20,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
-const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
+const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "elements/StatusEffect.js", "elements/Element.js", "elements/PairBonus.js", "elements/ElementRegistry.js", "elements/Ember.js", "elements/Frostbite.js", "elements/ChainSpark.js", "elements/Venom.js", "elements/Shatter.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
 const SOURCES = FILES.map((f) => [f, fs.readFileSync(path.join(ROOT, "src", f), "utf8")]);
 
 // ---------- CLI ----------

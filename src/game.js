@@ -609,6 +609,7 @@ LST.Game = class Game extends LST.World {
     this.tower.update(dt, this);
     this.updateList(this.enemies, dt);
     this.updateList(this.projectiles, dt);
+    if (this.hasStatus) LST.StatusEffects.tickAll(this, dt); // burn / venom / freeze (elemental cards)
     this.checkLowHp();
 
     if (this.state !== "playing") return; // e.g. King Mole just went down
