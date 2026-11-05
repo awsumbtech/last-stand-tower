@@ -30,8 +30,8 @@ LST.ElementRegistry.register(new (class Venom extends LST.Element {
   statText(l) { return `${Math.round(this.at("stackShare", l) * 100)}%/s x${this.stats.maxStacks}`; }
   details(l) {
     const s = this.at("stackShare", l);
-    return `Each hit adds a poison stack (up to ${this.stats.maxStacks}). Every stack deals ${Math.round(s * 100)}% of the hit's damage per second for ${this.stats.time}s, ` +
-      `so a fully poisoned enemy takes ${Math.round(s * this.stats.maxStacks * 100)}%/s (bosses ${Math.round(this.stats.bossShare * 100)}% of that).`;
+    return `Each hit adds a poison stack (max ${this.stats.maxStacks}). Each deals ${Math.round(s * 100)}% of the hit's damage per second for ${this.stats.time}s, ` +
+      `so a fully poisoned enemy takes ${Math.round(s * this.stats.maxStacks * 100)}%/s.`;
   }
 })({
   id: "venom", element: "poison", name: "Venom", rarity: "rare", color: "#8be04a", unlockCost: 130, maxLevel: 3,

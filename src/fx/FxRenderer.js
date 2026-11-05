@@ -180,8 +180,8 @@ LST.FxRenderer = class FxRenderer {
         }
         ctx.lineTo(x1, y1);
       }
-      if (th.ink) { ctx.globalAlpha = 0.6 * f; ctx.strokeStyle = th.ink; ctx.lineWidth = 7; ctx.stroke(); }
-      ctx.globalAlpha = f; ctx.strokeStyle = a.color || "#ffe14d"; ctx.lineWidth = 4.5; ctx.stroke();
+      ctx.globalAlpha = Math.min(1, 1.6 * f); ctx.strokeStyle = th.ink || "#2a2410"; ctx.lineWidth = 7.5; ctx.stroke(); // dark underlay: reads on white hit-flash
+      ctx.globalAlpha = Math.min(1, 1.4 * f); ctx.strokeStyle = a.color || "#ffe14d"; ctx.lineWidth = 4.5; ctx.stroke();
       ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.8; ctx.stroke();
       // Arc flash: a bright ring on every struck enemy for the first part of the bolt's life.
       if (f > 0.45) {

@@ -94,7 +94,7 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   shot(LST, game, e, els, 10);
   const hits = (game.pairHits || {}).shatter || 0;
   const direct = hp0 - e.hp;
-  ok(want ? hits === 1 && Math.abs(direct - 12.5) < 1e-6 : hits === 0 && Math.abs(direct - 10) < 1e-6,
+  ok(want ? hits === 1 && Math.abs(direct - 10 * (1 + LST.ElementRegistry.pairs.find((p) => p.id === "shatter").bonus)) < 1e-6 : hits === 0 && Math.abs(direct - 10) < 1e-6,
     `Shatter with ${label}: ${hits ? "on" : "off"}, hit dealt ${direct.toFixed(2)} (base 10)`);
 }
 { // not frozen -> no bonus even with both
