@@ -27,8 +27,13 @@ CHECK = r"""async ({ flipAll }) => {
   for (const id of ids) if (LST.cardById(id).trap) LST.meta.discoverTrap(id);
   g.coins = 401; g.wave = 19; g.tower.maxHp = 370; g.tower.hp = 289;
   const inside = (r, box, pad = 0.5) => r.left >= box.left - pad && r.right <= box.right + pad && r.top >= box.top - pad && r.bottom <= box.bottom + pad;
-  for (let i = 0; i < ids.length; i += 3) {
-    const group = [ids[i], ids[(i + 1) % ids.length], ids[(i + 2) % ids.length]];
+  // Every card in sequence, then every flippable card next to the two shortest plain cards
+  // (the row is as tall as its tallest card, so that's the tightest a back face gets).
+  const plain = LST.CARDS.filter((c) => !c.trap && !c.details).map((c) => c.id);
+  const groups = [];
+  for (let i = 0; i < ids.length; i += 3) groups.push([ids[i], ids[(i + 1) % ids.length], ids[(i + 2) % ids.length]]);
+  for (const id of ids) { const c = LST.cardById(id); if (c.trap || c.details) groups.push([id, plain[0], plain[1]]); }
+  for (const group of groups) {
     g.shop.picked = true;
     g.shop.cards = group.map((id) => ({ card: LST.cardById(id), taken: false }));
     g.ui.renderShop();
