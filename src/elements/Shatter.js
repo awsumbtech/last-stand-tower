@@ -3,4 +3,4 @@ LST.ElementRegistry.registerPair(new (class Shatter extends LST.PairBonus {
   modify({ enemy: e }) {
     return LST.StatusEffects.get(e, "frozen") && LST.StatusEffects.get(e, "burn") ? 1 + this.bonus : 1;
   }
-})({ id: "shatter", name: "Shatter", needs: ["ember", "frostbite"], bonus: 0.25, color: "#c8f4ff" }));
+})({ id: "shatter", name: "Shatter", needs: ["ember", "frostbite"], bonus: 0.35, color: "#c8f4ff" }));

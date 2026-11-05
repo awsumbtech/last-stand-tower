@@ -113,7 +113,7 @@ LST.FxDirector = class FxDirector {
       if (this.arcs.length >= LST.FxDirector.ARC_CAP) this.arcs.shift();
       const pts = e.points.map((p) => p.slice()), jag = [];
       for (let i = 1; i < pts.length; i++) for (let k = 1; k < 4; k++) jag.push((this.rng.next ? this.rng.next() : Math.random()) - 0.5);
-      this.arcs.push({ pts, jag, t: 0, life: 0.2, color: e.color });
+      this.arcs.push({ pts, jag, t: 0, life: 0.28, color: e.color });
     }
   }
 
