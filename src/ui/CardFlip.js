@@ -17,7 +17,7 @@ LST.CardFlip = class CardFlip {
         <span class="back-title">${title}</span>
         <span class="back-body">${body}</span>
         ${note ? `<span class="back-note">${note}</span>` : ""}
-        <span class="back-hint">Tap to flip back</span>
+        <button type="button" class="back-hint flip-back" aria-label="Flip back to the front">Tap to flip back</button>
       </span>`;
   }
 
@@ -39,11 +39,22 @@ LST.CardFlip = class CardFlip {
   static toggle(el, opts = {}) {
     if (!CardFlip.canFlip(el) || el.dataset.flipping) return CardFlip.isFlipped(el);
     const to = !CardFlip.isFlipped(el);
+    // Keyboard: the back's "flip back" button takes focus while the back shows, the marker gets
+    // it back afterwards, and the front's controls (take button) leave the tab order meanwhile.
+    const hadFocus = typeof document !== "undefined" && el.contains(document.activeElement);
     const set = () => {
       el.classList.toggle("flipped", to);
-      el.querySelector(":scope > .card-back").setAttribute("aria-hidden", String(!to));
+      const back = el.querySelector(":scope > .card-back");
+      back.setAttribute("aria-hidden", String(!to));
       const marker = el.querySelector(":scope > .flip-marker");
       if (marker) marker.setAttribute("aria-expanded", String(to));
+      for (const c of el.querySelectorAll(":scope > button")) {
+        if (to) c.setAttribute("tabindex", "-1"); else c.removeAttribute("tabindex");
+      }
+      if (hadFocus || opts.focus) {
+        const target = to ? back.querySelector(".flip-back") : marker;
+        if (target) target.focus();
+      }
     };
     if (opts.instant || CardFlip.reducedMotion()) { set(); return to; }
     el.dataset.flipping = "1";

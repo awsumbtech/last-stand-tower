@@ -1157,3 +1157,6 @@ svg.eye-ico circle { fill: var(--ink); }
   .card-back.info .back-title { font-size: 13.5px; }
   .card-back.info .back-body { font-size: 10.5px; line-height: 1.16; }
 }
+/* The back's "flip back" control is a real button (keyboard users can always flip back). */
+.card-back button.flip-back { border: 0; background: none; padding: 4px 8px; margin: -4px 0; font-family: inherit; cursor: pointer; }
+.card-back button.flip-back:focus-visible { outline: 3px solid var(--purple); outline-offset: 1px; border-radius: 8px; }

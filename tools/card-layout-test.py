@@ -116,6 +116,45 @@ CLICKS = r"""async () => {
   return fails;
 }"""
 
+KEY_SETUP = r"""() => {
+  const g = window.game; g.shop.picked = true; g.coins = 401; LST.meta.discoverTrap("thorns");
+  g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: LST.cardById("thorns"), taken: false }];
+  g.ui.renderShop();
+  document.querySelector('#card-row [data-slot="2"] .flip-marker').focus();
+}"""
+KEY_STATE = r"""() => {
+  const card = document.querySelector('#card-row [data-slot="2"]'), a = document.activeElement;
+  const visible = a && a !== document.body && getComputedStyle(a).visibility !== "hidden" && a.getClientRects().length > 0;
+  const tag = card.querySelector(":scope > button.tag");
+  return { flipped: card.classList.contains("flipped"), inCard: card.contains(a), visible, focus: a ? a.className : null,
+    tagTabbable: !!tag && tag.tabIndex >= 0, coins: game.coins, taken: game.shop.cards[2].taken };
+}"""
+
+def keyboard_case(p):
+    # Enter on the marker flips, focus stays in the card on a visible control, the hidden take
+    # button leaves the tab order, Enter and Space flip back, nothing is bought.
+    fails = []
+    p.evaluate(KEY_SETUP)
+    def step(key, want_flip, label):
+        p.keyboard.press(key); p.wait_for_timeout(400)
+        st = p.evaluate(KEY_STATE)
+        if st["flipped"] != want_flip: fails.append(f"keyboard {label}: flipped={st['flipped']}")
+        if not (st["inCard"] and st["visible"]): fails.append(f"keyboard {label}: focus left the card or is on a hidden control ({st['focus']})")
+        if want_flip and st["tagTabbable"]: fails.append(f"keyboard {label}: take button under the back is still tabbable")
+        if st["coins"] != 401 or st["taken"]: fails.append(f"keyboard {label}: bought the card (coins {st['coins']})")
+        return st
+    step("Enter", True, "Enter on marker")
+    p.keyboard.press("Tab"); p.wait_for_timeout(50)
+    if p.evaluate("() => document.activeElement.matches('#card-row [data-slot=\"2\"] button.tag')"): fails.append("keyboard: Tab reached the hidden take button")
+    p.keyboard.press("Shift+Tab"); p.wait_for_timeout(50)
+    if not p.evaluate("() => { const b = document.querySelector('#card-row [data-slot=\"2\"] .flip-back'); if (b) b.focus(); return !!b; }"):
+        fails.append("keyboard: the back has no flip-back button"); return fails
+    st = step("Enter", False, "Enter flip back")
+    if "flip-marker" not in (st["focus"] or ""): fails.append(f"keyboard: focus did not return to the marker ({st['focus']})")
+    step(" ", True, "Space on marker")
+    step(" ", False, "Space flip back")
+    return fails
+
 def main():
     fails = []
     with sync_playwright() as pw:
@@ -132,6 +171,7 @@ def main():
             for flip in (False, True):
                 fails += [f"{w}x{h}: {f}" for f in p.evaluate(CHECK, {"flipAll": flip})]
             fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]
+            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]
             ctx.close()
         b.close()
     for f in fails: print("FAIL", f)
