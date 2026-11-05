@@ -1150,7 +1150,7 @@ svg.eye-ico circle { fill: var(--ink); }
   background: linear-gradient(180deg, #fffdf6, #fff6e6);
   box-shadow: inset 0 0 0 5px var(--accent);
 }
-.card-back.info .back-label { background: var(--accent); color: var(--ink); }
+.card-back.info .back-label { background: var(--accent); color: var(--ink); font-size: 10px; letter-spacing: 0; padding: 0 6px 1px; max-width: 100%; }
 .card-back.info .back-body { color: #3a2a4c; font-size: 11.5px; line-height: 1.2; }
 @media (max-width: 560px) {
   .card-back.info { padding: 12px 6px 8px; gap: 3px; }
@@ -1158,5 +1158,5 @@ svg.eye-ico circle { fill: var(--ink); }
   .card-back.info .back-body { font-size: 10.5px; line-height: 1.16; }
 }
 /* The back's "flip back" control is a real button (keyboard users can always flip back). */
-.card-back button.flip-back { border: 0; background: none; padding: 4px 8px; margin: -4px 0; font-family: inherit; cursor: pointer; }
+.card-back button.flip-back { border: 0; background: none; padding: 4px 8px; margin: -4px 0; font-family: inherit; line-height: inherit; cursor: pointer; }
 .card-back button.flip-back:focus-visible { outline: 3px solid var(--purple); outline-offset: 1px; border-radius: 8px; }
