@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v17"; // Elemental cards: Ember Rounds, Frostbite, Chain Spark, Venom (+ Shatter)
+const VERSION = "v18"; // Elemental cards + status looks: flames / ice / goo / sparks drawn on enemies
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -68,6 +68,11 @@ const PRECACHE = [
   "src/fx/ImpactSync.js",
   "src/fx/ScreenAnchors.js",
   "src/fx/FxRenderer.js",
+  "src/elements/looks/StatusLook.js",
+  "src/elements/looks/BurnFlames.js",
+  "src/elements/looks/IceCrust.js",
+  "src/elements/looks/VenomDrips.js",
+  "src/elements/looks/SparkCrackle.js",
   "src/fx/FxOverlay.js",
   "src/fx/FxDirector.js",
   "src/ui/CardFlip.js",

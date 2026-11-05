@@ -113,7 +113,7 @@ LST.FxRenderer = class FxRenderer {
     ctx.restore();
   }
 
-  // Status rings on affected enemies (burn / venom / frozen): only drawn while an effect is
+  // Status rings on affected enemies (venom / frozen): only drawn while an effect is
   // active, so nothing animates on an idle lawn. Reduced motion: steady rings, no flicker.
   drawStatusRings(ctx, enemies, time, reduced, low) {
     const S = LST.StatusEffects;
@@ -121,24 +121,14 @@ LST.FxRenderer = class FxRenderer {
     ctx.lineCap = "round";
     for (const e of enemies) {
       if (!e.status || e.dead) continue;
-      const fz = S.get(e, "frozen"), burn = S.get(e, "burn"), ven = S.get(e, "venom");
-      if (!fz && !burn && !ven) continue;
+      const fz = S.get(e, "frozen"), ven = S.get(e, "venom"); // burn: drawn by BurnFlames (src/elements/looks)
+      if (!fz && !ven) continue;
       const r = e.radius;
       if (fz) {
         ctx.globalAlpha = 0.38; ctx.fillStyle = "#bff3ff";
         ctx.beginPath(); ctx.arc(e.x, e.y, r * 1.08, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 0.95; ctx.strokeStyle = "#e9fbff"; ctx.lineWidth = 3;
         ctx.stroke();
-      }
-      if (burn) {
-        const fl = reduced ? 0.8 : 0.65 + 0.35 * Math.sin(time * 18 + e.x * 0.05);
-        // Dark underlay keeps the fire ring readable on orange enemies (tanks).
-        ctx.globalAlpha = 0.85; ctx.strokeStyle = "#2a0d00"; ctx.lineWidth = 6.5;
-        ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = fl; ctx.strokeStyle = "#ffd23a"; ctx.lineWidth = 3.5;
-        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
-        ctx.stroke();
-        ctx.setLineDash([]);
       }
       if (ven) {
         const n = ven.count;
