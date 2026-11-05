@@ -132,9 +132,12 @@ LST.FxRenderer = class FxRenderer {
       }
       if (burn) {
         const fl = reduced ? 0.8 : 0.65 + 0.35 * Math.sin(time * 18 + e.x * 0.05);
-        ctx.globalAlpha = fl; ctx.strokeStyle = "#ff7a1a"; ctx.lineWidth = 3.5;
-        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
+        // Dark underlay keeps the fire ring readable on orange enemies (tanks).
+        ctx.globalAlpha = 0.85; ctx.strokeStyle = "#2a0d00"; ctx.lineWidth = 6.5;
         ctx.beginPath(); ctx.arc(e.x, e.y, r + 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = fl; ctx.strokeStyle = "#ffd23a"; ctx.lineWidth = 3.5;
+        ctx.setLineDash([7, 6]); ctx.lineDashOffset = reduced ? 0 : -time * 30;
+        ctx.stroke();
         ctx.setLineDash([]);
       }
       if (ven) {
@@ -162,9 +165,11 @@ LST.FxRenderer = class FxRenderer {
       for (let i = 1; i < a.pts.length; i++) {
         const [x0, y0] = a.pts[0 + (i === 1 ? 0 : i - 1)], [x1, y1] = a.pts[i];
         const nx = -(y1 - y0), ny = x1 - x0, L = Math.hypot(nx, ny) || 1;
+        // Bunched targets: bow short bolts outward (alternating sides) so each hop reads as its own arc.
+        const bow = L < 90 ? (90 - L) * 0.55 * (i % 2 ? 1 : -1) : 0;
         ctx.moveTo(x0, y0);
         for (let k = 1; k < 4; k++) {
-          const off = a.jag[j++] * 22;
+          const off = a.jag[j++] * 22 + bow * Math.sin(Math.PI * k / 4);
           ctx.lineTo(x0 + (x1 - x0) * k / 4 + nx / L * off, y0 + (y1 - y0) * k / 4 + ny / L * off);
         }
         ctx.lineTo(x1, y1);

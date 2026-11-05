@@ -94,7 +94,10 @@ function loadGame(seed, unlocked = UNLOCKED) {
 
   // Balance overrides: { config: { ...deep-merged into LST.CONFIG } }
   if (OVERRIDES.config) deepMerge(LST.CONFIG, OVERRIDES.config);
+  // Element tuning: { elements: { ember: { dpsShare: [0.5, 0.2] }, ... } } merged into each element's stats.
+  if (OVERRIDES.elements && LST.ElementRegistry) for (const id in OVERRIDES.elements) Object.assign(LST.ElementRegistry.byId(id).stats, OVERRIDES.elements[id]);
 
+  ELEMENT_WORTH = elementWorth(LST);
   const renderer = VIEW;
   const game = new LST.Game(renderer);
   return { LST, game };
@@ -110,12 +113,29 @@ function offense(t) {
 }
 // Rough steady-state worth of element cards as an offense multiplier (1 when none are owned,
 // so element-free runs score exactly as before).
-const ELEMENT_WORTH = { ember: [0.25, 0.1], venom: [0.2, 0.075], chainSpark: [0.2, 0.1], frostbite: [0.15, 0.05] };
+// Read from the element's live stats, so the bot's opinion follows any retune. Uptime guesses:
+// an enemy lives ~1.5 s under fire (DoT past that is wasted), ~3 venom stacks on average,
+// a freeze is worth about half its length in extra hits on the frozen target.
+let ELEMENT_WORTH = null;
+function elementWorth(LST) {
+  const R = LST.ElementRegistry, w = {};
+  if (!R) return w;
+  for (const el of R.elements) {
+    const S = el.stats;
+    w[el.id] = (l) => el.id === "ember" ? el.at("dpsShare", l) * Math.min(S.time, 1.5)
+      : el.id === "venom" ? el.at("stackShare", l) * Math.min(3, S.maxStacks) * Math.min(S.time, 1.5)
+      : el.id === "chainSpark" ? S.chance * S.share * el.at("jumps", l) * 0.7
+      : el.id === "frostbite" ? 0.5 * el.at("freeze", l) / (S.every / 3) : 0;
+  }
+  const sh = R.pairs.find((p) => p.id === "shatter");
+  w.shatter = sh ? sh.bonus * 0.3 : 0;
+  return w;
+}
 function elementValue(t) {
   if (!t.elements) return 1;
   let v = 1;
-  for (const id in t.elements) { const l = t.elements[id], w = ELEMENT_WORTH[id]; if (l && w) v += w[0] + w[1] * (l - 1); }
-  if (t.elements.ember && t.elements.frostbite) v += 0.05; // Shatter
+  for (const id in t.elements) { const l = t.elements[id], f = ELEMENT_WORTH && ELEMENT_WORTH[id]; if (l && f) v += f(l); }
+  if (t.elements.ember && t.elements.frostbite && ELEMENT_WORTH) v += ELEMENT_WORTH.shatter;
   return v;
 }
 function defense(t) { return t.maxHp * (1 + t.regen * 16 + t.lifesteal * 25); }

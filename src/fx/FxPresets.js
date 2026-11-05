@@ -96,7 +96,7 @@ LST.FX_IMPACTS = {
   // Elemental cards (src/elements): small, frequent hits, so each is a short colored burst with
   // its own sound (sfx) instead of the bass thump, no flash or shake, and a throttle so a fast
   // tower doesn't spray past the particle caps. Shatter is the one with a little punch.
-  elemEmber: { space: "world", burst: { count: 9, speedMul: 0.35 }, colors: ["#fff3a0", "#ffb347", "#ff7a1a"],
+  elemEmber: { space: "world", burst: { count: 9, speedMul: 0.35 }, colors: ["#fff3a0", "#ffd23a", "#3a1200"],
                ring: 34, bloom: 0.22, flash: 0, shake: 0, thump: 0, sfx: "sizzle", throttle: 0.09 },
   elemFrost: { space: "world", burst: { count: 14, speedMul: 0.4 }, colors: ["#ffffff", "#c8f4ff", "#7fe3ff"],
                ring: 52, bloom: 0.3, flash: 0, shake: 0, thump: 0, sfx: "frostCrack", throttle: 0.08 },
