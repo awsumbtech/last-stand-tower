@@ -163,14 +163,14 @@ LST.FX_EMBER_STYLES = {
                core: { color: "#ffffff", width: 1.5 } } },
   // B: hue shifted to crimson (away from the tank's orange) on a dark wine outline.
   b: { colors: ["#ffe3e3", "#ff4d5e", "#c8102e", "#2b0008"],
-       ring: { under: { color: "#2b0008", width: 7.5, alpha: 0.9 }, main: { color: "#ff2e45", width: 4, dash: [8, 5] },
+       ring: { under: { color: "#2b0008", width: 7.5, alpha: 0.9 }, main: { color: "#ff2e45", width: 5, dash: [8, 5] },
                core: { color: "#ffd0d6", width: 1.2 } } },
   // C: dark ember-red smoke disc under white-hot sparks and a white dashed ring.
   c: { colors: ["#ffffff", "#fff8e0", "#ffe6a0", "#4a1000"],
        ring: { halo: { color: "#5a1200", alpha: 0.5, pad: 9 }, under: { color: "#3a0a00", width: 6, alpha: 0.8 },
                main: { color: "#ffffff", width: 3, dash: [7, 6] } } },
 };
-LST.FX_EMBER_STYLE = "b"; // chosen: crimson reads best on orange tanks (see PR)
+LST.FX_EMBER_STYLE = "b"; // B scored best: author 11/12, independent checker 9/12 (PR #3); both picked B
 LST.applyEmberStyle = (id) => {
   const st = LST.FX_EMBER_STYLES[id]; if (!st) return false;
   LST.FX_EMBER_STYLE = id; LST.FX_IMPACTS.elemEmber.colors = st.colors.slice(); return true;
