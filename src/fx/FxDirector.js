@@ -28,6 +28,7 @@ LST.FxDirector = class FxDirector {
     this.camera = new LST.FxCamera(4);
     this.aura = new LST.TowerAura(LST.FX_PRESETS.aura);
     this.renderer = new LST.FxRenderer(doc);
+    this.looks = LST.LookLayer ? new LST.LookLayer(bus) : null; // status looks on enemies (src/elements/looks)
     this.overlay = new LST.FxOverlay(doc);
     this.anchors = new LST.ScreenAnchors(doc);
     this.impacts = new LST.ImpactSync({
@@ -150,6 +151,7 @@ LST.FxDirector = class FxDirector {
   drawProjectiles(ctx, scene) { this.renderer.drawProjectiles(ctx, scene.projectiles, this.quality.low); }
   drawWorld(ctx, scene) {
     if (scene && scene.hasStatus) this.renderer.drawStatusRings(ctx, scene.enemies, this.time, this.quality.reduced, this.quality.low);
+    if (this.looks) this.looks.render(ctx, scene, this.time, this.quality.reduced);
     if (this.arcs.length) this.renderer.drawArcs(ctx, this.arcs, this.quality.low);
     this.renderer.drawPulses(ctx, this.camera, "world", this.frame, 1, this.quality.low);
     this.renderer.drawPool(ctx, this.pools.world, 1, this.quality.low);

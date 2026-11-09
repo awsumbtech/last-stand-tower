@@ -153,5 +153,39 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   check(LST, "retuned:");
   ok(["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"].join() === [1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(LST.ordinal).join(), "ordinal helper: 1st 2nd 3rd 4th 11th 12th 13th 21st 22nd 23rd");
 }
+
+// ---------- Status looks (src/elements/looks): one object per status, attached only while active ----------
+{
+  const { LST } = load(1);
+  const sb = { LST, Math, console };
+  vm.createContext(sb);
+  for (const f of ["StatusLook", "BurnFlames", "IceCrust", "VenomDrips", "SparkCrackle"]) vm.runInContext(fs.readFileSync(path.join(ROOT, "src/elements/looks", f + ".js"), "utf8"), sb, { filename: f });
+  const calls = { fill: 0 };
+  const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (k === "fill" ? () => calls.fill++ : () => {})), set: (t, k, v) => { t[k] = v; return true; } });
+  LST.draw = LST.draw || {}; if (!LST.draw.roundRect) LST.draw.roundRect = () => {};
+  const subs = {}; const bus = { on: (t, fn) => { subs[t] = fn; return () => {}; } };
+  const L = new LST.LookLayer(bus), R = LST.LookRegistry;
+  ok(R.get("burn") === LST.BurnFlames && R.get("frozen") === LST.IceCrust && R.get("venom") === LST.VenomDrips && R.get("spark") === LST.SparkCrackle, "looks: registry maps burn/frozen/venom/spark to their classes");
+  const mk = (type, x) => ({ type, x, y: 0, radius: 20, age: 1 });
+  const a = mk("tank", 0), b = mk("basic", 100), scene = { enemies: [a, b], hasStatus: false };
+  let t = 0; const frame = (dt = 0.1) => { t += dt; calls.fill = 0; L.render(ctx, scene, t, false); return calls.fill; };
+  frame(); ok(L.count === 0 && calls.fill === 0, "looks: nothing attached or drawn with no status");
+  LST.StatusEffects.add(a, new LST.Burn(1, 1)); scene.hasStatus = true;
+  ok(frame() > 0 && L.looksOf(a).get("burn") instanceof LST.BurnFlames && !L.looksOf(b), "looks: BurnFlames attaches to the burning enemy only and draws");
+  LST.StatusEffects.add(b, new LST.Frozen(1)); LST.StatusEffects.add(b, new LST.Poison(1, 1, 3)); frame();
+  ok(L.looksOf(b).get("frozen") instanceof LST.IceCrust && L.looksOf(b).get("venom") instanceof LST.VenomDrips && L.count === 3, "looks: IceCrust + VenomDrips attach to the frozen, poisoned enemy");
+  for (const v of ["a", "b", "c"]) { LST.setLookVariant("flame", v); LST.setLookVariant("ice", v); ok(frame(0) > 0, "looks: variant " + v + " draws"); }
+  LST.setLookVariant("flame", "b"); LST.setLookVariant("ice", "b");
+  ok(!LST.setLookVariant("flame", "z") && LST.LOOK_STYLE.flame === "b", "looks: unknown variant rejected");
+  a.status.burn.time = 0; frame(); ok(!L.looksOf(a) && L.count === 2, "looks: BurnFlames detached the frame the burn ended");
+  b.dead = true; frame(); ok(L.count === 0 && frame() === 0, "looks: a dead enemy's looks are removed, nothing drawn after");
+  const c = mk("basic", 50); scene.enemies.push(c);
+  subs[LST.EVENTS.ELEMENT_HIT]({ element: "chainSpark", x: 0, y: 0, points: [[0, 0], [50, 0]] });
+  ok(L.looksOf(c) && L.looksOf(c).get("spark") instanceof LST.SparkCrackle, "looks: SparkCrackle on an enemy hit by a Chain Spark");
+  const n0 = L.count; subs[LST.EVENTS.ELEMENT_HIT]({ element: "ember", x: 50, y: 0 }); ok(L.count === n0, "looks: other element hits add no event look");
+  frame(0.3); ok(L.count === 0 && frame() === 0, "looks: SparkCrackle removed after its 0.22 s life");
+  LST.StatusEffects.add(c, new LST.Burn(9, 1)); frame(); subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "looks: run start clears every look");
+  calls.fill = 0; L.render(ctx, scene, t + 1, true); ok(calls.fill > 0, "looks: reduced motion still draws (static pose)");
+}
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);
