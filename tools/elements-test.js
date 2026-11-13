@@ -277,13 +277,17 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   s1.slowTimer = 1.2; frame();
   ok(L.looksOf(s1) && L.looksOf(s1).get("chill") instanceof LST.ChillFrost && !L.looksOf(s2), "chill: attaches to the slowed enemy only, with no StatusEffect on it (hasStatus false)");
   ok(calls.draws.length === 0 && !LST.lookSheets.get("ChillFrost"), "chill: asset missing -> nothing drawn (no fallback, no tint)");
-  const CF = sheetJson.ChillFrost || { strips: { attach: { image: "ChillFrost_test_attach.png", frame: { w: 256, h: 288 }, count: 2, fps: 20, loop: false }, main: { image: "ChillFrost_test.png", frame: { w: 256, h: 288 }, count: 4, fps: 8, loop: true } }, anchor: { x: 128, y: 152 }, refBodyR: 88 };
+  const CF = sheetJson.ChillFrost || { strips: { attach: { image: "t_attach.png", frame: { w: 288, h: 288 }, count: 2, fps: 12, loop: false }, still: { image: "t_still.png", frame: { w: 288, h: 288 }, count: 1, fps: 0, loop: false }, loop: { image: "t.png", frame: { w: 288, h: 288 }, count: 4, fps: 8, loop: true } }, anchor: { x: 144, y: 144 }, refBodyR: 88 };
   const cfImg = img.ChillFrost || Object.fromEntries(Object.keys(CF.strips).map((id) => [id, { id: "ChillFrost:" + id }]));
   LST.lookSheets.install("ChillFrost", CF, cfImg);
   { const cf = L.looksOf(s1).get("chill"), S = LST.lookSheets.get("ChillFrost").strips; cf.t = 0;
-    ok(frame(0) === 1 && Object.values(cfImg).includes(calls.draws[0][0]), "chill: draws one ChillFrost image once the sheet is in");
-    if (S.main.count > 1 && S.main.loop) { cf.t = 10; const a1 = cf.pick(S, false); cf.t = 10 + 1 / S.main.fps; const a2 = cf.pick(S, false); ok(a1[0] === "main" && a2[0] === "main" && a1[1] !== a2[1], "chill: main loops by fps after any attach"); }
-    cf.t = 0; ok(cf.pick(S, true).join() === "main,0", "chill: reduced motion = main frame 0, no attach");
+    ok(frame(0) === 1 && calls.draws[0][0] === cfImg.attach, "chill: draws one ChillFrost image (attach) once the sheet is in");
+    { const A = S.attach, Lp = S.loop, seen = [];
+      for (let i = 0; i < A.count; i++) { cf.t = (i + 0.5) / A.fps; seen.push(cf.pick(S, false).join()); }
+      ok(seen.join("|") === [...Array(A.count).keys()].map((i) => "attach," + i).join("|"), "chill: plays the attach one-shot frame by frame first");
+      const lf = []; for (let i = 0; i < Lp.count + 1; i++) { cf.t = A.duration + (i + 0.5) / Lp.fps; lf.push(cf.pick(S, false).join()); }
+      ok(lf.join("|") === [...Array(Lp.count).keys(), 0].map((i) => "loop," + i).join("|"), "chill: then the loop from frame 0 at its fps, wrapping"); }
+    cf.t = 0; ok(cf.pick(S, true).join() === (S.still ? "still,0" : "loop,0"), "chill: reduced motion = the still frame, no attach");
     const d = calls.draws[0], k = LST.StatusLook.bodyR(s1) / (CF.refBodyR || 88);
     ok(Math.abs(d[5] - (s1.x - CF.anchor.x * k)) < 1e-9 && Math.abs(d[6] - (s1.y - CF.anchor.y * k)) < 1e-9, "chill: anchor on the body centre, scaled bodyR / refBodyR"); }
   LST.StatusEffects.add(s1, new LST.Frozen(1)); scene.hasStatus = true; frame(0);
