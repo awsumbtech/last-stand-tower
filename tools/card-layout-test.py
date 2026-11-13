@@ -79,6 +79,7 @@ CHECK = r"""async ({ flipAll }) => {
     if (b.scrollWidth > b.clientWidth + 1) fails.push(`#${b.id}: content wider than button`);
   }
   if (!backs) fails.push("no flippable cards were rendered");
+  window.__cardRows = (window.__cardRows || 0) + groups.length; // case count for the summary line
   return fails;
 }"""
 
@@ -214,6 +215,7 @@ def keyboard_case(p):
 
 def main():
     fails = []
+    cases = {"card rows": 0, "click flows": 0, "keyboard flows": 0, "world-card screens": 0}
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path=os.environ.get("CHROME") or None)
         for w, h in VIEWPORTS:
@@ -227,8 +229,9 @@ def main():
             p.wait_for_timeout(700)  # let deal-in animations settle
             for flip in (False, True):
                 fails += [f"{w}x{h}: {f}" for f in p.evaluate(CHECK, {"flipAll": flip})]
-            fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]
-            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]
+            cases["card rows"] += p.evaluate("window.__cardRows || 0")
+            fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]; cases["click flows"] += 1
+            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]; cases["keyboard flows"] += 1
             ctx.close()
         for w, h in WORLD_VIEWPORTS:
             for open_ in (False, True):
@@ -239,9 +242,13 @@ def main():
                 p.wait_for_function("!!(window.game && window.LST && LST.WorldSelect)")
                 tag = "open" if open_ else "locked"
                 fails += [f"{w}x{h} world cards ({tag}): {f}" for f in p.evaluate(WORLD_CHECK, {"open": open_})]
+                cases["world-card screens"] += 1
                 ctx.close()
         b.close()
     for f in fails: print("FAIL", f)
+    total = sum(cases.values())
+    print(f"card-layout-test: {total} cases (" + ", ".join(f"{n} {k}" for k, n in cases.items()) + ")")
+    if total == 0: fails.append("no cases ran")
     print("card-layout-test:", "PASS" if not fails else f"{len(fails)} failure(s)")
     sys.exit(1 if fails else 0)
 
