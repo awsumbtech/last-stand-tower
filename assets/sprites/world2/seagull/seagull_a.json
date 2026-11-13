@@ -116,7 +116,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "seagull_a.png",
+    "image": "seagull_a.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 518,
@@ -159,7 +159,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "a51459072a585e00b8406fd50e632463184d5a286619cb8d11cfd5d863fec0d1",
+    "sha256": "08c00cc2530e7d53ac6b14798bf4ecce076666e6427abc9f08e14ddd92857c20",
     "entity": "seagull",
     "role": "World 2 fast flyer (immune to slow)",
     "proposedConfig": {
@@ -167,7 +167,7 @@
       "note": "game radius (src/enemies/BeachEnemies.js); art keeps refBodyR 24.3 px"
     },
     "shadow": {
-      "image": "seagull_a_shadow.png",
+      "image": "seagull_a_shadow.q.png",
       "json": "seagull_a_shadow.json"
     },
     "variant": "a",
@@ -186,8 +186,8 @@
           "scale": 0.2421
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -250,6 +250,13 @@
       "maxChannelError": 13,
       "sha256": "08c00cc2530e7d53ac6b14798bf4ecce076666e6427abc9f08e14ddd92857c20",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "seagull_a.png",
+      "sha256": "a51459072a585e00b8406fd50e632463184d5a286619cb8d11cfd5d863fec0d1",
+      "bytes": 37951,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

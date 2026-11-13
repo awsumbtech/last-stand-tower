@@ -1,0 +1,92 @@
+{
+  "source": {
+    "delivery": "Game Art & Motion: last-stand-tower element-looks",
+    "version": "0.1.0",
+    "date": "2026-11-12",
+    "picks": "FINAL-PICKS.md (independent checker, confidence 0.84): BurnFlames a, IceCrust a, VenomDrips a, SparkCrackle c",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "originals": "no quantized copies: the delivered PNGs are the repo files (byte-identical). Raw generations stay in the delivery's _src/ (hashes in its _src/raw/SHA256SUMS)."
+  },
+  "originalsCommitted": false,
+  "files": {
+    "IceCrust/IceCrust_a.json": {
+      "sha256": "298adadc888516cecdcf54965eb68830c8cb1d6c7506975c574997b25d89fd65",
+      "bytes": 2136,
+      "source": "IceCrust/recommended/IceCrust_a.json",
+      "sourceSha256": "85e0359d8038943d80dde460ac85476ee44efa6425ccc62919e3d35cd2ef89e0",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        ".provenance.raw": "_src/raw/ice_a.jpg",
+        ".provenance.styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)"
+      }
+    },
+    "IceCrust/IceCrust_a.png": {
+      "sha256": "7026eff816d5933e67745b2e301bdf99ffe386e373edb921810e8e139872114b",
+      "bytes": 38298,
+      "source": "IceCrust/recommended/IceCrust_a.png",
+      "sourceSha256": "7026eff816d5933e67745b2e301bdf99ffe386e373edb921810e8e139872114b",
+      "edit": "none (byte-identical copy)"
+    },
+    "IceCrust/IceCrust_a_snap.png": {
+      "sha256": "285f5d903916650872c78d1d25da98e3728ed38eca760f675045cefe5e05b8d8",
+      "bytes": 73705,
+      "source": "IceCrust/recommended/IceCrust_a_snap.png",
+      "sourceSha256": "285f5d903916650872c78d1d25da98e3728ed38eca760f675045cefe5e05b8d8",
+      "edit": "none (byte-identical copy)"
+    },
+    "BurnFlames/BurnFlames_a.json": {
+      "sha256": "4b3e0d9363f0f40286326af39f81f17fa854782105c19824575796b27ff8fc7a",
+      "bytes": 1687,
+      "source": "BurnFlames/recommended/BurnFlames_a.json",
+      "sourceSha256": "f2a4e88c36e56992431b507b9128592c81e37b45f1fd8e7b0c07388d8727a7da",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        ".provenance.raw": "_src/raw/flames_a.jpg",
+        ".provenance.styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)"
+      }
+    },
+    "BurnFlames/BurnFlames_a.png": {
+      "sha256": "dd1b5e8a0a9d50307b85fb934dc07c3c5e44d0761e5005a06a9a45a65a3f6bf7",
+      "bytes": 252450,
+      "source": "BurnFlames/recommended/BurnFlames_a.png",
+      "sourceSha256": "dd1b5e8a0a9d50307b85fb934dc07c3c5e44d0761e5005a06a9a45a65a3f6bf7",
+      "edit": "none (byte-identical copy)"
+    },
+    "SparkCrackle/SparkCrackle_c.json": {
+      "sha256": "f4f05fde9ee98fb6933804714b8594bccfc1cf0c336a0db27805cb67306701a3",
+      "bytes": 1513,
+      "source": "SparkCrackle/recommended/SparkCrackle_c.json",
+      "sourceSha256": "1d9aa2af072aaf41d12c8f56d37d08d2c53148f8669f788de7d5cf9ef7f3dcff",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        ".provenance.raw": "_src/raw/spark_c.jpg",
+        ".provenance.styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)"
+      }
+    },
+    "SparkCrackle/SparkCrackle_c.png": {
+      "sha256": "fc63d1ffe7e01ccf07537257c2cacc10637570e7da64b87c93db45bd584f3f26",
+      "bytes": 253657,
+      "source": "SparkCrackle/recommended/SparkCrackle_c.png",
+      "sourceSha256": "fc63d1ffe7e01ccf07537257c2cacc10637570e7da64b87c93db45bd584f3f26",
+      "edit": "none (byte-identical copy)"
+    },
+    "VenomDrips/VenomDrips_a.json": {
+      "sha256": "c82efd631b93abcab096a3d6f2395e12ca8b2aabccace15f41d0e936aee67aca",
+      "bytes": 1619,
+      "source": "VenomDrips/recommended/VenomDrips_a.json",
+      "sourceSha256": "a2f3c2480463efc09228cfccd4da17c8b732cbab2b1d5e86c01f6688e1f2ac87",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        ".provenance.raw": "_src/raw/venom_a.jpg",
+        ".provenance.styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)"
+      }
+    },
+    "VenomDrips/VenomDrips_a.png": {
+      "sha256": "c102021d8881fd44377a55e2457069bf8b2fcae4ecd3f2d1fcf3df1f64495409",
+      "bytes": 85628,
+      "source": "VenomDrips/recommended/VenomDrips_a.png",
+      "sourceSha256": "c102021d8881fd44377a55e2457069bf8b2fcae4ecd3f2d1fcf3df1f64495409",
+      "edit": "none (byte-identical copy)"
+    }
+  }
+}

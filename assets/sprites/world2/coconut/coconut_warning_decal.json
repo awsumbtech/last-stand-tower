@@ -38,7 +38,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "coconut_warning_decal.png",
+    "image": "coconut_warning_decal.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 160,
@@ -81,7 +81,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
+    "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
     "entity": "coconut_warning_decal",
     "role": "ground target warning where a coconut will land; draw under enemies",
     "scaleRule": "drawScale = impactRadius_world / 37.5 (outer ring radius is 75 px = 37.5 world units at 2 px/unit); pulse alpha/scale in code if wanted",
@@ -100,8 +100,8 @@
           "scale": 0.2246
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -133,6 +133,13 @@
       "maxChannelError": 18,
       "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "coconut_warning_decal.png",
+      "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
+      "bytes": 31459,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

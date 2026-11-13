@@ -1,0 +1,724 @@
+{
+  "source": {
+    "delivery": "Game Art & Motion: last-stand-tower world2-beach",
+    "version": "0.1.1",
+    "date": "2026-11-12",
+    "picks": "FINAL-PICKS.md + CHANGELOG-v0.1.1.md (independent checker picks: background a, hermit crab a, seagull a, Crabclaw b, Elite shell c)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower via Grok Bot GenerateImage; no third-party assets.",
+    "originals": "RGBA masters total 6.8 MB, over the ~3 MB repo budget: not committed, hashes below (quantizedFrom / originalImage)."
+  },
+  "originalsCommitted": false,
+  "files": {
+    "cards/card_backyard.png": {
+      "sha256": "d8a383b440930693090cae13d507ec37d7f357d3891065c1f353631c1e6e84e2",
+      "bytes": 267822,
+      "source": "cards/card_backyard.png",
+      "sourceSha256": "d8a383b440930693090cae13d507ec37d7f357d3891065c1f353631c1e6e84e2",
+      "edit": "none (byte-identical copy)",
+      "generatedFrom": [
+        {
+          "rawKey": "card_backyard",
+          "raw": "_src/raw/card_backyard.jpg",
+          "rawSha256": "fb7b241760330a69455bad06c61212211a2eb582da002af9f3ffc0b3f319961f",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        }
+      ]
+    },
+    "cards/card_beach.png": {
+      "sha256": "231bc1372c9d7c816247088680292a7289d9ded13de7b042a5e41e81807cc053",
+      "bytes": 272250,
+      "source": "cards/card_beach.png",
+      "sourceSha256": "231bc1372c9d7c816247088680292a7289d9ded13de7b042a5e41e81807cc053",
+      "edit": "none (byte-identical copy)",
+      "generatedFrom": [
+        {
+          "rawKey": "card_beach",
+          "raw": "_src/raw/card_beach.jpg",
+          "rawSha256": "c1e0eaf5e337883e08cac2538bcaba0c1ba7da750d95d9a86184ed753c6762df",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        }
+      ]
+    },
+    "cards/card_locked_overlay.png": {
+      "sha256": "40702d8b2ae9f3782b16cd4237cb3b6f4ce3d1bd888f0623b856f1ac1243fd8e",
+      "bytes": 215929,
+      "source": "cards/card_locked_overlay.png",
+      "sourceSha256": "40702d8b2ae9f3782b16cd4237cb3b6f4ce3d1bd888f0623b856f1ac1243fd8e",
+      "edit": "none (byte-identical copy)",
+      "generatedFrom": [
+        {
+          "rawKey": "card_locked",
+          "raw": "_src/raw/card_locked.jpg",
+          "rawSha256": "e2c755ce1902b874f3bc412ffc9a8014a8aeccedfa99217db604f629c474f57c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        }
+      ]
+    },
+    "cards/cards.json": {
+      "sha256": "94d67d3717cb0a42f84386b2ff0f54225e937e9d8aeee1b8fb3ab28ebdf533cc",
+      "bytes": 1700,
+      "source": "cards/cards.json",
+      "sourceSha256": "10106ebaf982aa7f4a78e6f7b34e01b49d273eea123298e5db8a595737fe9328",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "cards.card_backyard.hiRes": "card_backyard@960x576.png",
+        "cards.card_backyard.hiResSize": [
+          960,
+          576
+        ],
+        "cards.card_backyard.raw": "_src/raw/card_backyard.jpg",
+        "cards.card_backyard.rawSha256": "fb7b241760330a69455bad06c61212211a2eb582da002af9f3ffc0b3f319961f",
+        "cards.card_beach.hiRes": "card_beach@960x576.png",
+        "cards.card_beach.hiResSize": [
+          960,
+          576
+        ],
+        "cards.card_beach.raw": "_src/raw/card_beach.jpg",
+        "cards.card_beach.rawSha256": "c1e0eaf5e337883e08cac2538bcaba0c1ba7da750d95d9a86184ed753c6762df",
+        "cards.card_locked_overlay.hiRes": "card_locked_overlay@960x576.png",
+        "cards.card_locked_overlay.hiResSize": [
+          960,
+          576
+        ],
+        "cards.card_locked_overlay.raw": "_src/raw/card_locked.jpg",
+        "cards.card_locked_overlay.rawSha256": "e2c755ce1902b874f3bc412ffc9a8014a8aeccedfa99217db604f629c474f57c"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "card_backyard",
+          "raw": "_src/raw/card_backyard.jpg",
+          "rawSha256": "fb7b241760330a69455bad06c61212211a2eb582da002af9f3ffc0b3f319961f",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        },
+        {
+          "rawKey": "card_beach",
+          "raw": "_src/raw/card_beach.jpg",
+          "rawSha256": "c1e0eaf5e337883e08cac2538bcaba0c1ba7da750d95d9a86184ed753c6762df",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        },
+        {
+          "rawKey": "card_locked",
+          "raw": "_src/raw/card_locked.jpg",
+          "rawSha256": "e2c755ce1902b874f3bc412ffc9a8014a8aeccedfa99217db604f629c474f57c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:25:36"
+        }
+      ]
+    },
+    "coconut/coconut_spin.json": {
+      "sha256": "9d2f9b9f6a940529a9831294f9f66f30c0e1d65aa11c406cc403bea906961894",
+      "bytes": 6345,
+      "source": "coconut/coconut_spin.json",
+      "sourceSha256": "d72fe966a9228db77d4af73777f7fa6cf53425ad776ee3ec6e0f5d8bc997863e",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "coconut_spin.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "coconut_spin",
+          "raw": "_src/raw/coconut_spin.jpg",
+          "rawSha256": "7117a1309952da0d4069a801096e64bf8e4cf285fd93c563aa0361b4b4d56d19",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "coconut/coconut_spin.q.png": {
+      "sha256": "64274f7ed5cbd588ed6c7b7eec692abb7a1b0b386f86817ee952857226525ca1",
+      "bytes": 6077,
+      "source": "coconut/coconut_spin.q.png",
+      "sourceSha256": "64274f7ed5cbd588ed6c7b7eec692abb7a1b0b386f86817ee952857226525ca1",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "coconut_spin.png",
+        "source": "coconut/coconut_spin.png",
+        "sha256": "9dd08ea99a8da8691c43a54155b20a511ad2ebb78519293d01bf72271a251acc",
+        "bytes": 13825,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "coconut_spin",
+          "raw": "_src/raw/coconut_spin.jpg",
+          "rawSha256": "7117a1309952da0d4069a801096e64bf8e4cf285fd93c563aa0361b4b4d56d19",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "coconut/coconut_splat.json": {
+      "sha256": "4e484f351db1ef12b1b3e0f0128f577e4890203af412f72eebe207b5be5d4edc",
+      "bytes": 6526,
+      "source": "coconut/coconut_splat.json",
+      "sourceSha256": "7e4af00b4576bcfef6c1a07afa464f50e04fc118e8626f79ffda0dddcbff38f7",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "coconut_splat.png",
+        ".meta.usesCellsOf": "_src/raw/coconut_fx.jpg bottom row cells 1-3 (top row and cell 8 rejected)",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "coconut_fx",
+          "raw": "_src/raw/coconut_fx.jpg",
+          "rawSha256": "5cb20b7e34b1603f1a105d774d6c0be4b5f652ca9ee7589910673973a6199b15",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "coconut/coconut_splat.q.png": {
+      "sha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
+      "bytes": 8300,
+      "source": "coconut/coconut_splat.q.png",
+      "sourceSha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "coconut_splat.png",
+        "source": "coconut/coconut_splat.png",
+        "sha256": "a8b1f883fddfc7f716b515eb2d37ab7595caac9a7fdc49c3d636ce63b20bc586",
+        "bytes": 26413,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "coconut_fx",
+          "raw": "_src/raw/coconut_fx.jpg",
+          "rawSha256": "5cb20b7e34b1603f1a105d774d6c0be4b5f652ca9ee7589910673973a6199b15",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "coconut/coconut_warning_decal.json": {
+      "sha256": "fbc7a37f90db8fe7573f4113a1aa8c4f078d02f64878be2dd6373a66297055d0",
+      "bytes": 4308,
+      "source": "coconut/coconut_warning_decal.json",
+      "sourceSha256": "b7faaeaaf44978d264a9b06e910dbb7e6c251b7dddef71a4127f6a2ceaafd9a2",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "coconut_warning_decal.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "warning_decal",
+          "raw": "_src/raw/warning_decal.jpg",
+          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "coconut/coconut_warning_decal.q.png": {
+      "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+      "bytes": 10244,
+      "source": "coconut/coconut_warning_decal.q.png",
+      "sourceSha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "coconut_warning_decal.png",
+        "source": "coconut/coconut_warning_decal.png",
+        "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
+        "bytes": 31459,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "warning_decal",
+          "raw": "_src/raw/warning_decal.jpg",
+          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:23:10"
+        }
+      ]
+    },
+    "seagull/seagull_a.json": {
+      "sha256": "fbf9fb6a3762e0f85e7b9e85c37ea5f5e67af982bf964fa616f8ab89ac8b5b3b",
+      "bytes": 6449,
+      "source": "seagull/recommended/seagull_a.json",
+      "sourceSha256": "40d385ebff3c455b8ced1c1ce4d8416a9569868c2c7904fd7c5d140c0e60a65f",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "seagull_a.png",
+        "meta.shadow.image": "seagull_a_shadow.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "gull_a",
+          "raw": "_src/raw/gull_a.jpg",
+          "rawSha256": "70299dd554ecf47467fce19f29be5adbbfc2e065a09ab5953bc6c6401ddad54c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:12:59"
+        }
+      ]
+    },
+    "seagull/seagull_a.q.png": {
+      "sha256": "08c00cc2530e7d53ac6b14798bf4ecce076666e6427abc9f08e14ddd92857c20",
+      "bytes": 12189,
+      "source": "seagull/recommended/seagull_a.q.png",
+      "sourceSha256": "08c00cc2530e7d53ac6b14798bf4ecce076666e6427abc9f08e14ddd92857c20",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "seagull_a.png",
+        "source": "seagull/recommended/seagull_a.png",
+        "sha256": "a51459072a585e00b8406fd50e632463184d5a286619cb8d11cfd5d863fec0d1",
+        "bytes": 37951,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "gull_a",
+          "raw": "_src/raw/gull_a.jpg",
+          "rawSha256": "70299dd554ecf47467fce19f29be5adbbfc2e065a09ab5953bc6c6401ddad54c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:12:59"
+        }
+      ]
+    },
+    "seagull/seagull_a_shadow.json": {
+      "sha256": "9ca9739d93cef16dc7a44c184f749083c95a2286a36342e2bf31539b7ea6e5d4",
+      "bytes": 3668,
+      "source": "seagull/recommended/seagull_a_shadow.json",
+      "sourceSha256": "1a81b883d2e57fc4457ce758216af303520ab46b7805b76b968cc3b5dc665947",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "seagull_a_shadow.png",
+        ".meta.provenance.raw": "_src/raw/gull_shadows.jpg"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "gull_shadows",
+          "raw": "_src/raw/gull_shadows.jpg",
+          "rawSha256": "e1d861414d632f72f4a9ade3325413cef7352b2e32bbf4d339effd67e6454096",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:12:59"
+        }
+      ]
+    },
+    "seagull/seagull_a_shadow.q.png": {
+      "sha256": "9c3ed4019492a48ad37eeaec9ef6260c7968bdaa2e3079f90b051fb1ba8096a9",
+      "bytes": 1609,
+      "source": "seagull/recommended/seagull_a_shadow.q.png",
+      "sourceSha256": "9c3ed4019492a48ad37eeaec9ef6260c7968bdaa2e3079f90b051fb1ba8096a9",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "seagull_a_shadow.png",
+        "source": "seagull/recommended/seagull_a_shadow.png",
+        "sha256": "1c43e861bd52b3a40ef50c0f6215ffd17c7db92fbe79835f93150dd9be44c4da",
+        "bytes": 2721,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "gull_shadows",
+          "raw": "_src/raw/gull_shadows.jpg",
+          "rawSha256": "e1d861414d632f72f4a9ade3325413cef7352b2e32bbf4d339effd67e6454096",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:12:59"
+        }
+      ]
+    },
+    "crabclaw/crabclaw_b.json": {
+      "sha256": "1b0805b5fef44141d4144cac6e6e12347ce038df7a51a0c12b4e1c79f5c973a8",
+      "bytes": 15890,
+      "source": "crabclaw/recommended/crabclaw_b.json",
+      "sourceSha256": "f3daad620256848238c06a4bc11f145b009ef505cf3dff87623ab34ccabb979c",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "crabclaw_b.png",
+        "meta.layerSet.normal": "crabclaw_b.png/json",
+        "meta.layerSet.angry": "crabclaw_b_angry.png/json",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "boss_b_walk",
+          "raw": "_src/raw/boss_b_walk.jpg",
+          "rawSha256": "2910fcd6e41b73207b55d238913ce131a8322d3b84d8333335343f7c395e2337",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:18"
+        },
+        {
+          "rawKey": "boss_b_idle",
+          "raw": "_src/raw/boss_b_idle.jpg",
+          "rawSha256": "1523baeb173352246bb569321af8df7125fdba2dfcaf1bc0ea9ae2699a9ee62e",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:48:42"
+        },
+        {
+          "rawKey": "boss_b_throw_v011",
+          "raw": "_src/raw/boss_b_throw_v011.jpg",
+          "rawSha256": "4337f15b7e637f74959c089ae801ae209e9f6e02ac27afa36015c5c6df43bf50",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_hurt",
+          "raw": "_src/raw/boss_b_hurt.jpg",
+          "rawSha256": "63fd0ff95051a2eac223109b22d3209c143e8683d5d59f5921589c84b341ccbf",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        }
+      ]
+    },
+    "crabclaw/crabclaw_b.q.png": {
+      "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
+      "bytes": 266030,
+      "source": "crabclaw/recommended/crabclaw_b.q.png",
+      "sourceSha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "crabclaw_b.png",
+        "source": "crabclaw/recommended/crabclaw_b.png",
+        "sha256": "c20892a3f7f95ada0b7e2ad14b261f1abe41acbe6676d031a254ad0ccbc06d71",
+        "bytes": 931679,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "boss_b_walk",
+          "raw": "_src/raw/boss_b_walk.jpg",
+          "rawSha256": "2910fcd6e41b73207b55d238913ce131a8322d3b84d8333335343f7c395e2337",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:18"
+        },
+        {
+          "rawKey": "boss_b_idle",
+          "raw": "_src/raw/boss_b_idle.jpg",
+          "rawSha256": "1523baeb173352246bb569321af8df7125fdba2dfcaf1bc0ea9ae2699a9ee62e",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:48:42"
+        },
+        {
+          "rawKey": "boss_b_throw_v011",
+          "raw": "_src/raw/boss_b_throw_v011.jpg",
+          "rawSha256": "4337f15b7e637f74959c089ae801ae209e9f6e02ac27afa36015c5c6df43bf50",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_hurt",
+          "raw": "_src/raw/boss_b_hurt.jpg",
+          "rawSha256": "63fd0ff95051a2eac223109b22d3209c143e8683d5d59f5921589c84b341ccbf",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        }
+      ]
+    },
+    "crabclaw/crabclaw_b_angry.json": {
+      "sha256": "6961cd029a84757f9f5b278746edc3cefccc52429fbf69b1a8785fc243416a73",
+      "bytes": 15868,
+      "source": "crabclaw/recommended/crabclaw_b_angry.json",
+      "sourceSha256": "c6dc1553b07e2c84cd7e86f4cce6ace761ab916382d93af03f4f569ac73def2f",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "crabclaw_b_angry.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "boss_b_angry",
+          "raw": "_src/raw/boss_b_angry.jpg",
+          "rawSha256": "2e11088572ccffc7d7ff284b8b901b82a57ee38834857a95a8addef1ed2c1329",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        },
+        {
+          "rawKey": "boss_b_angry_idle",
+          "raw": "_src/raw/boss_b_angry_idle.jpg",
+          "rawSha256": "15278d5ba477a96633a54f4a2a176d1dcdf7b793b5b72145b6f81b7244877ef6",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_angry_throw",
+          "raw": "_src/raw/boss_b_angry_throw.jpg",
+          "rawSha256": "6939d513db834f87baba523fd5bc5944127626f1f13accea64ad2c0f258b1bf9",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_hurt",
+          "raw": "_src/raw/boss_b_hurt.jpg",
+          "rawSha256": "63fd0ff95051a2eac223109b22d3209c143e8683d5d59f5921589c84b341ccbf",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        }
+      ]
+    },
+    "crabclaw/crabclaw_b_angry.q.png": {
+      "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
+      "bytes": 290388,
+      "source": "crabclaw/recommended/crabclaw_b_angry.q.png",
+      "sourceSha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "crabclaw_b_angry.png",
+        "source": "crabclaw/recommended/crabclaw_b_angry.png",
+        "sha256": "4e98c2213f845af54786f23804b11328e5b6727b83659652d793ade2d68c218b",
+        "bytes": 1057466,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "boss_b_angry",
+          "raw": "_src/raw/boss_b_angry.jpg",
+          "rawSha256": "2e11088572ccffc7d7ff284b8b901b82a57ee38834857a95a8addef1ed2c1329",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        },
+        {
+          "rawKey": "boss_b_angry_idle",
+          "raw": "_src/raw/boss_b_angry_idle.jpg",
+          "rawSha256": "15278d5ba477a96633a54f4a2a176d1dcdf7b793b5b72145b6f81b7244877ef6",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_angry_throw",
+          "raw": "_src/raw/boss_b_angry_throw.jpg",
+          "rawSha256": "6939d513db834f87baba523fd5bc5944127626f1f13accea64ad2c0f258b1bf9",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:47:43"
+        },
+        {
+          "rawKey": "boss_b_hurt",
+          "raw": "_src/raw/boss_b_hurt.jpg",
+          "rawSha256": "63fd0ff95051a2eac223109b22d3209c143e8683d5d59f5921589c84b341ccbf",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:19:19"
+        }
+      ]
+    },
+    "hermit_crab/hermit_crab_a.json": {
+      "sha256": "6d1a6603182c10abcc31f547a28a8a4d33868e6814bacbee84886dbe7a7f70ae",
+      "bytes": 18249,
+      "source": "hermit_crab/recommended/hermit_crab_a.json",
+      "sourceSha256": "0358fbaa4c31860a47a703263e8cde40e6d35952b74a415ebbcd715f9227a7d7",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "hermit_crab_a.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "crab_a_model_v011",
+          "raw": "_src/raw/crab_a_model_v011.jpg",
+          "rawSha256": "e824252abd33d8d9b1c3697cd93a58b8c46609a8b6b549ca7526c34aedb38666",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:48:43"
+        },
+        {
+          "rawKey": "crab_a_walk_v011",
+          "raw": "_src/raw/crab_a_walk_v011.jpg",
+          "rawSha256": "04ac31e6fa5162ad54695d1e794e348e7b2bc7036322ae9293e10ca0ad8f8900",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:03"
+        },
+        {
+          "rawKey": "crab_a_broken_v011",
+          "raw": "_src/raw/crab_a_broken_v011.jpg",
+          "rawSha256": "e6e0e61bcbec1550be7c4f6f1c9c3536a9e6035c0513fa7098031074799a3b1d",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:39"
+        },
+        {
+          "rawKey": "crab_a_crack_v011",
+          "raw": "_src/raw/crab_a_crack_v011.jpg",
+          "rawSha256": "9d00f1d1987ed2555bf46d7b52dbb163388567c3c3d888c7ea08e95a6f9582fc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:51:09"
+        },
+        {
+          "rawKey": "crab_a_regrow_v011",
+          "raw": "_src/raw/crab_a_regrow_v011.jpg",
+          "rawSha256": "2c2d7ed0d5840ba48c18f4d67ec1e5719713ff4b042016a4b517d1d4eafcb569",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:03"
+        }
+      ]
+    },
+    "hermit_crab/hermit_crab_a.q.png": {
+      "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
+      "bytes": 91854,
+      "source": "hermit_crab/recommended/hermit_crab_a.q.png",
+      "sourceSha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "hermit_crab_a.png",
+        "source": "hermit_crab/recommended/hermit_crab_a.png",
+        "sha256": "02ce87b7a2ad7264710486d669585da2bdeefe2bd294d56a7745cb81a4df49ef",
+        "bytes": 323685,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "crab_a_model_v011",
+          "raw": "_src/raw/crab_a_model_v011.jpg",
+          "rawSha256": "e824252abd33d8d9b1c3697cd93a58b8c46609a8b6b549ca7526c34aedb38666",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:48:43"
+        },
+        {
+          "rawKey": "crab_a_walk_v011",
+          "raw": "_src/raw/crab_a_walk_v011.jpg",
+          "rawSha256": "04ac31e6fa5162ad54695d1e794e348e7b2bc7036322ae9293e10ca0ad8f8900",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:03"
+        },
+        {
+          "rawKey": "crab_a_broken_v011",
+          "raw": "_src/raw/crab_a_broken_v011.jpg",
+          "rawSha256": "e6e0e61bcbec1550be7c4f6f1c9c3536a9e6035c0513fa7098031074799a3b1d",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:39"
+        },
+        {
+          "rawKey": "crab_a_crack_v011",
+          "raw": "_src/raw/crab_a_crack_v011.jpg",
+          "rawSha256": "9d00f1d1987ed2555bf46d7b52dbb163388567c3c3d888c7ea08e95a6f9582fc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:51:09"
+        },
+        {
+          "rawKey": "crab_a_regrow_v011",
+          "raw": "_src/raw/crab_a_regrow_v011.jpg",
+          "rawSha256": "2c2d7ed0d5840ba48c18f4d67ec1e5719713ff4b042016a4b517d1d4eafcb569",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:50:03"
+        }
+      ]
+    },
+    "background/beach_bg_a.json": {
+      "sha256": "cc1f92f08288a932fc07ce45670c09e0f8667dbbdd469ef803ab0baf7c3b285b",
+      "bytes": 4172,
+      "source": "background/recommended/beach_bg_a.json",
+      "sourceSha256": "dce960f5317393bf5eb6d958e52fb49aa2123f7d7c5701b0d52ccc73b29b84aa",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "beach_bg_a.png",
+        ".meta.provenance.raw": "_src/raw/bg_a.jpg"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "bg_a",
+          "raw": "_src/raw/bg_a.jpg",
+          "rawSha256": "72f93ea273d9e94d6171a59f9d747644bc57af49e85e07e17cc7ee1924ac273e",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:01:19"
+        }
+      ]
+    },
+    "background/beach_bg_a.q.png": {
+      "sha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
+      "bytes": 484637,
+      "source": "background/recommended/beach_bg_a.q.png",
+      "sourceSha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "beach_bg_a.png",
+        "source": "background/recommended/beach_bg_a.png",
+        "sha256": "52e957f73bbf5280fa4d23fe9c855acc6146b6de5496ba7225f661a40f834c2a",
+        "bytes": 907577,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "bg_a",
+          "raw": "_src/raw/bg_a.jpg",
+          "rawSha256": "72f93ea273d9e94d6171a59f9d747644bc57af49e85e07e17cc7ee1924ac273e",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:01:19"
+        }
+      ]
+    },
+    "background/beach_surf.json": {
+      "sha256": "75b3d536848cba0dad64129fe7df58ad37fe96a6220290e89b819581e03c1a4a",
+      "bytes": 5402,
+      "source": "background/recommended/beach_surf.json",
+      "sourceSha256": "cf40689a3b05b1a05a4b322760fce541d273f85c83c7bd218d62f242033742aa",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "beach_surf.png",
+        ".meta.provenance.raw": "_src/raw/surf_v011.jpg"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "surf_v011",
+          "raw": "_src/raw/surf_v011.jpg",
+          "rawSha256": "72caad9b5983ee7af81cc523c96697e29a76e6fa21b6603040a79ea0b87126dc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:56:24"
+        }
+      ]
+    },
+    "background/beach_surf.q.png": {
+      "sha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
+      "bytes": 474158,
+      "source": "background/recommended/beach_surf.q.png",
+      "sourceSha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "beach_surf.png",
+        "source": "background/recommended/beach_surf.png",
+        "sha256": "25a183ab749cbf5ca4dbcedd6511e35a4d9652d13ce0bcc54655f50e7d4d7bc7",
+        "bytes": 1191684,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "surf_v011",
+          "raw": "_src/raw/surf_v011.jpg",
+          "rawSha256": "72caad9b5983ee7af81cc523c96697e29a76e6fa21b6603040a79ea0b87126dc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:56:24"
+        }
+      ]
+    },
+    "elite_shell/elite_shell_c.json": {
+      "sha256": "53be34870ddaafb76a8c32e473e1cda3a9fd8e7a3144cdfafa86381ef2d4ac7d",
+      "bytes": 13422,
+      "source": "elite_shell/recommended/elite_shell_c.json",
+      "sourceSha256": "acb069c83e8e1399cfb8e48a6cab02a1d806eb82e285fa6bfbf7532b237e36f7",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "meta.image (delivery)": "elite_shell_c.png",
+        ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
+      }
+    },
+    "elite_shell/elite_shell_c.q.png": {
+      "sha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
+      "bytes": 147986,
+      "source": "elite_shell/recommended/elite_shell_c.q.png",
+      "sourceSha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "elite_shell_c.png",
+        "source": "elite_shell/recommended/elite_shell_c.png",
+        "sha256": "d92e7cba4b3e99a954a8d53cc95ebbca6f3c77a814ffc7c35c34316b359be329",
+        "bytes": 479556,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    }
+  }
+}

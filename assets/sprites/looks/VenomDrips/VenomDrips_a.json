@@ -41,11 +41,10 @@
   },
   "provenance": {
     "generator": "Grok Bot GenerateImage (cursor namespace)",
-    "raw": "_src/raw/venom_a.jpg",
     "rawSha256": "4c83f7c89075979859034d942eddbe014159af9a08348c9240f99cb2640b6e5e",
-    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
     "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.6007, register, strip)",
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
-    "prompt": "4-frame 2x2: lime goo band on block bottom edge, three drips, bubble; drip stretch/fall + bubble pop loop."
+    "prompt": "4-frame 2x2: lime goo band on block bottom edge, three drips, bubble; drip stretch/fall + bubble pop loop.",
+    "see": "../PROVENANCE.json"
   }
 }

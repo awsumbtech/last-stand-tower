@@ -116,7 +116,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "beach_surf.png",
+    "image": "beach_surf.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 6150,
@@ -163,11 +163,11 @@
     "layering": "draw after the ground, before the range ring and enemies",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
-      "raw": "_src/raw/surf_v011.jpg",
       "rawSha256": "72caad9b5983ee7af81cc523c96697e29a76e6fa21b6603040a79ea0b87126dc",
-      "postProcess": "_tools/v011_static.py: pinkness matte key, red despill, 4 bands registered on their top foam edge (src tops [95, 319, 555, 805]), scale x1.500, one horizontal row, 2 px gutter"
+      "postProcess": "_tools/v011_static.py: pinkness matte key, red despill, 4 bands registered on their top foam edge (src tops [95, 319, 555, 805]), scale x1.500, one horizontal row, 2 px gutter",
+      "see": "../PROVENANCE.json"
     },
-    "sha256": "25a183ab749cbf5ca4dbcedd6511e35a4d9652d13ce0bcc54655f50e7d4d7bc7",
+    "sha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
     "quantizedCopy": {
       "image": "beach_surf.q.png",
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
@@ -181,6 +181,13 @@
       "maxChannelError": 27,
       "sha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "beach_surf.png",
+      "sha256": "25a183ab749cbf5ca4dbcedd6511e35a4d9652d13ce0bcc54655f50e7d4d7bc7",
+      "bytes": 1191684,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

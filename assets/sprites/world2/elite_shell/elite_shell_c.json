@@ -336,7 +336,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "elite_shell_c.png",
+    "image": "elite_shell_c.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 1222,
@@ -391,7 +391,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "d92e7cba4b3e99a954a8d53cc95ebbca6f3c77a814ffc7c35c34316b359be329",
+    "sha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
     "entity": "elite_shell",
     "role": "Elite Big Red (Beach Gate III) ShellShield overlay, drawn on top of Big Red's own sprite by EliteShellRenderer",
     "variant": "c",
@@ -442,8 +442,8 @@
           "scale": 0.4953
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -586,6 +586,13 @@
       "maxChannelError": 44,
       "sha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "elite_shell_c.png",
+      "sha256": "d92e7cba4b3e99a954a8d53cc95ebbca6f3c77a814ffc7c35c34316b359be329",
+      "bytes": 479556,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

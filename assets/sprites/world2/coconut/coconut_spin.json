@@ -116,7 +116,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "coconut_spin.png",
+    "image": "coconut_spin.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 262,
@@ -159,7 +159,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "9dd08ea99a8da8691c43a54155b20a511ad2ebb78519293d01bf72271a251acc",
+    "sha256": "64274f7ed5cbd588ed6c7b7eec692abb7a1b0b386f86817ee952857226525ca1",
     "entity": "coconut",
     "role": "Captain Crabclaw's lobbed projectile",
     "proposedConfig": {
@@ -182,8 +182,8 @@
           "scale": 0.1318
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -246,6 +246,13 @@
       "maxChannelError": 10,
       "sha256": "64274f7ed5cbd588ed6c7b7eec692abb7a1b0b386f86817ee952857226525ca1",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "coconut_spin.png",
+      "sha256": "9dd08ea99a8da8691c43a54155b20a511ad2ebb78519293d01bf72271a251acc",
+      "bytes": 13825,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

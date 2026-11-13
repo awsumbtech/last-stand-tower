@@ -7,17 +7,11 @@
         600,
         360
       ],
-      "hiRes": "card_backyard@960x576.png",
-      "hiResSize": [
-        960,
-        576
-      ],
       "alpha": false,
-      "raw": "_src/raw/card_backyard.jpg",
-      "rawSha256": "fb7b241760330a69455bad06c61212211a2eb582da002af9f3ffc0b3f319961f",
       "sha256": "d8a383b440930693090cae13d507ec37d7f357d3891065c1f353631c1e6e84e2",
       "postProcess": "centre-crop 1024x576 -> 960x576 (5:3), LANCZOS to 600x360",
-      "license": "Original art generated for Last Stand Tower; no third-party packs."
+      "license": "Original art generated for Last Stand Tower; no third-party packs.",
+      "provenance": "see ../PROVENANCE.json"
     },
     "card_beach": {
       "image": "card_beach.png",
@@ -25,17 +19,11 @@
         600,
         360
       ],
-      "hiRes": "card_beach@960x576.png",
-      "hiResSize": [
-        960,
-        576
-      ],
       "alpha": false,
-      "raw": "_src/raw/card_beach.jpg",
-      "rawSha256": "c1e0eaf5e337883e08cac2538bcaba0c1ba7da750d95d9a86184ed753c6762df",
       "sha256": "231bc1372c9d7c816247088680292a7289d9ded13de7b042a5e41e81807cc053",
       "postProcess": "centre-crop 1024x576 -> 960x576 (5:3), LANCZOS to 600x360",
-      "license": "Original art generated for Last Stand Tower; no third-party packs."
+      "license": "Original art generated for Last Stand Tower; no third-party packs.",
+      "provenance": "see ../PROVENANCE.json"
     },
     "card_locked_overlay": {
       "image": "card_locked_overlay.png",
@@ -43,18 +31,12 @@
         600,
         360
       ],
-      "hiRes": "card_locked_overlay@960x576.png",
-      "hiResSize": [
-        960,
-        576
-      ],
       "alpha": true,
-      "raw": "_src/raw/card_locked.jpg",
-      "rawSha256": "e2c755ce1902b874f3bc412ffc9a8014a8aeccedfa99217db604f629c474f57c",
       "sha256": "40702d8b2ae9f3782b16cd4237cb3b6f4ce3d1bd888f0623b856f1ac1243fd8e",
       "postProcess": "key green, centre-crop 1024x576 -> 960x576 (5:3), LANCZOS to 600x360",
       "license": "Original art generated for Last Stand Tower; no third-party packs.",
-      "use": "draw over a locked world's card (same 600x360 rect). It has no dim wash baked in; dim/desaturate the card under it in code if wanted. Leave the lock condition text to the UI."
+      "use": "draw over a locked world's card (same 600x360 rect). It has no dim wash baked in; dim/desaturate the card under it in code if wanted. Leave the lock condition text to the UI.",
+      "provenance": "see ../PROVENANCE.json"
     }
   },
   "note": "Full-bleed illustrations with no text or frame: the UI draws the card frame, name, best wave, Gear multiplier and lock condition."

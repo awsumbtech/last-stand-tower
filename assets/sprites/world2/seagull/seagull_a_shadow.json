@@ -38,7 +38,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "seagull_a_shadow.png",
+    "image": "seagull_a_shadow.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 128,
@@ -81,12 +81,12 @@
     },
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
-      "raw": "_src/raw/gull_shadows.jpg",
       "rawSha256": "e1d861414d632f72f4a9ade3325413cef7352b2e32bbf4d339effd67e6454096",
       "silhouette": "left",
-      "postProcess": "_tools/shadows.py: key white, split, scale x0.2119 to 0.9 x median gull span, alpha x0.35"
+      "postProcess": "_tools/shadows.py: key white, split, scale x0.2119 to 0.9 x median gull span, alpha x0.35",
+      "see": "../PROVENANCE.json"
     },
-    "sha256": "1c43e861bd52b3a40ef50c0f6215ffd17c7db92fbe79835f93150dd9be44c4da",
+    "sha256": "9c3ed4019492a48ad37eeaec9ef6260c7968bdaa2e3079f90b051fb1ba8096a9",
     "note": "no MANIFEST slot (optional extra); draw under the gull at globalAlpha 1 (0.35 is baked in)",
     "quantizedCopy": {
       "image": "seagull_a_shadow.q.png",
@@ -101,6 +101,13 @@
       "maxChannelError": 2,
       "sha256": "9c3ed4019492a48ad37eeaec9ef6260c7968bdaa2e3079f90b051fb1ba8096a9",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "seagull_a_shadow.png",
+      "sha256": "1c43e861bd52b3a40ef50c0f6215ffd17c7db92fbe79835f93150dd9be44c4da",
+      "bytes": 2721,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

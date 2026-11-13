@@ -38,7 +38,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "beach_bg_a.png",
+    "image": "beach_bg_a.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 1536,
@@ -103,11 +103,11 @@
     },
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace), 768x1024 output",
-      "raw": "_src/raw/bg_a.jpg",
       "rawSha256": "72f93ea273d9e94d6171a59f9d747644bc57af49e85e07e17cc7ee1924ac273e",
-      "postProcess": "_tools/background.py: 2x LANCZOS upscale to 1536x2048 (the generator's max is 768x1024, so the art is upscaled, not authored at 1536)"
+      "postProcess": "_tools/background.py: 2x LANCZOS upscale to 1536x2048 (the generator's max is 768x1024, so the art is upscaled, not authored at 1536)",
+      "see": "../PROVENANCE.json"
     },
-    "sha256": "52e957f73bbf5280fa4d23fe9c855acc6146b6de5496ba7225f661a40f834c2a",
+    "sha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
     "knownIssue": "a starfish decoration sits at the right edge beside the pause button at 390x844 (CSS ~385,760); not moved: the ground must stay centred on the tower, and a symmetric crop-zoom big enough to push it off-screen would also push the shoreline under the top HUD",
     "quantizedCopy": {
       "image": "beach_bg_a.q.png",
@@ -122,6 +122,13 @@
       "maxChannelError": 61,
       "sha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "beach_bg_a.png",
+      "sha256": "52e957f73bbf5280fa4d23fe9c855acc6146b6de5496ba7225f661a40f834c2a",
+      "bytes": 907577,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

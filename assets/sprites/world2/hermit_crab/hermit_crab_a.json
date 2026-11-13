@@ -446,7 +446,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "hermit_crab_a.png",
+    "image": "hermit_crab_a.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 774,
@@ -507,7 +507,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "02ce87b7a2ad7264710486d669585da2bdeefe2bd294d56a7745cb81a4df49ef",
+    "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
     "entity": "hermit_crab",
     "role": "World 2 shielded enemy (Sprint 5 'Shielded': shell = shield, regrows once)",
     "proposedConfig": {
@@ -576,8 +576,8 @@
           "scale": 0.2967
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -822,6 +822,13 @@
       "maxChannelError": 48,
       "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "hermit_crab_a.png",
+      "sha256": "02ce87b7a2ad7264710486d669585da2bdeefe2bd294d56a7745cb81a4df49ef",
+      "bytes": 323685,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

@@ -1,8 +1,8 @@
 # World 2 (Beach) art: Game Art & Motion v0.1.1 recommended picks
 
-These files are byte-identical copies from `lst-art/world2-beach` (`<asset>/recommended/`, `coconut/`, `cards/`). The game uses the pngquant `.q.png` copies named in each JSON's `meta.quantizedCopy`. At real size they look the same as the originals: premultiplied p99 difference is 4.6/255 or less at 390x844 DPR2.
+Every image here is a byte-identical copy from the `lst-art/world2-beach` delivery (`<asset>/recommended/`, `coconut/`, `cards/`). The game ships the pngquant `.q.png` copies; at real size they look the same as the RGBA masters (premultiplied p99 difference 4.6/255 or less at 390x844 DPR2). The masters add 6.8 MB, so they are not committed: `PROVENANCE.json` records each file's sha256, its delivery source and, for every `.q.png`, the master's name and sha256. The sprite JSON is the delivery JSON with reference fixes only (`meta.image` = the shipped `.q.png`, master in `meta.originalImage`, `_src/` raw and prompt references moved to `PROVENANCE.json`); `tools/art-provenance.py` rebuilds both from the delivery and `tools/world-test.js` fails if a file is missing, unlisted or changed.
 
-The art is never edited. `src/worlds/render/AtlasSheetAdapter.js` reads the TexturePacker grid JSON as-is (2 px gutter, `meta.pivot`, `meta.body.r`) and renames animations to the renderer slots. `src/worlds/render/World2Sheets.js` lists the files.
+The images are never edited. `src/worlds/render/AtlasSheetAdapter.js` reads the TexturePacker grid JSON as-is (2 px gutter, `meta.pivot`, `meta.body.r`) and renames animations to the renderer slots. `src/worlds/render/World2Sheets.js` lists the files.
 
 | Renderer sheet | Files | Slots (theirs -> ours) |
 |---|---|---|

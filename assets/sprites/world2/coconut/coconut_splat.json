@@ -90,7 +90,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "coconut_splat.png",
+    "image": "coconut_splat.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 484,
@@ -133,10 +133,9 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "a8b1f883fddfc7f716b515eb2d37ab7595caac9a7fdc49c3d636ce63b20bc586",
+    "sha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
     "entity": "coconut_splat",
     "role": "coconut landing crack/splash, plays once (0.25 s) then remove",
-    "usesCellsOf": "_src/raw/coconut_fx.jpg bottom row cells 1-3 (top row and cell 8 rejected)",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
@@ -152,8 +151,8 @@
           "scale": 0.319
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -240,6 +239,13 @@
       "maxChannelError": 24,
       "sha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "coconut_splat.png",
+      "sha256": "a8b1f883fddfc7f716b515eb2d37ab7595caac9a7fdc49c3d636ce63b20bc586",
+      "bytes": 26413,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

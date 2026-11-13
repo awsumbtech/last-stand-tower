@@ -1,0 +1,55 @@
+{
+  "about": "Backyard byte-identity: md5 of tools/sim.js JSON output for the same four seeded configs tools/sim-ab.sh runs. These are the main 70bff8c values (sim-ab IDENTICAL). tools/sim-check.js reruns them and fails on any change. Only update this file when a Backyard balance change is intended and approved.",
+  "baseline": "main 70bff8c",
+  "node": "24.x",
+  "runs": [
+    {
+      "name": "default",
+      "args": [
+        "--runs",
+        "20"
+      ],
+      "md5": "9abf012916933c954a3183a9e92cf378",
+      "short": "9abf01291693"
+    },
+    {
+      "name": "phone",
+      "args": [
+        "--runs",
+        "12",
+        "--phone",
+        "--strategies",
+        "casual,skilled"
+      ],
+      "md5": "b9a690d334ab191bcee1a8d61dba4fec",
+      "short": "b9a690d334ab"
+    },
+    {
+      "name": "starter",
+      "args": [
+        "--runs",
+        "10",
+        "--unlocked",
+        "starter",
+        "--strategies",
+        "casual,skilled"
+      ],
+      "md5": "339ce064390edb41c97c6249b495deb5",
+      "short": "339ce064390e"
+    },
+    {
+      "name": "campaign",
+      "args": [
+        "--campaign",
+        "--hours",
+        "1",
+        "--runs",
+        "3",
+        "--strategies",
+        "casual"
+      ],
+      "md5": "9e0a4dc20206a22f9d26dcef5fbfd416",
+      "short": "9e0a4dc20206"
+    }
+  ]
+}

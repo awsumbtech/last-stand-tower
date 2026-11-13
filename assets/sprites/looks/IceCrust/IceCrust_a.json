@@ -59,11 +59,10 @@
   "alpha": "shell fill is see-through (about 50% alpha); ink, snow and glint are solid",
   "provenance": {
     "generator": "Grok Bot GenerateImage (cursor namespace)",
-    "raw": "_src/raw/ice_a.jpg",
     "rawSha256": "9478d873d88cce6e3d4223d73bb13957ea0ef6a9869ab327940a91b661a9c09d",
-    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
     "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.5627, register, strip); see-through alpha from colour class",
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
-    "prompt": "4-frame 2x2: rounded ice-cube shell, snow cap with wavy drip edge, glint; frames 1-3 snap-on, frame 4 final."
+    "prompt": "4-frame 2x2: rounded ice-cube shell, snow cap with wavy drip edge, glint; frames 1-3 snap-on, frame 4 final.",
+    "see": "../PROVENANCE.json"
   }
 }

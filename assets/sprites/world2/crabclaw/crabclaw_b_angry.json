@@ -378,7 +378,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "crabclaw_b_angry.png",
+    "image": "crabclaw_b_angry.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 1542,
@@ -439,7 +439,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "4e98c2213f845af54786f23804b11328e5b6727b83659652d793ade2d68c218b",
+    "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
     "entity": "crabclaw",
     "phase": 2,
     "layerOf": "crabclaw_b",
@@ -499,8 +499,8 @@
           "scale": 0.438
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -707,6 +707,13 @@
       "maxChannelError": 58,
       "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "crabclaw_b_angry.png",
+      "sha256": "4e98c2213f845af54786f23804b11328e5b6727b83659652d793ade2d68c218b",
+      "bytes": 1057466,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }

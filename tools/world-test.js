@@ -298,8 +298,6 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
     ok([...urls, ...imgs, ...cardArt].every((f) => fs.existsSync(path.join(ROOT, f)) && sw.includes('"' + f + '"')), "sw.js precaches every World 2 json + png the game loads, and each exists (" + (urls.length + imgs.length + 3) + " files)");
     const listed = [...sw.matchAll(/"(assets\/sprites\/world2\/[^"]+)"/g)].map((m) => m[1]);
     ok(listed.every((f) => fs.existsSync(path.join(ROOT, f))), "sw.js: every listed world2 file exists (" + listed.length + "), so install can't fail");
-    for (const f of [...urls, ...imgs]) { const src = f.replace("assets/sprites/world2/", ""), alt = [path.join("/workspace/lst-art/world2-beach", path.dirname(src), "recommended", path.basename(src)), path.join("/workspace/lst-art/world2-beach", src)].find((x) => fs.existsSync(x));
-      if (alt) ok(fs.readFileSync(alt).equals(fs.readFileSync(path.join(ROOT, f))), "art unchanged: " + f + " == Game Art v0.1.1"); }
   }
   // Source scan: no canvas paths / fills / tints in any new render or UI file
   const BANNED = /\.\s*(beginPath|arc|arcTo|lineTo|moveTo|bezierCurveTo|quadraticCurveTo|closePath|ellipse|fillRect|strokeRect|roundRect|stroke|fill|fillText|strokeText|createLinearGradient|createRadialGradient|putImageData)\s*\(|\.\s*(fillStyle|strokeStyle|globalAlpha|globalCompositeOperation|filter|lineWidth|shadowColor|shadowBlur)\s*=(?!=)|LST\.draw\b/;
@@ -308,6 +306,40 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
     const code = fs.readFileSync(path.join(ROOT, "src", f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
     const m = code.match(BANNED); ok(!m, "no code-drawn art in src/" + f + (m ? " (found " + m[0] + ")" : ""));
   }
+}
+
+// ---------- 7b. Art provenance: repo files == committed manifests (fails, never skips) ----------
+for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
+  const dir = path.join(ROOT, dirRel), mf = path.join(dir, "PROVENANCE.json");
+  ok(fs.existsSync(mf), "provenance: " + dirRel + "/PROVENANCE.json committed");
+  if (!fs.existsSync(mf)) continue;
+  const P = JSON.parse(fs.readFileSync(mf, "utf8")), files = P.files || {};
+  const sha = (f) => require("crypto").createHash("sha256").update(fs.readFileSync(f)).digest("hex");
+  ok(P.source && P.source.delivery && P.source.version && P.source.date && Object.keys(files).length > 0, "provenance: " + dirRel + " names delivery, version and date (" + (P.source && P.source.version) + ", " + (P.source && P.source.date) + ")");
+  const onDisk = []; (function walk(d) { for (const n of fs.readdirSync(d)) { const f = path.join(d, n); if (fs.statSync(f).isDirectory()) walk(f); else onDisk.push(path.relative(dir, f).split(path.sep).join("/")); } })(dir);
+  const unlisted = onDisk.filter((f) => !files[f] && f !== "PROVENANCE.json" && f !== "MANIFEST.md");
+  ok(unlisted.length === 0, "provenance: every file in " + dirRel + " is in the manifest" + (unlisted.length ? " (unlisted: " + unlisted.join(", ") + ")" : ""));
+  const missing = [], changed = [];
+  for (const [rel, e] of Object.entries(files)) {
+    const f = path.join(dir, rel);
+    if (!fs.existsSync(f)) { missing.push(rel); continue; }
+    if (sha(f) !== e.sha256 || fs.statSync(f).size !== e.bytes) changed.push(rel);
+  }
+  ok(missing.length === 0, "provenance: no manifest file missing from " + dirRel + (missing.length ? " (MISSING: " + missing.join(", ") + ")" : ""));
+  ok(changed.length === 0, "provenance: " + Object.keys(files).length + " files in " + dirRel + " match their committed sha256" + (changed.length ? " (CHANGED: " + changed.join(", ") + ")" : ""));
+  const imgs = Object.entries(files).filter(([rel]) => rel.endsWith(".png"));
+  ok(imgs.every(([, e]) => e.sha256 === e.sourceSha256 && /byte-identical/.test(e.edit)), "provenance: every image in " + dirRel + " is a byte-identical delivery file (sha256 == sourceSha256)");
+  ok(imgs.filter(([rel]) => rel.endsWith(".q.png")).every(([, e]) => e.quantizedFrom && /^[0-9a-f]{64}$/.test(e.quantizedFrom.sha256) && e.quantizedFrom.name), "provenance: each .q.png records its original's name + sha256");
+  // Every file name a sprite JSON points at exists in the repo (no _src/raw or missing masters).
+  const broken = [];
+  for (const rel of Object.keys(files).filter((r) => r.endsWith(".json"))) {
+    let j; try { j = JSON.parse(fs.readFileSync(path.join(dir, rel), "utf8")); } catch (e) { broken.push(rel + " is not valid JSON"); continue; }
+    const base = path.dirname(path.join(dir, rel));
+    const refs = [];
+    (function walk(o, k) { if (o && typeof o === "object") { for (const [kk, v] of Object.entries(o)) walk(v, kk); } else if (typeof o === "string") { if (/_src\//.test(o)) broken.push(rel + " -> " + o); else if (/^(image|json)$/.test(k)) refs.push(o); } })(j, "");
+    for (const r of refs) if (!fs.existsSync(path.join(base, r))) broken.push(rel + " -> " + r);
+  }
+  ok(broken.length === 0, "provenance: every image / json name in " + dirRel + " JSON exists in the repo, no _src refs" + (broken.length ? " (" + broken.join("; ") + ")" : ""));
 }
 
 // ---------- 8. UI data: world cards + screens ----------

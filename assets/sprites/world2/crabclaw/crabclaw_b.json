@@ -368,7 +368,7 @@
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
     "version": "0.1.1",
-    "image": "crabclaw_b.png",
+    "image": "crabclaw_b.q.png",
     "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
     "size": {
       "w": 1542,
@@ -429,12 +429,12 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "c20892a3f7f95ada0b7e2ad14b261f1abe41acbe6676d031a254ad0ccbc06d71",
+    "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
     "entity": "crabclaw",
     "role": "World 2 boss (wave 20): lobs coconuts from range",
     "layerSet": {
-      "normal": "crabclaw_b.png/json",
-      "angry": "crabclaw_b_angry.png/json",
+      "normal": "crabclaw_b.q.png + crabclaw_b.json",
+      "angry": "crabclaw_b_angry.q.png + crabclaw_b_angry.json",
       "note": "phase 2 swaps the whole body to the angry atlas (its own generated art, not a tint); same frame size, pivot and feet line"
     },
     "proposedConfig": {
@@ -496,8 +496,8 @@
           "scale": 0.438
         }
       },
-      "prompts": "see _src/prompts.json (keys = raw names)",
-      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
     },
     "qa": {
       "frames": {
@@ -704,6 +704,13 @@
       "maxChannelError": 46,
       "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "crabclaw_b.png",
+      "sha256": "c20892a3f7f95ada0b7e2ad14b261f1abe41acbe6676d031a254ad0ccbc06d71",
+      "bytes": 931679,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
   }
 }
