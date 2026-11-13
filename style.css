@@ -1170,12 +1170,12 @@ svg.eye-ico circle { fill: var(--ink); }
 }
 .world-card:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
 .world-card.on { background: #fff3c4; outline: 3px solid #ffb020; outline-offset: 1px; }
-.world-card.locked { cursor: default; opacity: 0.72; }
+.world-card.locked { cursor: default; }
 .world-card .wc-pic { position: relative; display: block; height: 58px; overflow: hidden; border-bottom: 3px solid var(--ink); background: #cfe8f5; }
 .world-card .wc-art { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
 .world-card .wc-lock { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-/* Locked: a UI dim wash on the art image (CSS filter), with the lock illustration on top. */
-.world-card.locked .wc-art { filter: grayscale(0.7) brightness(0.62); }
+/* Locked: the card art stays as drawn; only card_locked_overlay.png (chains + padlock) sits on top.
+   No CSS filter or opacity anywhere on a locked card. */
 .world-card .wc-body { display: flex; flex-direction: column; gap: 1px; padding: 6px 8px 7px; }
 .world-card .wc-name { font-weight: 700; font-size: 16px; line-height: 1.1; }
 .world-card .wc-line, .world-card .wc-mult { font-size: 12px; line-height: 1.2; color: #5b4a6e; }
@@ -1196,5 +1196,9 @@ svg.eye-ico circle { fill: var(--ink); }
 @media (max-height: 760px) {
   .world-card .wc-mult::before { content: "\00a0\00b7\00a0"; }
   .world-card.locked .wc-mult { display: none; }
+  /* Short phones hide the card art; a locked card still shows the lock overlay, as a badge on the right. */
+  .world-card.locked .wc-pic { display: block; position: absolute; top: 3px; right: 4px; bottom: 3px; width: 70px; height: auto; border: 0; background: none; }
+  .world-card.locked .wc-art { display: none; }
+  .world-card.locked .wc-body { padding-right: 76px; }
 }
 @media (max-height: 760px) { .world-card .wc-mult { white-space: nowrap; } }

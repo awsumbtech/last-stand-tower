@@ -339,6 +339,16 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   ok(/id="world-select"/.test(html) && /id="res-g-worldmult"/.test(html) && /id="cl-title"/.test(html), "index.html has the world select, results row and cleared-screen ids");
 }
 
+// Locked world cards: overlay image only (P2-4). No CSS filter / opacity on any .world-card rule.
+{
+  const css = fs.readFileSync(path.join(ROOT, "style.css"), "utf8");
+  const rules = [...css.matchAll(/([^{}]*\.world-card[^{}]*)\{([^}]*)\}/g)].map((m) => [m[1].trim(), m[2]]);
+  const bad = rules.filter(([, body]) => /(^|[;\s])(filter|opacity|-webkit-filter|mix-blend-mode)\s*:/.test(body)).map(([sel]) => sel);
+  ok(rules.length > 5 && bad.length === 0, "world cards: no CSS filter / opacity on world-card rules (locked = overlay image only)" + (bad.length ? " (found in " + bad.join(" | ") + ")" : ""));
+  const ws = fs.readFileSync(path.join(ROOT, "src/ui/WorldSelect.js"), "utf8");
+  ok(/card_locked_overlay\.png/.test(ws) && /wc-lock/.test(ws), "world cards: locked cards layer card_locked_overlay.png over the art");
+}
+
 // ---------- 10. Beach smoke run ----------
 {
   const { LST, game } = load(5);

@@ -8,7 +8,7 @@
 //   12-14 Siege       denser waves (x1.1)
 //   15    Gate III    Elite Big Red (shell shield phase) + 2 gull escorts   16 Supply
 //   17-19 Last stand  peak pressure (x1.2)
-//   20    Finale      Captain Crabclaw lobs coconuts, 2 phases + frenzy at 150 s
+//   20    Finale      Captain Crabclaw lobs coconuts, 2 phases + frenzy at 110 s (CaptainCrabclaw.frenzyAt)
 // Endless after the finale: last-stand mix, Elite Big Red every 5th wave.
 (function () {
   // No Backyard tanks here: the Hermit Crab is the Beach's tough walker.

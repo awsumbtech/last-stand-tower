@@ -62,5 +62,6 @@ LST.WorldSelect = class WorldSelect {
     }
   }
 };
-// Game Art & Motion's lock illustration, laid over a locked world's card art (dimmed by CSS).
+// Game Art & Motion's lock illustration, laid over a locked world's card art. It alone shows the
+// locked state: no CSS filter or opacity on the card (world-test checks style.css).
 LST.WorldSelect.LOCK_ART = "assets/sprites/world2/cards/card_locked_overlay.png";
