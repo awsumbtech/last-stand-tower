@@ -535,6 +535,7 @@ LST.Game = class Game extends LST.World {
   }
 
   toMenu() {
+    if (this.devRun) { LST.DevRunGuard.end(); this.devRun = false; } // quit mid door run: put the save back
     this.reset();
     this.state = "menu";
     this.ui.show("start");

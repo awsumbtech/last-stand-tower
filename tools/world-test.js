@@ -451,6 +451,11 @@ function devFlagsAt(href) {
   ok(store["lst.meta"] === before && Object.keys(store).sort().join() === beforeKeys, "door run: localStorage lst.meta byte-unchanged (no world pick, Gears, clears, best wave)");
   ok(JSON.stringify(LST.meta.state) === beforeState && !LST.meta.worldCleared("beach") && LST.meta.state.gears === 250 && LST.meta.state.runs === 4, "door run: meta.state byte-unchanged after the run");
   ok(!LST.DevRunGuard.active && !game.devRun, "door run: guard released after finishRun");
+  // Quitting a door run mid-way (pause > Quit) also puts the save back and releases the guard.
+  game.state = "menu"; game.selectWorld("beach"); game.newGame(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
+  for (let i = 0; i < 60 * 30; i++) game.step(1 / 60);
+  LST.meta.state.gears += 999; LST.meta.save(); game.toMenu();
+  ok(store["lst.meta"] === before && JSON.stringify(LST.meta.state) === beforeState && !LST.DevRunGuard.active && !game.devRun, "door run: quitting mid-run leaves the save byte-unchanged and releases the guard");
   // Normal runs are untouched by the guard.
   LST.DevFlags = Object.freeze({ enabled: false, local: true, unlocks: Object.freeze([]) });
   game.state = "menu"; game.selectWorld("backyard"); game.newGame();
