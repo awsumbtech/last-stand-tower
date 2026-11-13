@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v18"; // Elemental cards + status looks: flames / ice / goo / sparks drawn on enemies
+const VERSION = "v19"; // Status looks are image art: flame / ice / goo / spark sheets (assets/sprites/looks)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -39,6 +39,8 @@ const PRECACHE = [
   "src/sprites/SpriteAtlas.js",
   "src/sprites/SpriteLibrary.js",
   "src/sprites/AnimationPlayer.js",
+  "src/sprites/SheetAnimation.js",
+  "src/sprites/LookSheetLibrary.js",
   "src/sprites/SpriteTinter.js",
   "src/sprites/EyeLayer.js",
   "src/sprites/EnemyAnimationRules.js",
@@ -69,6 +71,8 @@ const PRECACHE = [
   "src/fx/ScreenAnchors.js",
   "src/fx/FxRenderer.js",
   "src/elements/looks/StatusLook.js",
+  "src/elements/looks/LookRegistry.js",
+  "src/elements/looks/LookLayer.js",
   "src/elements/looks/BurnFlames.js",
   "src/elements/looks/IceCrust.js",
   "src/elements/looks/VenomDrips.js",
@@ -111,6 +115,16 @@ const PRECACHE = [
   "assets/sprites/enemies/king_mole/king_mole_angry_body.png",
   "assets/sprites/enemies/king_mole/king_mole_front.json",
   "assets/sprites/enemies/king_mole/king_mole_front.png",
+  // Status look sheets (Game Art & Motion v0.1.0, ~700 KB)
+  "assets/sprites/looks/BurnFlames/BurnFlames_a.json",
+  "assets/sprites/looks/BurnFlames/BurnFlames_a.png",
+  "assets/sprites/looks/IceCrust/IceCrust_a.json",
+  "assets/sprites/looks/IceCrust/IceCrust_a.png",
+  "assets/sprites/looks/IceCrust/IceCrust_a_snap.png",
+  "assets/sprites/looks/VenomDrips/VenomDrips_a.json",
+  "assets/sprites/looks/VenomDrips/VenomDrips_a.png",
+  "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
+  "assets/sprites/looks/SparkCrackle/SparkCrackle_c.png",
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

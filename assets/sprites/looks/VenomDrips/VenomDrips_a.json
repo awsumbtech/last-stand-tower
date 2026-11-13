@@ -1,0 +1,51 @@
+{
+  "look": "VenomDrips",
+  "variant": "a",
+  "version": "0.1.0",
+  "strips": {
+    "main": {
+      "image": "VenomDrips_a.png",
+      "size": {
+        "w": 1152,
+        "h": 336
+      },
+      "frame": {
+        "w": 288,
+        "h": 336
+      },
+      "count": 4,
+      "fps": 8,
+      "loop": true,
+      "play": "loop while poisoned",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "c102021d8881fd44377a55e2457069bf8b2fcae4ecd3f2d1fcf3df1f64495409"
+    }
+  },
+  "anchor": {
+    "x": 144,
+    "y": 128,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "bottomEdge": {
+    "x": 144,
+    "y": 216,
+    "meaning": "Enemy body bottom edge (anchor.y + refBodyR). The goo band hugs this edge; drips hang below."
+  },
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "raw": "_src/raw/venom_a.jpg",
+    "rawSha256": "4c83f7c89075979859034d942eddbe014159af9a08348c9240f99cb2640b6e5e",
+    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
+    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.6007, register, strip)",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "4-frame 2x2: lime goo band on block bottom edge, three drips, bubble; drip stretch/fall + bubble pop loop."
+  }
+}

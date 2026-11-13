@@ -1,0 +1,69 @@
+{
+  "look": "IceCrust",
+  "variant": "a",
+  "version": "0.1.0",
+  "strips": {
+    "main": {
+      "image": "IceCrust_a.png",
+      "size": {
+        "w": 256,
+        "h": 288
+      },
+      "frame": {
+        "w": 256,
+        "h": 288
+      },
+      "count": 1,
+      "fps": 0,
+      "loop": false,
+      "play": "static: hold this frame while frozen",
+      "clippedFractionPerFrame": [
+        0.0
+      ],
+      "sha256": "7026eff816d5933e67745b2e301bdf99ffe386e373edb921810e8e139872114b"
+    },
+    "snap": {
+      "image": "IceCrust_a_snap.png",
+      "size": {
+        "w": 768,
+        "h": 288
+      },
+      "frame": {
+        "w": 256,
+        "h": 288
+      },
+      "count": 3,
+      "fps": 30,
+      "loop": false,
+      "play": "optional one-shot on attach, then switch to main",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "285f5d903916650872c78d1d25da98e3728ed38eca760f675045cefe5e05b8d8"
+    }
+  },
+  "anchor": {
+    "x": 128,
+    "y": 152,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "shellBottom": {
+    "y": 253,
+    "meaning": "bottom of the ice shell = body bottom + 0.15*refBodyR"
+  },
+  "alpha": "shell fill is see-through (about 50% alpha); ink, snow and glint are solid",
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "raw": "_src/raw/ice_a.jpg",
+    "rawSha256": "9478d873d88cce6e3d4223d73bb13957ea0ef6a9869ab327940a91b661a9c09d",
+    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
+    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.5627, register, strip); see-through alpha from colour class",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "4-frame 2x2: rounded ice-cube shell, snow cap with wavy drip edge, glint; frames 1-3 snap-on, frame 4 final."
+  }
+}

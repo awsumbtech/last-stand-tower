@@ -1,0 +1,47 @@
+{
+  "look": "SparkCrackle",
+  "variant": "c",
+  "version": "0.1.0",
+  "strips": {
+    "main": {
+      "image": "SparkCrackle_c.png",
+      "size": {
+        "w": 1152,
+        "h": 288
+      },
+      "frame": {
+        "w": 288,
+        "h": 288
+      },
+      "count": 4,
+      "fps": 18.18,
+      "loop": false,
+      "durationSec": 0.22,
+      "play": "one-shot on Chain Spark hit, then detach",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "fc63d1ffe7e01ccf07537257c2cacc10637570e7da64b87c93db45bd584f3f26"
+    }
+  },
+  "anchor": {
+    "x": 144,
+    "y": 144,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "raw": "_src/raw/spark_c.jpg",
+    "rawSha256": "4c08a8a19174342d4c6906e959ac883f9f81a23707e37bb72587e5169582dd8f",
+    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
+    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.8528, register, strip)",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "4-frame row: fat ink-outlined yellow sticker bolts radiating from centre (flash, burst, jump out, bits)."
+  }
+}

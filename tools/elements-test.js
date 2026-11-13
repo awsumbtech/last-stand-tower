@@ -154,38 +154,98 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   ok(["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd"].join() === [1, 2, 3, 4, 11, 12, 13, 21, 22, 23].map(LST.ordinal).join(), "ordinal helper: 1st 2nd 3rd 4th 11th 12th 13th 21st 22nd 23rd");
 }
 
-// ---------- Status looks (src/elements/looks): one object per status, attached only while active ----------
+// ---------- Status looks (src/elements/looks): one image-art object per status, attached only while active ----------
 {
   const { LST } = load(1);
   const sb = { LST, Math, console };
   vm.createContext(sb);
-  for (const f of ["StatusLook", "BurnFlames", "IceCrust", "VenomDrips", "SparkCrackle"]) vm.runInContext(fs.readFileSync(path.join(ROOT, "src/elements/looks", f + ".js"), "utf8"), sb, { filename: f });
-  const calls = { fill: 0 };
-  const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (k === "fill" ? () => calls.fill++ : () => {})), set: (t, k, v) => { t[k] = v; return true; } });
-  LST.draw = LST.draw || {}; if (!LST.draw.roundRect) LST.draw.roundRect = () => {};
+  const LOOK_FILES = ["StatusLook", "LookRegistry", "LookLayer", "BurnFlames", "IceCrust", "VenomDrips", "SparkCrackle"];
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "src/sprites/SheetAnimation.js"), "utf8"), sb, { filename: "SheetAnimation.js" });
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "src/sprites/LookSheetLibrary.js"), "utf8"), sb, { filename: "LookSheetLibrary.js" });
+  for (const f of LOOK_FILES) vm.runInContext(fs.readFileSync(path.join(ROOT, "src/elements/looks", f + ".js"), "utf8"), sb, { filename: f });
+  // ctx that records every drawImage (and would record any path call)
+  const calls = { draws: [], paths: 0 };
+  const PATH = ["beginPath", "arc", "lineTo", "moveTo", "bezierCurveTo", "quadraticCurveTo", "fill", "stroke", "rect", "ellipse", "fillRect"];
+  const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : k === "drawImage" ? (...a) => calls.draws.push(a) : PATH.includes(k) ? () => calls.paths++ : () => {}), set: (t, k, v) => { t[k] = v; return true; } });
   const subs = {}; const bus = { on: (t, fn) => { subs[t] = fn; return () => {}; } };
+  const sheetJson = {}, img = {};
+  for (const [name, url] of Object.entries(LST.LOOK_SHEETS)) {
+    ok(fs.existsSync(path.join(ROOT, url)), "looks: sheet json exists " + url);
+    sheetJson[name] = JSON.parse(fs.readFileSync(path.join(ROOT, url), "utf8"));
+    for (const s of Object.values(sheetJson[name].strips)) ok(fs.existsSync(path.join(ROOT, path.dirname(url), s.image)), "looks: sheet image exists " + s.image);
+    img[name] = {}; for (const id of Object.keys(sheetJson[name].strips)) img[name][id] = { id: name + ":" + id };
+  }
+  const swSrc = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"), html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  ok(Object.values(LST.LOOK_SHEETS).every((u) => swSrc.includes('"' + u + '"') && Object.values(JSON.parse(fs.readFileSync(path.join(ROOT, u), "utf8")).strips).every((s) => swSrc.includes('"' + path.dirname(u) + "/" + s.image + '"'))), "looks: sw.js precaches every look json + png");
+  ok(["src/sprites/SheetAnimation.js", "src/sprites/LookSheetLibrary.js", ...LOOK_FILES.map((f) => "src/elements/looks/" + f + ".js")].every((f) => html.includes('src="' + f + '"') && swSrc.includes('"' + f + '"')), "looks: index.html + sw.js list every look script");
+  // No code-drawn art: the look classes (and their base / player) never call canvas path or shape APIs.
+  const BANNED = /\.\s*(beginPath|arc|arcTo|lineTo|moveTo|bezierCurveTo|quadraticCurveTo|closePath|ellipse|fillRect|strokeRect|roundRect|stroke|fill|createLinearGradient|createRadialGradient|putImageData)\s*\(|\.\s*(fillStyle|strokeStyle|globalAlpha|globalCompositeOperation|filter|lineWidth)\s*=(?!=)|LST\.draw\b|LookKit|LOOK_VARIANTS/;
+  for (const f of [...LOOK_FILES.map((n) => "src/elements/looks/" + n + ".js"), "src/sprites/SheetAnimation.js", "src/sprites/LookSheetLibrary.js"]) {
+    const code = fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
+    const m = code.match(BANNED); ok(!m, "looks: no canvas path / shape / tint calls in " + f + (m ? " (found " + m[0] + ")" : ""));
+  }
+  ok(!LST.LOOK_VARIANTS && !LST.LOOK_STYLE && !LST.setLookVariant && !LST.LookKit, "looks: code-drawn variant presets are gone");
+
   const L = new LST.LookLayer(bus), R = LST.LookRegistry;
   ok(R.get("burn") === LST.BurnFlames && R.get("frozen") === LST.IceCrust && R.get("venom") === LST.VenomDrips && R.get("spark") === LST.SparkCrackle, "looks: registry maps burn/frozen/venom/spark to their classes");
-  const mk = (type, x) => ({ type, x, y: 0, radius: 20, age: 1 });
+  ok([LST.BurnFlames, LST.IceCrust, LST.VenomDrips, LST.SparkCrackle].every((C) => C.prototype instanceof LST.StatusLook && LST.LOOK_SHEETS[C.sheet]), "looks: each look is its own StatusLook subclass with its own sheet");
+  const mk = (type, x, radius = 20) => ({ type, x, y: 0, radius, age: 1 });
   const a = mk("tank", 0), b = mk("basic", 100), scene = { enemies: [a, b], hasStatus: false };
-  let t = 0; const frame = (dt = 0.1) => { t += dt; calls.fill = 0; L.render(ctx, scene, t, false); return calls.fill; };
-  frame(); ok(L.count === 0 && calls.fill === 0, "looks: nothing attached or drawn with no status");
+  let t = 0; const frame = (dt = 0.1, reduced = false) => { t += dt; calls.draws = []; L.render(ctx, scene, t, reduced); return calls.draws.length; };
+
+  // Before any image is in: looks attach but draw nothing (no coded fallback)
   LST.StatusEffects.add(a, new LST.Burn(1, 1)); scene.hasStatus = true;
-  ok(frame() > 0 && L.looksOf(a).get("burn") instanceof LST.BurnFlames && !L.looksOf(b), "looks: BurnFlames attaches to the burning enemy only and draws");
-  LST.StatusEffects.add(b, new LST.Frozen(1)); LST.StatusEffects.add(b, new LST.Poison(1, 1, 3)); frame();
+  ok(frame() === 0 && L.looksOf(a).get("burn") instanceof LST.BurnFlames && calls.paths === 0, "looks: attached before the sheet loads but draws nothing (no fallback)");
+  const half = LST.lookSheets.install("BurnFlames", sheetJson.BurnFlames, {});
+  ok(!LST.lookSheets.get("BurnFlames") && !half.strips.main.draw(ctx, 0, 0, 0, 27), "looks: a sheet without its image is not handed out and draws nothing");
+  for (const n of Object.keys(sheetJson)) LST.lookSheets.install(n, sheetJson[n], img[n]);
+  L.remove(a, "burn"); a.status.burn.time = 0; frame();
+  ok(L.count === 0 && frame() === 0, "looks: nothing attached or drawn with no status");
+
+  LST.StatusEffects.add(a, new LST.Burn(1, 1));
+  ok(frame() === 1 && calls.draws[0][0] === img.BurnFlames.main && L.looksOf(a).get("burn") instanceof LST.BurnFlames && !L.looksOf(b), "looks: BurnFlames attaches to the burning enemy only and draws its sheet");
+  // anchor + scale: frame w * bodyR/88, anchor pixel on (e.x, e.y)
+  { const d = calls.draws[0], k = LST.StatusLook.bodyR(a) / 88, J = sheetJson.BurnFlames;
+    ok(Math.abs(d[5] - (a.x - J.anchor.x * k)) < 1e-9 && Math.abs(d[6] - (a.y - J.anchor.y * k)) < 1e-9 && Math.abs(d[7] - 288 * k) < 1e-9 && Math.abs(d[8] - 352 * k) < 1e-9 && d[3] === 288 && d[4] === 352,
+      "looks: scale = bodyR/88 and the anchor (144,248) sits on (e.x, e.y)"); }
+  { const big = mk("tank", 300, 40); const d1 = LST.SheetAnimation.prototype.rect.call(LST.lookSheets.get("BurnFlames").strips.main, 300, 0, LST.StatusLook.bodyR(big));
+    ok(Math.abs(d1[2] - 288 * 54 / 88) < 1e-9 && Math.abs(d1[0] - (300 - 144 * 54 / 88)) < 1e-9, "looks: twice the radius draws twice the size, anchor still on the body"); }
+  // frame stepping by fps: burn 10 fps x6 loop, venom 8 fps x4 loop
+  { const B = LST.lookSheets.get("BurnFlames").strips.main, V = LST.lookSheets.get("VenomDrips").strips.main;
+    ok([0, 0.099, 0.1, 0.35, 0.59, 0.6, 0.71].map((s) => B.index(s)).join() === "0,0,1,3,5,0,1", "looks: BurnFlames steps at 10 fps and loops after 6 frames");
+    ok([0, 0.124, 0.125, 0.3, 0.5, 0.625].map((s) => V.index(s)).join() === "0,0,1,2,0,1", "looks: VenomDrips steps at 8 fps and loops after 4 frames");
+    const lk = L.looksOf(a).get("burn"); lk.t = 0.35; calls.draws = []; L.draw(ctx, false); ok(calls.draws[0][1] === 3 * 288, "looks: the drawn source rect follows the frame index"); }
+
+  LST.StatusEffects.add(b, new LST.Frozen(1)); LST.StatusEffects.add(b, new LST.Poison(1, 1, 3)); frame(0);
   ok(L.looksOf(b).get("frozen") instanceof LST.IceCrust && L.looksOf(b).get("venom") instanceof LST.VenomDrips && L.count === 3, "looks: IceCrust + VenomDrips attach to the frozen, poisoned enemy");
-  for (const v of ["a", "b", "c"]) { LST.setLookVariant("flame", v); LST.setLookVariant("ice", v); ok(frame(0) > 0, "looks: variant " + v + " draws"); }
-  LST.setLookVariant("flame", "b"); LST.setLookVariant("ice", "b");
-  ok(!LST.setLookVariant("flame", "z") && LST.LOOK_STYLE.flame === "b", "looks: unknown variant rejected");
+  // ice: snap strip (3 frames @30 fps, once) then straight to the static frame
+  { const ice = L.looksOf(b).get("frozen"), S = LST.lookSheets.get("IceCrust").strips, seen = [];
+    for (const s of [0, 0.034, 0.067, 0.099, 0.1, 0.5, 5]) { ice.t = s; const p = ice.pick(S, false); seen.push(p[0] + p[1]); }
+    ok(seen.join() === "snap0,snap1,snap2,snap2,main0,main0,main0", "looks: IceCrust plays its 3-frame snap at 30 fps once, then holds the static frame");
+    ice.t = 0; ok(ice.pick(S, true).join() === "main,0", "looks: IceCrust reduced motion = static frame, no snap");
+    ice.t = 0; calls.draws = []; ice.draw(ctx, b, false); ok(calls.draws[0][0] === img.IceCrust.snap, "looks: IceCrust draws the snap image on attach");
+    ice.t = 1; calls.draws = []; ice.draw(ctx, b, false); ok(calls.draws[0][0] === img.IceCrust.main, "looks: IceCrust draws the static image after the snap"); }
+  ok(frame(0) === 3, "looks: one image per active look per frame");
   a.status.burn.time = 0; frame(); ok(!L.looksOf(a) && L.count === 2, "looks: BurnFlames detached the frame the burn ended");
+  b.status.frozen.time = 0; frame(); ok(L.looksOf(b) && !L.looksOf(b).has("frozen") && L.looksOf(b).has("venom"), "looks: IceCrust detached on thaw, VenomDrips stays while poisoned");
   b.dead = true; frame(); ok(L.count === 0 && frame() === 0, "looks: a dead enemy's looks are removed, nothing drawn after");
+
   const c = mk("basic", 50); scene.enemies.push(c);
   subs[LST.EVENTS.ELEMENT_HIT]({ element: "chainSpark", x: 0, y: 0, points: [[0, 0], [50, 0]] });
   ok(L.looksOf(c) && L.looksOf(c).get("spark") instanceof LST.SparkCrackle, "looks: SparkCrackle on an enemy hit by a Chain Spark");
   const n0 = L.count; subs[LST.EVENTS.ELEMENT_HIT]({ element: "ember", x: 50, y: 0 }); ok(L.count === n0, "looks: other element hits add no event look");
-  frame(0.3); ok(L.count === 0 && frame() === 0, "looks: SparkCrackle removed after its 0.22 s life");
-  LST.StatusEffects.add(c, new LST.Burn(9, 1)); frame(); subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "looks: run start clears every look");
-  calls.fill = 0; L.render(ctx, scene, t + 1, true); ok(calls.fill > 0, "looks: reduced motion still draws (static pose)");
+  { const sp = L.looksOf(c).get("spark"), S = LST.lookSheets.get("SparkCrackle").strips;
+    ok([0, 0.06, 0.12, 0.2].map((s) => { sp.t = s; return sp.pick(S, false)[1]; }).join() === "0,1,2,3" && (sp.t = 0.22, sp.pick(S, false) === null), "looks: SparkCrackle plays 4 frames once over 0.22 s, then nothing");
+    sp.t = 0.05; ok(sp.pick(S, true).join() === "main,1", "looks: SparkCrackle reduced motion = the peak frame"); sp.t = 0; }
+  ok(L.looksOf(a) && L.looksOf(a).has("spark") && frame(0.1) === 2 && calls.draws.every((d) => d[0] === img.SparkCrackle.main), "looks: SparkCrackle draws on both hit enemies during its life");
+  frame(0.2); ok(L.count === 0 && frame() === 0, "looks: SparkCrackle removed after its 0.22 s life");
+  subs[LST.EVENTS.ELEMENT_HIT]({ element: "chainSpark", x: 50, y: 0 }); frame(0, true);
+  ok(calls.draws.length === 1 && calls.draws[0][1] === 288, "looks: reduced motion spark draws the single peak frame");
+  frame(0.3, true); ok(L.count === 0, "looks: reduced motion spark gone after its life");
+  LST.StatusEffects.add(c, new LST.Burn(9, 1)); LST.StatusEffects.add(c, new LST.Poison(9, 1, 3)); frame();
+  ok(frame(0.25, true) === 2 && calls.draws.every((d) => d[1] === 0), "looks: reduced motion holds frame 0 (burn, venom)");
+  subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "looks: run start clears every look");
+  ok(calls.paths === 0, "looks: no path or shape call reached the canvas in any frame");
 }
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);

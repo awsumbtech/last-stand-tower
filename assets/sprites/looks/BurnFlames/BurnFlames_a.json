@@ -1,0 +1,53 @@
+{
+  "look": "BurnFlames",
+  "variant": "a",
+  "version": "0.1.0",
+  "strips": {
+    "main": {
+      "image": "BurnFlames_a.png",
+      "size": {
+        "w": 1728,
+        "h": 352
+      },
+      "frame": {
+        "w": 288,
+        "h": 352
+      },
+      "count": 6,
+      "fps": 10,
+      "loop": true,
+      "play": "loop while burning",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "dd1b5e8a0a9d50307b85fb934dc07c3c5e44d0761e5005a06a9a45a65a3f6bf7"
+    }
+  },
+  "anchor": {
+    "x": 144,
+    "y": 248,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "topEdge": {
+    "x": 144,
+    "y": 160,
+    "meaning": "Enemy body top edge (anchor.y - refBodyR). The bottom-centre of the flame crown sits here."
+  },
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "raw": "_src/raw/flames_a.jpg",
+    "rawSha256": "98b1e3200ac601c118a9403140ebb77a1dfc3bbbc6d81f56dca6241c4f30b599",
+    "styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)",
+    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.9362, register, strip)",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "6-frame 3x2 sheet: flame crown of five ink-outlined tongues on a gray placeholder block, flicker loop (upright, lean L, squash, lean R, stretch, settle)."
+  }
+}
