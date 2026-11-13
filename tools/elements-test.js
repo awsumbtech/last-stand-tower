@@ -184,6 +184,13 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
     const code = fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
     const m = code.match(BANNED); ok(!m, "looks: no canvas path / shape / tint calls in " + f + (m ? " (found " + m[0] + ")" : ""));
   }
+  // The looks alone carry the status visuals: the old code-drawn frozen disc / venom pips
+  // (FxRenderer.drawStatusRings, called from FxDirector.drawWorld) must never come back.
+  const RING_BANNED = /drawStatusRings|StatusRings|\.get\(\s*e\s*,\s*"(frozen|venom|burn)"\s*\)|status\.(frozen|venom)\b/;
+  for (const f of fs.readdirSync(path.join(ROOT, "src/fx")).filter((n) => n.endsWith(".js")).map((n) => "src/fx/" + n)) {
+    const code = fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
+    const m = code.match(RING_BANNED); ok(!m, "looks: no code-drawn status rings / pips in " + f + (m ? " (found " + m[0] + ")" : ""));
+  }
   ok(!LST.LOOK_VARIANTS && !LST.LOOK_STYLE && !LST.setLookVariant && !LST.LookKit, "looks: code-drawn variant presets are gone");
 
   const L = new LST.LookLayer(bus), R = LST.LookRegistry;

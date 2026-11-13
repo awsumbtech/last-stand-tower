@@ -113,36 +113,6 @@ LST.FxRenderer = class FxRenderer {
     ctx.restore();
   }
 
-  // Status rings on affected enemies (venom / frozen): only drawn while an effect is
-  // active, so nothing animates on an idle lawn. Reduced motion: steady rings, no flicker.
-  drawStatusRings(ctx, enemies, time, reduced, low) {
-    const S = LST.StatusEffects;
-    ctx.save();
-    ctx.lineCap = "round";
-    for (const e of enemies) {
-      if (!e.status || e.dead) continue;
-      const fz = S.get(e, "frozen"), ven = S.get(e, "venom"); // burn: drawn by BurnFlames (src/elements/looks)
-      if (!fz && !ven) continue;
-      const r = e.radius;
-      if (fz) {
-        ctx.globalAlpha = 0.38; ctx.fillStyle = "#bff3ff";
-        ctx.beginPath(); ctx.arc(e.x, e.y, r * 1.08, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 0.95; ctx.strokeStyle = "#e9fbff"; ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-      if (ven) {
-        const n = ven.count;
-        ctx.globalAlpha = 0.95; ctx.fillStyle = "#8be04a"; ctx.strokeStyle = "#2b3a12"; ctx.lineWidth = 1.5;
-        for (let i = 0; i < n; i++) {
-          const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42;
-          const px = e.x + Math.cos(a) * (r + 11), py = e.y + Math.sin(a) * (r + 11);
-          ctx.beginPath(); ctx.arc(px, py, 3.6, 0, Math.PI * 2); ctx.fill(); if (!low) ctx.stroke();
-        }
-      }
-    }
-    ctx.restore();
-  }
-
   // Chain Spark bolts: jagged lines between the hit enemy and each arc target, fading over ~0.2s.
   drawArcs(ctx, arcs, low) {
     const th = this.theme;
