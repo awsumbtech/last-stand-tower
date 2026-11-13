@@ -71,10 +71,23 @@ copies show an **eye icon** and their real effect.
   hit) and pops up somewhere closer. Three phases at 66% and 33% HP, each with a banner, faster slams, nastier minions
   (blobs, then teardrops, then helmets), pop-ups closer to the tower, and darker, faster music.
 - **Beat him** and you get a victory party and the **World cleared!** screen: **+250 Gears** the first time (+75 after
-  that), paid and saved right away. The Backyard is marked as cleared in your save (world 2 arrives in a later update).
+  that), paid and saved right away. The Backyard is marked as cleared in your save, and that opens the **Beach** (see Worlds).
   Then choose **Continue (Endless)**: waves keep scaling, with a mini-boss every 5 waves; or **Return to Workshop**: the run
   ends and pays its Gears. Losing to King Mole is a normal results screen.
 - Head Start can't skip King Mole until you've beaten him once (it stops at wave 16).
+
+### Worlds
+
+- **World select** on the start screen shows one card per world: its art, best wave and Gear multiplier. A locked world
+  shows the lock art over its card and the condition ("Beat Backyard wave 20"). Your pick is saved.
+- **Backyard** (Gears x1): the classic waves and King Mole.
+- **Beach** (Gears x1.6, enemy HP x2.5, damage x1.2) opens when you beat King Mole. One 20-wave level in acts: Hermit
+  Crabs from wave 2 (a shell soaks hits and regrows once), Seagulls from wave 7 (fast flyers, slows don't work), Big Red
+  gates on 5 / 10 / 15 (wave 15 is Elite Big Red with a shell shield), supply waves after each gate, and **Captain
+  Crabclaw** on wave 20: he lobs coconuts at the tower (a warning ring shows where they land), gets angry in phase 2 and
+  goes into a frenzy after 110 s. Head Start works on the Beach after its first clear.
+- Dev only: `?debug=1&unlock=beach` opens the Beach for testing, **only on localhost / 127.0.0.1 / file:**. On any
+  other host it does nothing, and a run in a world opened this way saves nothing (no Gears, clears, best wave or pick).
 
 ### Active ability
 
@@ -196,11 +209,30 @@ Opening `index.html` directly also works (without offline support, since service
 | `manifest.webmanifest`, `icons/` | App name, colors and icons (regenerate icons with `python3 tools/make_icons.py`) |
 | `fonts/` | Bundled [Fredoka](https://github.com/hafontia/Fredoka-One) font (SIL Open Font License, see `fonts/OFL.txt`) |
 | `src/ui.js` | HUD and menu screens (HTML overlays) |
+| `src/worlds/` | `WorldDefinition`, `WorldRegistry`, `Backyard`, `Beach`, `LevelPlan` / `LevelDirector`; `render/` draws World 2 from image sheets (`AtlasSheetAdapter`) |
+| `src/ui/WorldSelect.js`, `src/ui/WorldScreens.js` | World cards on the start screen; per-world lines on results / World cleared! |
+| `src/enemies/`, `src/bosses/` | Part-based enemies (Hermit Crab `ShellShield`, Seagull `Flyer`), `CaptainCrabclaw` + `Coconut` |
+| `src/elements/looks/` | Status looks (burn, frozen, venom, spark) drawn from image strips, one class per look |
+| `src/core/DevFlags.js`, `src/core/DevRunGuard.js` | Local-only dev door (`?debug=1&unlock=`) and the guard that keeps door runs out of the save |
+| `assets/sprites/world2/`, `assets/sprites/looks/` | Game Art & Motion art (byte-identical copies) with `PROVENANCE.json` (sha256 per file) |
 | `src/main.js` | Startup, game loop, keyboard shortcuts |
 | `tools/sim.js` | Headless balance simulator (see below) |
 | `tools/simChunks.js` | Chunked, resumable sim jobs (results in `tools/out/`, git-ignored) |
 
 The game object is on `window.game` for poking around in the browser console.
+
+## Tests
+
+```bash
+node tools/world-test.js         # worlds, Beach systems, saves + migrations, dev door, art manifests
+node tools/elements-test.js      # elements and the image status looks (no code-drawn art)
+node tools/sim-check.js          # Backyard sims vs the committed hashes in tools/sim-expected.json (~50 s)
+python3 -m http.server 8765 &    # then:
+python3 tools/card-layout-test.py http://127.0.0.1:8765/index.html   # shop cards + world cards (Playwright)
+```
+
+GitHub Actions (`.github/workflows/test.yml`) runs all four on every push and pull request.
+`tools/sim-ab.sh <main checkout>` is the full A/B against another checkout.
 
 ## Balance simulator
 

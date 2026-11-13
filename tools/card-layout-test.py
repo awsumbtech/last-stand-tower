@@ -8,6 +8,12 @@ card-pick screen at 390x844, 360x740 and 768x1024 and checks:
   * the Reroll / Repair buttons fit their label and price (Repair at 289/370 HP);
   * a flippable card's take button has a >= 44 px tap area;
   * tapping a flippable card flips it and never takes it; its take button takes it.
+World cards on the start screen (WorldSelect) at 360x740, 390x844 and 375x667, with the Beach
+locked and open:
+  * both cards sit inside the start panel and the viewport, the same height, text unclipped,
+    tap target >= 44 px, the page doesn't scroll and Play stays on screen;
+  * a locked card shows card_locked_overlay.png (loaded, inside the card) and no CSS filter or
+    opacity anywhere on the card; an open card has no overlay.
 
 Usage: python3 tools/card-layout-test.py [http://127.0.0.1:8000/index.html]
 Serve the repo first, e.g.  python3 -m http.server 8000
@@ -73,6 +79,7 @@ CHECK = r"""async ({ flipAll }) => {
     if (b.scrollWidth > b.clientWidth + 1) fails.push(`#${b.id}: content wider than button`);
   }
   if (!backs) fails.push("no flippable cards were rendered");
+  window.__cardRows = (window.__cardRows || 0) + groups.length; // case count for the summary line
   return fails;
 }"""
 
@@ -121,6 +128,52 @@ CLICKS = r"""async () => {
   return fails;
 }"""
 
+WORLD_VIEWPORTS = [(360, 740), (390, 844), (375, 667)]
+WORLD_CHECK = r"""async ({ open }) => {
+  const fails = [], g = window.game;
+  if (open) LST.meta.clearWorld("backyard", 600); else LST.meta.resetAll && LST.meta.resetAll();
+  g.state = "menu"; g.ui.show("start");
+  await new Promise((r) => setTimeout(r, 500));
+  const cards = [...document.querySelectorAll("#world-select .world-card")];
+  if (cards.length < 2) return ["world cards: expected 2, got " + cards.length];
+  const vw = innerWidth, vh = innerHeight;
+  const hs = cards.map((c) => c.getBoundingClientRect().height);
+  if (Math.max(...hs) - Math.min(...hs) > 1) fails.push("world cards: unequal heights " + hs.map(Math.round).join("/"));
+  const panel = document.querySelector("#screen-start .panel").getBoundingClientRect();
+  for (const c of cards) {
+    const id = c.dataset.world, box = c.getBoundingClientRect(), locked = c.classList.contains("locked");
+    if (box.left < -0.5 || box.right > vw + 0.5 || box.top < -0.5 || box.bottom > vh + 0.5) fails.push(`${id}: card outside the viewport`);
+    if (box.left < panel.left - 0.5 || box.right > panel.right + 0.5) fails.push(`${id}: card outside the start panel`);
+    if (box.width < 44 || box.height < 44) fails.push(`${id}: tap target ${Math.round(box.width)}x${Math.round(box.height)} < 44`);
+    for (const el of c.querySelectorAll("*")) {
+      const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+      if (!r.width || cs.display === "none") continue;
+      if (r.left < box.left - 0.5 || r.right > box.right + 0.5 || r.top < box.top - 0.5 || r.bottom > box.bottom + 0.5) fails.push(`${id}: .${el.className} outside card`);
+      if (el.scrollWidth > el.clientWidth + 1 && cs.overflow !== "visible" && el.tagName !== "IMG") fails.push(`${id}: .${el.className} clipped`);
+    }
+    for (const el of [c, ...c.querySelectorAll("*")]) {
+      const cs = getComputedStyle(el);
+      if (cs.filter !== "none") fails.push(`${id}: CSS filter on .${el.className} (${cs.filter})`);
+      if (+cs.opacity < 1) fails.push(`${id}: opacity ${cs.opacity} on .${el.className}`);
+    }
+    const lock = c.querySelector("img.wc-lock");
+    if (locked) {
+      if (!lock) fails.push(`${id}: locked card has no lock overlay`);
+      else {
+        if (!lock.complete || !lock.naturalWidth) fails.push(`${id}: lock overlay image did not load`);
+        const r = lock.getBoundingClientRect();
+        if (r.width < 20 || r.height < 20 || getComputedStyle(lock).display === "none" || getComputedStyle(lock.parentElement).display === "none") fails.push(`${id}: lock overlay not visible`);
+      }
+    } else if (lock) fails.push(`${id}: open card shows the lock overlay`);
+  }
+  const se = document.scrollingElement;
+  if (se.scrollHeight > vh + 1 || se.scrollWidth > vw + 1) fails.push(`page scrolls (${se.scrollWidth}x${se.scrollHeight})`);
+  const play = document.getElementById("btn-start").getBoundingClientRect();
+  if (play.bottom > vh + 0.5 || play.top < 0) fails.push("Play button off screen");
+  if (!cards.some((c) => c.classList.contains("locked")) === !open) fails.push(open ? "Beach still locked after a Backyard clear" : "no locked card on a fresh save");
+  return fails;
+}"""
+
 KEY_SETUP = r"""() => {
   const g = window.game; g.shop.picked = true; g.coins = 401; LST.meta.discoverTrap("thorns");
   g.shop.cards = [{ card: LST.cardById("damage"), taken: false }, { card: LST.cardById("maxHp"), taken: false }, { card: LST.cardById("thorns"), taken: false }];
@@ -162,6 +215,7 @@ def keyboard_case(p):
 
 def main():
     fails = []
+    cases = {"card rows": 0, "click flows": 0, "keyboard flows": 0, "world-card screens": 0}
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path=os.environ.get("CHROME") or None)
         for w, h in VIEWPORTS:
@@ -175,11 +229,26 @@ def main():
             p.wait_for_timeout(700)  # let deal-in animations settle
             for flip in (False, True):
                 fails += [f"{w}x{h}: {f}" for f in p.evaluate(CHECK, {"flipAll": flip})]
-            fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]
-            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]
+            cases["card rows"] += p.evaluate("window.__cardRows || 0")
+            fails += [f"{w}x{h}: {f}" for f in p.evaluate(CLICKS)]; cases["click flows"] += 1
+            fails += [f"{w}x{h}: {f}" for f in keyboard_case(p)]; cases["keyboard flows"] += 1
             ctx.close()
+        for w, h in WORLD_VIEWPORTS:
+            for open_ in (False, True):
+                ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2, service_workers="block")
+                p = ctx.new_page()
+                p.on("pageerror", lambda e: fails.append(f"{w}: page error {e}"))
+                p.goto(BASE)
+                p.wait_for_function("!!(window.game && window.LST && LST.WorldSelect)")
+                tag = "open" if open_ else "locked"
+                fails += [f"{w}x{h} world cards ({tag}): {f}" for f in p.evaluate(WORLD_CHECK, {"open": open_})]
+                cases["world-card screens"] += 1
+                ctx.close()
         b.close()
     for f in fails: print("FAIL", f)
+    total = sum(cases.values())
+    print(f"card-layout-test: {total} cases (" + ", ".join(f"{n} {k}" for k, n in cases.items()) + ")")
+    if total == 0: fails.append("no cases ran")
     print("card-layout-test:", "PASS" if not fails else f"{len(fails)} failure(s)")
     sys.exit(1 if fails else 0)
 

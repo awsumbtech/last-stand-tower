@@ -33,7 +33,7 @@ LST.UPGRADES = [
 
 LST.meta = (function () {
   const KEY = "lst.meta";
-  const VERSION = 4;
+  const VERSION = 5;
   const storage = LST.utils.storage;
   const M = () => LST.CONFIG.meta;
 
@@ -44,11 +44,15 @@ LST.meta = (function () {
       codex: { seen: [], traps: [] }, // cards you've been dealt / traps you've discovered
       armorRefund: 0,                 // Gears refunded when Armor changed
       armorNotice: false,             // show the "Armor changed" note once
-      worlds: { backyard: { cleared: false, clears: 0, bestTime: 0 } }, // world finales beaten (world 2 unlocks in Sprint 6)
+      worlds: { backyard: { cleared: false, clears: 0, bestTime: 0 }, beach: freshWorld() }, // world finales beaten, per-world bests
+      world: "backyard",              // the world picked on the start screen (src/worlds/WorldRegistry.js)
       abilities: ["shockwave"], ability: "shockwave", // unlocked / equipped active ability
       finaleNotice: false,            // "King Mole waits at wave 20" note for older saves
     };
   }
+
+  // A world's save record. The Backyard's best wave stays in its old "lst.bestWave" key.
+  function freshWorld() { return { cleared: false, clears: 0, bestTime: 0, best: 0 }; }
 
   // Each step takes a save of version k and returns version k + 1.
   const MIGRATIONS = {
@@ -67,6 +71,13 @@ LST.meta = (function () {
       v: 4, worlds: { backyard: { cleared: false, clears: 0, bestTime: 0 } }, abilities: ["shockwave"], ability: "shockwave",
       finaleNotice: (+storage.get("lst.bestWave", 0) || 0) >= 15,
     }),
+    // v5: World 2 (Beach). Adds its record and the picked world; nothing else changes.
+    // Beach opens from worlds.backyard.cleared, which v4 saves already have.
+    4: (s) => {
+      s.worlds = s.worlds && typeof s.worlds === "object" ? s.worlds : {};
+      s.worlds.beach = Object.assign(freshWorld(), s.worlds.beach || {});
+      return Object.assign(s, { v: 5, world: "backyard" });
+    },
   };
 
   function sanitize(s) {
@@ -84,6 +95,8 @@ LST.meta = (function () {
     if (!s.codex || typeof s.codex !== "object") s.codex = { seen: [], traps: [] };
     if (!s.worlds || typeof s.worlds !== "object") s.worlds = {};
     s.worlds.backyard = Object.assign({ cleared: false, clears: 0, bestTime: 0 }, s.worlds.backyard || {});
+    s.worlds.beach = Object.assign(freshWorld(), s.worlds.beach || {});
+    if (typeof s.world !== "string" || !s.worlds[s.world]) s.world = "backyard";
     if (!Array.isArray(s.abilities)) s.abilities = ["shockwave"];
     s.abilities = s.abilities.filter((a) => LST.CONFIG.abilities[a]);
     if (!s.abilities.includes("shockwave")) s.abilities.unshift("shockwave");
@@ -227,22 +240,25 @@ LST.meta = (function () {
     },
 
     // Highest Head Start wave allowed: 5 per level, capped at headStartCap (85%) of the best wave (multiple of 5).
-    headStartMax(best) {
+    headStartMax(best, world = "backyard") {
       const per = M().upgrades.headStart.per;
       let cap = Math.floor((best * M().headStartCap) / per) * per;
-      // You can't skip King Mole until you've beaten him once.
-      if (!this.worldCleared()) cap = Math.min(cap, LST.CONFIG.finale.wave - per);
+      // You can't skip a world's finale boss until you've beaten it once. New worlds (Beach) give
+      // no Head Start at all until their first clear: the first clear is played in full.
+      const def = LST.WorldRegistry && LST.WorldRegistry.get(world);
+      if (def && !def.headStartBeforeClear && !this.worldCleared(world)) return 0;
+      if (!this.worldCleared(world)) cap = Math.min(cap, LST.CONFIG.finale.wave - per);
       return Math.max(0, Math.min(per * this.level("headStart"), cap));
     },
 
     // ---------- Worlds ----------
     worldCleared(id = "backyard") { return !!(this.state.worlds[id] && this.state.worlds[id].cleared); },
-    // Beat a world finale: pays the bonus right away (saved) and returns it.
-    clearWorld(id, seconds) {
+    // Beat a world finale: pays the bonus (x the world's Gear multiplier) right away (saved) and returns it.
+    clearWorld(id, seconds, gearMult = 1) {
       const w = this.state.worlds[id] || (this.state.worlds[id] = { cleared: false, clears: 0, bestTime: 0 });
       const g = LST.CONFIG.finale.gears;
       const first = !w.cleared;
-      const bonus = first ? g.first : g.again;
+      const bonus = Math.round((first ? g.first : g.again) * gearMult);
       w.cleared = true;
       w.clears += 1;
       if (seconds && (!w.bestTime || seconds < w.bestTime)) w.bestTime = Math.round(seconds);
@@ -270,17 +286,17 @@ LST.meta = (function () {
       return true;
     },
     // What the next run will skip to (the player can pick lower on the start screen).
-    headStartWave(best) {
-      const max = this.headStartMax(best);
+    headStartWave(best, world = "backyard") {
+      const max = this.headStartMax(best, world);
       const pick = this.state.headStartPick;
       return pick === null || pick === undefined ? max : Math.max(0, Math.min(max, pick));
     },
-    cycleHeadStart(best) {
-      const per = M().upgrades.headStart.per, max = this.headStartMax(best);
-      const cur = this.headStartWave(best);
+    cycleHeadStart(best, world = "backyard") {
+      const per = M().upgrades.headStart.per, max = this.headStartMax(best, world);
+      const cur = this.headStartWave(best, world);
       this.state.headStartPick = cur >= max ? 0 : cur + per;
       this.save();
-      return this.headStartWave(best);
+      return this.headStartWave(best, world);
     },
 
     anyAffordable() {

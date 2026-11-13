@@ -1,0 +1,855 @@
+{
+  "frames": {
+    "hermit_crab_b_walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_1": {
+      "frame": {
+        "x": 194,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_2": {
+      "frame": {
+        "x": 388,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_3": {
+      "frame": {
+        "x": 582,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_hit_crack_0": {
+      "frame": {
+        "x": 0,
+        "y": 194,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "hermit_crab_b_hit_crack_1": {
+      "frame": {
+        "x": 194,
+        "y": 194,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "hermit_crab_b_hit_crack_2": {
+      "frame": {
+        "x": 388,
+        "y": 194,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "hermit_crab_b_hit_crack_3": {
+      "frame": {
+        "x": 582,
+        "y": 194,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "hermit_crab_b_walk_broken_0": {
+      "frame": {
+        "x": 0,
+        "y": 388,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_broken_1": {
+      "frame": {
+        "x": 194,
+        "y": 388,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_broken_2": {
+      "frame": {
+        "x": 388,
+        "y": 388,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_walk_broken_3": {
+      "frame": {
+        "x": 582,
+        "y": 388,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 100
+    },
+    "hermit_crab_b_regrow_0": {
+      "frame": {
+        "x": 0,
+        "y": 582,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "hermit_crab_b_regrow_1": {
+      "frame": {
+        "x": 194,
+        "y": 582,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "hermit_crab_b_regrow_2": {
+      "frame": {
+        "x": 388,
+        "y": 582,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "hermit_crab_b_regrow_3": {
+      "frame": {
+        "x": 582,
+        "y": 582,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "walk": {
+      "frames": [
+        "hermit_crab_b_walk_0",
+        "hermit_crab_b_walk_1",
+        "hermit_crab_b_walk_2",
+        "hermit_crab_b_walk_3"
+      ],
+      "fps": 10,
+      "loop": true
+    },
+    "hit_crack": {
+      "frames": [
+        "hermit_crab_b_hit_crack_0",
+        "hermit_crab_b_hit_crack_1",
+        "hermit_crab_b_hit_crack_2",
+        "hermit_crab_b_hit_crack_3"
+      ],
+      "fps": 16,
+      "loop": false
+    },
+    "walk_broken": {
+      "frames": [
+        "hermit_crab_b_walk_broken_0",
+        "hermit_crab_b_walk_broken_1",
+        "hermit_crab_b_walk_broken_2",
+        "hermit_crab_b_walk_broken_3"
+      ],
+      "fps": 10,
+      "loop": true
+    },
+    "regrow": {
+      "frames": [
+        "hermit_crab_b_regrow_0",
+        "hermit_crab_b_regrow_1",
+        "hermit_crab_b_regrow_2",
+        "hermit_crab_b_regrow_3"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.3",
+    "image": "hermit_crab_b.q.png",
+    "format": "RGBA8888 (Pillow, not quantized: pngquant is not installed on the box)",
+    "size": {
+      "w": 774,
+      "h": 774
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "walk",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      },
+      {
+        "name": "hit_crack",
+        "from": 4,
+        "to": 7,
+        "direction": "forward"
+      },
+      {
+        "name": "walk_broken",
+        "from": 8,
+        "to": 11,
+        "direction": "forward"
+      },
+      {
+        "name": "regrow",
+        "from": 12,
+        "to": 15,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 96,
+      "y": 96,
+      "note": "in sourceSize px: frame centre = entity position (e.x, e.y); feet line at y = 140"
+    },
+    "hitbox": {
+      "r": 36,
+      "units": "frame px",
+      "worldRadius": 18,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 48.6,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its round red body width = 59 px (same on-screen size as v0.1.1), body centre at x = 103, feet line at y = 140 (pivot + 44)"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 2396304,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "d028848cbda2c648fe59b39deb68e7da47687a21b54fa46db056f64a8b3a3036",
+    "entity": "hermit_crab",
+    "role": "World 2 shielded enemy (Sprint 5 'Shielded': shell = shield, regrows once)",
+    "proposedConfig": {
+      "radius": 13,
+      "note": "game radius (src/enemies/BeachEnemies.js). Art keeps refBodyR 48.6 px; the game scales by bodyR/refBodyR."
+    },
+    "states": {
+      "walk": "shell intact (shield up)",
+      "hit_crack": "plays once when the shield breaks (4 frames @16: impact, cracks, burst, shell-less)",
+      "walk_broken": "shield down: shell gone, soft pale abdomen exposed (different outline and value from the shelled walk)",
+      "regrow": "plays once when the shell regrows (4 frames @12), ends on the full-shell pose, then back to walk"
+    },
+    "variant": "b",
+    "manifestNames": {
+      "walk": "walk",
+      "bare": "walk_broken",
+      "crack": "hit_crack",
+      "regrow": "regrow"
+    },
+    "v012": "readability pass for ~25 CSS px: scuttle walk (4 different leg poses); bare = claws thrown up in panic + limp pale shrimp tail: Y-shaped silhouette. Blind packet _checker/hermit_crab_v012/; not picked yet.",
+    "v013": "walk pass: big leg kicks: back leg kicked high / neutral (v0.1.2 frame 0) / front leg kicked forward / neutral",
+    "v013Candidate": "blind candidate (see _checker/hermit_crab_v013/)",
+    "v013RegistrationOffsets": {
+      "dyFramePx": {
+        "w1 (crab_v013_c_walk_p1)": -4,
+        "w3 (crab_v013_c_walk_p3)": -5
+      },
+      "note": "mechanical per-frame registration offsets (whole frame moved up when negative), applied after the red-body/feet-line registration to give a 1-2 CSS px body bob at radius 13; no pixels inside a frame are moved. Frames not listed: 0."
+    },
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "crack": {
+          "raw": "crab_v012_crack_b",
+          "rawSha256": "ec9fc43432e0a227265eead65e8a499127b1e9d3a77a23bf81b74cdef252c8e2",
+          "keyColour": [
+            46,
+            181,
+            76
+          ],
+          "measuredSpan": 205.0,
+          "scale": 0.2878
+        },
+        "regrow": {
+          "raw": "crab_v012_regrow_b",
+          "rawSha256": "f31424d92d08d72f3d88527f7de15cf00af09b57015c54be50408b6a45f410b3",
+          "keyColour": [
+            41,
+            183,
+            75
+          ],
+          "measuredSpan": 201.5,
+          "scale": 0.2928
+        },
+        "w1": {
+          "raw": "crab_v013_c_walk_p1",
+          "rawSha256": "06faae6cb8bfa6d42bb596b2bc84fb401ee14a11931c59079646038d33174f23",
+          "keyColour": [
+            39,
+            182,
+            78
+          ],
+          "measuredSpan": 381.0,
+          "scale": 0.1549
+        },
+        "w3": {
+          "raw": "crab_v013_c_walk_p3",
+          "rawSha256": "618b98233ca8d09b7c4ace271911f6166119237c8f75a14feed7a5f8f0769371",
+          "keyColour": [
+            40,
+            179,
+            78
+          ],
+          "measuredSpan": 375.0,
+          "scale": 0.1573
+        },
+        "wm": {
+          "raw": "crab_v012_walk_waddle",
+          "rawSha256": "4a0793762b1701ca2bffc047b516037f871e64164a1bfacbaa54a5b9d4121cce",
+          "keyColour": [
+            45,
+            183,
+            80
+          ],
+          "measuredSpan": 189.5,
+          "scale": 0.3113
+        },
+        "b1": {
+          "raw": "crab_v013_c_bare_p1",
+          "rawSha256": "470873b3efb9ce4e3675296ef864c59203d3c1dc55c73faf5c3a1db508e1f29d",
+          "keyColour": [
+            37,
+            181,
+            79
+          ],
+          "measuredSpan": 395.0,
+          "scale": 0.1494
+        },
+        "b3": {
+          "raw": "crab_v013_c_bare_p3",
+          "rawSha256": "728427a273b3c952de4035a99d38b704d091029696bf5c63955aa1b894cc26c4",
+          "keyColour": [
+            36,
+            183,
+            80
+          ],
+          "measuredSpan": 386.0,
+          "scale": 0.1528
+        },
+        "bm": {
+          "raw": "crab_v012_barewalk_b",
+          "rawSha256": "3f615b4fe7abae76bdabd14b8cc051a391286db65b6dcebe286b7926543f6915",
+          "keyColour": [
+            43,
+            182,
+            80
+          ],
+          "measuredSpan": 204.5,
+          "scale": 0.2885
+        }
+      },
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
+    },
+    "qa": {
+      "frames": {
+        "crack[0]": {
+          "clippedFraction": 0.0009,
+          "edgeMarginPx": 27,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[1]": {
+          "clippedFraction": 0.0015,
+          "edgeMarginPx": 28,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[2]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[3]": {
+          "clippedFraction": 0.0013,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[0]": {
+          "clippedFraction": 0.0013,
+          "edgeMarginPx": 33,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[1]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[3]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 23,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "w1[0]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 9,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "w3[0]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 9,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[0]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 15,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[1]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 15,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[2]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 13,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[3]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 14,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "b1[0]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 28,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "b3[0]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[0]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 33,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[1]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[3]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        }
+      },
+      "motion": {
+        "walk": {
+          "centroidShiftPx": [
+            6.7,
+            6.7,
+            6.7,
+            6.7
+          ],
+          "IoU": [
+            0.783,
+            0.789,
+            0.789,
+            0.783
+          ]
+        },
+        "hit_crack": {
+          "centroidShiftPx": [
+            2.8,
+            10.6,
+            1.9
+          ],
+          "IoU": [
+            0.576,
+            0.579,
+            0.852
+          ]
+        },
+        "walk_broken": {
+          "centroidShiftPx": [
+            2.0,
+            3.3,
+            3.3,
+            2.0
+          ],
+          "IoU": [
+            0.803,
+            0.755,
+            0.755,
+            0.803
+          ]
+        },
+        "regrow": {
+          "centroidShiftPx": [
+            4.2,
+            2.6,
+            6.7
+          ],
+          "IoU": [
+            0.72,
+            0.856,
+            0.701
+          ]
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "hermit_crab_b.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 291482,
+        "indexed": 84611
+      },
+      "psnrDb": 47.35,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 52,
+      "sha256": "d028848cbda2c648fe59b39deb68e7da47687a21b54fa46db056f64a8b3a3036",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "hermit_crab_b.png",
+      "sha256": "94f87305a41461885c2c5a19be779016de4afc13baa8aaedc263fb6ca2f49353",
+      "bytes": 291482,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
+    }
+  }
+}

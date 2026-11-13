@@ -1,0 +1,111 @@
+{
+  "look": "IceCrust",
+  "variant": "a",
+  "version": "0.1.1",
+  "strips": {
+    "main": {
+      "image": "IceCrust_a.q.png",
+      "size": {
+        "w": 256,
+        "h": 288
+      },
+      "frame": {
+        "w": 256,
+        "h": 288
+      },
+      "count": 1,
+      "fps": 0,
+      "loop": false,
+      "play": "static: hold this frame while frozen",
+      "clippedFractionPerFrame": [
+        0.0
+      ],
+      "sha256": "175cba5383bc4865d1ca4b9c5fd2434f003a333a2aa736ee4b55b0d574ec3433",
+      "quantizedCopy": {
+        "image": "IceCrust_a.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 57760,
+          "indexed": 23864
+        },
+        "psnrDb": 47.47,
+        "maxChannelError": 26,
+        "metric": "premultiplied RGBA",
+        "sha256": "175cba5383bc4865d1ca4b9c5fd2434f003a333a2aa736ee4b55b0d574ec3433",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "IceCrust_a.png",
+        "sha256": "adb9adc1ed6ace67989137d919f321a6430d07039752ece9c92b23591e75e960",
+        "bytes": 57760,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    },
+    "snap": {
+      "image": "IceCrust_a_snap.q.png",
+      "size": {
+        "w": 768,
+        "h": 288
+      },
+      "frame": {
+        "w": 256,
+        "h": 288
+      },
+      "count": 3,
+      "fps": 30,
+      "loop": false,
+      "play": "optional one-shot on attach, then switch to main",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "832fd229f5af75120c0a39013755048e4514d377e45d632dc4d3f6688286c221",
+      "quantizedCopy": {
+        "image": "IceCrust_a_snap.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 132671,
+          "indexed": 50608
+        },
+        "psnrDb": 47.98,
+        "maxChannelError": 41,
+        "metric": "premultiplied RGBA",
+        "sha256": "832fd229f5af75120c0a39013755048e4514d377e45d632dc4d3f6688286c221",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "IceCrust_a_snap.png",
+        "sha256": "25136bfc7f3e2f26de55f1bb3df721ed2dcaa32f9f91c0444e37dd489c5c693f",
+        "bytes": 132671,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    }
+  },
+  "anchor": {
+    "x": 128,
+    "y": 152,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "shellBottom": {
+    "y": 266,
+    "meaning": "lowest opaque row of the hold frame (round ice shell, plus icicles/bumps if any)"
+  },
+  "alpha": "shell fill is see-through (about 50% alpha); ink, snow and glint are solid",
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "rawSha256": "1b94a5be5924b2bb9c5ea1f53c7c9cf18672de326bbda8aa5a2824479a818f3d",
+    "postProcess": "_tools/process_v011.py build_ice (key bg, un-mix, see-through alpha by colour class, 2x2 cells, scale x0.6113 so the round shell is 220 px wide (<= 2.5*refBodyR, largest with no cell clipping), shell centre on anchor, other frames registered to it by ink cross-correlation; snap = generated frames 0,1,3, main = frame 3)",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "2x2 on flat crimson-magenta; same ice style as the v0.1.0 pick (ref ice_a.jpg: see-through cyan fill, navy ink, white rim, glints, snow cap with wavy drip edge); shell is a perfect ROUND circle; outline+frost rim / half filled / full shell / full shell + snow cap hugging the top curve (final).",
+    "v011Candidate": "a",
+    "see": "../PROVENANCE.json"
+  }
+}

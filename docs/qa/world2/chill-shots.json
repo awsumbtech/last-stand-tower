@@ -1,0 +1,276 @@
+{
+ "what": "ChillFrost v0.1.1 (ChillFrost_c) QA, PR #5: chilled basic / fast / tank + crab (Beach) or Big Red (Backyard; crab art only draws in the Beach) next to a frozen tank with IceCrust. 390x844 CSS px at DPR 2, service worker blocked, enemies held still. *-zoom2x.png = nearest-neighbour 2x crops of the chilled row and the frozen tank from the matching capture; *-zoom3x.png = 3x crop of the tank and crab / Big Red.",
+ "art": "assets/sprites/looks/ChillFrost/ChillFrost_c.json",
+ "chillFrame": "ChillFrost strip:frame each chilled enemy was showing (from ChillFrost.pick); reduced = prefers-reduced-motion",
+ "files": {
+  "backyard-chill-vs-frozen-f0-390x844.png": "ed9fed886fa00ff1d1d5555807bacfadc3ec0bf9fa35a30347d7d79f018c80e3",
+  "backyard-chill-vs-frozen-f0-zoom2x.png": "260f9b9252f69f294e77cb73c1721d6ff11d2a4ef6d8882f34601b971643fcc0",
+  "backyard-chill-vs-frozen-reduced-390x844.png": "3257fba6eb89177bb17121f980dae3134f110ccd011e77a34395a723ee5c72c2",
+  "backyard-chill-vs-frozen-reduced-zoom2x.png": "0497ca181e33f77548be8891ab6789ad1ee9e828d7b219f75ec6c3353c8f122d",
+  "backyard-chill-attach-f0-zoom2x.png": "ae83e82717bcb4d3c809ac22459755e844f950fd8a138312c155ee585c8e3e38",
+  "backyard-chill-attach-f1-zoom2x.png": "c50ff5b178a6d303cd9ddc369a7af9ca043287dcd6115c38ff5a7ba89611674b",
+  "backyard-chill-fade-f0-zoom2x.png": "c9f01e3ba4c0668a3ce63fa983b1001a19ebed11128c1eb6b43fd81af0dbeb5e",
+  "backyard-chill-fade-f1-zoom2x.png": "5b91553fc4a3f4010cc06364df33e0a593ca9bcfa441763a9af73b2a25c98eb2",
+  "backyard-chill-tank-bigred-zoom3x.png": "1ceb3817b83647b6da2abebe7ca2af1b9c1e1d91399e5ea7fc4eb8ff8ccc70fa",
+  "beach-chill-vs-frozen-f0-390x844.png": "765025f843f2ab78f20e2a3e33a15aef37c872e1adbdc8452a3c50893143de2f",
+  "beach-chill-vs-frozen-f0-zoom2x.png": "7d202932394cae856def44abb27c0bccecaee107b9edf365d568714d1672d8d0",
+  "beach-chill-vs-frozen-reduced-390x844.png": "c482b9c9a543e07c0810cb8b5f1afe80de4db673d2eb6b2a1f2f455e7fcec328",
+  "beach-chill-vs-frozen-reduced-zoom2x.png": "e85321909493ead554c965fc0bf768fd14ff5daf8723f725ee3c612bf99def9d",
+  "beach-chill-attach-f0-zoom2x.png": "9e5a09f05aa580f3017c5c487ba4cdbcfd318f681408cc4ff3dc1a1f2823f22e",
+  "beach-chill-attach-f1-zoom2x.png": "7614f2d3befb9fafa1a11dc2ea2697550f7d5e5b9040d154cd1cd3c652ce9268",
+  "beach-chill-fade-f0-zoom2x.png": "bd3c2566217e02d5eb6eda16b9d8963cbb1233a7eddd9370543550ebe86293d1",
+  "beach-chill-fade-f1-zoom2x.png": "bd400a923cbbf0ecb6fa7e952e8dc017cdb94cef2cf66994cbcd822ef0488fe6",
+  "beach-chill-tank-crab-zoom3x.png": "0d819bab45236c59b4838e0314563eb00a99b19540aa2aa3637e369fc1373ada"
+ },
+ "shots": [
+  {
+   "world": "backyard",
+   "shot": "vs-frozen-f0",
+   "files": [
+    "backyard-chill-vs-frozen-f0-390x844.png",
+    "backyard-chill-vs-frozen-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "loop:0": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "vs-frozen-reduced",
+   "files": [
+    "backyard-chill-vs-frozen-reduced-390x844.png",
+    "backyard-chill-vs-frozen-reduced-zoom2x.png"
+   ],
+   "chillFrame": {
+    "still:0": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "attach-f0",
+   "files": [
+    "backyard-chill-attach-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "attach:0": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "attach-f1",
+   "files": [
+    "backyard-chill-attach-f1-zoom2x.png"
+   ],
+   "chillFrame": {
+    "attach:1": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "fade-f0",
+   "files": [
+    "backyard-chill-fade-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "fade:0": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "fade-f1",
+   "files": [
+    "backyard-chill-fade-f1-zoom2x.png"
+   ],
+   "chillFrame": {
+    "fade:1": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "backyard",
+   "shot": "corner-check 3x (from vs-frozen-f0)",
+   "files": [
+    "backyard-chill-tank-bigred-zoom3x.png"
+   ],
+   "chillFrame": {
+    "loop:0": 4
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "boss=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "vs-frozen-f0",
+   "files": [
+    "beach-chill-vs-frozen-f0-390x844.png",
+    "beach-chill-vs-frozen-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "loop:0": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "vs-frozen-reduced",
+   "files": [
+    "beach-chill-vs-frozen-reduced-390x844.png",
+    "beach-chill-vs-frozen-reduced-zoom2x.png"
+   ],
+   "chillFrame": {
+    "still:0": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "attach-f0",
+   "files": [
+    "beach-chill-attach-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "attach:0": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "attach-f1",
+   "files": [
+    "beach-chill-attach-f1-zoom2x.png"
+   ],
+   "chillFrame": {
+    "attach:1": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "fade-f0",
+   "files": [
+    "beach-chill-fade-f0-zoom2x.png"
+   ],
+   "chillFrame": {
+    "fade:0": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "fade-f1",
+   "files": [
+    "beach-chill-fade-f1-zoom2x.png"
+   ],
+   "chillFrame": {
+    "fade:1": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  },
+  {
+   "world": "beach",
+   "shot": "corner-check 3x (from vs-frozen-f0)",
+   "files": [
+    "beach-chill-tank-crab-zoom3x.png"
+   ],
+   "chillFrame": {
+    "loop:0": 5
+   },
+   "looksByEnemy": [
+    "basic=chill",
+    "crab=chill",
+    "crab=chill",
+    "fast=chill",
+    "tank=chill",
+    "tank=frozen"
+   ]
+  }
+ ]
+}

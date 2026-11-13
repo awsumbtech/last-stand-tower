@@ -1,0 +1,134 @@
+{
+  "frames": {
+    "beach_bg_a_main_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 2048
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 2048
+      },
+      "sourceSize": {
+        "w": 1536,
+        "h": 2048
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 1000
+    }
+  },
+  "animations": {
+    "main": {
+      "frames": [
+        "beach_bg_a_main_0"
+      ],
+      "fps": 1,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "beach_bg_a.q.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 1536,
+      "h": 2048
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "main",
+        "from": 0,
+        "to": 0,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 768.0,
+      "y": 1024.0,
+      "note": "image centre = the tower spot (MANIFEST BeachGround anchor)"
+    },
+    "body": {
+      "r": 768.0,
+      "units": "frame px",
+      "note": "static ground: no hitbox. body r = half the image width; scale the ground by cover-fit to the viewport, not by an enemy radius"
+    },
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs.",
+    "static": true,
+    "fit": "cover, centred on the screen centre (= the tower)",
+    "shorelineFoamRowSrcPx": 315,
+    "calmCheck": {
+      "390x844": {
+        "coverScale": 0.4121,
+        "visibleSourceRect": [
+          295,
+          0,
+          946,
+          2048
+        ],
+        "calmRadiusSrcPx": 137.4,
+        "inkPixelsInCalmZone": 0,
+        "lumStdInCalmZone": 1.69,
+        "edgePixels(sobel>60)InCalmZone": 0,
+        "shorelineVisibleAtCssY": 129.8
+      },
+      "768x1024": {
+        "coverScale": 0.5,
+        "visibleSourceRect": [
+          0,
+          0,
+          1536,
+          2048
+        ],
+        "calmRadiusSrcPx": 223.0,
+        "inkPixelsInCalmZone": 0,
+        "lumStdInCalmZone": 2.82,
+        "edgePixels(sobel>60)InCalmZone": 0,
+        "shorelineVisibleAtCssY": 157.5
+      }
+    },
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace), 768x1024 output",
+      "rawSha256": "72f93ea273d9e94d6171a59f9d747644bc57af49e85e07e17cc7ee1924ac273e",
+      "postProcess": "_tools/background.py: 2x LANCZOS upscale to 1536x2048 (the generator's max is 768x1024, so the art is upscaled, not authored at 1536)",
+      "see": "../PROVENANCE.json"
+    },
+    "sha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
+    "knownIssue": "a starfish decoration sits at the right edge beside the pause button at 390x844 (CSS ~385,760); not moved: the ground must stay centred on the tower, and a symmetric crop-zoom big enough to push it off-screen would also push the shoreline under the top HUD",
+    "quantizedCopy": {
+      "image": "beach_bg_a.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 907577,
+        "indexed": 484637
+      },
+      "psnrDb": 47.69,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 61,
+      "sha256": "cdcd529f7e5ec5d184a002d8f533307cd14bb1b5ac8c35ead68d70d7fb900557",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "beach_bg_a.png",
+      "sha256": "52e957f73bbf5280fa4d23fe9c855acc6146b6de5496ba7225f661a40f834c2a",
+      "bytes": 907577,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-// SpriteTinter: draws an atlas frame with a colour effect (hit flash, frost, charge
+// SpriteTinter: draws an atlas frame with a colour effect (hit flash, charge
 // flicker) without baking tinted copies of whole sheets. One reusable scratch canvas.
 // The colour is blended *into* the art (keeping the ink outlines and shading) and then
 // clipped back to the sprite's own alpha, so a flashed enemy reads as "lit up" rather

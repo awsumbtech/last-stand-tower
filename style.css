@@ -1160,3 +1160,45 @@ svg.eye-ico circle { fill: var(--ink); }
 /* The back's "flip back" control is a real button (keyboard users can always flip back). */
 .card-back button.flip-back { border: 0; background: none; padding: 4px 8px; margin: -4px 0; font-family: inherit; line-height: inherit; cursor: pointer; }
 .card-back button.flip-back:focus-visible { outline: 3px solid var(--purple); outline-offset: 1px; border-radius: 8px; }
+
+/* ---------- World select (src/ui/WorldSelect.js) ---------- */
+.world-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; width: 100%; margin: 4px 0 10px; }
+.world-card {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; min-height: 64px; min-width: 0;
+  padding: 0; overflow: hidden; border: 3px solid var(--ink); border-radius: 14px; background: var(--cream);
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer; box-shadow: 0 3px 0 var(--ink);
+}
+.world-card:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.world-card.on { background: #fff3c4; outline: 3px solid #ffb020; outline-offset: 1px; }
+.world-card.locked { cursor: default; }
+.world-card .wc-pic { position: relative; display: block; height: 58px; overflow: hidden; border-bottom: 3px solid var(--ink); background: #cfe8f5; }
+.world-card .wc-art { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.world-card .wc-lock { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* Locked: the card art stays as drawn; only card_locked_overlay.png (chains + padlock) sits on top.
+   No CSS filter or opacity anywhere on a locked card. */
+.world-card .wc-body { display: flex; flex-direction: column; gap: 1px; padding: 6px 8px 7px; }
+.world-card .wc-name { font-weight: 700; font-size: 16px; line-height: 1.1; }
+.world-card .wc-line, .world-card .wc-mult { font-size: 12px; line-height: 1.2; color: #5b4a6e; }
+.world-card .wc-done { font-style: normal; color: #2e9e5b; }
+.world-card .wc-dev { font-style: normal; font-size: 10px; padding: 0 4px; border-radius: 6px; background: #8e6cff; color: #fff; vertical-align: middle; }
+.boss-bar.pips-half .pip.p1 { left: 50%; }
+.boss-bar.pips-half .pip.p2 { display: none; }
+/* Short phones (375x667): one text line per card so the start panel still fits. */
+@media (max-height: 760px) {
+  .world-select { margin: 2px 0 6px; }
+  .world-card { min-height: 48px; }
+  .world-card .wc-pic { display: none; }
+  .world-card .wc-body { display: block; padding: 4px 8px 5px; }
+  .world-card .wc-name { display: block; font-size: 15px; }
+  .world-card .wc-line, .world-card .wc-mult { display: inline; font-size: 11.5px; }
+  .world-card .wc-mult::before { content: " \00b7 "; }
+}
+@media (max-height: 760px) {
+  .world-card .wc-mult::before { content: "\00a0\00b7\00a0"; }
+  .world-card.locked .wc-mult { display: none; }
+  /* Short phones hide the card art; a locked card still shows the lock overlay, as a badge on the right. */
+  .world-card.locked .wc-pic { display: block; position: absolute; top: 3px; right: 3px; bottom: 3px; width: 54px; height: auto; border: 0; background: none; }
+  .world-card.locked .wc-art { display: none; }
+  .world-card.locked .wc-body { padding-right: 58px; }
+}
+@media (max-height: 760px) { .world-card .wc-mult { white-space: nowrap; } }

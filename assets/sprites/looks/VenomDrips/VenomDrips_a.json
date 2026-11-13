@@ -1,0 +1,72 @@
+{
+  "look": "VenomDrips",
+  "variant": "a",
+  "version": "0.1.1",
+  "strips": {
+    "main": {
+      "image": "VenomDrips_a.q.png",
+      "size": {
+        "w": 1152,
+        "h": 336
+      },
+      "frame": {
+        "w": 288,
+        "h": 336
+      },
+      "count": 4,
+      "fps": 8,
+      "loop": true,
+      "play": "loop while poisoned",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "572f212c49f92b4e7396dc3e01a080481f0e91a9ec74e898955738c55198cf02",
+      "quantizedCopy": {
+        "image": "VenomDrips_a.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 104573,
+          "indexed": 38609
+        },
+        "psnrDb": 51.19,
+        "maxChannelError": 44,
+        "metric": "premultiplied RGBA",
+        "sha256": "572f212c49f92b4e7396dc3e01a080481f0e91a9ec74e898955738c55198cf02",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "VenomDrips_a.png",
+        "sha256": "0acaef60c0b3ccb5589170d1376dcf0159850d1398609ec9c9bd8ffe52242543",
+        "bytes": 104573,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    }
+  },
+  "anchor": {
+    "x": 144,
+    "y": 128,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "bottomEdge": {
+    "x": 144,
+    "y": 216,
+    "meaning": "Enemy body bottom edge (anchor.y + refBodyR). The goo band hugs this edge; drips hang below."
+  },
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "rawSha256": "de5acd8a8e3fb1341986bc9b30d2ed41b320b7e3261211d98f02e0492a32e7a9",
+    "postProcess": "_tools/process_v011.py build_disc (key bg + gray placeholder circle, un-mix, 2x2 cells, register circle centre on anchor, scale x0.8564 so circle = 2*refBodyR, strip)",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "2x2 on flat magenta; same goo style as the v0.1.0 pick (refs venom_a.jpg + candidate 11); SMALL gray placeholder circle; goo curves around the round bottom and gathers into ONE big fat teardrop drip with two side nubs; no falling drops; bulge / stretch / bulb tip / spring back.",
+    "v011Candidate": "c",
+    "see": "../PROVENANCE.json"
+  }
+}

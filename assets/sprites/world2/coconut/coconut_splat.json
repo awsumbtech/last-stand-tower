@@ -1,0 +1,251 @@
+{
+  "frames": {
+    "coconut_splat_splat_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "coconut_splat_splat_1": {
+      "frame": {
+        "x": 162,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "coconut_splat_splat_2": {
+      "frame": {
+        "x": 324,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "splat": {
+      "frames": [
+        "coconut_splat_splat_0",
+        "coconut_splat_splat_1",
+        "coconut_splat_splat_2"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "coconut_splat.q.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 484,
+      "h": 160
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "splat",
+        "from": 0,
+        "to": 2,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 80,
+      "y": 80,
+      "note": "pivot (80, 80) = frame centre = impact point on the ground (draw at the coconut's landing position)"
+    },
+    "hitbox": {
+      "r": 16,
+      "units": "frame px",
+      "worldRadius": 8,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 20,
+      "drawScale": 1.25,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its frame-0 squashed coconut width = 52 px, the same coconut scale as coconut_spin (body r 20); each frame's content centred at y = 72"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 309760,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
+    "entity": "coconut_splat",
+    "role": "coconut landing crack/splash, plays once (0.25 s) then remove",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "fx": {
+          "raw": "coconut_fx",
+          "rawSha256": "5cb20b7e34b1603f1a105d774d6c0be4b5f652ca9ee7589910673973a6199b15",
+          "keyColour": [
+            223,
+            31,
+            130
+          ],
+          "measuredSpan": 163.0,
+          "scale": 0.319
+        }
+      },
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
+    },
+    "qa": {
+      "frames": {
+        "fx[0]": {
+          "clippedFraction": 0.001,
+          "edgeMarginPx": 46,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[1]": {
+          "clippedFraction": 0.0009,
+          "edgeMarginPx": 42,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[2]": {
+          "clippedFraction": 0.001,
+          "edgeMarginPx": 46,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[3]": {
+          "clippedFraction": 0.001,
+          "edgeMarginPx": 46,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[4]": {
+          "clippedFraction": 0.0028,
+          "edgeMarginPx": 39,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[5]": {
+          "clippedFraction": 0.0018,
+          "edgeMarginPx": 38,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[6]": {
+          "clippedFraction": 0.0019,
+          "edgeMarginPx": 21,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "fx[7]": {
+          "clippedFraction": 0.0022,
+          "edgeMarginPx": 41,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        }
+      },
+      "motion": {
+        "splat": {
+          "centroidShiftPx": [
+            6.8,
+            19.9
+          ],
+          "IoU": [
+            0.448,
+            0.338
+          ]
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "coconut_splat.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 26413,
+        "indexed": 8300
+      },
+      "psnrDb": 50.85,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 24,
+      "sha256": "81b898bc81d17ec8541c9c1a7a5b5e662d9c4d58776b9535011bed9cbc1ea4e0",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "coconut_splat.png",
+      "sha256": "a8b1f883fddfc7f716b515eb2d37ab7595caac9a7fdc49c3d636ce63b20bc586",
+      "bytes": 26413,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
+    }
+  }
+}

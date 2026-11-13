@@ -1,0 +1,219 @@
+{
+  "source": {
+    "delivery": "Game Art & Motion: last-stand-tower element-looks",
+    "version": "0.1.1",
+    "date": "2026-11-12",
+    "picks": "FINAL-PICKS.md v0.1.1 + CHANGELOG-v0.1.1.md + _checker/v011/INDEPENDENT-SCORES.md (independent checker, PASS, confidence 0.85): BurnFlames a (1-pixel fix at (188,102)), SparkCrackle c (bolts in the corners), IceCrust a (round crust, snap last frame == hold), VenomDrips c (shipped as VenomDrips_a.*: bigger drips, cup-shaped goo). ChillFrost v0.1.1 (2026-11-13): ChillFrost/recommended/NOTES.md + _checker/chillfrost_v011/CHECKER-SCORES-chillfrost_v011.md (blind checker, 21/25, confidence 0.65): ChillFrost c (irregular cyan ice chips, navy ink, white/cyan sparkles; key-spill un-mix, official pink count 0); replaces v0.1.0 b",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "originals": "the repo ships the delivered pngquant .q.png copies (same at real size: in-browser A/B at every enemy radius, p99 <= 7/255 for r <= 18, <= 13/255 at boss r 44); RGBA masters are not committed, hashes below (quantizedFrom / strips.*.originalImage). Raw generations stay in the delivery's _src/."
+  },
+  "integration": {
+    "release": "Element looks v0.1.1 + ChillFrost v0.1.1",
+    "date": "2026-11-13"
+  },
+  "originalsCommitted": false,
+  "files": {
+    "IceCrust/IceCrust_a.json": {
+      "sha256": "6c43f48b9378cc2b4999f2ecdca55a939e5c854b33fc2c687128cb5c4d12e5c6",
+      "bytes": 4464,
+      "source": "IceCrust/recommended/IceCrust_a.json",
+      "sourceSha256": "42d38ebecb4da1ae5f1438ecb4d9fdc80f18c3468950e7fe25e6a2a28b1257b7",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.main.image (delivery)": "IceCrust_a.png",
+        "strips.snap.image (delivery)": "IceCrust_a_snap.png",
+        ".provenance.raw": "_src/raw/v011/ice_v011_a.jpg",
+        ".provenance.styleReference": "current v0.1.0 pick raw _src/raw/ice_a.jpg (same look object)",
+        ".provenance.supersedes": "v0.1.0 _src/raw/ice_a.jpg (archived in _archive/v0.1.0/)"
+      }
+    },
+    "IceCrust/IceCrust_a.q.png": {
+      "sha256": "175cba5383bc4865d1ca4b9c5fd2434f003a333a2aa736ee4b55b0d574ec3433",
+      "bytes": 23864,
+      "source": "IceCrust/recommended/IceCrust_a.q.png",
+      "sourceSha256": "175cba5383bc4865d1ca4b9c5fd2434f003a333a2aa736ee4b55b0d574ec3433",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "IceCrust_a.png",
+        "source": "IceCrust/recommended/IceCrust_a.png",
+        "sha256": "adb9adc1ed6ace67989137d919f321a6430d07039752ece9c92b23591e75e960",
+        "bytes": 57760,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "IceCrust/IceCrust_a_snap.q.png": {
+      "sha256": "832fd229f5af75120c0a39013755048e4514d377e45d632dc4d3f6688286c221",
+      "bytes": 50608,
+      "source": "IceCrust/recommended/IceCrust_a_snap.q.png",
+      "sourceSha256": "832fd229f5af75120c0a39013755048e4514d377e45d632dc4d3f6688286c221",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "IceCrust_a_snap.png",
+        "source": "IceCrust/recommended/IceCrust_a_snap.png",
+        "sha256": "25136bfc7f3e2f26de55f1bb3df721ed2dcaa32f9f91c0444e37dd489c5c693f",
+        "bytes": 132671,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "BurnFlames/BurnFlames_a.json": {
+      "sha256": "4a1dcc145823e80b312b0c09ce85d2418ec1220cf58de033c19ce65d418cd715",
+      "bytes": 2821,
+      "source": "BurnFlames/recommended/BurnFlames_a.json",
+      "sourceSha256": "391a2f37ca5876c8f48365f4da502aff0fe7f162eb3689ce497aa2148f0b3bf8",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.main.image (delivery)": "BurnFlames_a.png",
+        ".provenance.raw": "_src/raw/flames_a.jpg",
+        ".provenance.styleReference": "_src/style_ref_enemies.png (crop of Brian's own assets/sprites/enemies/tank+basic)"
+      }
+    },
+    "BurnFlames/BurnFlames_a.q.png": {
+      "sha256": "0102a12460f7bf0316cc205e703e1510161028ad3b0131b9acdf4924bf3283c4",
+      "bytes": 97389,
+      "source": "BurnFlames/recommended/BurnFlames_a.q.png",
+      "sourceSha256": "0102a12460f7bf0316cc205e703e1510161028ad3b0131b9acdf4924bf3283c4",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "BurnFlames_a.png",
+        "source": "BurnFlames/recommended/BurnFlames_a.png",
+        "sha256": "0a5af49c9d7b7578615e860c94902d9c654f89e791db26fefe70ec1f6c927a11",
+        "bytes": 252438,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "SparkCrackle/SparkCrackle_c.json": {
+      "sha256": "f427c56a3fa3fecad5e1e6a89e0e4376f9d7bb023ff1377c80490c7bb8f58776",
+      "bytes": 2823,
+      "source": "SparkCrackle/recommended/SparkCrackle_c.json",
+      "sourceSha256": "f4979a28b4144220e71c0e96bc1859527390e8afe52924ce4269f7c8cc6414fe",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.main.image (delivery)": "SparkCrackle_c.png",
+        ".provenance.raw": "_src/raw/v011/spark_v011_c.jpg",
+        ".provenance.styleReference": "current v0.1.0 pick raw _src/raw/spark_c.jpg (same look object)",
+        ".provenance.supersedes": "v0.1.0 _src/raw/spark_c.jpg (archived in _archive/v0.1.0/)"
+      }
+    },
+    "SparkCrackle/SparkCrackle_c.q.png": {
+      "sha256": "0e41cc53f2f29dfff7236f3418cf38d2e22dc92d0102cf7e6d0e82348148d7f7",
+      "bytes": 59351,
+      "source": "SparkCrackle/recommended/SparkCrackle_c.q.png",
+      "sourceSha256": "0e41cc53f2f29dfff7236f3418cf38d2e22dc92d0102cf7e6d0e82348148d7f7",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "SparkCrackle_c.png",
+        "source": "SparkCrackle/recommended/SparkCrackle_c.png",
+        "sha256": "abb09bdef20d7380fd45ddae76bb7c44583e972f637d723ec1841fe1d05e290f",
+        "bytes": 179683,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_c.json": {
+      "sha256": "33904c42c9b779a72c173e2b681ffb13fc997da75b102af42a9fdac79b9c3f2e",
+      "bytes": 7763,
+      "source": "ChillFrost/recommended/ChillFrost_c.json",
+      "sourceSha256": "1467e8ade4ce769a2de1deb8639afd1f6866a19554391de7687fb6dd38fbb824",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.attach.image (delivery)": "ChillFrost_c_attach.png",
+        "strips.still.image (delivery)": "ChillFrost_c_still.png",
+        "strips.loop.image (delivery)": "ChillFrost_c.png",
+        "strips.fade.image (delivery)": "ChillFrost_c_fade.png",
+        ".provenance.raw": "_src/raw/chillfrost_v011/chillfrost_c.jpg",
+        ".provenance.styleReference": "IceCrust v0.1.1 pick raw _src/raw/v011/ice_v011_a.jpg (same ice ink/cyan/white family; ChillFrost is a rim, not a shell)"
+      }
+    },
+    "ChillFrost/ChillFrost_c.q.png": {
+      "sha256": "29afc1089ef42a434d4dbd72bc1347099d4d6903c3e58514bd9119f7708b6280",
+      "bytes": 52720,
+      "source": "ChillFrost/recommended/ChillFrost_c.q.png",
+      "sourceSha256": "29afc1089ef42a434d4dbd72bc1347099d4d6903c3e58514bd9119f7708b6280",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_c.png",
+        "source": "ChillFrost/recommended/ChillFrost_c.png",
+        "sha256": "8ac89f539dc245f1d7f9078d3b978e6814ee00219a43e6ce08f11658a805919f",
+        "bytes": 178233,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_c_attach.q.png": {
+      "sha256": "bd22301c39b1a239e552bfabfef2e3d975600fc8879977410603e5af60054d30",
+      "bytes": 17694,
+      "source": "ChillFrost/recommended/ChillFrost_c_attach.q.png",
+      "sourceSha256": "bd22301c39b1a239e552bfabfef2e3d975600fc8879977410603e5af60054d30",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_c_attach.png",
+        "source": "ChillFrost/recommended/ChillFrost_c_attach.png",
+        "sha256": "e17b71dbda9888bb2e5ed16cdee842ccb95c44e75717c74620c5247a6dd2864b",
+        "bytes": 56044,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_c_fade.q.png": {
+      "sha256": "586b07d4d85b6c40175f732a37459714160e9fd6d6d64de341c8810f6362ace5",
+      "bytes": 16705,
+      "source": "ChillFrost/recommended/ChillFrost_c_fade.q.png",
+      "sourceSha256": "586b07d4d85b6c40175f732a37459714160e9fd6d6d64de341c8810f6362ace5",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_c_fade.png",
+        "source": "ChillFrost/recommended/ChillFrost_c_fade.png",
+        "sha256": "dc8ac4cd99d4e44850f34922d50e411e9e56c424eeeb0edd21fd91afc70d0f64",
+        "bytes": 52650,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_c_still.q.png": {
+      "sha256": "c34e724d93c8741eb2000878aca4a67b910b37003af59b215c406fcf4bfa6e5b",
+      "bytes": 15012,
+      "source": "ChillFrost/recommended/ChillFrost_c_still.q.png",
+      "sourceSha256": "c34e724d93c8741eb2000878aca4a67b910b37003af59b215c406fcf4bfa6e5b",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_c_still.png",
+        "source": "ChillFrost/recommended/ChillFrost_c_still.png",
+        "sha256": "82f51ead731e9360e9afe352688987366d3857607a2c301c1073c0cd9e104eac",
+        "bytes": 46971,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "VenomDrips/VenomDrips_a.json": {
+      "sha256": "9c6f3fa0852715f2afda0873fb5c34b4b435a5fb4ef43b45fa07a6ff48a4caa7",
+      "bytes": 2852,
+      "source": "VenomDrips/recommended/VenomDrips_a.json",
+      "sourceSha256": "9e588abb65aad75ed5e8f41fd0e47b68148ff512378bc1af1016f7ee1a4a9068",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.main.image (delivery)": "VenomDrips_a.png",
+        ".provenance.raw": "_src/raw/v011/venom_v011_c.jpg",
+        ".provenance.styleReference": "current v0.1.0 pick raw _src/raw/venom_a.jpg (same look object)",
+        ".provenance.supersedes": "v0.1.0 _src/raw/venom_a.jpg (archived in _archive/v0.1.0/)"
+      }
+    },
+    "VenomDrips/VenomDrips_a.q.png": {
+      "sha256": "572f212c49f92b4e7396dc3e01a080481f0e91a9ec74e898955738c55198cf02",
+      "bytes": 38609,
+      "source": "VenomDrips/recommended/VenomDrips_a.q.png",
+      "sourceSha256": "572f212c49f92b4e7396dc3e01a080481f0e91a9ec74e898955738c55198cf02",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "VenomDrips_a.png",
+        "source": "VenomDrips/recommended/VenomDrips_a.png",
+        "sha256": "0acaef60c0b3ccb5589170d1376dcf0159850d1398609ec9c9bd8ffe52242543",
+        "bytes": 104573,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    }
+  }
+}

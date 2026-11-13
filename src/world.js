@@ -11,6 +11,7 @@ LST.World = class World {
     this.tower = new LST.Tower();
     this.enemies = [];
     this.projectiles = [];
+    this.hazards = [];  // boss projectiles that land on the ground (Captain Crabclaw's coconuts)
     this.particles = [];
     this.texts = [];
     this.bursts = [];
@@ -64,12 +65,14 @@ LST.World = class World {
     const d = Math.hypot(x, y);
     const max = LST.CONFIG.MAX_SPAWN_DIST;
     if (d > max) { x *= max / d; y *= max / d; }
-    const enemy = new LST.Enemy(type, x, y, mult);
-    if (type === "boss") { enemy.maxHp = enemy.hp = LST.CONFIG.enemies.boss.hp * Math.pow(mult.hp, LST.CONFIG.bosses.hpExp); }
-    const early = type === "boss" && LST.CONFIG.bosses.early[this.wave];
+    // The registry makes archetype enemies (Beach: crab, gull, Elite Big Red); any other id is a plain Enemy.
+    const enemy = LST.EnemyRegistry ? LST.EnemyRegistry.create(type, x, y, mult) : new LST.Enemy(type, x, y, mult);
+    const boss = enemy.type === "boss";
+    if (boss) { enemy.maxHp = enemy.hp = LST.CONFIG.enemies.boss.hp * Math.pow(mult.hp, LST.CONFIG.bosses.hpExp); }
+    const early = boss && LST.CONFIG.bosses.early[this.wave];
     if (early) { enemy.maxHp *= early.hp; enemy.hp = enemy.maxHp; enemy.dmgMult *= early.dmg; }
     this.enemies.push(enemy);
-    if (type === "boss") this.onBossSpawn(enemy);
+    if (boss) this.onBossSpawn(enemy);
     return enemy;
   }
 
@@ -105,7 +108,8 @@ LST.World = class World {
     types.forEach((type, i) => {
       const a = Math.atan2(boss.y, boss.x) + (i - (types.length - 1) / 2) * 0.55;
       const r = boss.radius + 26;
-      const e = new LST.Enemy(type, boss.x + Math.cos(a) * r, boss.y + Math.sin(a) * r, m);
+      const x = boss.x + Math.cos(a) * r, y = boss.y + Math.sin(a) * r;
+      const e = LST.EnemyRegistry ? LST.EnemyRegistry.create(type, x, y, m) : new LST.Enemy(type, x, y, m);
       e.age = 0;
       this.enemies.push(e);
       this.bursts.push(new LST.Burst(e.x, e.y, "#ffffff", 22, "hit"));

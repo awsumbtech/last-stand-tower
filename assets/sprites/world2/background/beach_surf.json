@@ -1,0 +1,238 @@
+{
+  "frames": {
+    "beach_surf_main_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "sourceSize": {
+        "w": 1536,
+        "h": 226
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.03982300884955752
+      },
+      "duration": 167
+    },
+    "beach_surf_main_1": {
+      "frame": {
+        "x": 1538,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "sourceSize": {
+        "w": 1536,
+        "h": 226
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.03982300884955752
+      },
+      "duration": 167
+    },
+    "beach_surf_main_2": {
+      "frame": {
+        "x": 3076,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "sourceSize": {
+        "w": 1536,
+        "h": 226
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.03982300884955752
+      },
+      "duration": 167
+    },
+    "beach_surf_main_3": {
+      "frame": {
+        "x": 4614,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1536,
+        "h": 226
+      },
+      "sourceSize": {
+        "w": 1536,
+        "h": 226
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.03982300884955752
+      },
+      "duration": 167
+    }
+  },
+  "animations": {
+    "main": {
+      "frames": [
+        "beach_surf_main_0",
+        "beach_surf_main_1",
+        "beach_surf_main_2",
+        "beach_surf_main_3",
+        "beach_surf_main_2",
+        "beach_surf_main_1"
+      ],
+      "fps": 6,
+      "loop": true
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.2",
+    "image": "beach_surf.q.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 6150,
+      "h": 226
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "main",
+        "from": 0,
+        "to": 3,
+        "direction": "pingpong"
+      }
+    ],
+    "pivot": {
+      "x": 768.0,
+      "y": 9,
+      "note": "top-centre of the steady foam line (x = centre of the 1536-wide ground, y = top of the foam band). Place it on the ground at (768, placement[v].foamTopYInBackgroundSrcPx), in ground source px, then apply the ground's cover-fit transform"
+    },
+    "body": {
+      "r": 768.0,
+      "units": "frame px",
+      "note": "overlay of the ground: no hitbox. body r = half the ground width (768) so it scales exactly like BeachGround"
+    },
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs.",
+    "placement": {
+      "a": {
+        "foamTopYInBackgroundSrcPx": 275,
+        "note": "40 px above the ground's own shoreline foam row so the steady foam band covers it and the wash slides down onto the sand"
+      },
+      "b": {
+        "foamTopYInBackgroundSrcPx": 364,
+        "note": "40 px above the ground's own shoreline foam row so the steady foam band covers it and the wash slides down onto the sand"
+      },
+      "c": {
+        "foamTopYInBackgroundSrcPx": 360,
+        "note": "40 px above the ground's own shoreline foam row so the steady foam band covers it and the wash slides down onto the sand"
+      }
+    },
+    "layering": "draw after the ground, before the range ring and enemies",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "rawSha256": "72caad9b5983ee7af81cc523c96697e29a76e6fa21b6603040a79ea0b87126dc",
+      "postProcess": "_tools/v011_static.py: pinkness matte key, red despill, 4 bands registered on their top foam edge (src tops [95, 319, 555, 805]), scale x1.500, one horizontal row, 2 px gutter; v0.1.2 (_tools/v012_surf.py): cells re-ordered by wash reach (v0.1.1 cells [0, 1, 3, 2] -> 0..3), loop = ping-pong 0,1,2,3,2,1 (no new pixels)",
+      "see": "../PROVENANCE.json"
+    },
+    "sha256": "c197f4b5e435a097a9749d6195087c9dcb51446653936e11e0a3723ec00e7434",
+    "loopSeam": {
+      "metric": "median over columns of the change in the wash front (lowest alpha>128 row), src px; CSS px = src x 844/2048 at 390x844",
+      "v011_forward": {
+        "order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "stepsSrcPx": [
+          15.0,
+          22.0,
+          -7.0,
+          -32.0
+        ],
+        "seamStepSrcPx": -32.0,
+        "seamStepCssPx": -13.2,
+        "maxInLoopAbsSrcPx": 22.0
+      },
+      "v012_pingpong": {
+        "order": "cells 0,1,2,3,2,1",
+        "stepsSrcPx": [
+          15.0,
+          15.0,
+          7.0,
+          -7.0,
+          -15.0,
+          -15.0
+        ],
+        "seamStepSrcPx": -15.0,
+        "seamStepCssPx": -6.2,
+        "maxInLoopAbsSrcPx": 15.0,
+        "maxInLoopAbsCssPx": 6.2
+      },
+      "frontMedianSrcPx": {
+        "v011Cells": [
+          155.0,
+          172.0,
+          194.5,
+          188.0
+        ]
+      }
+    },
+    "quantizedCopy": {
+      "image": "beach_surf.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 1191538,
+        "indexed": 475321
+      },
+      "psnrDb": 46.69,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 36,
+      "sha256": "c197f4b5e435a097a9749d6195087c9dcb51446653936e11e0a3723ec00e7434",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "beach_surf.png",
+      "sha256": "19489f8b406bb3dfcaaed37ac1d4267b00105fb9dcc9f02123320d0bd3c08cfc",
+      "bytes": 1191538,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
+    }
+  }
+}

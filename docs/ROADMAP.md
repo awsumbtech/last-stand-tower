@@ -239,6 +239,7 @@ Watch item: the few 10+ minute runs come in hours 0-2 (long finale attempts). Bo
 ---
 
 ## Sprint 6: Worlds 1-3 and world select
+**Status (Nov 12 2026): World select and World 2 (Beach) are built on branch `world-2-beach` (PR #5, not merged).** That covers the world cards, Hermit Crab, Seagull, Elite Big Red, Captain Crabclaw with coconuts, Gears x1.6, the unlock on the Backyard's first clear, and the Game Art & Motion art. Snowy Peak (World 3) and the per-world music variants are not built.
 **Goal:** the long-journey map. A run happens inside one world; worlds unlock in order.
 
 - **World select** on the start screen: cartoon map cards with a palette preview, the best wave, the Gear multiplier and the lock condition.

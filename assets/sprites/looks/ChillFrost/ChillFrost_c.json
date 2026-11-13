@@ -1,0 +1,193 @@
+{
+  "look": "ChillFrost",
+  "variant": "c",
+  "version": "0.1.1",
+  "strips": {
+    "attach": {
+      "image": "ChillFrost_c_attach.q.png",
+      "size": {
+        "w": 576,
+        "h": 288
+      },
+      "frame": {
+        "w": 288,
+        "h": 288
+      },
+      "count": 2,
+      "fps": 12,
+      "loop": false,
+      "play": "optional one-shot on attach, then switch to loop",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0
+      ],
+      "sha256": "bd22301c39b1a239e552bfabfef2e3d975600fc8879977410603e5af60054d30",
+      "quantizedCopy": {
+        "image": "ChillFrost_c_attach.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 56044,
+          "indexed": 17694
+        },
+        "psnrDb": 47.12,
+        "maxChannelError": 46,
+        "metric": "premultiplied RGBA",
+        "sha256": "bd22301c39b1a239e552bfabfef2e3d975600fc8879977410603e5af60054d30",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "ChillFrost_c_attach.png",
+        "sha256": "e17b71dbda9888bb2e5ed16cdee842ccb95c44e75717c74620c5247a6dd2864b",
+        "bytes": 56044,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    },
+    "still": {
+      "image": "ChillFrost_c_still.q.png",
+      "size": {
+        "w": 288,
+        "h": 288
+      },
+      "frame": {
+        "w": 288,
+        "h": 288
+      },
+      "count": 1,
+      "fps": 0,
+      "loop": false,
+      "play": "static: reduced motion",
+      "clippedFractionPerFrame": [
+        0.0
+      ],
+      "sha256": "c34e724d93c8741eb2000878aca4a67b910b37003af59b215c406fcf4bfa6e5b",
+      "quantizedCopy": {
+        "image": "ChillFrost_c_still.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 46971,
+          "indexed": 15012
+        },
+        "psnrDb": 44.77,
+        "maxChannelError": 48,
+        "metric": "premultiplied RGBA",
+        "sha256": "c34e724d93c8741eb2000878aca4a67b910b37003af59b215c406fcf4bfa6e5b",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "ChillFrost_c_still.png",
+        "sha256": "82f51ead731e9360e9afe352688987366d3857607a2c301c1073c0cd9e104eac",
+        "bytes": 46971,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    },
+    "loop": {
+      "image": "ChillFrost_c.q.png",
+      "size": {
+        "w": 1152,
+        "h": 288
+      },
+      "frame": {
+        "w": 288,
+        "h": 288
+      },
+      "count": 4,
+      "fps": 8,
+      "loop": true,
+      "play": "loop while slowed and not frozen",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sha256": "29afc1089ef42a434d4dbd72bc1347099d4d6903c3e58514bd9119f7708b6280",
+      "quantizedCopy": {
+        "image": "ChillFrost_c.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 178233,
+          "indexed": 52720
+        },
+        "psnrDb": 44.84,
+        "maxChannelError": 44,
+        "metric": "premultiplied RGBA",
+        "sha256": "29afc1089ef42a434d4dbd72bc1347099d4d6903c3e58514bd9119f7708b6280",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "ChillFrost_c.png",
+        "sha256": "8ac89f539dc245f1d7f9078d3b978e6814ee00219a43e6ce08f11658a805919f",
+        "bytes": 178233,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    },
+    "fade": {
+      "image": "ChillFrost_c_fade.q.png",
+      "size": {
+        "w": 576,
+        "h": 288
+      },
+      "frame": {
+        "w": 288,
+        "h": 288
+      },
+      "count": 2,
+      "fps": 12,
+      "loop": false,
+      "play": "optional one-shot on detach",
+      "clippedFractionPerFrame": [
+        0.0,
+        0.0
+      ],
+      "sha256": "586b07d4d85b6c40175f732a37459714160e9fd6d6d64de341c8810f6362ace5",
+      "quantizedCopy": {
+        "image": "ChillFrost_c_fade.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 52650,
+          "indexed": 16705
+        },
+        "psnrDb": 47.75,
+        "maxChannelError": 40,
+        "metric": "premultiplied RGBA",
+        "sha256": "586b07d4d85b6c40175f732a37459714160e9fd6d6d64de341c8810f6362ace5",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "ChillFrost_c_fade.png",
+        "sha256": "dc8ac4cd99d4e44850f34922d50e411e9e56c424eeeb0edd21fd91afc70d0f64",
+        "bytes": 52650,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
+    }
+  },
+  "anchor": {
+    "x": 144,
+    "y": 144,
+    "units": "frame px",
+    "meaning": "Enemy body centre. Draw each frame with this pixel on the enemy position (e.x, e.y)."
+  },
+  "refBodyR": 88,
+  "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
+  "alpha": "frost fill is see-through (about 50% alpha); ink, white rim and glint are solid (same colour-class rule as IceCrust)",
+  "provenance": {
+    "generator": "Grok Bot GenerateImage (cursor namespace)",
+    "rawSha256": "a8b66af6ee90a60e0c0c8b09fb6572ef7e6dabee839cef213db90f2803dc7bfb",
+    "postProcess": "_tools/process_chillfrost.py (key bg + gray placeholder circles, un-mix, edge-bleed, speck>=8, magenta despill, see-through alpha by colour class as IceCrust, 3x3 cells, scale so the true placeholder radius is refBodyR 88, circle centre on anchor (144,144), drop small disconnected components that sit far outside the ring (min r>=120) or have leftover magenta/plum hue, assemble attach/still/loop/fade strips); unmix_key_spill: subtract residual magenta-key chroma on pink/magenta-hued bright AA pixels (HSV H in [0.78,1]U[0,0.05], S>=0.08, V>=0.70), bleed remaining fringe from the nearest clean solid, drop pure key-mix; applied after key/despill and again after scale; scale x0.7644, truePlaceholderR_raw=115.12px",
+    "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
+    "prompt": "3x3 on flat crimson-magenta; IceCrust v0.1.1 pick style; flat gray placeholder circle (no outline) in every cell, empty interior; open ring of irregular jagged ice chips (triangles/trapezoids, not pearls) plus white/cyan sparkles; attach bottom+sides / attach almost-complete including the top / still full / loop glint UL-UR-LR-LL / fade breaking chips with gaps / fade few isolated melting chips.",
+    "v011Candidate": "c",
+    "date": "2026-11-13 America/New_York",
+    "fadeCellsSwapped": false,
+    "keySpillUnmixed": true,
+    "see": "../PROVENANCE.json"
+  }
+}

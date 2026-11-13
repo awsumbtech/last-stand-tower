@@ -1,0 +1,644 @@
+{
+  "frames": {
+    "crabclaw_b_angry_walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 143
+    },
+    "crabclaw_b_angry_walk_1": {
+      "frame": {
+        "x": 386,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 143
+    },
+    "crabclaw_b_angry_walk_2": {
+      "frame": {
+        "x": 772,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 143
+    },
+    "crabclaw_b_angry_walk_3": {
+      "frame": {
+        "x": 1158,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 143
+    },
+    "crabclaw_b_angry_idle_angry_0": {
+      "frame": {
+        "x": 0,
+        "y": 386,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 167
+    },
+    "crabclaw_b_angry_idle_angry_1": {
+      "frame": {
+        "x": 386,
+        "y": 386,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 167
+    },
+    "crabclaw_b_angry_idle_angry_2": {
+      "frame": {
+        "x": 772,
+        "y": 386,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 167
+    },
+    "crabclaw_b_angry_idle_angry_3": {
+      "frame": {
+        "x": 1158,
+        "y": 386,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 167
+    },
+    "crabclaw_b_angry_throw_angry_0": {
+      "frame": {
+        "x": 0,
+        "y": 772,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "crabclaw_b_angry_throw_angry_1": {
+      "frame": {
+        "x": 386,
+        "y": 772,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "crabclaw_b_angry_throw_angry_2": {
+      "frame": {
+        "x": 772,
+        "y": 772,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "crabclaw_b_angry_throw_angry_3": {
+      "frame": {
+        "x": 1158,
+        "y": 772,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "crabclaw_b_angry_hurt_0": {
+      "frame": {
+        "x": 0,
+        "y": 1158,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    }
+  },
+  "animations": {
+    "walk": {
+      "frames": [
+        "crabclaw_b_angry_walk_0",
+        "crabclaw_b_angry_walk_1",
+        "crabclaw_b_angry_walk_2",
+        "crabclaw_b_angry_walk_3"
+      ],
+      "fps": 7,
+      "loop": true
+    },
+    "idle_angry": {
+      "frames": [
+        "crabclaw_b_angry_idle_angry_0",
+        "crabclaw_b_angry_idle_angry_1",
+        "crabclaw_b_angry_idle_angry_2",
+        "crabclaw_b_angry_idle_angry_3"
+      ],
+      "fps": 6,
+      "loop": true
+    },
+    "throw_angry": {
+      "frames": [
+        "crabclaw_b_angry_throw_angry_0",
+        "crabclaw_b_angry_throw_angry_1",
+        "crabclaw_b_angry_throw_angry_2",
+        "crabclaw_b_angry_throw_angry_3"
+      ],
+      "fps": 8,
+      "loop": false
+    },
+    "hurt": {
+      "frames": [
+        "crabclaw_b_angry_hurt_0"
+      ],
+      "fps": 8,
+      "loop": false
+    },
+    "walk_angry": {
+      "frames": [
+        "crabclaw_b_angry_walk_0",
+        "crabclaw_b_angry_walk_1",
+        "crabclaw_b_angry_walk_2",
+        "crabclaw_b_angry_walk_3"
+      ],
+      "fps": 7,
+      "loop": true
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.2",
+    "image": "crabclaw_b_angry.q.png",
+    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
+    "size": {
+      "w": 1542,
+      "h": 1542
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "walk",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      },
+      {
+        "name": "idle_angry",
+        "from": 4,
+        "to": 7,
+        "direction": "forward"
+      },
+      {
+        "name": "throw_angry",
+        "from": 8,
+        "to": 11,
+        "direction": "forward"
+      },
+      {
+        "name": "hurt",
+        "from": 12,
+        "to": 12,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 192,
+      "y": 192,
+      "note": "in sourceSize px: frame centre = entity position (e.x, e.y); feet line at y = 298"
+    },
+    "hitbox": {
+      "r": 92,
+      "units": "frame px",
+      "worldRadius": 46,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 110.4,
+      "drawScale": 1.2,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its leg-and-claw span (lowest 40% of the main body) = 240 px, feet line at y = 298 (pivot + 106)"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 9511056,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
+    "entity": "crabclaw",
+    "phase": 2,
+    "layerOf": "crabclaw_b",
+    "note": "phase-2 body (own generated art). walk (alias walk_angry), idle_angry 4@6 loop, throw_angry 4@8 once (release frame 2, empty claw), hurt.",
+    "variant": "b",
+    "throwTiming": {
+      "releaseFrame": 2
+    },
+    "aliases": {
+      "walk_angry": "walk (same frames; MANIFEST name)"
+    },
+    "v012": "walk re-ordered to cells 0,1,2,1 (v0.1.1 cell 3 lifted the body and raised a claw: the 'hop' between frames 2 and 3); per-sheet scaleMul {'walk': 1.071, 'idle': 1.077, 'throw': 1.045, 'hurt': 1.03} so the hat width matches phase 1 (v0.1.1 angry hat was ~7% smaller)",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "walk": {
+          "raw": "boss_b_angry",
+          "rawSha256": "2e11088572ccffc7d7ff284b8b901b82a57ee38834857a95a8addef1ed2c1329",
+          "keyColour": [
+            60,
+            160,
+            100
+          ],
+          "measuredSpan": 460.0,
+          "scale": 0.5588
+        },
+        "idle": {
+          "raw": "boss_b_angry_idle",
+          "rawSha256": "15278d5ba477a96633a54f4a2a176d1dcdf7b793b5b72145b6f81b7244877ef6",
+          "keyColour": [
+            60,
+            157,
+            101
+          ],
+          "measuredSpan": 457.0,
+          "scale": 0.5656
+        },
+        "throw": {
+          "raw": "boss_b_angry_throw",
+          "rawSha256": "6939d513db834f87baba523fd5bc5944127626f1f13accea64ad2c0f258b1bf9",
+          "keyColour": [
+            60,
+            156,
+            102
+          ],
+          "measuredSpan": 423.0,
+          "scale": 0.5929
+        },
+        "hurt": {
+          "raw": "boss_b_hurt",
+          "rawSha256": "63fd0ff95051a2eac223109b22d3209c143e8683d5d59f5921589c84b341ccbf",
+          "keyColour": [
+            61,
+            162,
+            100
+          ],
+          "measuredSpan": 548.0,
+          "scale": 0.4511
+        }
+      },
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
+      "see": "../PROVENANCE.json"
+    },
+    "qa": {
+      "frames": {
+        "crabclaw_b_angry_walk_0": {
+          "edgeMarginPx": 62,
+          "clippedFraction": 0.0,
+          "opaquePx": 33951
+        },
+        "crabclaw_b_angry_walk_1": {
+          "edgeMarginPx": 60,
+          "clippedFraction": 0.0,
+          "opaquePx": 30137
+        },
+        "crabclaw_b_angry_walk_2": {
+          "edgeMarginPx": 64,
+          "clippedFraction": 0.0,
+          "opaquePx": 33482
+        },
+        "crabclaw_b_angry_walk_3": {
+          "edgeMarginPx": 60,
+          "clippedFraction": 0.0,
+          "opaquePx": 30137
+        },
+        "crabclaw_b_angry_idle_angry_0": {
+          "edgeMarginPx": 61,
+          "clippedFraction": 0.0,
+          "opaquePx": 34662
+        },
+        "crabclaw_b_angry_idle_angry_1": {
+          "edgeMarginPx": 60,
+          "clippedFraction": 0.0,
+          "opaquePx": 33261
+        },
+        "crabclaw_b_angry_idle_angry_2": {
+          "edgeMarginPx": 58,
+          "clippedFraction": 0.0,
+          "opaquePx": 32350
+        },
+        "crabclaw_b_angry_idle_angry_3": {
+          "edgeMarginPx": 61,
+          "clippedFraction": 0.0,
+          "opaquePx": 31712
+        },
+        "crabclaw_b_angry_throw_angry_0": {
+          "edgeMarginPx": 64,
+          "clippedFraction": 0.0,
+          "opaquePx": 33912
+        },
+        "crabclaw_b_angry_throw_angry_1": {
+          "edgeMarginPx": 46,
+          "clippedFraction": 0.0,
+          "opaquePx": 34331
+        },
+        "crabclaw_b_angry_throw_angry_2": {
+          "edgeMarginPx": 42,
+          "clippedFraction": 0.0,
+          "opaquePx": 34018
+        },
+        "crabclaw_b_angry_throw_angry_3": {
+          "edgeMarginPx": 18,
+          "clippedFraction": 0.0,
+          "opaquePx": 34078
+        },
+        "crabclaw_b_angry_hurt_0": {
+          "edgeMarginPx": 53,
+          "clippedFraction": 0.0,
+          "opaquePx": 30362
+        }
+      },
+      "motion": {
+        "walk": {
+          "centroidShiftPx": [
+            0.7,
+            2.5,
+            2.5,
+            0.7
+          ],
+          "IoU": [
+            0.831,
+            0.819,
+            0.819,
+            0.831
+          ]
+        },
+        "idle_angry": {
+          "centroidShiftPx": [
+            5.9,
+            9.8,
+            14.0,
+            1.3
+          ],
+          "IoU": [
+            0.803,
+            0.601,
+            0.635,
+            0.875
+          ]
+        },
+        "throw_angry": {
+          "centroidShiftPx": [
+            28.6,
+            21.8,
+            5.9
+          ],
+          "IoU": [
+            0.59,
+            0.636,
+            0.776
+          ]
+        },
+        "hurt": {
+          "centroidShiftPx": [],
+          "IoU": []
+        }
+      },
+      "remeasured": "meta.qa.frames re-measured by tools/art-provenance.py on the shipped crabclaw_b_angry.q.png (the delivered block predated the v0.1.2 rescale and used idle[]/throw[]/hurt[1] keys); keyFringe / rim / xcorr fields dropped (master-only metrics). meta.qa.motion re-checked on the same sheet: current, unchanged."
+    },
+    "quantizedCopy": {
+      "image": "crabclaw_b_angry.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 1084697,
+        "indexed": 295514
+      },
+      "psnrDb": 46.05,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 75,
+      "sha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    },
+    "originalImage": {
+      "name": "crabclaw_b_angry.png",
+      "sha256": "56a50e30c2c299da5fbdf1d72f68de2ba8d3096dce0b52c1d2970cc4d63559b1",
+      "bytes": 1084697,
+      "inRepo": false,
+      "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
+    }
+  }
+}
