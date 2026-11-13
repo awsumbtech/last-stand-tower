@@ -84,6 +84,8 @@ LST.Game = class Game extends LST.World {
   // ---------- Flow ----------
 
   newGame() {
+    // A run in a world opened only by the local dev door writes nothing to the save (DevRunGuard).
+    this.devRun = LST.DevRunGuard ? LST.DevRunGuard.begin(this) : false;
     if (LST.meta.state.finaleNotice) { LST.meta.state.finaleNotice = false; LST.meta.save(); }
     this.reset();
     LST.audio.startMusic();
@@ -457,8 +459,9 @@ LST.Game = class Game extends LST.World {
       gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1, headStart: this.headStart,
       gearMult: this.gearMult, newCodex: this.newCodex.slice(),
       won, bossKills: this.bossKills, worldBonus: this.worldBonus, endless: this.endless,
-      world: this.world.id, worldGearMult: this.world.gearMult,
+      world: this.world.id, worldGearMult: this.world.gearMult, devRun: !!this.devRun,
     };
+    if (this.devRun) { LST.DevRunGuard.end(); this.devRun = false; } // the save goes back exactly as it was
   }
 
   showResults() {

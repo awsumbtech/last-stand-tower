@@ -84,6 +84,21 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   ok(vb.game.world.id === "backyard", "load: a saved Beach pick on a save that hasn't opened it starts in the Backyard");
 }
 
+// v1 -> v5 and v3 -> v5: every step runs in order and lands on a clean v5 save.
+{
+  const v1 = { v: 1, gears: 40, lifetimeGears: 90, runs: 3, unlocked: ["multishot"] };
+  const st1 = { "lst.meta": JSON.stringify(v1), "lst.bestWave": "8" };
+  const a = load(1, st1), s1 = a.LST.meta.state;
+  ok(s1.v === 5 && s1.gears === 40 && s1.lifetimeGears === 90 && s1.runs === 3 && s1.unlocked.join() === "multishot", "migration: v1 save -> v5 keeps Gears, runs, unlocked cards");
+  ok(s1.worlds.backyard && !s1.worlds.backyard.cleared && s1.worlds.beach && !s1.worlds.beach.cleared && s1.world === "backyard" && s1.ability === "shockwave" && Array.isArray(s1.codex.seen), "migration: v1 -> v5 adds codex, abilities, Backyard + Beach records, world = backyard");
+  ok(!a.LST.WorldRegistry.isUnlocked("beach", a.LST.meta, null) && a.game.bestWave === 8 && JSON.parse(st1["lst.meta"]).v === 5, "migration: v1 -> v5 keeps the Beach locked, reads the legacy best wave (8), saves as v5");
+  const v3 = { v: 3, gears: 77, lifetimeGears: 300, runs: 12, unlocked: [], upgrades: { armor: 20, power: 5 }, benched: ["damage"], headStartPick: 6, codex: { seen: ["b"], traps: ["t"] }, armorRefund: 0, armorNotice: false };
+  const st3 = { "lst.meta": JSON.stringify(v3), "lst.bestWave": "16" };
+  const b = load(1, st3), s3 = b.LST.meta.state;
+  ok(s3.v === 5 && s3.gears === 77 && s3.upgrades.armor === 20 && s3.upgrades.power === 5 && s3.benched.join() === "damage" && s3.headStartPick === 6 && s3.codex.traps.join() === "t", "migration: v3 save -> v5 keeps Gears, upgrades, bench, head-start pick, codex");
+  ok(s3.worlds.backyard && s3.worlds.beach && s3.world === "backyard" && s3.finaleNotice === true && JSON.parse(st3["lst.meta"]).v === 5, "migration: v3 -> v5 adds world records + pick, finale notice for best wave 16, saves as v5");
+}
+
 // ---------- 3. LevelPlan acts and beats ----------
 {
   const { LST } = load(1);
@@ -315,9 +330,9 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
 // ---------- 9. index.html + sw.js ----------
 {
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
-  const all = [...FILES, ...RENDER_FILES, ...UI_FILES, "core/DevFlags.js"].map((f) => "src/" + f);
+  const all = [...FILES, ...RENDER_FILES, ...UI_FILES, "core/DevFlags.js", "core/DevRunGuard.js"].map((f) => "src/" + f);
   ok(all.every((f) => html.includes(`src="${f}"`)), "index.html loads every World 2 script");
-  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v20"/.test(sw), "sw.js v20 precaches every World 2 script");
+  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v21"/.test(sw), "sw.js v21 precaches every World 2 script");
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
   const at = (f) => scripts.indexOf("src/" + f);
   ok(at("waves.js") < at("enemies/parts/EnemyPart.js") && at("worlds/Beach.js") < at("game.js") && at("sprites/LookSheetLibrary.js") < at("worlds/render/World2Sheets.js") && at("worlds/render/WorldRenderers.js") < at("main.js"), "index.html script order: systems after waves.js, renderers after LookSheetLibrary, all before main.js");
@@ -342,6 +357,64 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   const fb = game.finale && game.finale.mole;
   if (!["cleared", "victory"].includes(game.state)) console.log("  smoke: wave", game.wave, "state", game.state, "boss", fb && fb.type, fb && Math.round(fb.hp) + "/" + Math.round(fb.maxHp), "mode", fb && fb.mode, "enemies", game.enemies.length);
   ok(maxHz > 0 && ["cleared", "victory"].includes(game.state) && LST.meta.worldCleared("beach"), "smoke: Crabclaw threw coconuts and the Beach was cleared (state " + game.state + ")");
+}
+
+// ---------- 11. Dev door: local hosts only, and a door run never writes the save ----------
+function devFlagsAt(href) {
+  const u = new URL(href);
+  const cls = new Set();
+  const sb = { URLSearchParams, location: { search: u.search, hostname: u.hostname, protocol: u.protocol },
+    document: { documentElement: { classList: { toggle: (c, on) => (on ? cls.add(c) : cls.delete(c)) } } } };
+  sb.window = sb; vm.createContext(sb);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "src/core/DevFlags.js"), "utf8"), sb);
+  return sb.LST.DevFlags;
+}
+{
+  const { LST } = load(1);
+  const R = LST.WorldRegistry;
+  for (const href of ["https://awsumbtech.github.io/last-stand-tower/?debug=1&unlock=beach", "http://192.168.1.20:8765/?debug=1&unlock=beach", "https://example.com/?dev=1&unlock=beach"]) {
+    const f = devFlagsAt(href);
+    ok(f.enabled && !f.local && f.unlocks.length === 0 && !R.isUnlocked("beach", LST.meta, f), "door: inert on a non-local host (" + new URL(href).host + ")");
+  }
+  for (const href of ["http://localhost:8765/?debug=1&unlock=beach", "http://127.0.0.1:8765/index.html?debug=1&unlock=beach", "file:///home/x/index.html?debug=1&unlock=beach"]) {
+    const f = devFlagsAt(href);
+    ok(f.local && f.unlocks.join() === "beach" && R.isUnlocked("beach", LST.meta, f), "door: opens the Beach on a local host (" + (new URL(href).host || "file:") + ")");
+  }
+  ok(devFlagsAt("http://localhost:8765/?unlock=beach").unlocks.length === 0, "door: needs ?debug=1 even on localhost");
+}
+{
+  // A full door run on the Beach (cleared finale, Gears, best wave, codex) leaves the save byte-unchanged.
+  const store = {};
+  const { LST, game } = load(9, store);
+  LST.meta.state.gears = 250; LST.meta.state.runs = 4; LST.meta.save();
+  const before = store["lst.meta"], beforeState = JSON.stringify(LST.meta.state), beforeKeys = Object.keys(store).sort().join();
+  LST.DevFlags = Object.freeze({ enabled: true, local: true, unlocks: Object.freeze(["beach"]) });
+  game.state = "menu";
+  ok(game.selectWorld("beach") && game.world.id === "beach" && store["lst.meta"] === before && LST.meta.state.world === "backyard", "door run: picking the door-only Beach saves no world pick");
+  let err = null;
+  try {
+    game.newGame();
+    ok(game.devRun === true && LST.DevRunGuard.active, "door run: newGame marks a door-only world run as a dev run");
+    game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
+    for (let w = 0; w < 21 && !["cleared", "victory"].includes(game.state); w++) {
+      if (game.state !== "playing") game.startNextWave();
+      for (let i = 0; i < 60 * 240 && game.state === "playing"; i++) game.step(1 / 60);
+      if (game.state === "shop") game.state = "menu";
+    }
+    ok(["cleared", "victory"].includes(game.state) && LST.meta.worldCleared("beach") && LST.meta.state.worlds.beach.best > 0, "door run: the Beach finale was cleared in memory during the run (state " + game.state + ")");
+    game.finishRun({ won: true });
+  } catch (e) { err = e; }
+  ok(!err, "door run: ran start to finish without errors" + (err ? " (" + err.stack + ")" : ""));
+  ok(game.result && game.result.devRun === true && game.result.gears.total > 0, "door run: results still show the run (and say it was a dev run)");
+  ok(store["lst.meta"] === before && Object.keys(store).sort().join() === beforeKeys, "door run: localStorage lst.meta byte-unchanged (no world pick, Gears, clears, best wave)");
+  ok(JSON.stringify(LST.meta.state) === beforeState && !LST.meta.worldCleared("beach") && LST.meta.state.gears === 250 && LST.meta.state.runs === 4, "door run: meta.state byte-unchanged after the run");
+  ok(!LST.DevRunGuard.active && !game.devRun, "door run: guard released after finishRun");
+  // Normal runs are untouched by the guard.
+  LST.DevFlags = Object.freeze({ enabled: false, local: true, unlocks: Object.freeze([]) });
+  game.state = "menu"; game.selectWorld("backyard"); game.newGame();
+  ok(game.devRun === false && !LST.DevRunGuard.active, "normal run: no guard in the Backyard");
+  game.wave = 3; game.finishRun({ won: false });
+  ok(LST.meta.state.runs === 5 && store["lst.meta"] !== before, "normal run: results are saved as usual");
 }
 
 console.log(`\n${fails ? "FAILED " + fails : "ALL PASS"} (${passes} passed)`);

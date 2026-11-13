@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v20"; // World 2 (Beach) systems: worlds, level plan, crab / gull / Crabclaw, world select
+const VERSION = "v21"; // World 2 review fixes: local-only dev door + DevRunGuard, overlay-only locked cards, no code status rings
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -114,6 +114,7 @@ const PRECACHE = [
   "src/demo.js",
   "src/main.js",
   "src/core/DevFlags.js",
+  "src/core/DevRunGuard.js",
   "src/pwa.js",
   "icons/icon-192.png",
   "icons/icon-512.png",

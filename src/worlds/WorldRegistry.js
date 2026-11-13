@@ -1,8 +1,12 @@
 // WorldRegistry: world id -> WorldDefinition, in map order, and which one the player picked.
 //   isUnlocked(id)  the world's own rule, OR the dev test door (?debug=1&unlock=beach via
-//                   LST.DevFlags.unlocks). The door never writes the save.
+//                   LST.DevFlags.unlocks, local hosts only). The door never writes the
+//                   save: select() below doesn't store a door pick and LST.DevRunGuard throws
+//                   away everything a door run would have saved.
 //   selected()      the saved pick (meta.state.world) if it's open right now, else the first world
-//   select(id)      saves the pick when that world is open; returns the world or null
+//   select(id)      picks an open world and returns it (null if locked). The pick is saved to
+//                   meta.state.world only when the world is open by its own rule; a world open
+//                   only through the dev door is picked for this page load and never saved.
 LST.WorldRegistry = {
   worlds: {},
   register(def) { this.worlds[def.id] = def; return def; },
@@ -20,7 +24,8 @@ LST.WorldRegistry = {
   },
   select(id, meta = LST.meta, flags = LST.DevFlags) {
     if (!this.isUnlocked(id, meta, flags)) return null;
-    if (meta && meta.state) { meta.state.world = id; meta.save(); }
-    return this.get(id);
+    const w = this.get(id);
+    if (meta && meta.state && w.isUnlockedBy(meta)) { meta.state.world = id; meta.save(); }
+    return w;
   },
 };
