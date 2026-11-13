@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v24"; // ChillFrost v0.1.0 look for slowed enemies (frozen tint removed); neon/pixel hidden (ThemeSelector); docs/OO-MIGRATION.md
+const VERSION = "v25"; // ChillFrost v0.1.1 (cyan ice chips, rim inside the body edge, authored fade); neon/pixel hidden (ThemeSelector)
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -155,11 +155,11 @@ const PRECACHE = [
   "assets/sprites/looks/VenomDrips/VenomDrips_a.q.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.q.png",
-  "assets/sprites/looks/ChillFrost/ChillFrost_b.json",
-  "assets/sprites/looks/ChillFrost/ChillFrost_b.q.png",
-  "assets/sprites/looks/ChillFrost/ChillFrost_b_attach.q.png",
-  "assets/sprites/looks/ChillFrost/ChillFrost_b_still.q.png",
-  "assets/sprites/looks/ChillFrost/ChillFrost_b_fade.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_c.json",
+  "assets/sprites/looks/ChillFrost/ChillFrost_c.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_c_attach.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_c_still.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_c_fade.q.png",
   // World 2 (Beach) art, Game Art & Motion v0.1.2 recommended picks (tools/world-test.js checks each exists).
   "assets/sprites/world2/background/beach_bg_a.json",
   "assets/sprites/world2/background/beach_bg_a.q.png",

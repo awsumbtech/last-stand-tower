@@ -398,7 +398,7 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
   const all = [...FILES, ...RENDER_FILES, ...UI_FILES, "core/DevFlags.js", "core/DevRunGuard.js"].map((f) => "src/" + f);
   ok(all.every((f) => html.includes(`src="${f}"`)), "index.html loads every World 2 script");
-  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v24"/.test(sw), "sw.js v24 precaches every World 2 script");
+  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v25"/.test(sw), "sw.js v25 precaches every World 2 script");
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
   const at = (f) => scripts.indexOf("src/" + f);
   ok(at("waves.js") < at("enemies/parts/EnemyPart.js") && at("worlds/Beach.js") < at("game.js") && at("sprites/LookSheetLibrary.js") < at("worlds/render/World2Sheets.js") && at("worlds/render/WorldRenderers.js") < at("main.js"), "index.html script order: systems after waves.js, renderers after LookSheetLibrary, all before main.js");

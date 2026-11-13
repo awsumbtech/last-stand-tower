@@ -20,7 +20,7 @@ Rules for every PR below:
 5. **Particles:** fixed colour variants baked into the art. Never tint.
 6. **Slow as a proper status (N11):** only if all 4 Backyard sim hashes stay identical. Otherwise `Enemy.slowTimer` stays the source and `ChillFrost` reads it.
 7. **Big Red:** add a `ChargeGlow` overlay object (`src/bosses/looks/ChargeGlow.js`). Replaces TINT.charge.
-8. **ChillFrost now, in PR #5:** the frozen/slow tint is removed in PR #5 and `ChillFrost` (`src/elements/looks/ChillFrost.js`) owns the slowed look. Art: Game Art & Motion ChillFrost v0.1.0, variant b (`assets/sprites/looks/ChillFrost/ChillFrost_b.*`, sha256 in `assets/sprites/looks/PROVENANCE.json`).
+8. **ChillFrost now, in PR #5:** the frozen/slow tint is removed in PR #5 and `ChillFrost` (`src/elements/looks/ChillFrost.js`) owns the slowed look. Art: Game Art & Motion ChillFrost v0.1.1, variant c (`assets/sprites/looks/ChillFrost/ChillFrost_c.*`, sha256 in `assets/sprites/looks/PROVENANCE.json`; replaced v0.1.0 b). QA: `docs/qa/world2/*chill*` (index: `docs/qa/world2/chill-shots.json`).
 
 ### Landed in PR #5 (2026-11-13)
 - `ChillFrost`: StatusLook, active while `Enemy.slowTimer > 0` and not frozen. Plays `attach` (2f @12 fps, once), then `loop` (4f @8 fps); `still` for reduced motion; `fade` (2f @12 fps, once) when the slow wears off. No fade when the enemy freezes (IceCrust takes over at once), dies, or with reduced motion. Draws nothing until its sheet loads.
@@ -58,7 +58,9 @@ Per Decision 8, the frozen tint and its SpriteTinter use are removed in PR #5, a
 
 ---
 
-## 1. Visual inventory (code-drawn art at fc3f443)
+## 1. Visual inventory (code-drawn art; audited at fc3f443, status refreshed at PR #5 v25)
+
+Status column: **done** = landed in PR #5; **PR n** = planned PR in section 3; line numbers are current on `world-2-beach`.
 
 The image check:
 - **Real image files:** all enemy bodies (basic, fast body/face, tank, big_red, all King Mole sheets, with clips for walk/idle/death and boss attacks). The pupils (EyeLayer) are images too.
@@ -68,10 +70,10 @@ The image check:
 ### A. Status tints and enemy overlays — 7 items
 | # | Where | Looks like / when | New owner (class, file) | Art ask |
 |---|---|---|---|---|
-| A1 | `palette.js:17-22` TINT.frozen; `enemies.js:29,31,40`; `enemy-parts.js:28-33`; `enemy-mole.js:49,129`; `src/sprites/SpriteTinter.js` (scratch canvas + `globalCompositeOperation`); `EnemyAnimationRules` `tinted` flags | Icy blue recolor while slowed | `ChillFrost`, `src/elements/looks/ChillFrost.js` | ChillFrost sheet (section 0) |
-| A2 | TINT.flash (white overlay ×2); vector `#ffffff` fill | Enemy flashes white for a frame when hit | `HitFlash` look, `src/elements/looks/HitFlash.js` (or a sheet "hurt" clip) | Preferred: a 1–2 frame **hurt** frame per enemy sheet (basic, fast_body, tank, big_red, king_mole body/angry). Fallback: one shared "impact sparkle" overlay sheet, 3 frames, refBodyR 88. **Judgment call** |
-| A3 | TINT.bossFlash; vector `#ff8a95` / mole `#c8a99b` | Boss blush on hit | Same as A2 | Covered by A2 hurt frames for big_red and king_mole |
-| A4 | TINT.charge; `enemies.js:30` `charge` flicker | Big Red flickers red while charging | Big Red `charge` clip (already in the sheet) plus `ChargeGlow` look `src/bosses/looks/ChargeGlow.js` | "ChargeGlow" red speed-aura loop, 4 frames, anchor at body centre (or drop it if the charge clip reads well alone) |
+| A1 | **done (PR #5).** Was: TINT.frozen (`palette.js`), the frozen branch of `spriteTint`, `enemies.js` / `enemy-mole.js` frozen fills and King Mole's frozen sprite tint. All deleted | Slowed enemies: `ChillFrost` frost-chip ring (attach → loop, still for reduced motion, fade on slow end) | `ChillFrost`, `src/elements/looks/ChillFrost.js` | Delivered: ChillFrost v0.1.1 (`ChillFrost_c.*`) |
+| A2 | **PR 1.** `palette.js:18-23` TINT.flash; `enemy-parts.js:28-31` `spriteTint`; `enemy-mole.js:129`; drawn by `SpriteTinter` via `EnemySpriteRenderer.js:106` on `tinted` layers; vector fill `enemies.js:30` | Enemy flashes white for a frame when hit | `HitFlash` look, `src/elements/looks/HitFlash.js` | **Decided (Decision 1):** one shared HitFlash overlay sheet, 2–3 frames one-shot, refBodyR 88, anchor at body centre |
+| A3 | **PR 1.** TINT.bossFlash (`palette.js:20`); vector fills `enemies.js:30` (`#ff8a95`), `enemy-mole.js:49` (`#c8a99b`) | Boss blush on hit | Same `HitFlash` | Same shared HitFlash sheet (no per-boss art) |
+| A4 | **PR 1.** TINT.charge (`palette.js`); `enemy-parts.js:30`; vector fill `enemies.js:30` | Big Red flickers red while charging | `ChargeGlow` look, `src/bosses/looks/ChargeGlow.js` (with the existing `charge` clip) | **Decided (Decision 7):** "ChargeGlow" red speed-aura loop, 4 frames, anchor at body centre |
 | A5 | `enemy-fx.js:7-41` | Slam telegraph: red ring growing, dashed line to the tower, "!" | `SlamTelegraph`, `src/bosses/fx/SlamTelegraph.js` | Ring sheet (fill-up 8 frames, or one ring scaled), dashed line segment tile, "!" badge (2-frame pulse) |
 | A6 | `enemy-fx.js:44-55` | Dizzy stars orbiting a stunned enemy | `DizzyStars` look, `src/elements/looks/DizzyStars.js` | 3-star orbit loop, 6 frames, anchor above head |
 | A7 | `enemy-parts.js:7-12` `shadow()` (also the tower shadow at `tower.js:24`) | Soft ellipse ground shadow | `GroundShadow`, `src/render/GroundShadow.js` | `shadow_soft.png` ellipse, scaled per body |
@@ -98,9 +100,9 @@ The image check:
 | B17 | `FxRenderer.js:182-216` drawPool motes | Particle motes for bossKill, finaleWon, tierUp, elem* presets (`FxPresets.js:78-107`) | `MoteParticle` | Mote sprite set (round, star, flake, ember, venom drop) |
 | B18 | `FxRenderer.js:217-260` drawStreaks | Speed streaks (`streakBurst`) | `StreakParticle` | Streak sprite, with an ink-outlined variant |
 | B19 | `FxRenderer.js:264-290` drawPulses (ImpactSync) | Impact ring pulses | `ImpactPulse` | Ring sheet, 6 frames (can share B4) |
-| B20 | `FxRenderer.js:294+` drawFlashes; `render.js:184-187` scene.flash | Full-screen white flash | `ScreenFlash`, `src/fx/ScreenFlash.js` | `flash_burst.png` (radial white). **Judgment:** a flat fill is not really art |
+| B20 | **PR 2.** `FxRenderer.js:294+` drawFlashes; `render.js:184-187` scene.flash | Full-screen white flash | `ScreenFlash`, `src/fx/ScreenFlash.js` | **Decided (Decision 4):** `flash_burst.png` (radial white) owned by `ScreenFlash` |
 | B21 | `render.js:173-182` | Red radial vignette at low tower HP | `LowHpVignette`, `src/fx/LowHpVignette.js` | `vignette_red.png`, 9-slice or full-screen |
-| B22 | `render.js:134-146` | Finale intro: the lawn dims | `FinaleDim`, `src/fx/FinaleDim.js` | Optional `vignette_dark.png`. **Judgment** |
+| B22 | **PR 2.** `render.js:134-146` | Finale intro: the lawn dims | `FinaleDim`, `src/fx/FinaleDim.js` | **Decided (Decision 4):** `vignette_dark.png` owned by `FinaleDim` |
 | B23 | `text.js:22-52` FloatText kinds `coin` (spinning ellipse) and `crit` (starburst) | Coin icon next to "+N"; star behind crit numbers | `CoinPopText`, `CritPopText` (FloatText subclasses) | Coin spin, 6 frames; crit starburst, 1–2 frames. The number text stays text |
 | B24 | `text.js:68-112` bossBanner | Yellow/ink hazard-stripe band, "BOSS" | `BossBanner`, `src/ui/canvas/BossBanner.js` | Banner band image (stripes) plus a slam-in, 4 frames. WAVE banner `text.js:54-65` is text only (**judgment**) |
 
@@ -112,7 +114,7 @@ Infrastructure only, not art: `src/fx/FxOverlay.js:15` is the menu FX canvas hos
 | C1 | `enemy-bodies.js:7-52` `vectorBody` | Vector fallback for basic, fast, tank and Big Red before sprites load | Delete. `EnemyView` draws nothing until loaded, like World 2 | none |
 | C2 | `enemy-mole.js:7-119` `drawMole` | Vector King Mole fallback (mound, claws, crown, teeth) | Delete. `KingMoleView` sprite-only | none (sheets exist) |
 | C3 | `primitives.js` outlined/eyes/star; `render.js:192+` `LST.draw` polygon/confetti/roundRect | Drawing helpers | Delete once nothing calls them | none |
-| C4 | `enemy-parts.js:14-26` hpBar (also `enemyHud` for World 2) | Rounded HP bar with ink outline | `EnemyHpBar`, `src/ui/canvas/EnemyHpBar.js` | **Judgment:** keep as a bar, or a frame+fill 9-slice image |
+| C4 | `enemy-parts.js:14-26` hpBar (also `enemyHud` for World 2) | Rounded HP bar with ink outline | `EnemyHpBar`, `src/ui/canvas/EnemyHpBar.js` | **Decided (Decision 3):** `Bar` object with an image frame + image fill (late in PR 6) |
 
 The enemy views become `BasicView`, `FastView`, `TankView`, `BigRedView` and `KingMoleView` (`src/enemies/views/`). They replace the cartoon `enemy()`/`moleSprite` dispatch and the `e.type` frequency branches (`enemies.js:20-22`).
 
@@ -121,13 +123,13 @@ The enemy views become `BasicView`, `FastView`, `TankView`, `BigRedView` and `Ki
 |---|---|---|---|---|
 | D1 | `themes/cartoon/tower.js:10-141` (shadow 24, cannon 28-37 with recoil, 8 bolts 41-46, body, highlight 51, face 57-130: eyes with look-follow, blink 74, `> <` squint 66, worried brows 95, cheeks 103, mouth O/wobble/smile 109, sweat drop 129) | The whole tower is vector art | `TowerView`, `src/tower/TowerView.js`, with `TowerFace` (`src/tower/TowerFace.js`) | **Tower sheet**, layered:<br>- base/body with bolts, cannon (separate layer, pivot at the joint, recoil 3 frames);<br>- face states: idle, blink (3 frames), fire "O", hurt squint, low-HP worried, sweat-drop loop (4 frames);<br>- pupil image;<br>- tier variants if tiers change the look;<br>- anchor at body centre; size about 2× R |
 | D2 | `projectiles.js:10-31` | Yellow ball with speed lines | `ProjectileView`, `src/tower/ProjectileView.js` | Projectile sheet: normal (2-frame spin), crit, plus element variants ember/frost/spark/venom as separate art |
-| D3 | `lawn.js:108-121` | Dashed range ring | `RangeRing`, `src/tower/RangeRing.js` | Ring image (dash pattern, scaled) or a tiled arc segment. **Judgment** |
+| D3 | **PR 4.** `lawn.js:108-121` | Dashed range ring | `RangeRing`, `src/tower/RangeRing.js` | **Decided (Decision 4):** ring image (dash pattern, scaled) owned by `RangeRing` |
 
 ### E. Backgrounds and map — 2 items
 | # | Where | What | Owner | Art ask |
 |---|---|---|---|---|
 | E1 | `lawn.js:9-96` `buildGround` (offscreen procedural: mowed checker 19, tufts 30, pebbles 44, flowers 56, dirt patch, soft vignette) | Backyard lawn | `BackyardBackdrop`, `src/worlds/render/BackyardBackdrop.js` (mirrors BeachBackdrop) | `backyard_bg_a.png` at the beach_bg_a size and contract: cover-fit, centre dirt patch under the tower, 16 px overdraw margin |
-| E2 | `src/themes/neon.js` (164 lines, 55 draw calls), `src/themes/pixel.js` (334 lines, 24), `FX_THEMES.neon/pixel` (`FxPresets.js:135-137`); reachable with `?style=` (`main.js:4-6`) | Two complete code-drawn alternate themes | **Pending Brian:** hidden behind a flag (off), out of the picker and `?style=` path, code kept | none while hidden |
+| E2 | **Hidden (PR #5), deletion pending Brian.** `src/themes/neon.js` (164 lines), `src/themes/pixel.js` (334 lines), `FX_THEMES.neon/pixel` (`FxPresets.js:135-137`). `LST.ThemeSelector.ALT_THEMES` is off: not loaded by `index.html` / `styles.html`, not precached, `?style=` ignored (`main.js:6` → `ThemeSelector.pick`), picker lists cartoon only | Two complete code-drawn alternate themes (unreachable) | `ThemeSelector`, `src/themes/ThemeSelector.js` | none while hidden |
 
 ### F. UI art (DOM) — about 75 items in 5 groups
 | # | Where | What | Owner | Art ask |
@@ -136,7 +138,7 @@ The enemy views become `BasicView`, `FastView`, `TankView`, `BigRedView` and `Ki
 | F2 | `index.html` 19 SVGs (lines 31, 35, 36, 56, 63, 64, 68, 87, 91, 95, 109-112, 126, 134, 186, 191, 202); `ui.js:683-693` GEAR, ABILITY_ICON×3, EYE and LOCK; `CardFlip.js:71` | HUD and menu icons (heart, sound, music, settings, gear, speed, restart, abilities, eye, lock, trophy) | Same `IconAtlas` | UI icon sheet, about 16 icons at 64 px, plus on/off states for toggles |
 | F3 | `style.css:61` | Coin icon (radial gradient) | `UiIcon("coin")` | Coin icon (can reuse the B23 frame 0) |
 | F4 | `style.css` rarity and decoration gradients: 322-323, 551-552, 723-724 (rare/epic cards); 330, 576 (shimmer, sparkle); 514, 564, 732, 826, 857, 860, 1112 (stripes, locked, card back, codex unknown); 1150 (info back) | Card frames, shimmer, card backs | `CardFrame` CSS class backed by images (`assets/ui/`) | Card frame set: common, rare, epic, locked, back, codex-unknown, info-back; shimmer sweep strip; sparkle sprite |
-| F5 | `style.css:533-534, 930, 978, 984` (unlock bar, conic ability cooldown, boss HP fill); 45 `box-shadow`s; about 20 keyframes | Bars and chunky button shadows | Stay CSS | **Judgment:** these are bars and button styling. The brief lets buttons stay CSS |
+| F5 | `style.css:533-534, 930, 978, 984` (unlock bar, conic ability cooldown, boss HP fill); 45 `box-shadow`s; about 20 keyframes | Bars and chunky button shadows | Stay CSS | **Decided (Decision 3):** HP / unlock / cooldown / boss bars become `Bar` objects (image frame + image fill, late in PR 6); button box-shadows and keyframes stay CSS |
 
 **Visual totals:** A 7, B 24, C 4, D 3, E 2, F 5 groups (about 75 icons or decorations). That is about 40 canvas visual objects plus the UI art.
 

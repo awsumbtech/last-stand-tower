@@ -55,6 +55,6 @@ LST.LOOK_SHEETS = {
   IceCrust: "assets/sprites/looks/IceCrust/IceCrust_a.json",
   VenomDrips: "assets/sprites/looks/VenomDrips/VenomDrips_a.json",
   SparkCrackle: "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
-  ChillFrost: "assets/sprites/looks/ChillFrost/ChillFrost_b.json",
+  ChillFrost: "assets/sprites/looks/ChillFrost/ChillFrost_c.json",
 };
 LST.lookSheets = new LST.LookSheetLibrary(LST.LOOK_SHEETS);
