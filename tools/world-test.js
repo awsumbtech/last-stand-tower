@@ -280,18 +280,38 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
     ok(a > 0 && b === 0 && c1 > 0, "reduced motion: loops hold frame 0, one-shots still play"); }
   cc.phase = 1; frame(); ok(calls.draws.some((d) => d[0].id === "CaptainCrabclaw:throw_angry"), "crabclaw renderer: angry art in phase 2 (own sheet strips, not a tint)");
   nut.update(0.6, { tower: { x: 0, y: 0, radius: 30 } }); frame(); ok(calls.draws.some((d) => d[0].id === "Coconut:splat") && !calls.draws.some((d) => d[0].id === "Coconut:spin"), "coconut renderer: splat after landing, no air sprite");
-  // Real v0.1.1 atlases through the adapter (stub image): slots, gutters, pivots, body radius.
+  // Real v0.1.2 atlases through the adapter (stub image): slots, gutters, pivots, body radius, JSON sequences.
   {
     const A = LST.AtlasSheetAdapter, dir = path.join(ROOT, "assets/sprites/world2"), J = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
-    const crabA = A.build(J("hermit_crab/hermit_crab_a.json"), { id: "atlas" }, { walk_broken: "bare", hit_crack: "crack" }).strips;
-    ok(["walk", "bare", "crack", "regrow"].every((k) => crabA[k]) && crabA.walk.count === 4 && crabA.walk.refBodyR === 48.6 && crabA.walk.ax === 96, "adapter: hermit_crab_a -> walk / bare / crack / regrow, 4 frames, refBodyR 48.6, pivot 96");
+    const crabA = A.build(J("hermit_crab/hermit_crab_b.json"), { id: "atlas" }, { walk_broken: "bare", hit_crack: "crack" }).strips;
+    ok(["walk", "bare", "crack", "regrow"].every((k) => crabA[k]) && crabA.walk.count === 4 && crabA.walk.refBodyR === 48.6 && crabA.walk.ax === 96 && crabA.walk.fps === 10 && crabA.bare.fps === 10, "adapter: hermit_crab_b -> walk / bare / crack / regrow, 4 frames, refBodyR 48.6, pivot 96, walk + bare at 10 fps from JSON");
     calls.draws = []; crabA.bare.draw(ctx, 1, 0, 0, 48.6);
-    const d = calls.draws[0], fr = J("hermit_crab/hermit_crab_a.json").frames.hermit_crab_a_walk_broken_1.frame;
+    const d = calls.draws[0], fr = J("hermit_crab/hermit_crab_b.json").frames.hermit_crab_b_walk_broken_1.frame;
     ok(d[1] === fr.x && d[2] === fr.y && fr.x === 194 && d[5] === -96 && d[6] === -96 && d[7] === 192, "adapter: frame rects honour the 2 px gutter grid and the centre pivot");
     const boss = Object.assign({}, A.build(J("crabclaw/crabclaw_b.json"), {}).strips, A.build(J("crabclaw/crabclaw_b_angry.json"), {}, { walk: "walk_angry", hurt: "hurt_angry" }).strips);
     ok(["walk", "idle", "throw", "walk_angry", "idle_angry", "throw_angry"].every((k) => boss[k]) && boss.throw.releaseFrame === 2 && boss.throw_angry.releaseFrame === 2, "adapter: crabclaw_b + angry -> all six slots, releaseFrame 2");
     const surf = A.build(J("background/beach_surf.json"), {}).strips.main;
-    ok(surf.placement.a.foamTopYInBackgroundSrcPx === 275 && surf.loop && surf.count === 4, "adapter: surf keeps its placement on background a (row 275)");
+    ok(surf.placement.a.foamTopYInBackgroundSrcPx === 275 && surf.loop && surf.count === 6 && surf.fps === 6, "adapter: surf keeps its placement on background a (row 275), 6-step loop at 6 fps");
+    const cell = (seq) => seq.map((id) => id.match(/_(\d+)$/)[1]).join(",");
+    ok(cell(surf.sequence) === "0,1,2,3,2,1", "adapter: surf plays the JSON ping-pong 0,1,2,3,2,1 (" + cell(surf.sequence) + ")");
+    calls.draws = []; surf.draw(ctx, 4, 0, 0, 768); const sj = J("background/beach_surf.json").frames;
+    ok(calls.draws[0][1] === sj.beach_surf_main_2.frame.x, "adapter: surf step 4 draws cell 2's rect (sequence, not index)");
+    const cw = J("crabclaw/crabclaw_b.json"), cwa = J("crabclaw/crabclaw_b_angry.json");
+    const rect = (d, id) => JSON.stringify(d.frames[id].frame);
+    ok(boss.walk.sequence.length === 4 && boss.walk.fps === 6 && boss.walk_angry.fps === 7, "adapter: Crabclaw walk 4 steps @6 fps, angry walk @7 fps (from JSON)");
+    // 0,1,2,1: the 4th listed cell is a pixel copy of cell 1 in both atlases (verified on the .q.png at integration).
+    ok(boss.walk.sequence[3] === "crabclaw_b_walk_3" && rect(cw, "crabclaw_b_walk_3") !== rect(cw, "crabclaw_b_walk_1") && cwa.animations.walk_angry.frames.join() === cwa.animations.walk.frames.join(), "adapter: Crabclaw walk follows the JSON frame list; walk_angry aliases angry walk");
+    // A JSON without an explicit frame list falls back to frameTags (forward / reverse / pingpong), nothing hardcoded.
+    const synth = { frames: { f_0: { frame: { x: 0, y: 0, w: 4, h: 4 } }, f_1: { frame: { x: 6, y: 0, w: 4, h: 4 } }, f_2: { frame: { x: 12, y: 0, w: 4, h: 4 } } }, animations: { pp: { fps: 5, loop: true }, rv: { fps: 2 } },
+      meta: { pivot: { x: 2, y: 2 }, body: { r: 2 }, frameTags: [{ name: "pp", from: 0, to: 2, direction: "pingpong" }, { name: "rv", from: 0, to: 2, direction: "reverse" }, { name: "fw", from: 1, to: 2, direction: "forward" }] } };
+    const ss = A.build(synth, {}).strips;
+    ok(cell(ss.pp.sequence) === "0,1,2,1" && ss.pp.fps === 5 && cell(ss.rv.sequence) === "2,1,0" && cell(ss.fw.sequence) === "1,2", "adapter: frameTags fallback (pingpong 0,1,2,1 / reverse / forward) when a JSON has no frame list");
+    const src = fs.readFileSync(path.join(ROOT, "src/worlds/render/AtlasSheetAdapter.js"), "utf8") + ["BeachBackdrop", "CrabclawRenderer", "HermitCrabRenderer", "SheetRenderer"].map((f) => fs.readFileSync(path.join(ROOT, "src/worlds/render/" + f + ".js"), "utf8")).join("\n");
+    ok(!/\[\s*0\s*,\s*1\s*,\s*2\s*,\s*[13]\s*(,|\])/.test(src.split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n")), "adapter + renderers: no hardcoded frame sequences in code");
+    // Warning decal v0.1.2: refBodyR 75 = inner ring; drawn at dangerR, the frame spans 2x the frame/2 ratio (300/75 = 4 dangerR wide).
+    const warn = A.build(J("coconut/coconut_warning_decal.json"), {}).strips.warn;
+    calls.draws = []; warn.draw(ctx, 0, 0, 0, 44);
+    ok(warn.refBodyR === 75 && warn.ax === 150 && near(calls.draws[0][7], 300 * 44 / 75) && near(calls.draws[0][5], -150 * 44 / 75), "decal: inner ring (r 75) drawn at dangerR 44; 300 px frame -> " + (300 * 44 / 75).toFixed(0) + " world units wide");
     const sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"), urls = [].concat(...Object.values(LST.WORLD2_SHEETS).map((v) => [].concat(v).map((x) => (typeof x === "string" ? x : x.url))));
     const imgs = urls.map((u) => { const m = JSON.parse(fs.readFileSync(path.join(ROOT, u), "utf8")).meta; return path.dirname(u) + "/" + (m.quantizedCopy ? m.quantizedCopy.image : m.image); });
     const cardArt = ["assets/sprites/world2/cards/card_backyard.png", "assets/sprites/world2/cards/card_beach.png", LST.WorldSelect ? LST.WorldSelect.LOCK_ART : "assets/sprites/world2/cards/card_locked_overlay.png"];
@@ -364,7 +384,7 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
   const all = [...FILES, ...RENDER_FILES, ...UI_FILES, "core/DevFlags.js", "core/DevRunGuard.js"].map((f) => "src/" + f);
   ok(all.every((f) => html.includes(`src="${f}"`)), "index.html loads every World 2 script");
-  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v21"/.test(sw), "sw.js v21 precaches every World 2 script");
+  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v22"/.test(sw), "sw.js v22 precaches every World 2 script");
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
   const at = (f) => scripts.indexOf("src/" + f);
   ok(at("waves.js") < at("enemies/parts/EnemyPart.js") && at("worlds/Beach.js") < at("game.js") && at("sprites/LookSheetLibrary.js") < at("worlds/render/World2Sheets.js") && at("worlds/render/WorldRenderers.js") < at("main.js"), "index.html script order: systems after waves.js, renderers after LookSheetLibrary, all before main.js");
@@ -451,10 +471,14 @@ function devFlagsAt(href) {
   ok(store["lst.meta"] === before && Object.keys(store).sort().join() === beforeKeys, "door run: localStorage lst.meta byte-unchanged (no world pick, Gears, clears, best wave)");
   ok(JSON.stringify(LST.meta.state) === beforeState && !LST.meta.worldCleared("beach") && LST.meta.state.gears === 250 && LST.meta.state.runs === 4, "door run: meta.state byte-unchanged after the run");
   ok(!LST.DevRunGuard.active && !game.devRun, "door run: guard released after finishRun");
+  ok(game.world.id === "beach" && game.bestWave === game.world.loadBest() && game.bestWave === 0 && !game.newBest, "door run: game.bestWave re-read from the restored save after finishRun (" + game.bestWave + ")");
   // Quitting a door run mid-way (pause > Quit) also puts the save back and releases the guard.
   game.state = "menu"; game.selectWorld("beach"); game.newGame(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
   for (let i = 0; i < 60 * 30; i++) game.step(1 / 60);
+  game.saveBest(Math.max(game.wave, 3));
+  const midBest = game.bestWave;
   LST.meta.state.gears += 999; LST.meta.save(); game.toMenu();
+  ok(midBest >= 3 && game.bestWave === game.world.loadBest() && game.bestWave === 0, "door run: quitting re-reads bestWave from the restored save (was " + midBest + " in the run, now " + game.bestWave + ")");
   ok(store["lst.meta"] === before && JSON.stringify(LST.meta.state) === beforeState && !LST.DevRunGuard.active && !game.devRun, "door run: quitting mid-run leaves the save byte-unchanged and releases the guard");
   // Normal runs are untouched by the guard.
   LST.DevFlags = Object.freeze({ enabled: false, local: true, unlocks: Object.freeze([]) });
