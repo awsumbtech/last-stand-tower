@@ -6,6 +6,8 @@
 // which may repeat cells, e.g. surf 0,1,2,3,2,1 or Crabclaw walk 0,1,2,1) and `.fps` / `.loop`.
 // An animation with no frame list falls back to its `meta.frameTags` range and direction
 // (forward / reverse / pingpong). Nothing here knows any sheet's sequence.
+// A bad sheet fails loudly: an animation with no frames, or a listed frame id missing from
+// `frames`, throws (the sheet is not handed out) instead of silently drawing fewer frames.
 LST.AtlasSheetAdapter = class AtlasSheetAdapter extends LST.LookSheetLibrary {
   // Played frame ids for one animation, from the JSON alone.
   static sequence(data, name) {
@@ -30,8 +32,10 @@ LST.AtlasSheetAdapter = class AtlasSheetAdapter extends LST.LookSheetLibrary {
     for (const name of LST.AtlasSheetAdapter.animationNames(data)) {
       const anim = (data.animations || {})[name] || {};
       const ids = LST.AtlasSheetAdapter.sequence(data, name);
-      const frames = ids.map((id) => data.frames[id]).filter(Boolean);
-      if (!frames.length) continue;
+      if (!ids.length) throw new Error(`AtlasSheetAdapter: animation "${name}" has no frames (${(meta && meta.image) || "sheet"})`);
+      const missing = ids.filter((id) => !data.frames[id]);
+      if (missing.length) throw new Error(`AtlasSheetAdapter: animation "${name}" lists missing frame ids ${missing.join(", ")} (${(meta && meta.image) || "sheet"})`);
+      const frames = ids.map((id) => data.frames[id]);
       const first = frames[0].frame;
       const a = new LST.SheetAnimation({ image: meta.image, frame: { w: first.w, h: first.h },
         count: frames.length, fps: anim.fps, loop: anim.loop }, meta.pivot, meta.body.r);

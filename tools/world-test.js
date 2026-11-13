@@ -306,6 +306,20 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
       meta: { pivot: { x: 2, y: 2 }, body: { r: 2 }, frameTags: [{ name: "pp", from: 0, to: 2, direction: "pingpong" }, { name: "rv", from: 0, to: 2, direction: "reverse" }, { name: "fw", from: 1, to: 2, direction: "forward" }] } };
     const ss = A.build(synth, {}).strips;
     ok(cell(ss.pp.sequence) === "0,1,2,1" && ss.pp.fps === 5 && cell(ss.rv.sequence) === "2,1,0" && cell(ss.fw.sequence) === "1,2", "adapter: frameTags fallback (pingpong 0,1,2,1 / reverse / forward) when a JSON has no frame list");
+    // P3-1: a missing frame id or an empty animation throws; every shipped World 2 JSON animation builds its listed length.
+    const throws = (d) => { try { A.build(d, {}); return null; } catch (err) { return String(err.message); } };
+    const bad1 = JSON.parse(JSON.stringify(synth)); bad1.animations.pp.frames = ["f_0", "f_9"];
+    const bad2 = JSON.parse(JSON.stringify(synth)); bad2.animations.empty = { frames: [], fps: 4 };
+    const m1 = throws(bad1), m2 = throws(bad2);
+    ok(m1 && /missing frame ids f_9/.test(m1) && m2 && /"empty" has no frames/.test(m2), "adapter: throws on a missing frame id (" + m1 + ") and on an empty animation (" + m2 + ")");
+    const w2json = [];
+    (function walk(d) { for (const f of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name);
+      if (f.isDirectory()) walk(p); else if (f.name.endsWith(".json") && f.name !== "PROVENANCE.json" && f.name !== "cards.json") w2json.push(p); } })(dir);
+    let built = 0; const short = [];
+    for (const p of w2json) { const data = JSON.parse(fs.readFileSync(p, "utf8")), st = A.build(data, {}).strips;
+      for (const [name, an] of Object.entries(data.animations || {})) { built++;
+        if (!st[name] || st[name].count !== an.frames.length || st[name].sequence.join() !== an.frames.join()) short.push(path.relative(dir, p) + ":" + name); } }
+    ok(w2json.length === 11 && built > 20 && !short.length, "adapter: every World 2 JSON animation builds its listed length (" + w2json.length + " JSONs, " + built + " animations" + (short.length ? "; wrong: " + short.join(" ") : "") + ")");
     const src = fs.readFileSync(path.join(ROOT, "src/worlds/render/AtlasSheetAdapter.js"), "utf8") + ["BeachBackdrop", "CrabclawRenderer", "HermitCrabRenderer", "SheetRenderer"].map((f) => fs.readFileSync(path.join(ROOT, "src/worlds/render/" + f + ".js"), "utf8")).join("\n");
     ok(!/\[\s*0\s*,\s*1\s*,\s*2\s*,\s*[13]\s*(,|\])/.test(src.split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n")), "adapter + renderers: no hardcoded frame sequences in code");
     // Warning decal v0.1.2: refBodyR 75 = inner ring; drawn at dangerR, the frame spans 2x the frame/2 ratio (300/75 = 4 dangerR wide).
