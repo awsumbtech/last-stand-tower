@@ -1,6 +1,6 @@
 # Last Stand Tower: Progression Plan
 
-One design to approve before Sprint 5. Nothing here is built yet. The goals are **longer, more fun levels** and progress that feels **earned**.
+One design to approve before Sprint 5. **Status (Nov 12 2026):** the level structure in section 1 is built for **World 2, the Beach** (`src/worlds/Beach.js` + `LevelPlan` / `LevelDirector`: acts, gates, supply waves, Elite Big Red, Captain Crabclaw with a frenzy at 110 s), along with world select and the Beach unlock on the Backyard's first clear (Gears x1.6). The Backyard still uses the classic waves, so its balance is unchanged (the sims are byte-identical). The rest of this plan is not built yet. The goals are **longer, more fun levels** and progress that feels **earned**.
 
 **Baseline** (chunked sim, Oct 29, `tools/out/baseline-*`; 120 fresh runs plus 16 four-hour campaigns): Big Red's kill rate is **100%** at every boss wave (830+ fights, 0 enrages, ~25–39 s waves). The **King Mole fight lasts 3.5–4 min** (median 207–225 s, max 317 s), and only 13% of attempts win. Campaign **runs take a median of 5–6 min**. Runs that reach the finale take 7.1–7.2 min, but **13–18% go past 10 min** (max 16.5). The first clear comes at about run 15, around 1.5 h.
 

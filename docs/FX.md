@@ -23,6 +23,14 @@ seeded A/B sims are byte-identical to main).
 
 `?fx=off` runs the game with no effects (A/B checks).
 
+## Status looks (images only)
+
+Burn, frozen, venom and spark on an enemy are drawn only by the look objects in `src/elements/looks/`
+(`BurnFlames`, `IceCrust`, `VenomDrips`, `SparkCrackle`, attached by `LookLayer` from `LookRegistry`). Each
+draws frames from its Game Art & Motion image strip (`assets/sprites/looks/`, scaled by body radius, no tint).
+FxDirector draws the layer; it no longer draws any code-made status rings or pips
+(`tools/elements-test.js` fails if `drawStatusRings` or similar code returns to `src/fx/`).
+
 ## Event routes (`LST.FX_ROUTES`)
 
 Which game events fire an impact is data in `src/fx/FxPresets.js`. Card picks

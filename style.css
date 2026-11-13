@@ -1197,8 +1197,8 @@ svg.eye-ico circle { fill: var(--ink); }
   .world-card .wc-mult::before { content: "\00a0\00b7\00a0"; }
   .world-card.locked .wc-mult { display: none; }
   /* Short phones hide the card art; a locked card still shows the lock overlay, as a badge on the right. */
-  .world-card.locked .wc-pic { display: block; position: absolute; top: 3px; right: 4px; bottom: 3px; width: 70px; height: auto; border: 0; background: none; }
+  .world-card.locked .wc-pic { display: block; position: absolute; top: 3px; right: 3px; bottom: 3px; width: 54px; height: auto; border: 0; background: none; }
   .world-card.locked .wc-art { display: none; }
-  .world-card.locked .wc-body { padding-right: 76px; }
+  .world-card.locked .wc-body { padding-right: 58px; }
 }
 @media (max-height: 760px) { .world-card .wc-mult { white-space: nowrap; } }
