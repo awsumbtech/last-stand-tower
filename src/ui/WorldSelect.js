@@ -35,14 +35,14 @@ LST.WorldSelect = class WorldSelect {
     this.root.innerHTML = this.cards().map((c) => `
       <button class="world-card${c.selected ? " on" : ""}${c.open ? "" : " locked"}" data-world="${c.id}" aria-pressed="${c.selected}"
         aria-label="${esc(c.name)}${c.open ? `, best wave ${c.best}, Gears x${c.gearMult}` : `, locked. ${esc(c.lockText)}`}">
-        ${c.art ? `<img class="wc-art" src="${esc(c.art)}" alt="" draggable="false">` : ""}
+        ${c.art ? `<span class="wc-pic"><img class="wc-art" src="${esc(c.art)}" alt="" draggable="false">${c.open ? "" : `<img class="wc-lock" src="${LST.WorldSelect.LOCK_ART}" alt="" draggable="false">`}</span>` : ""}
         <span class="wc-body">
           <span class="wc-name">${esc(c.name)}${c.cleared ? ' <i class="wc-done">&#10003;</i>' : ""}${c.dev ? ' <i class="wc-dev">test</i>' : ""}</span>
           <span class="wc-line">${c.open ? `Best wave <b>${c.best}</b>` : esc(c.lockText.replace(/ to unlock$/, ""))}</span>
           <span class="wc-mult">Gears <b>x${c.gearMult}</b></span>
         </span>
       </button>`).join("");
-    for (const img of this.root.querySelectorAll("img.wc-art")) {
+    for (const img of this.root.querySelectorAll("img.wc-art, img.wc-lock")) {
       img.addEventListener("error", () => img.remove(), { once: true });
     }
   }
@@ -62,3 +62,5 @@ LST.WorldSelect = class WorldSelect {
     }
   }
 };
+// Game Art & Motion's lock illustration, laid over a locked world's card art (dimmed by CSS).
+LST.WorldSelect.LOCK_ART = "assets/sprites/world2/cards/card_locked_overlay.png";

@@ -1171,8 +1171,11 @@ svg.eye-ico circle { fill: var(--ink); }
 .world-card:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
 .world-card.on { background: #fff3c4; outline: 3px solid #ffb020; outline-offset: 1px; }
 .world-card.locked { cursor: default; opacity: 0.72; }
-.world-card .wc-art { display: block; width: 100%; height: 54px; object-fit: cover; border-bottom: 3px solid var(--ink); }
-.world-card.locked .wc-art { filter: grayscale(1) brightness(0.8); }
+.world-card .wc-pic { position: relative; display: block; height: 58px; overflow: hidden; border-bottom: 3px solid var(--ink); background: #cfe8f5; }
+.world-card .wc-art { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.world-card .wc-lock { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* Locked: a UI dim wash on the art image (CSS filter), with the lock illustration on top. */
+.world-card.locked .wc-art { filter: grayscale(0.7) brightness(0.62); }
 .world-card .wc-body { display: flex; flex-direction: column; gap: 1px; padding: 6px 8px 7px; }
 .world-card .wc-name { font-weight: 700; font-size: 16px; line-height: 1.1; }
 .world-card .wc-line, .world-card .wc-mult { font-size: 12px; line-height: 1.2; color: #5b4a6e; }
@@ -1181,16 +1184,17 @@ svg.eye-ico circle { fill: var(--ink); }
 .boss-bar.pips-half .pip.p1 { left: 50%; }
 .boss-bar.pips-half .pip.p2 { display: none; }
 /* Short phones (375x667): one text line per card so the start panel still fits. */
-@media (max-height: 720px) {
+@media (max-height: 760px) {
   .world-select { margin: 2px 0 6px; }
   .world-card { min-height: 48px; }
-  .world-card .wc-art { height: 36px; }
+  .world-card .wc-pic { display: none; }
   .world-card .wc-body { display: block; padding: 4px 8px 5px; }
   .world-card .wc-name { display: block; font-size: 15px; }
   .world-card .wc-line, .world-card .wc-mult { display: inline; font-size: 11.5px; }
   .world-card .wc-mult::before { content: " \00b7 "; }
 }
-@media (max-height: 720px) {
+@media (max-height: 760px) {
   .world-card .wc-mult::before { content: "\00a0\00b7\00a0"; }
   .world-card.locked .wc-mult { display: none; }
 }
+@media (max-height: 760px) { .world-card .wc-mult { white-space: nowrap; } }

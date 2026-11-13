@@ -1,32 +1,20 @@
-# World 2 (Beach) art manifest
+# World 2 (Beach) art: Game Art & Motion v0.1.1 recommended picks
 
-The game loads these files (src/worlds/render/World2Sheets.js). Until a sheet's JSON and every
-strip PNG are present, the renderer that uses it draws **nothing** (no code-drawn fallback).
+These files are byte-identical copies from `lst-art/world2-beach` (`<asset>/recommended/`, `coconut/`, `cards/`). The game uses the pngquant `.q.png` copies named in each JSON's `meta.quantizedCopy`. At real size they look the same as the originals: premultiplied p99 difference is 4.6/255 or less at 390x844 DPR2.
 
-Format: the same "strips" JSON as the status looks (assets/sprites/looks, LookSheetLibrary /
-SheetAnimation): one horizontal PNG per strip, frames packed left to right with **no gutter**.
+The art is never edited. `src/worlds/render/AtlasSheetAdapter.js` reads the TexturePacker grid JSON as-is (2 px gutter, `meta.pivot`, `meta.body.r`) and renames animations to the renderer slots. `src/worlds/render/World2Sheets.js` lists the files.
 
-```json
-{ "anchor": { "x": 96, "y": 96 }, "refBodyR": 48,
-  "strips": { "walk": { "image": "HermitCrab_walk.png", "frame": { "w": 192, "h": 192 }, "count": 6, "fps": 10, "loop": true } } }
-```
-
-- `anchor`: pixel in a frame that sits on the entity position (body centre unless noted).
-- `refBodyR`: body radius in frame px. Drawn scale = bodyR / refBodyR, bodyR = enemy radius x 1.35.
-- One-shots (`loop: false`) hold their last frame. Strips without `fps` are spread over a game timer.
-- All World 2 art faces **right**; the game mirrors it on the right of the tower.
-
-| Sheet (`<Sheet>/<Sheet>.json`) | Strips: frames @ fps (loop / once) | Anchor |
+| Renderer sheet | Files | Slots (theirs -> ours) |
 |---|---|---|
-| BeachGround | main 1 (static, portrait) | the tower spot (image centre) |
-| BeachSurf (optional) | main 4-6 @ 6 loop (shoreline foam) | top-centre of the ground image |
-| HermitCrab | walk 6 @ 10 loop; bare 6 @ 12 loop; crack 4 @ 16 once; regrow 4 @ 12 once | body centre |
-| Seagull | fly 6 @ 12 loop | body centre |
-| CaptainCrabclaw | walk 6 @ 8 loop; idle 4 @ 6 loop; throw 6 (spread over the windup); walk_angry, idle_angry, throw_angry (phase 2 / frenzy) | body centre |
-| EliteShell | on 4 @ 8 loop; crack 4 @ 16 once; regrow 4 @ 12 once (overlay on Big Red) | Big Red's body centre |
-| Coconut | spin 4 @ 16 loop; splat 4 (spread over 0.35 s) | coconut centre |
-| CoconutWarning | warn 6 (spread over the flight) | landing spot; refBodyR = danger radius in px (drawn at hitRadius 18) |
+| BeachGround | background/beach_bg_a | main |
+| BeachSurf | background/beach_surf | main, placed at `meta.placement.a` (row 275) |
+| HermitCrab | hermit_crab/hermit_crab_a | walk; walk_broken -> bare; hit_crack -> crack; regrow |
+| Seagull | seagull/seagull_a | fly (faces camera, not mirrored) |
+| SeagullShadow | seagull/seagull_a_shadow | shadow (30 frame px below the gull) |
+| CaptainCrabclaw | crabclaw/crabclaw_b + crabclaw_b_angry | walk, idle, throw (release frame 2); walk -> walk_angry, idle_angry, throw_angry (faces camera) |
+| EliteShell | elite_shell/elite_shell_c | on, crack, regrow (overlay on Big Red) |
+| Coconut | coconut/coconut_spin + coconut_splat | spin; splat (spread over 0.35 s) |
+| CoconutWarning | coconut/coconut_warning_decal | warn (ring drawn at tower radius + hitRadius) |
+| World cards | cards/card_backyard, card_beach, card_locked_overlay | `<img>` on the start screen |
 
-World cards: `cards/backyard_card.png`, `cards/beach_card.png` (wide, shown 54 px tall, cover-fit).
-
-Body radii in world units: crab 13, gull 10, Crabclaw 44, coconut 9.
+Gameplay radii stay as tuned: crab 13, gull 10, Crabclaw 44, coconut 9. Drawn scale = radius x 1.35 / `meta.body.r`.

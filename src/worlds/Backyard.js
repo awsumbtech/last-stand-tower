@@ -14,7 +14,7 @@ LST.WorldRegistry.register(new LST.WorldDefinition({
     },
     arrive(game, m) { game.onMoleRise(m); LST.audio.play("boss"); },
   },
-  art: { background: null, card: "assets/sprites/world2/cards/backyard_card.png" },
+  art: { background: null, card: "assets/sprites/world2/cards/card_backyard.png" },
   unlock: null,
   copy: {
     finaleSub: "King Mole rises!",

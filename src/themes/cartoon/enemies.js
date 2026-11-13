@@ -48,6 +48,14 @@
       ctx.restore();
     },
 
+    // HP bar only, for bodies drawn by another renderer (World 2 image art): same bar as above.
+    enemyHud(ctx, e) {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      hpBar(ctx, e, e.radius * 1.35);
+      ctx.restore();
+    },
+
     // Death animations (sprites only). A kill leaves a Corpse for exactly the clip length.
     corpseLife(e) {
       return LST.enemySprites ? LST.enemySprites.deathDuration(e) : 0;

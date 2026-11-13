@@ -9,7 +9,7 @@
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const ROOT = path.join(__dirname, "..");
 const FILES = JSON.parse(fs.readFileSync(path.join(__dirname, "sim.js"), "utf8").match(/const FILES = (\[[^\]]*\])/)[1]);
-const RENDER_FILES = ["sprites/SheetAnimation.js", "sprites/LookSheetLibrary.js", ...["World2Sheets", "SheetRenderer", "HermitCrabRenderer", "SeagullRenderer", "CrabclawRenderer", "EliteShellRenderer", "CoconutRenderer", "BeachBackdrop", "WorldRenderers"].map((f) => "worlds/render/" + f + ".js")];
+const RENDER_FILES = ["sprites/SheetAnimation.js", "sprites/LookSheetLibrary.js", ...["AtlasSheetAdapter", "World2Sheets", "SheetRenderer", "HermitCrabRenderer", "SeagullRenderer", "CrabclawRenderer", "EliteShellRenderer", "CoconutRenderer", "BeachBackdrop", "WorldRenderers"].map((f) => "worlds/render/" + f + ".js")];
 const UI_FILES = ["ui/WorldSelect.js", "ui/WorldScreens.js"];
 
 function mulberry32(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -199,7 +199,7 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
 
 // ---------- 7. World 2 renderers: images only ----------
 {
-  const { LST } = load(1, {}, [...RENDER_FILES]);
+  const { LST } = load(1, {}, [...RENDER_FILES, ...UI_FILES]);
   const calls = { draws: [], paths: 0 };
   const PATH = ["beginPath", "arc", "lineTo", "moveTo", "bezierCurveTo", "quadraticCurveTo", "fill", "stroke", "rect", "ellipse", "fillRect", "strokeRect", "roundRect", "fillText"];
   const ctx = new Proxy({ canvas: { width: 780, height: 1688 } }, { get: (t, k) => (k in t ? t[k] : k === "drawImage" ? (...a) => calls.draws.push(a) : PATH.includes(k) ? () => calls.paths++ : () => {}), set: (t, k, v) => { t[k] = v; return true; } });
@@ -210,6 +210,7 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   let themed = 0; const theme = () => { themed++; };
   const frame = () => {
     calls.draws = []; themed = 0;
+    W.shadows(ctx, [crab, gull, cc, elite], r);
     const handled = [crab, gull, cc, elite].map((e) => W.enemy(ctx, e, r, theme));
     W.groundHazards(ctx, [nut]); W.airHazards(ctx, [nut]);
     const bg = W.background(LST.WorldRegistry.get("beach")); bg.draw(ctx, r);
@@ -225,8 +226,9 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
     EliteShell: { anchor: { x: 96, y: 96 }, refBodyR: 48, strips: { on: [192, 192, 4, 8, true], crack: [192, 192, 4, 16, false], regrow: [192, 192, 4, 12, false] } },
     Coconut: { anchor: { x: 32, y: 32 }, refBodyR: 12, strips: { spin: [64, 64, 4, 16, true], splat: [160, 128, 4, 0, false] } },
     CoconutWarning: { anchor: { x: 80, y: 80 }, refBodyR: 75, strips: { warn: [160, 160, 6, 0, false] } },
+    SeagullShadow: { anchor: { x: 64, y: 32 }, refBodyR: 32, strips: { shadow: [128, 64, 1, 0, false] } },
   };
-  ok(Object.keys(SPEC).join() === Object.keys(LST.WORLD2_SHEETS).join() && Object.entries(LST.WORLD2_SHEETS).every(([n, u]) => u === `assets/sprites/world2/${n}/${n}.json`), "manifest: one sheet per World 2 visual at assets/sprites/world2/<Sheet>/<Sheet>.json");
+  ok(Object.keys(SPEC).sort().join() === Object.keys(LST.WORLD2_SHEETS).sort().join(), "manifest: one World 2 sheet per renderer slot (" + Object.keys(LST.WORLD2_SHEETS).join(", ") + ")");
 
   let h = frame();
   ok(calls.draws.length === 0 && calls.paths === 0 && h.join() === "true,true,true,true" && themed === 1, "renderers: no sheets loaded -> nothing drawn at all (no fallback), Backyard theme only under the Elite overlay");
@@ -241,7 +243,7 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   for (const n of Object.keys(SPEC)) lib.install(n, json[n], img[n]);
   h = frame();
   const used = calls.draws.map((d) => d[0].id);
-  ok(calls.paths === 0 && ["HermitCrab:walk", "Seagull:fly", "CaptainCrabclaw:walk", "EliteShell:on", "CoconutWarning:warn", "Coconut:spin", "BeachGround:main", "BeachSurf:main"].every((x) => used.includes(x)), "renderers: with stub sheets every visual is one drawImage of its own sheet, 0 path calls (" + used.join(" ") + ")");
+  ok(calls.paths === 0 && ["HermitCrab:walk", "Seagull:fly", "SeagullShadow:shadow", "CaptainCrabclaw:walk", "EliteShell:on", "CoconutWarning:warn", "Coconut:spin", "BeachGround:main", "BeachSurf:main"].every((x) => used.includes(x)), "renderers: with stub sheets every visual is one drawImage of its own sheet, 0 path calls (" + used.join(" ") + ")");
   { const d = calls.draws.find((x) => x[0].id === "HermitCrab:walk"), k = LST.SheetRenderer.bodyR(crab) / 48;
     ok(near(d[7], 192 * k) && near(d[8], 192 * k), "renderers: crab drawn at bodyR / refBodyR (radius x 1.35)"); }
   // shell states pick strips
@@ -251,8 +253,39 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   sh.update(3.1, crab); frame(); ok(calls.draws.some((d) => d[0].id === "HermitCrab:regrow"), "crab renderer: regrow plays once when it comes back");
   crab.age += 2; frame(); ok(calls.draws.some((d) => d[0].id === "HermitCrab:walk"), "crab renderer: back to walk");
   cc.mode = "fight"; cc.windup = cc.windupMax = 0.75; frame(); ok(calls.draws.some((d) => d[0].id === "CaptainCrabclaw:throw"), "crabclaw renderer: throw clip over the windup");
+  { const R = W.bodies.crabclaw; lib.sheets.CaptainCrabclaw.strips.throw.releaseFrame = 2; const sp = lib.sheets.CaptainCrabclaw.strips.throw; sp.count = 4;
+    const seq = []; cc.slamAnim = 0;
+    for (const w of [0.75, 0.5, 0.2, 0.01]) { cc.windup = w; seq.push(R.throwFrame("throw", cc)); }
+    cc.windup = 0; for (const a of [1, 0.6, 0.3]) { cc.slamAnim = a; seq.push(R.throwFrame("throw", cc)); }
+    ok(seq.join() === "0,0,1,1,2,2,3", "crabclaw renderer: frames 0-1 over the windup, release frame 2 on the throw, then 3 (" + seq.join() + ")"); cc.slamAnim = 0; cc.windup = 0.4; }
+  { calls.draws = []; W.bodies.gull.draw(ctx, gull); W.bodies.crabclaw.draw(ctx, cc);
+    ok(calls.draws.length === 2 && calls.draws.every((d) => d[7] > 0), "renderers: gull and Crabclaw face the camera, never mirrored (x>0 gull drawn unflipped)"); }
+  { let hud = 0; calls.draws = []; W.enemy(ctx, crab, r, theme, () => hud++); ok(hud === 1, "renderers: the theme HP bar is reused on top of a World 2 body"); }
+  { LST.SheetRenderer.reduced = false; const a = W.bodies.crab.frameAt("walk", 0.35); W.motion({ fx: { reducedMotion: true } }); const b = W.bodies.crab.frameAt("walk", 0.35), c1 = W.bodies.crab.frameAt("crack", 0.2); W.motion({});
+    ok(a > 0 && b === 0 && c1 > 0, "reduced motion: loops hold frame 0, one-shots still play"); }
   cc.phase = 1; frame(); ok(calls.draws.some((d) => d[0].id === "CaptainCrabclaw:throw_angry"), "crabclaw renderer: angry art in phase 2 (own sheet strips, not a tint)");
   nut.update(0.6, { tower: { x: 0, y: 0, radius: 30 } }); frame(); ok(calls.draws.some((d) => d[0].id === "Coconut:splat") && !calls.draws.some((d) => d[0].id === "Coconut:spin"), "coconut renderer: splat after landing, no air sprite");
+  // Real v0.1.1 atlases through the adapter (stub image): slots, gutters, pivots, body radius.
+  {
+    const A = LST.AtlasSheetAdapter, dir = path.join(ROOT, "assets/sprites/world2"), J = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
+    const crabA = A.build(J("hermit_crab/hermit_crab_a.json"), { id: "atlas" }, { walk_broken: "bare", hit_crack: "crack" }).strips;
+    ok(["walk", "bare", "crack", "regrow"].every((k) => crabA[k]) && crabA.walk.count === 4 && crabA.walk.refBodyR === 48.6 && crabA.walk.ax === 96, "adapter: hermit_crab_a -> walk / bare / crack / regrow, 4 frames, refBodyR 48.6, pivot 96");
+    calls.draws = []; crabA.bare.draw(ctx, 1, 0, 0, 48.6);
+    const d = calls.draws[0], fr = J("hermit_crab/hermit_crab_a.json").frames.hermit_crab_a_walk_broken_1.frame;
+    ok(d[1] === fr.x && d[2] === fr.y && fr.x === 194 && d[5] === -96 && d[6] === -96 && d[7] === 192, "adapter: frame rects honour the 2 px gutter grid and the centre pivot");
+    const boss = Object.assign({}, A.build(J("crabclaw/crabclaw_b.json"), {}).strips, A.build(J("crabclaw/crabclaw_b_angry.json"), {}, { walk: "walk_angry", hurt: "hurt_angry" }).strips);
+    ok(["walk", "idle", "throw", "walk_angry", "idle_angry", "throw_angry"].every((k) => boss[k]) && boss.throw.releaseFrame === 2 && boss.throw_angry.releaseFrame === 2, "adapter: crabclaw_b + angry -> all six slots, releaseFrame 2");
+    const surf = A.build(J("background/beach_surf.json"), {}).strips.main;
+    ok(surf.placement.a.foamTopYInBackgroundSrcPx === 275 && surf.loop && surf.count === 4, "adapter: surf keeps its placement on background a (row 275)");
+    const sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"), urls = [].concat(...Object.values(LST.WORLD2_SHEETS).map((v) => [].concat(v).map((x) => (typeof x === "string" ? x : x.url))));
+    const imgs = urls.map((u) => { const m = JSON.parse(fs.readFileSync(path.join(ROOT, u), "utf8")).meta; return path.dirname(u) + "/" + (m.quantizedCopy ? m.quantizedCopy.image : m.image); });
+    const cardArt = ["assets/sprites/world2/cards/card_backyard.png", "assets/sprites/world2/cards/card_beach.png", LST.WorldSelect ? LST.WorldSelect.LOCK_ART : "assets/sprites/world2/cards/card_locked_overlay.png"];
+    ok([...urls, ...imgs, ...cardArt].every((f) => fs.existsSync(path.join(ROOT, f)) && sw.includes('"' + f + '"')), "sw.js precaches every World 2 json + png the game loads, and each exists (" + (urls.length + imgs.length + 3) + " files)");
+    const listed = [...sw.matchAll(/"(assets\/sprites\/world2\/[^"]+)"/g)].map((m) => m[1]);
+    ok(listed.every((f) => fs.existsSync(path.join(ROOT, f))), "sw.js: every listed world2 file exists (" + listed.length + "), so install can't fail");
+    for (const f of [...urls, ...imgs]) { const src = f.replace("assets/sprites/world2/", ""), alt = [path.join("/workspace/lst-art/world2-beach", path.dirname(src), "recommended", path.basename(src)), path.join("/workspace/lst-art/world2-beach", src)].find((x) => fs.existsSync(x));
+      if (alt) ok(fs.readFileSync(alt).equals(fs.readFileSync(path.join(ROOT, f))), "art unchanged: " + f + " == Game Art v0.1.1"); }
+  }
   // Source scan: no canvas paths / fills / tints in any new render or UI file
   const BANNED = /\.\s*(beginPath|arc|arcTo|lineTo|moveTo|bezierCurveTo|quadraticCurveTo|closePath|ellipse|fillRect|strokeRect|roundRect|stroke|fill|fillText|strokeText|createLinearGradient|createRadialGradient|putImageData)\s*\(|\.\s*(fillStyle|strokeStyle|globalAlpha|globalCompositeOperation|filter|lineWidth|shadowColor|shadowBlur)\s*=(?!=)|LST\.draw\b/;
   const NEW = [...RENDER_FILES.slice(2), ...UI_FILES, "bosses/BossScript.js", "bosses/Coconut.js", "bosses/CaptainCrabclaw.js", "enemies/PartEnemy.js", "enemies/parts/ShellShield.js", "enemies/parts/Flyer.js", "worlds/Beach.js", "worlds/LevelDirector.js"];

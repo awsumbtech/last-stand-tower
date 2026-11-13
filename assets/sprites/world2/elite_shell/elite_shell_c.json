@@ -1,0 +1,591 @@
+{
+  "frames": {
+    "elite_shell_c_on_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "elite_shell_c_on_1": {
+      "frame": {
+        "x": 306,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "elite_shell_c_on_2": {
+      "frame": {
+        "x": 612,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "elite_shell_c_on_3": {
+      "frame": {
+        "x": 918,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 125
+    },
+    "elite_shell_c_crack_0": {
+      "frame": {
+        "x": 0,
+        "y": 306,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "elite_shell_c_crack_1": {
+      "frame": {
+        "x": 306,
+        "y": 306,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "elite_shell_c_crack_2": {
+      "frame": {
+        "x": 612,
+        "y": 306,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "elite_shell_c_crack_3": {
+      "frame": {
+        "x": 918,
+        "y": 306,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 62
+    },
+    "elite_shell_c_regrow_0": {
+      "frame": {
+        "x": 0,
+        "y": 612,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "elite_shell_c_regrow_1": {
+      "frame": {
+        "x": 306,
+        "y": 612,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "elite_shell_c_regrow_2": {
+      "frame": {
+        "x": 612,
+        "y": 612,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "elite_shell_c_regrow_3": {
+      "frame": {
+        "x": 918,
+        "y": 612,
+        "w": 304,
+        "h": 304
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 304,
+        "h": 304
+      },
+      "sourceSize": {
+        "w": 304,
+        "h": 304
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "on": {
+      "frames": [
+        "elite_shell_c_on_0",
+        "elite_shell_c_on_1",
+        "elite_shell_c_on_2",
+        "elite_shell_c_on_3"
+      ],
+      "fps": 8,
+      "loop": true
+    },
+    "crack": {
+      "frames": [
+        "elite_shell_c_crack_0",
+        "elite_shell_c_crack_1",
+        "elite_shell_c_crack_2",
+        "elite_shell_c_crack_3"
+      ],
+      "fps": 16,
+      "loop": false
+    },
+    "regrow": {
+      "frames": [
+        "elite_shell_c_regrow_0",
+        "elite_shell_c_regrow_1",
+        "elite_shell_c_regrow_2",
+        "elite_shell_c_regrow_3"
+      ],
+      "fps": 12,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "elite_shell_c.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 1222,
+      "h": 916
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "on",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      },
+      {
+        "name": "crack",
+        "from": 4,
+        "to": 7,
+        "direction": "forward"
+      },
+      {
+        "name": "regrow",
+        "from": 8,
+        "to": 11,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 152,
+      "y": 152,
+      "note": "pivot (152,152) = Big Red's body centre (same frame, pivot and refBodyR 81 as assets/sprites/enemies/big_red); draw on top of Big Red"
+    },
+    "hitbox": {
+      "r": 60,
+      "units": "frame px",
+      "worldRadius": 30,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 81,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its belt sized for Big Red's 304 px frame (ball centre ~(152,144), ball diameter ~172 px); main piece span = 210 px, centred at y = 222"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 4477408,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "d92e7cba4b3e99a954a8d53cc95ebbca6f3c77a814ffc7c35c34316b359be329",
+    "entity": "elite_shell",
+    "role": "Elite Big Red (Beach Gate III) ShellShield overlay, drawn on top of Big Red's own sprite by EliteShellRenderer",
+    "variant": "c",
+    "design": "striped shell-plate belt with a conch buckle round Big Red's lower half (face left clear)",
+    "manifestNames": {
+      "on": "on",
+      "crack": "crack",
+      "regrow": "regrow"
+    },
+    "proposedConfig": {
+      "radius": 30,
+      "note": "Big Red's radius; refBodyR 81 matches big_red.json so overlay and body draw at the same scale"
+    },
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "on": {
+          "raw": "elite_c_on",
+          "rawSha256": "e8fb424e58f9bcb00e43d287bfbc415db72a7cd9a8cf3972c079034afbe6d06c",
+          "keyColour": [
+            51,
+            181,
+            80
+          ],
+          "measuredSpan": 425.0,
+          "scale": 0.4941
+        },
+        "crack": {
+          "raw": "elite_c_crack",
+          "rawSha256": "f38c71f7998793fddff0dbfca370adcc7f7b79dfdb7eabd6937756cd83f0c54a",
+          "keyColour": [
+            47,
+            181,
+            82
+          ],
+          "measuredSpan": 429.0,
+          "scale": 0.4895
+        },
+        "regrow": {
+          "raw": "elite_c_regrow",
+          "rawSha256": "a4ba84e523eebc0255362e23c1e124914b832e5bfa10ce2194d607313611debc",
+          "keyColour": [
+            49,
+            180,
+            82
+          ],
+          "measuredSpan": 424.0,
+          "scale": 0.4953
+        }
+      },
+      "prompts": "see _src/prompts.json (keys = raw names)",
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+    },
+    "qa": {
+      "frames": {
+        "on[0]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 18,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "on[1]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 18,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "on[2]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 18,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "on[3]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 18,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[0]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 18,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[1]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 3,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[2]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 22,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[3]": {
+          "clippedFraction": 0.0059,
+          "edgeMarginPx": 19,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[0]": {
+          "clippedFraction": 0.0016,
+          "edgeMarginPx": 30,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[1]": {
+          "clippedFraction": 0.001,
+          "edgeMarginPx": 35,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[2]": {
+          "clippedFraction": 0.0009,
+          "edgeMarginPx": 6,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[3]": {
+          "clippedFraction": 0.0006,
+          "edgeMarginPx": 17,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        }
+      },
+      "motion": {
+        "on": {
+          "centroidShiftPx": [
+            0.8,
+            0.7,
+            0.2,
+            0.8
+          ],
+          "IoU": [
+            0.968,
+            0.966,
+            0.968,
+            0.961
+          ]
+        },
+        "crack": {
+          "centroidShiftPx": [
+            5.1,
+            31.6,
+            47.9
+          ],
+          "IoU": [
+            0.757,
+            0.354,
+            0.111
+          ]
+        },
+        "regrow": {
+          "centroidShiftPx": [
+            4.6,
+            0.8,
+            2.2
+          ],
+          "IoU": [
+            0.567,
+            0.522,
+            0.703
+          ]
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "elite_shell_c.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 479556,
+        "indexed": 147986
+      },
+      "psnrDb": 47.93,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 44,
+      "sha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    }
+  }
+}

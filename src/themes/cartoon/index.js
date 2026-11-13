@@ -3,7 +3,7 @@
 // Assembler: builds LST.themes.cartoon from the parts in src/themes/cartoon/.
 (function () {
   const M = LST.CartoonKit.methods;
-  const ORDER = ["background", "range", "tower", "enemy", "corpseLife", "corpse", "projectile",
+  const ORDER = ["background", "range", "tower", "enemy", "enemyHud", "corpseLife", "corpse", "projectile",
     "particle", "burst", "text", "confetti", "banner", "bossBanner"];
   const theme = {
     id: "cartoon",

@@ -7,7 +7,7 @@
 //   splat   0.35 s of splat on the ground (visual only), then dead.
 // Pure rules + timing; how it looks is CoconutRenderer's job.
 LST.Coconut = class Coconut {
-  constructor({ x, y, tx, ty, flight, damage, hitRadius, arc, boss }) {
+  constructor({ x, y, tx, ty, flight, damage, hitRadius, arc, boss, dangerR }) {
     this.kind = "coconut";
     this.x0 = x; this.y0 = y;
     this.x = x; this.y = y;
@@ -15,7 +15,8 @@ LST.Coconut = class Coconut {
     this.flight = flight;
     this.damage = damage;
     this.hitRadius = hitRadius;
-    this.arc = arc || 110;        // peak height in world units (drawn as a screen-up offset)
+    this.dangerR = dangerR || hitRadius; // tower radius + hitRadius: what the warning decal shows (visual only)
+    this.arc = arc || 60;         // peak height in world units (drawn as a screen-up offset)
     this.boss = boss || null;
     this.t = 0;
     this.state = "flying";

@@ -112,9 +112,11 @@ LST.Renderer = class Renderer {
     }
     for (const p of scene.particles) theme.particle(ctx, p, this);
     if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
+    if (W) W.shadows(ctx, scene.enemies, this); // World 2 baked shadows (gull) under every enemy
     for (const e of scene.enemies) {
       if (e.corpse) continue; // a Corpse now owns its look
-      if (!(W && W.enemy(ctx, e, this, () => theme.enemy(ctx, e, this)))) theme.enemy(ctx, e, this);
+      const hud = theme.enemyHud ? () => theme.enemyHud(ctx, e, this) : null; // reuse the theme's HP bar
+      if (!(W && W.enemy(ctx, e, this, () => theme.enemy(ctx, e, this), hud))) theme.enemy(ctx, e, this);
     }
     if (fx) fx.drawProjectiles(ctx, scene);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);

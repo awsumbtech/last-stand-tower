@@ -24,10 +24,12 @@ LST.BeachBackdrop = class BeachBackdrop {
     ctx.save();
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(g.image, 0, 0, g.fw, g.fh, x, y, w, h);
+    // Surf: its pivot (top of the steady foam line) goes on the ground's foam row for
+    // background a (meta.placement.a.foamTopYInBackgroundSrcPx), same cover-fit scale.
     const f = this.surf.strips(), sm = f && f.main;
     if (sm && sm.image) {
-      const i = sm.index(r.time || 0), sw = w, sh = sm.fh * (w / sm.fw);
-      ctx.drawImage(sm.image, i * sm.fw, 0, sm.fw, sm.fh, x, y, sw, sh);
+      const row = sm.placement && sm.placement.a ? sm.placement.a.foamTopYInBackgroundSrcPx : sm.ay;
+      sm.draw(ctx, this.surf.frameAt("main", r.time || 0), x + g.ax * k, y + row * k, sm.refBodyR * k);
     }
     ctx.restore();
     return k > 0;

@@ -93,8 +93,9 @@ LST.CaptainCrabclaw = class CaptainCrabclaw extends LST.BossScript {
       let tx = t.x, ty = t.y;
       if (i > 0) { const a = Math.random() * Math.PI * 2, r = C.scatter * Math.sqrt(Math.random()); tx += Math.cos(a) * r; ty += Math.sin(a) * r; }
       const c = new LST.Coconut({
-        x: this.x, y: this.y - this.radius * 0.6, tx, ty, flight: P.flight + i * 0.12,
-        damage: C.coconutDamage * this.dmgMult * P.dmg, hitRadius: C.hitRadius, boss: this,
+        // Leaves from the raised image-right claw (crabclaw_b throw release frame).
+        x: this.x + this.radius * 0.75, y: this.y - this.radius * 0.55, tx, ty, flight: P.flight + i * 0.12,
+        damage: C.coconutDamage * this.dmgMult * P.dmg, hitRadius: C.hitRadius, boss: this, dangerR: t.radius + C.hitRadius,
       });
       (game.hazards || (game.hazards = [])).push(c);
       this.thrown += 1;

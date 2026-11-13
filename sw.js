@@ -58,6 +58,7 @@ const PRECACHE = [
   "src/sprites/AnimationPlayer.js",
   "src/sprites/SheetAnimation.js",
   "src/sprites/LookSheetLibrary.js",
+  "src/worlds/render/AtlasSheetAdapter.js",
   "src/worlds/render/World2Sheets.js",
   "src/worlds/render/SheetRenderer.js",
   "src/worlds/render/HermitCrabRenderer.js",
@@ -153,8 +154,33 @@ const PRECACHE = [
   "assets/sprites/looks/VenomDrips/VenomDrips_a.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.png",
-  // World 2 (Beach) sheets are added here when Game Art & Motion's files land (phase 2):
-  // addAll() fails the whole install on a missing file, so nothing is listed before it exists.
+  // World 2 (Beach) art, Game Art & Motion v0.1.1 recommended picks (tools/world-test.js checks each exists).
+  "assets/sprites/world2/background/beach_bg_a.json",
+  "assets/sprites/world2/background/beach_bg_a.q.png",
+  "assets/sprites/world2/background/beach_surf.json",
+  "assets/sprites/world2/background/beach_surf.q.png",
+  "assets/sprites/world2/cards/card_backyard.png",
+  "assets/sprites/world2/cards/card_beach.png",
+  "assets/sprites/world2/cards/card_locked_overlay.png",
+  "assets/sprites/world2/cards/cards.json",
+  "assets/sprites/world2/coconut/coconut_spin.json",
+  "assets/sprites/world2/coconut/coconut_spin.q.png",
+  "assets/sprites/world2/coconut/coconut_splat.json",
+  "assets/sprites/world2/coconut/coconut_splat.q.png",
+  "assets/sprites/world2/coconut/coconut_warning_decal.json",
+  "assets/sprites/world2/coconut/coconut_warning_decal.q.png",
+  "assets/sprites/world2/crabclaw/crabclaw_b.json",
+  "assets/sprites/world2/crabclaw/crabclaw_b.q.png",
+  "assets/sprites/world2/crabclaw/crabclaw_b_angry.json",
+  "assets/sprites/world2/crabclaw/crabclaw_b_angry.q.png",
+  "assets/sprites/world2/elite_shell/elite_shell_c.json",
+  "assets/sprites/world2/elite_shell/elite_shell_c.q.png",
+  "assets/sprites/world2/hermit_crab/hermit_crab_a.json",
+  "assets/sprites/world2/hermit_crab/hermit_crab_a.q.png",
+  "assets/sprites/world2/seagull/seagull_a.json",
+  "assets/sprites/world2/seagull/seagull_a.q.png",
+  "assets/sprites/world2/seagull/seagull_a_shadow.json",
+  "assets/sprites/world2/seagull/seagull_a_shadow.q.png",
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

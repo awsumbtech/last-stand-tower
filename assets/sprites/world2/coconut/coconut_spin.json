@@ -1,0 +1,251 @@
+{
+  "frames": {
+    "coconut_spin_spin_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "coconut_spin_spin_1": {
+      "frame": {
+        "x": 66,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "coconut_spin_spin_2": {
+      "frame": {
+        "x": 132,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "coconut_spin_spin_3": {
+      "frame": {
+        "x": 198,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "spin": {
+      "frames": [
+        "coconut_spin_spin_0",
+        "coconut_spin_spin_1",
+        "coconut_spin_spin_2",
+        "coconut_spin_spin_3"
+      ],
+      "fps": 12,
+      "loop": true
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "coconut_spin.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 262,
+      "h": 64
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "spin",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 32,
+      "y": 32,
+      "note": "in sourceSize px: pivot = entity position (e.x, e.y)"
+    },
+    "hitbox": {
+      "r": 16,
+      "units": "frame px",
+      "worldRadius": 8,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 20,
+      "drawScale": 1.25,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its coconut diameter = 40 px (20 world units)"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 67072,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "9dd08ea99a8da8691c43a54155b20a511ad2ebb78519293d01bf72271a251acc",
+    "entity": "coconut",
+    "role": "Captain Crabclaw's lobbed projectile",
+    "proposedConfig": {
+      "radius": 9,
+      "note": "game radius (src/bosses/Coconut.js)"
+    },
+    "note": "rotation is in the frames (tuft goes round clockwise); the code can also rotate the sprite",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "spin": {
+          "raw": "coconut_spin",
+          "rawSha256": "7117a1309952da0d4069a801096e64bf8e4cf285fd93c563aa0361b4b4d56d19",
+          "keyColour": [
+            210,
+            28,
+            121
+          ],
+          "measuredSpan": 303.5,
+          "scale": 0.1318
+        }
+      },
+      "prompts": "see _src/prompts.json (keys = raw names)",
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+    },
+    "qa": {
+      "frames": {
+        "spin[0]": {
+          "clippedFraction": 0.0,
+          "edgeMarginPx": 11,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 123
+        },
+        "spin[1]": {
+          "clippedFraction": 0.0,
+          "edgeMarginPx": 11,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 134
+        },
+        "spin[2]": {
+          "clippedFraction": 0.0,
+          "edgeMarginPx": 12,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 129
+        },
+        "spin[3]": {
+          "clippedFraction": 0.0,
+          "edgeMarginPx": 11,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 130
+        }
+      },
+      "motion": {
+        "spin": {
+          "centroidShiftPx": [
+            1.3,
+            1.4,
+            2.0,
+            1.8
+          ],
+          "IoU": [
+            0.87,
+            0.873,
+            0.844,
+            0.846
+          ]
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "coconut_spin.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 13825,
+        "indexed": 6077
+      },
+      "psnrDb": 53.88,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 10,
+      "sha256": "64274f7ed5cbd588ed6c7b7eec692abb7a1b0b386f86817ee952857226525ca1",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    }
+  }
+}

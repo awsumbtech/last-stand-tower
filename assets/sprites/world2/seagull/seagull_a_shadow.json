@@ -1,0 +1,106 @@
+{
+  "frames": {
+    "seagull_a_shadow_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 1000
+    }
+  },
+  "animations": {
+    "shadow": {
+      "frames": [
+        "seagull_a_shadow_0"
+      ],
+      "fps": 1,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "seagull_a_shadow.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 128,
+      "h": 64
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "shadow",
+        "from": 0,
+        "to": 0,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 64,
+      "y": 32,
+      "note": "shadow centre; draw at the ground point under the gull: (e.x, e.y + 30 frame px of the gull sheet = +15 world units at the gull's scale)"
+    },
+    "body": {
+      "r": 24.3,
+      "units": "frame px",
+      "note": "same refBodyR as seagull_a (24.3 px) so the shadow scales exactly like the gull; 2 px per world unit at the design radius"
+    },
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs.",
+    "hitbox": {
+      "r": 0,
+      "units": "frame px",
+      "worldRadius": 0,
+      "pxPerWorldUnit": 2
+    },
+    "draw": {
+      "at": "ground point under the gull: (e.x, e.y + 30 frame px) = 15 world units below the body; scale with the gull; draw BEFORE (under) the gull and under other enemies",
+      "opacityBakedIn": 0.35,
+      "note": "opacity is already in the alpha; draw at globalAlpha 1. Optional: shrink to ~85% on the wings-up frames."
+    },
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "raw": "_src/raw/gull_shadows.jpg",
+      "rawSha256": "e1d861414d632f72f4a9ade3325413cef7352b2e32bbf4d339effd67e6454096",
+      "silhouette": "left",
+      "postProcess": "_tools/shadows.py: key white, split, scale x0.2119 to 0.9 x median gull span, alpha x0.35"
+    },
+    "sha256": "1c43e861bd52b3a40ef50c0f6215ffd17c7db92fbe79835f93150dd9be44c4da",
+    "note": "no MANIFEST slot (optional extra); draw under the gull at globalAlpha 1 (0.35 is baked in)",
+    "quantizedCopy": {
+      "image": "seagull_a_shadow.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 2721,
+        "indexed": 1609
+      },
+      "psnrDb": 69.76,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 2,
+      "sha256": "9c3ed4019492a48ad37eeaec9ef6260c7968bdaa2e3079f90b051fb1ba8096a9",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    }
+  }
+}

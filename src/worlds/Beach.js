@@ -57,7 +57,7 @@
       },
       arrive(game, b) { if (game.onCrabclawArrive) game.onCrabclawArrive(b); },
     },
-    art: { background: "BeachGround", card: "assets/sprites/world2/cards/beach_card.png" },
+    art: { background: "BeachGround", card: "assets/sprites/world2/cards/card_beach.png" },
     unlock: { cleared: "backyard" },
     copy: {
       finaleSub: "Captain Crabclaw drops anchor!",

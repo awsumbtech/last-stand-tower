@@ -1,0 +1,255 @@
+{
+  "frames": {
+    "seagull_a_fly_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "seagull_a_fly_1": {
+      "frame": {
+        "x": 130,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "seagull_a_fly_2": {
+      "frame": {
+        "x": 260,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    },
+    "seagull_a_fly_3": {
+      "frame": {
+        "x": 390,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 83
+    }
+  },
+  "animations": {
+    "fly": {
+      "frames": [
+        "seagull_a_fly_0",
+        "seagull_a_fly_1",
+        "seagull_a_fly_2",
+        "seagull_a_fly_3"
+      ],
+      "fps": 12,
+      "loop": true
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "seagull_a.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 518,
+      "h": 128
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "fly",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 64,
+      "y": 64,
+      "note": "in sourceSize px: pivot = entity position (e.x, e.y)"
+    },
+    "hitbox": {
+      "r": 18,
+      "units": "frame px",
+      "worldRadius": 9,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 24.3,
+      "drawScale": 1.35,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its median wingspan (main-body bbox width over the 4 flap frames) = 100 px, registered on the body's centre column"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 265216,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "a51459072a585e00b8406fd50e632463184d5a286619cb8d11cfd5d863fec0d1",
+    "entity": "seagull",
+    "role": "World 2 fast flyer (immune to slow)",
+    "proposedConfig": {
+      "radius": 10,
+      "note": "game radius (src/enemies/BeachEnemies.js); art keeps refBodyR 24.3 px"
+    },
+    "shadow": {
+      "image": "seagull_a_shadow.png",
+      "json": "seagull_a_shadow.json"
+    },
+    "variant": "a",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "flap": {
+          "raw": "gull_a",
+          "rawSha256": "70299dd554ecf47467fce19f29be5adbbfc2e065a09ab5953bc6c6401ddad54c",
+          "keyColour": [
+            223,
+            68,
+            151
+          ],
+          "measuredSpan": 413.0,
+          "scale": 0.2421
+        }
+      },
+      "prompts": "see _src/prompts.json (keys = raw names)",
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+    },
+    "qa": {
+      "frames": {
+        "flap[0]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 13,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "flap[1]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 10,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "flap[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 16,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "flap[3]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 13,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        }
+      },
+      "motion": {
+        "fly": {
+          "centroidShiftPx": [
+            6.9,
+            2.1,
+            1.0,
+            9.0
+          ],
+          "IoU": [
+            0.575,
+            0.761,
+            0.885,
+            0.533
+          ]
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "seagull_a.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 37951,
+        "indexed": 12189
+      },
+      "psnrDb": 53.17,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 13,
+      "sha256": "08c00cc2530e7d53ac6b14798bf4ecce076666e6427abc9f08e14ddd92857c20",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    }
+  }
+}

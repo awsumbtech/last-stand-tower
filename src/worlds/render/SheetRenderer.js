@@ -9,7 +9,9 @@ LST.SheetRenderer = class SheetRenderer {
   has(strip) { const s = this.strips(); return !!(s && s[strip]); }
 
   // Frame index for a strip at time t (loops wrap, one-shots hold the last frame).
-  frameAt(strip, t) { const s = this.strips(); return s && s[strip] ? s[strip].index(t) : 0; }
+  // Reduced motion (LST.SheetRenderer.reduced, set per frame by WorldRenderers) holds loops on frame 0;
+  // one-shots (crack, regrow, throw, splat) still play because they carry game information.
+  frameAt(strip, t) { const s = this.strips(), a = s && s[strip]; return !a || (a.loop && LST.SheetRenderer.reduced) ? 0 : a.index(t); }
   // Frame index for a one-shot spread over progress k (0..1), e.g. a throw over its windup.
   frameFor(strip, k) { const s = this.strips(), a = s && s[strip]; return a ? Math.min(a.count - 1, Math.floor(Math.max(0, k) * a.count)) : 0; }
 

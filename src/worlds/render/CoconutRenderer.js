@@ -10,7 +10,9 @@ LST.CoconutRenderer = class CoconutRenderer {
   }
 
   drawGround(ctx, c) {
-    if (c.state === "flying") return this.warn.drawStrip(ctx, "warn", this.warn.frameFor("warn", c.progress), c.tx, c.ty, c.hitRadius);
+    // The decal's ring (refBodyR = ring radius) is drawn at the real danger radius around the
+    // landing spot (tower radius + hitRadius), so the aimed nut's ring shows outside the tower.
+    if (c.state === "flying") return this.warn.drawStrip(ctx, "warn", this.warn.frameFor("warn", c.progress), c.tx, c.ty, c.dangerR || c.hitRadius);
     const t = c.t - c.flight;
     return this.nut.drawStrip(ctx, "splat", this.nut.frameFor("splat", t / c.splatLife), c.tx, c.ty, c.radius * 1.35);
   }

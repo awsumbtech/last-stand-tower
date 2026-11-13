@@ -1,0 +1,138 @@
+{
+  "frames": {
+    "coconut_warning_decal_warn_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "duration": 1000
+    }
+  },
+  "animations": {
+    "warn": {
+      "frames": [
+        "coconut_warning_decal_warn_0"
+      ],
+      "fps": 1,
+      "loop": false
+    }
+  },
+  "meta": {
+    "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
+    "version": "0.1.1",
+    "image": "coconut_warning_decal.png",
+    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "size": {
+      "w": 160,
+      "h": 160
+    },
+    "scale": "1",
+    "packing": {
+      "mode": "grid",
+      "note": "Untrimmed grid: one row per animation, 2 px gutter, frame = sourceSize, pivot at the anchor."
+    },
+    "frameTags": [
+      {
+        "name": "warn",
+        "from": 0,
+        "to": 0,
+        "direction": "forward"
+      }
+    ],
+    "pivot": {
+      "x": 80,
+      "y": 80,
+      "note": "pivot = target centre on the ground"
+    },
+    "hitbox": {
+      "r": 0,
+      "units": "frame px",
+      "worldRadius": 0,
+      "pxPerWorldUnit": 2
+    },
+    "body": {
+      "r": 75,
+      "drawScale": 1,
+      "units": "frame px",
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its outer ring diameter = 150 px (= 75 world units at 1:1)"
+    },
+    "palette": {},
+    "memory": {
+      "decodedRGBA": 102400,
+      "note": "bytes once decoded to RGBA8888 (w * h * 4)"
+    },
+    "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
+    "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
+    "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
+    "entity": "coconut_warning_decal",
+    "role": "ground target warning where a coconut will land; draw under enemies",
+    "scaleRule": "drawScale = impactRadius_world / 37.5 (outer ring radius is 75 px = 37.5 world units at 2 px/unit); pulse alpha/scale in code if wanted",
+    "provenance": {
+      "generator": "Grok Bot GenerateImage (cursor namespace)",
+      "sources": {
+        "d": {
+          "raw": "warning_decal",
+          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "keyColour": [
+            66,
+            155,
+            73
+          ],
+          "measuredSpan": 668.0,
+          "scale": 0.2246
+        }
+      },
+      "prompts": "see _src/prompts.json (keys = raw names)",
+      "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)"
+    },
+    "qa": {
+      "frames": {
+        "d[0]": {
+          "clippedFraction": 0.0015,
+          "edgeMarginPx": 4,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 31
+        }
+      },
+      "motion": {
+        "warn": {
+          "centroidShiftPx": [],
+          "IoU": []
+        }
+      }
+    },
+    "quantizedCopy": {
+      "image": "coconut_warning_decal.q.png",
+      "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
+      "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+      "bytes": {
+        "rgba": 31459,
+        "indexed": 10244
+      },
+      "psnrDb": 49.54,
+      "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
+      "maxChannelError": 18,
+      "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+      "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
+    }
+  }
+}
