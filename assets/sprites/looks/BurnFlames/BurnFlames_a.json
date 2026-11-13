@@ -1,10 +1,10 @@
 {
   "look": "BurnFlames",
   "variant": "a",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "strips": {
     "main": {
-      "image": "BurnFlames_a.png",
+      "image": "BurnFlames_a.q.png",
       "size": {
         "w": 1728,
         "h": 352
@@ -25,7 +25,28 @@
         0.0,
         0.0
       ],
-      "sha256": "dd1b5e8a0a9d50307b85fb934dc07c3c5e44d0761e5005a06a9a45a65a3f6bf7"
+      "sha256": "0102a12460f7bf0316cc205e703e1510161028ad3b0131b9acdf4924bf3283c4",
+      "quantizedCopy": {
+        "image": "BurnFlames_a.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 252438,
+          "indexed": 97389
+        },
+        "psnrDb": 48.37,
+        "maxChannelError": 53,
+        "metric": "premultiplied RGBA",
+        "sha256": "0102a12460f7bf0316cc205e703e1510161028ad3b0131b9acdf4924bf3283c4",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "BurnFlames_a.png",
+        "sha256": "0a5af49c9d7b7578615e860c94902d9c654f89e791db26fefe70ec1f6c927a11",
+        "bytes": 252438,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
     }
   },
   "anchor": {
@@ -44,9 +65,10 @@
   "provenance": {
     "generator": "Grok Bot GenerateImage (cursor namespace)",
     "rawSha256": "98b1e3200ac601c118a9403140ebb77a1dfc3bbbc6d81f56dca6241c4f30b599",
-    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.9362, register, strip)",
+    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.9362, register, strip); v0.1.1: _tools/build_v011.py cleared 1 stray key-colour pixel at (188,102) frame 0, RGBA [31, 79, 143, 16] -> (0,0,0,0)",
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
     "prompt": "6-frame 3x2 sheet: flame crown of five ink-outlined tongues on a gray placeholder block, flicker loop (upright, lean L, squash, lean R, stretch, settle).",
+    "v011Change": "mechanical cleanup only: one pixel cleared; no new art",
     "see": "../PROVENANCE.json"
   }
 }

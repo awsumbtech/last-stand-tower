@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v22"; // Beach art v0.1.2: hermit_crab_b, ping-pong surf, wide coconut warning decal, Crabclaw walk 0,1,2,1
+const VERSION = "v23"; // Hermit crab walk v0.1.3 + element looks v0.1.1 (.q.png copies: Spark corner bolts, round IceCrust, Burn pixel fix, cup Venom) + crabclaw_b_angry qa metadata
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -147,14 +147,14 @@ const PRECACHE = [
   "assets/sprites/enemies/king_mole/king_mole_front.png",
   // Status look sheets (Game Art & Motion v0.1.0, ~700 KB)
   "assets/sprites/looks/BurnFlames/BurnFlames_a.json",
-  "assets/sprites/looks/BurnFlames/BurnFlames_a.png",
+  "assets/sprites/looks/BurnFlames/BurnFlames_a.q.png",
   "assets/sprites/looks/IceCrust/IceCrust_a.json",
-  "assets/sprites/looks/IceCrust/IceCrust_a.png",
-  "assets/sprites/looks/IceCrust/IceCrust_a_snap.png",
+  "assets/sprites/looks/IceCrust/IceCrust_a.q.png",
+  "assets/sprites/looks/IceCrust/IceCrust_a_snap.q.png",
   "assets/sprites/looks/VenomDrips/VenomDrips_a.json",
-  "assets/sprites/looks/VenomDrips/VenomDrips_a.png",
+  "assets/sprites/looks/VenomDrips/VenomDrips_a.q.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
-  "assets/sprites/looks/SparkCrackle/SparkCrackle_c.png",
+  "assets/sprites/looks/SparkCrackle/SparkCrackle_c.q.png",
   // World 2 (Beach) art, Game Art & Motion v0.1.2 recommended picks (tools/world-test.js checks each exists).
   "assets/sprites/world2/background/beach_bg_a.json",
   "assets/sprites/world2/background/beach_bg_a.q.png",

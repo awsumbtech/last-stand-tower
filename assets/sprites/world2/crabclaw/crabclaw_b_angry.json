@@ -505,147 +505,70 @@
     },
     "qa": {
       "frames": {
-        "walk[0]": {
-          "clippedFraction": 0.0005,
+        "crabclaw_b_angry_walk_0": {
           "edgeMarginPx": 62,
-          "keyFringePx": 190,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
+          "clippedFraction": 0.0,
+          "opaquePx": 33951
         },
-        "walk[1]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 61,
-          "keyFringePx": 146,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            -14
-          ]
-        },
-        "walk[2]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 64,
-          "keyFringePx": 166,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            16
-          ]
-        },
-        "walk[3]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 31,
-          "keyFringePx": 144,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -28,
-            10
-          ]
-        },
-        "idle[0]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 61,
-          "keyFringePx": 224,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            1
-          ]
-        },
-        "idle[1]": {
-          "clippedFraction": 0.0006,
+        "crabclaw_b_angry_walk_1": {
           "edgeMarginPx": 60,
-          "keyFringePx": 182,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            -11
-          ]
+          "clippedFraction": 0.0,
+          "opaquePx": 30137
         },
-        "idle[2]": {
-          "clippedFraction": 0.0004,
+        "crabclaw_b_angry_walk_2": {
+          "edgeMarginPx": 64,
+          "clippedFraction": 0.0,
+          "opaquePx": 33482
+        },
+        "crabclaw_b_angry_walk_3": {
+          "edgeMarginPx": 60,
+          "clippedFraction": 0.0,
+          "opaquePx": 30137
+        },
+        "crabclaw_b_angry_idle_angry_0": {
+          "edgeMarginPx": 61,
+          "clippedFraction": 0.0,
+          "opaquePx": 34662
+        },
+        "crabclaw_b_angry_idle_angry_1": {
+          "edgeMarginPx": 60,
+          "clippedFraction": 0.0,
+          "opaquePx": 33261
+        },
+        "crabclaw_b_angry_idle_angry_2": {
           "edgeMarginPx": 58,
-          "keyFringePx": 212,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            0
-          ]
+          "clippedFraction": 0.0,
+          "opaquePx": 32350
         },
-        "idle[3]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 63,
-          "keyFringePx": 203,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            2,
-            -6
-          ]
+        "crabclaw_b_angry_idle_angry_3": {
+          "edgeMarginPx": 61,
+          "clippedFraction": 0.0,
+          "opaquePx": 31712
         },
-        "throw[0]": {
-          "clippedFraction": 0.0004,
-          "edgeMarginPx": 65,
-          "keyFringePx": 243,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            0
-          ]
+        "crabclaw_b_angry_throw_angry_0": {
+          "edgeMarginPx": 64,
+          "clippedFraction": 0.0,
+          "opaquePx": 33912
         },
-        "throw[1]": {
-          "clippedFraction": 0.0006,
-          "edgeMarginPx": 28,
-          "keyFringePx": 272,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -18,
-            -1
-          ]
+        "crabclaw_b_angry_throw_angry_1": {
+          "edgeMarginPx": 46,
+          "clippedFraction": 0.0,
+          "opaquePx": 34331
         },
-        "throw[2]": {
-          "clippedFraction": 0.0007,
+        "crabclaw_b_angry_throw_angry_2": {
           "edgeMarginPx": 42,
-          "keyFringePx": 239,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            2
-          ]
+          "clippedFraction": 0.0,
+          "opaquePx": 34018
         },
-        "throw[3]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 20,
-          "keyFringePx": 258,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            2,
-            2
-          ]
+        "crabclaw_b_angry_throw_angry_3": {
+          "edgeMarginPx": 18,
+          "clippedFraction": 0.0,
+          "opaquePx": 34078
         },
-        "hurt[0]": {
-          "clippedFraction": 0.0006,
-          "edgeMarginPx": 67,
-          "keyFringePx": 75,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "hurt[1]": {
-          "clippedFraction": 0.0005,
+        "crabclaw_b_angry_hurt_0": {
           "edgeMarginPx": 53,
-          "keyFringePx": 75,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
+          "clippedFraction": 0.0,
+          "opaquePx": 30362
         }
       },
       "motion": {
@@ -693,7 +616,8 @@
           "centroidShiftPx": [],
           "IoU": []
         }
-      }
+      },
+      "remeasured": "meta.qa.frames re-measured by tools/art-provenance.py on the shipped crabclaw_b_angry.q.png (the delivered block predated the v0.1.2 rescale and used idle[]/throw[]/hurt[1] keys); keyFringe / rim / xcorr fields dropped (master-only metrics). meta.qa.motion re-checked on the same sheet: current, unchanged."
     },
     "quantizedCopy": {
       "image": "crabclaw_b_angry.q.png",

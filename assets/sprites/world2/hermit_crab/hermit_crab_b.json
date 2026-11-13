@@ -445,9 +445,9 @@
   },
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "image": "hermit_crab_b.q.png",
-    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
+    "format": "RGBA8888 (Pillow, not quantized: pngquant is not installed on the box)",
     "size": {
       "w": 774,
       "h": 774
@@ -507,7 +507,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
+    "sha256": "d028848cbda2c648fe59b39deb68e7da47687a21b54fa46db056f64a8b3a3036",
     "entity": "hermit_crab",
     "role": "World 2 shielded enemy (Sprint 5 'Shielded': shell = shield, regrows once)",
     "proposedConfig": {
@@ -527,32 +527,19 @@
       "crack": "hit_crack",
       "regrow": "regrow"
     },
-    "v012": "readability pass for ~25 CSS px: scuttle walk (4 different leg poses); bare = claws thrown up in panic + limp pale shrimp tail: Y-shaped silhouette. Blind packet _checker/hermit_crab_v012/; picked (checker v0.1.2).",
+    "v012": "readability pass for ~25 CSS px: scuttle walk (4 different leg poses); bare = claws thrown up in panic + limp pale shrimp tail: Y-shaped silhouette. Blind packet _checker/hermit_crab_v012/; not picked yet.",
+    "v013": "walk pass: big leg kicks: back leg kicked high / neutral (v0.1.2 frame 0) / front leg kicked forward / neutral",
+    "v013Candidate": "blind candidate (see _checker/hermit_crab_v013/)",
+    "v013RegistrationOffsets": {
+      "dyFramePx": {
+        "w1 (crab_v013_c_walk_p1)": -4,
+        "w3 (crab_v013_c_walk_p3)": -5
+      },
+      "note": "mechanical per-frame registration offsets (whole frame moved up when negative), applied after the red-body/feet-line registration to give a 1-2 CSS px body bob at radius 13; no pixels inside a frame are moved. Frames not listed: 0."
+    },
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
-        "walk": {
-          "raw": "crab_v012_walk_waddle",
-          "rawSha256": "4a0793762b1701ca2bffc047b516037f871e64164a1bfacbaa54a5b9d4121cce",
-          "keyColour": [
-            45,
-            183,
-            80
-          ],
-          "measuredSpan": 189.5,
-          "scale": 0.3113
-        },
-        "bare": {
-          "raw": "crab_v012_barewalk_b",
-          "rawSha256": "3f615b4fe7abae76bdabd14b8cc051a391286db65b6dcebe286b7926543f6915",
-          "keyColour": [
-            43,
-            182,
-            80
-          ],
-          "measuredSpan": 204.5,
-          "scale": 0.2885
-        },
         "crack": {
           "raw": "crab_v012_crack_b",
           "rawSha256": "ec9fc43432e0a227265eead65e8a499127b1e9d3a77a23bf81b74cdef252c8e2",
@@ -574,6 +561,72 @@
           ],
           "measuredSpan": 201.5,
           "scale": 0.2928
+        },
+        "w1": {
+          "raw": "crab_v013_c_walk_p1",
+          "rawSha256": "06faae6cb8bfa6d42bb596b2bc84fb401ee14a11931c59079646038d33174f23",
+          "keyColour": [
+            39,
+            182,
+            78
+          ],
+          "measuredSpan": 381.0,
+          "scale": 0.1549
+        },
+        "w3": {
+          "raw": "crab_v013_c_walk_p3",
+          "rawSha256": "618b98233ca8d09b7c4ace271911f6166119237c8f75a14feed7a5f8f0769371",
+          "keyColour": [
+            40,
+            179,
+            78
+          ],
+          "measuredSpan": 375.0,
+          "scale": 0.1573
+        },
+        "wm": {
+          "raw": "crab_v012_walk_waddle",
+          "rawSha256": "4a0793762b1701ca2bffc047b516037f871e64164a1bfacbaa54a5b9d4121cce",
+          "keyColour": [
+            45,
+            183,
+            80
+          ],
+          "measuredSpan": 189.5,
+          "scale": 0.3113
+        },
+        "b1": {
+          "raw": "crab_v013_c_bare_p1",
+          "rawSha256": "470873b3efb9ce4e3675296ef864c59203d3c1dc55c73faf5c3a1db508e1f29d",
+          "keyColour": [
+            37,
+            181,
+            79
+          ],
+          "measuredSpan": 395.0,
+          "scale": 0.1494
+        },
+        "b3": {
+          "raw": "crab_v013_c_bare_p3",
+          "rawSha256": "728427a273b3c952de4035a99d38b704d091029696bf5c63955aa1b894cc26c4",
+          "keyColour": [
+            36,
+            183,
+            80
+          ],
+          "measuredSpan": 386.0,
+          "scale": 0.1528
+        },
+        "bm": {
+          "raw": "crab_v012_barewalk_b",
+          "rawSha256": "3f615b4fe7abae76bdabd14b8cc051a391286db65b6dcebe286b7926543f6915",
+          "keyColour": [
+            43,
+            182,
+            80
+          ],
+          "measuredSpan": 204.5,
+          "scale": 0.2885
         }
       },
       "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
@@ -581,62 +634,6 @@
     },
     "qa": {
       "frames": {
-        "walk[0]": {
-          "clippedFraction": 0.0008,
-          "edgeMarginPx": 15,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "walk[1]": {
-          "clippedFraction": 0.0008,
-          "edgeMarginPx": 15,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "walk[2]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 13,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "walk[3]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 14,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "bare[0]": {
-          "clippedFraction": 0.0012,
-          "edgeMarginPx": 33,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "bare[1]": {
-          "clippedFraction": 0.0011,
-          "edgeMarginPx": 31,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "bare[2]": {
-          "clippedFraction": 0.0011,
-          "edgeMarginPx": 32,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
-        "bare[3]": {
-          "clippedFraction": 0.0012,
-          "edgeMarginPx": 32,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0
-        },
         "crack[0]": {
           "clippedFraction": 0.0009,
           "edgeMarginPx": 27,
@@ -692,21 +689,105 @@
           "keyFringePx": 0,
           "greenRimPx": 0,
           "magentaRimPx": 0
+        },
+        "w1[0]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 9,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "w3[0]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 9,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[0]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 15,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[1]": {
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 15,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[2]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 13,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "wm[3]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 14,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "b1[0]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 28,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "b3[0]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[0]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 33,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[1]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bm[3]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
         }
       },
       "motion": {
         "walk": {
           "centroidShiftPx": [
-            0.8,
-            1.6,
-            0.8,
-            1.3
+            6.7,
+            6.7,
+            6.7,
+            6.7
           ],
           "IoU": [
-            0.928,
-            0.896,
-            0.91,
-            0.914
+            0.783,
+            0.789,
+            0.789,
+            0.783
           ]
         },
         "hit_crack": {
@@ -723,16 +804,16 @@
         },
         "walk_broken": {
           "centroidShiftPx": [
-            1.2,
-            1.4,
-            0.5,
-            0.8
+            2.0,
+            3.3,
+            3.3,
+            2.0
           ],
           "IoU": [
-            0.879,
-            0.874,
-            0.872,
-            0.856
+            0.803,
+            0.755,
+            0.755,
+            0.803
           ]
         },
         "regrow": {
@@ -754,19 +835,19 @@
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
       "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
       "bytes": {
-        "rgba": 331089,
-        "indexed": 95379
+        "rgba": 291482,
+        "indexed": 84611
       },
-      "psnrDb": 47.42,
+      "psnrDb": 47.35,
       "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
-      "maxChannelError": 54,
-      "sha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
+      "maxChannelError": 52,
+      "sha256": "d028848cbda2c648fe59b39deb68e7da47687a21b54fa46db056f64a8b3a3036",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
     },
     "originalImage": {
       "name": "hermit_crab_b.png",
-      "sha256": "3c301a906f28b53a6544b0359b26736d1d0ffbe8c65974f7e1e12ce2aeb5cd21",
-      "bytes": 331089,
+      "sha256": "94f87305a41461885c2c5a19be779016de4afc13baa8aaedc263fb6ca2f49353",
+      "bytes": 291482,
       "inRepo": false,
       "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }

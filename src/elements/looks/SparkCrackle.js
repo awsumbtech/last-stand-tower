@@ -1,5 +1,6 @@
 // SparkCrackle (Chain Spark): sticker lightning bolts bursting off each enemy a bolt hits.
-// Art: assets/sprites/looks/SparkCrackle/SparkCrackle_c.png (4 frames once over 0.22 s; Game Art & Motion v0.1.0).
+// Art: assets/sprites/looks/SparkCrackle/SparkCrackle_c.q.png (4 frames once over 0.22 s; Game Art & Motion v0.1.1:
+// the bolts sit in the frame corners, clear of the enemy body).
 // An event look: attached for `life` seconds by LookLayer on a Chain Spark hit, then removed.
 // Reduced motion: the single peak frame (1) for its life, then gone.
 LST.SparkCrackle = LST.LookRegistry.register("spark", class SparkCrackle extends LST.StatusLook {

@@ -1,10 +1,10 @@
 {
   "look": "SparkCrackle",
   "variant": "c",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "strips": {
     "main": {
-      "image": "SparkCrackle_c.png",
+      "image": "SparkCrackle_c.q.png",
       "size": {
         "w": 1152,
         "h": 288
@@ -24,7 +24,28 @@
         0.0,
         0.0
       ],
-      "sha256": "fc63d1ffe7e01ccf07537257c2cacc10637570e7da64b87c93db45bd584f3f26"
+      "sha256": "0e41cc53f2f29dfff7236f3418cf38d2e22dc92d0102cf7e6d0e82348148d7f7",
+      "quantizedCopy": {
+        "image": "SparkCrackle_c.q.png",
+        "tool": "pngquant 3.0.3 (pip pngquant-cli, /workspace/lst-art/world2-beach/_tools/.venv)",
+        "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
+        "bytes": {
+          "rgba": 179683,
+          "indexed": 59351
+        },
+        "psnrDb": 45.34,
+        "maxChannelError": 61,
+        "metric": "premultiplied RGBA",
+        "sha256": "0e41cc53f2f29dfff7236f3418cf38d2e22dc92d0102cf7e6d0e82348148d7f7",
+        "note": "same layout as the RGBA master; either works (the RGBA file stays the master)"
+      },
+      "originalImage": {
+        "name": "SparkCrackle_c.png",
+        "sha256": "abb09bdef20d7380fd45ddae76bb7c44583e972f637d723ec1841fe1d05e290f",
+        "bytes": 179683,
+        "inRepo": false,
+        "note": "RGBA master from the delivery; the repo ships the pngquant copy (same at real size, see ../PROVENANCE.json)"
+      }
     }
   },
   "anchor": {
@@ -37,10 +58,11 @@
   "scaleRule": "drawScale = LST.StatusLook.bodyR(e) / refBodyR (world units per sheet px); i.e. draw the frame at frame.w * bodyR/88 world units wide. Same art for every enemy type, no tint.",
   "provenance": {
     "generator": "Grok Bot GenerateImage (cursor namespace)",
-    "rawSha256": "4c08a8a19174342d4c6906e959ac883f9f81a23707e37bb72587e5169582dd8f",
-    "postProcess": "_tools/process.py (key, un-mix, cut, scale x0.8528, register, strip)",
+    "rawSha256": "69c800e25c71bc0104d4bbd30615369c41cbbced3f157b927ccd11cabc33366d",
+    "postProcess": "_tools/process_v011.py build_disc (key bg + gray placeholder circle, un-mix, split row at gaps, register circle centre on anchor, scale x1.0179 (circle->2*refBodyR would be x1.2055; reduced to fit the 288 cell), strip)",
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
-    "prompt": "4-frame row: fat ink-outlined yellow sticker bolts radiating from centre (flash, burst, jump out, bits).",
+    "prompt": "4-frame row on flat magenta; same fat yellow ink-outlined sticker bolts as the v0.1.0 pick (ref spark_c.jpg); LARGE gray placeholder circle (about 55% of frame width); four bolts in the DIAGONAL corner gaps pointing outward, clear gap to the circle; flash / peak / move into corners + dots / fade.",
+    "v011Candidate": "c",
     "see": "../PROVENANCE.json"
   }
 }

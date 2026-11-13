@@ -1,4 +1,4 @@
-# World 2 (Beach) art: Game Art & Motion v0.1.2 recommended picks
+# World 2 (Beach) art: Game Art & Motion v0.1.3 recommended picks
 
 Every image here is a byte-identical copy from the `lst-art/world2-beach` delivery (`<asset>/recommended/`, `coconut/`, `cards/`). The game ships the pngquant `.q.png` copies; at real size they look the same as the RGBA masters (premultiplied p99 difference 4.6/255 or less at 390x844 DPR2). The masters add 5.0 MB, so they are not committed: `PROVENANCE.json` records each file's sha256, its delivery source and, for every `.q.png`, the master's name and sha256. The sprite JSON is the delivery JSON with reference fixes only (`meta.image` = the shipped `.q.png`, master in `meta.originalImage`, `_src/` raw and prompt references moved to `PROVENANCE.json`); `tools/art-provenance.py` rebuilds both from the delivery and `tools/world-test.js` fails if a file is missing, unlisted or changed.
 
@@ -8,7 +8,7 @@ The images are never edited. `src/worlds/render/AtlasSheetAdapter.js` reads the 
 |---|---|---|
 | BeachGround | background/beach_bg_a | main |
 | BeachSurf | background/beach_surf | main, JSON sequence 0,1,2,3,2,1 @6 fps, placed at `meta.placement.a` (row 275) |
-| HermitCrab | hermit_crab/hermit_crab_b | walk (10 fps); walk_broken -> bare (10 fps); hit_crack -> crack; regrow |
+| HermitCrab | hermit_crab/hermit_crab_b | walk (10 fps; v0.1.3 walk pass c: kick-back / neutral / kick-forward / neutral); walk_broken -> bare (10 fps); hit_crack -> crack; regrow |
 | Seagull | seagull/seagull_a | fly (faces camera, not mirrored) |
 | SeagullShadow | seagull/seagull_a_shadow | shadow (30 frame px below the gull) |
 | CaptainCrabclaw | crabclaw/crabclaw_b + crabclaw_b_angry | walk (0,1,2,1 cells), idle, throw (release frame 2); walk -> walk_angry, idle_angry, throw_angry (faces camera) |
