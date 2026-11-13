@@ -46,7 +46,7 @@
     ctx.translate(0, R * 0.5 + (1 - out) * R * 2.2 - lift * 10);
     ctx.scale(1 + squash * 0.25 - lift * 0.08, 1 - squash * 0.25 + lift * 0.12);
     const flash = e.hitFlash > 0;
-    const fill = flash ? "#c8a99b" : e.slowTimer > 0 ? "#bfefff" : COLORS.mole.body; // bosses only blush when hit (they get hit a lot)
+    const fill = flash ? "#c8a99b" : COLORS.mole.body; // bosses only blush when hit (they get hit a lot)
     // claws
     for (const side of [-1, 1]) {
       ctx.save();
@@ -126,7 +126,7 @@
     if (!clip) return false;
     const R = e.radius * 1.2;
     const lift = clip.codeMotion && e.windup > 0 ? 1 - e.windup / (e.windupMax || 1) : 0;
-    const tint = e.hitFlash > 0 ? TINT.flash : e.slowTimer > 0 ? TINT.frozen : null;
+    const tint = e.hitFlash > 0 ? TINT.flash : null; // slowed: the ChillFrost look, not a tint
     ctx.save();
     ctx.translate(e.x, e.y);
     S.drawBody(ctx, e, { sx: 1 - lift * 0.06, sy: 1 + lift * 0.1, anchorY: R * 0.55, tint }, clip);

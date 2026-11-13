@@ -159,7 +159,7 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   const { LST } = load(1);
   const sb = { LST, Math, console };
   vm.createContext(sb);
-  const LOOK_FILES = ["StatusLook", "LookRegistry", "LookLayer", "BurnFlames", "IceCrust", "VenomDrips", "SparkCrackle"];
+  const LOOK_FILES = ["StatusLook", "LookRegistry", "LookLayer", "BurnFlames", "IceCrust", "VenomDrips", "SparkCrackle", "ChillFrost"];
   vm.runInContext(fs.readFileSync(path.join(ROOT, "src/sprites/SheetAnimation.js"), "utf8"), sb, { filename: "SheetAnimation.js" });
   vm.runInContext(fs.readFileSync(path.join(ROOT, "src/sprites/LookSheetLibrary.js"), "utf8"), sb, { filename: "LookSheetLibrary.js" });
   for (const f of LOOK_FILES) vm.runInContext(fs.readFileSync(path.join(ROOT, "src/elements/looks", f + ".js"), "utf8"), sb, { filename: f });
@@ -187,9 +187,22 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   // The looks alone carry the status visuals: the old code-drawn frozen disc / venom pips
   // (FxRenderer.drawStatusRings, called from FxDirector.drawWorld) must never come back.
   const RING_BANNED = /drawStatusRings|StatusRings|\.get\(\s*e\s*,\s*"(frozen|venom|burn)"\s*\)|status\.(frozen|venom)\b/;
-  for (const f of fs.readdirSync(path.join(ROOT, "src/fx")).filter((n) => n.endsWith(".js")).map((n) => "src/fx/" + n)) {
-    const code = fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
-    const m = code.match(RING_BANNED); ok(!m, "looks: no code-drawn status rings / pips in " + f + (m ? " (found " + m[0] + ")" : ""));
+  const jsUnder = (d) => fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap((x) => x.isDirectory() ? jsUnder(d + "/" + x.name) : x.name.endsWith(".js") ? [d + "/" + x.name] : []);
+  const codeOf = (f) => fs.readFileSync(path.join(ROOT, f), "utf8").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n");
+  for (const f of [...jsUnder("src/fx"), ...jsUnder("src/themes"), ...jsUnder("src/sprites")]) {
+    const m = codeOf(f).match(RING_BANNED); ok(!m, "looks: no code-drawn status rings / pips in " + f + (m ? " (found " + m[0] + ")" : ""));
+  }
+  // src/sprites draws image frames only. SpriteTinter is the one exception, still used for the hit
+  // flash and Big Red's charge flicker until HitFlash / ChargeGlow replace it (docs/OO-MIGRATION.md PR 1).
+  for (const f of jsUnder("src/sprites").filter((f) => !f.endsWith("/SpriteTinter.js"))) {
+    const m = codeOf(f).match(BANNED); ok(!m, "sprites: no canvas path / shape / tint calls in " + f + (m ? " (found " + m[0] + ")" : ""));
+  }
+  // Slowed enemies get the ChillFrost look, never a tint: no theme or sprite code reads slowTimer to
+  // recolor, and the TINT table has no frost entry. (The cartoon theme's other vector art is planned
+  // for later PRs in docs/OO-MIGRATION.md; this scan only guards the slow/frozen tint.)
+  const FROST_TINT_BANNED = /TINT\.frozen|\bslowTimer\b|#bfefff|\bfrozen\s*:\s*\[/i;
+  for (const f of [...jsUnder("src/themes"), ...jsUnder("src/sprites")]) {
+    const m = codeOf(f).match(FROST_TINT_BANNED); ok(!m, "looks: no slow / frozen tint in " + f + (m ? " (found " + m[0] + ")" : ""));
   }
   ok(!LST.LOOK_VARIANTS && !LST.LOOK_STYLE && !LST.setLookVariant && !LST.LookKit, "looks: code-drawn variant presets are gone");
 
@@ -252,6 +265,32 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   LST.StatusEffects.add(c, new LST.Burn(9, 1)); LST.StatusEffects.add(c, new LST.Poison(9, 1, 3)); frame();
   ok(frame(0.25, true) === 2 && calls.draws.every((d) => d[1] === 0), "looks: reduced motion holds frame 0 (burn, venom)");
   subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "looks: run start clears every look");
+
+  // ChillFrost: slowed enemies (Enemy.slowTimer: Frost Shots, Frostbite chill, Freeze ability), hidden
+  // while frozen (IceCrust owns that), and nothing drawn until its sheet is in.
+  ok(R.get("chill") === LST.ChillFrost && LST.ChillFrost.prototype instanceof LST.StatusLook && LST.ChillFrost.sheet === "ChillFrost", "chill: ChillFrost is its own StatusLook subclass, registered as \"chill\"");
+  { const real = new LST.Enemy("basic", 0, 0, MULT); ok(!LST.ChillFrost.isActive(real), "chill: an unslowed enemy has no ChillFrost");
+    real.applySlow(0.15, 1.2); ok(LST.ChillFrost.isActive(real), "chill: Enemy.applySlow (Frost Shots / chill / Freeze) turns ChillFrost on");
+    LST.StatusEffects.add(real, new LST.Frozen(1)); ok(!LST.ChillFrost.isActive(real), "chill: hidden while the enemy is frozen"); }
+  const s1 = mk("basic", 200), s2 = mk("tank", 260); scene.enemies = [s1, s2]; scene.hasStatus = false;
+  delete LST.lookSheets.sheets.ChillFrost;
+  s1.slowTimer = 1.2; frame();
+  ok(L.looksOf(s1) && L.looksOf(s1).get("chill") instanceof LST.ChillFrost && !L.looksOf(s2), "chill: attaches to the slowed enemy only, with no StatusEffect on it (hasStatus false)");
+  ok(calls.draws.length === 0 && !LST.lookSheets.get("ChillFrost"), "chill: asset missing -> nothing drawn (no fallback, no tint)");
+  const CF = sheetJson.ChillFrost || { strips: { attach: { image: "ChillFrost_test_attach.png", frame: { w: 256, h: 288 }, count: 2, fps: 20, loop: false }, main: { image: "ChillFrost_test.png", frame: { w: 256, h: 288 }, count: 4, fps: 8, loop: true } }, anchor: { x: 128, y: 152 }, refBodyR: 88 };
+  const cfImg = img.ChillFrost || Object.fromEntries(Object.keys(CF.strips).map((id) => [id, { id: "ChillFrost:" + id }]));
+  LST.lookSheets.install("ChillFrost", CF, cfImg);
+  { const cf = L.looksOf(s1).get("chill"), S = LST.lookSheets.get("ChillFrost").strips; cf.t = 0;
+    ok(frame(0) === 1 && Object.values(cfImg).includes(calls.draws[0][0]), "chill: draws one ChillFrost image once the sheet is in");
+    if (S.main.count > 1 && S.main.loop) { cf.t = 10; const a1 = cf.pick(S, false); cf.t = 10 + 1 / S.main.fps; const a2 = cf.pick(S, false); ok(a1[0] === "main" && a2[0] === "main" && a1[1] !== a2[1], "chill: main loops by fps after any attach"); }
+    cf.t = 0; ok(cf.pick(S, true).join() === "main,0", "chill: reduced motion = main frame 0, no attach");
+    const d = calls.draws[0], k = LST.StatusLook.bodyR(s1) / (CF.refBodyR || 88);
+    ok(Math.abs(d[5] - (s1.x - CF.anchor.x * k)) < 1e-9 && Math.abs(d[6] - (s1.y - CF.anchor.y * k)) < 1e-9, "chill: anchor on the body centre, scaled bodyR / refBodyR"); }
+  LST.StatusEffects.add(s1, new LST.Frozen(1)); scene.hasStatus = true; frame(0);
+  ok(L.looksOf(s1).has("frozen") && !L.looksOf(s1).has("chill") && calls.draws.length === 1 && calls.draws[0][0] !== undefined && !Object.values(cfImg).includes(calls.draws[0][0]), "chill: frozen -> IceCrust only, ChillFrost hidden");
+  s1.status.frozen.time = 0; frame(); ok(L.looksOf(s1).has("chill") && !L.looksOf(s1).has("frozen"), "chill: back on after the thaw while still slowed");
+  s1.slowTimer = 0; frame(); ok(!L.looksOf(s1) && L.count === 0 && frame() === 0, "chill: removed the frame the slow ends");
+  s2.slowTimer = 4; subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "chill: run start clears ChillFrost too");
   ok(calls.paths === 0, "looks: no path or shape call reached the canvas in any frame");
 }
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");

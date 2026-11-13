@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v23"; // Hermit crab walk v0.1.3 + element looks v0.1.1 (.q.png copies: Spark corner bolts, round IceCrust, Burn pixel fix, cup Venom) + crabclaw_b_angry qa metadata
+const VERSION = "v24"; // ChillFrost look for slowed enemies (frozen tint removed) + docs/OO-MIGRATION.md
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -104,6 +104,7 @@ const PRECACHE = [
   "src/elements/looks/IceCrust.js",
   "src/elements/looks/VenomDrips.js",
   "src/elements/looks/SparkCrackle.js",
+  "src/elements/looks/ChillFrost.js",
   "src/fx/FxOverlay.js",
   "src/fx/FxDirector.js",
   "src/ui/CardFlip.js",

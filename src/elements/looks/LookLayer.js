@@ -21,7 +21,7 @@ LST.LookLayer = class LookLayer {
     if (!scene || !scene.enemies) return;
     const dt = this.last === null ? 0 : Math.max(0, time - this.last); this.last = time;
     this.enemies = scene.enemies;
-    if (!scene.hasStatus && !this.byEnemy.size) return;
+    if (!scene.hasStatus && !this.byEnemy.size && !scene.enemies.some((e) => e.slowTimer > 0)) return; // slow (ChillFrost) is not a StatusEffect
     this.sync(scene.enemies, dt); this.draw(ctx, reduced);
   }
   get count() { let n = 0; for (const m of this.byEnemy.values()) n += m.size; return n; }
@@ -45,9 +45,9 @@ LST.LookLayer = class LookLayer {
     for (const e of enemies) {
       if (e.dead || e.corpse) continue;
       alive.add(e);
-      if (!e.status && !this.byEnemy.has(e)) continue;
+      if (!e.status && !(e.slowTimer > 0) && !this.byEnemy.has(e)) continue;
       for (const [id, Cls] of LST.LookRegistry.statusLooks()) {
-        const on = !!e.status && Cls.isActive(e), m = this.byEnemy.get(e), has = !!(m && m.has(id));
+        const on = !!Cls.isActive(e), m = this.byEnemy.get(e), has = !!(m && m.has(id));
         if (on && !has) this.add(e, id); else if (!on && has) this.remove(e, id);
       }
     }

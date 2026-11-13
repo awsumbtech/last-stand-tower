@@ -25,9 +25,8 @@
     }
   }
 
-  function spriteTint(e, flash, frozen, charge) {
+  function spriteTint(e, flash, charge) { // slowed enemies: the ChillFrost look, not a tint
     if (flash) return e.isBoss ? TINT.bossFlash : TINT.flash;
-    if (frozen) return TINT.frozen;
     if (charge) return TINT.charge;
     return null;
   }

@@ -26,9 +26,8 @@
       const sy = (1 - 0.12 * w - e.slamAnim * 0.3 + lift * 0.2) * grow;
       const R = e.radius * 1.35;
       const flash = e.hitFlash > 0;
-      const frozen = e.slowTimer > 0; // Frost Shots: icy blue tint
       const charge = e.charging && Math.floor(e.age * 10) % 2;
-      const fill = flash ? (e.isBoss ? "#ff8a95" : "#ffffff") : frozen ? "#bfefff" : charge ? "#ff1f3d" : c.body;
+      const fill = flash ? (e.isBoss ? "#ff8a95" : "#ffffff") : charge ? "#ff1f3d" : c.body;
 
       ctx.save();
       ctx.translate(e.x, e.y);
@@ -37,7 +36,7 @@
       const sq = e.isBoss ? 0.04 : 0.12;
       const bx = sx * (flash ? 1 + sq : 1), by = sy * (flash ? 1 - sq : 1);
       // rot only turns sprite layers flagged to rotate (Fast's dart); look aims the pupils.
-      const fx = { sx: bx, sy: by, rot: look - Math.PI / 2, look, tint: spriteTint(e, flash, frozen, charge) };
+      const fx = { sx: bx, sy: by, rot: look - Math.PI / 2, look, tint: spriteTint(e, flash, charge) };
       if (!(LST.enemySprites && LST.enemySprites.drawBody(ctx, e, fx))) {
         ctx.save();
         ctx.scale(bx, by);
