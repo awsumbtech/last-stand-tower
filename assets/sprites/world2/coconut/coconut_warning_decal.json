@@ -4,20 +4,20 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 160,
-        "h": 160
+        "w": 300,
+        "h": 300
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 160,
-        "h": 160
+        "w": 300,
+        "h": 300
       },
       "sourceSize": {
-        "w": 160,
-        "h": 160
+        "w": 300,
+        "h": 300
       },
       "pivot": {
         "x": 0.5,
@@ -37,12 +37,12 @@
   },
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "image": "coconut_warning_decal.q.png",
-    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
     "size": {
-      "w": 160,
-      "h": 160
+      "w": 300,
+      "h": 300
     },
     "scale": "1",
     "packing": {
@@ -58,9 +58,9 @@
       }
     ],
     "pivot": {
-      "x": 80,
-      "y": 80,
-      "note": "pivot = target centre on the ground"
+      "x": 150,
+      "y": 150,
+      "note": "pivot (150, 150) = target centre on the ground"
     },
     "hitbox": {
       "r": 0,
@@ -72,32 +72,33 @@
       "r": 75,
       "drawScale": 1,
       "units": "frame px",
-      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its outer ring diameter = 150 px (= 75 world units at 1:1)"
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its inner life-ring outer radius = 75 px = body r (= the danger radius dangerR = tower.radius + hitRadius the game passes); the new outer hazard ring reaches 1.83x that (about 137 px)"
     },
     "palette": {},
     "memory": {
-      "decodedRGBA": 102400,
+      "decodedRGBA": 360000,
       "note": "bytes once decoded to RGBA8888 (w * h * 4)"
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+    "sha256": "509328b46a05b862c3e338f33fc6ba4248fc8bc5bfc793382a522e24b49dba96",
     "entity": "coconut_warning_decal",
     "role": "ground target warning where a coconut will land; draw under enemies",
-    "scaleRule": "drawScale = impactRadius_world / 37.5 (outer ring radius is 75 px = 37.5 world units at 2 px/unit); pulse alpha/scale in code if wanted",
+    "scaleRule": "game draws it with bodyR = dangerR (tower radius 26 + hitRadius 18 = 44 world units): inner ring edge at 44 u, outer hazard ring band from ~64 to ~80 u, i.e. 40-51 CSS px from the target centre at 390x844, outside the ~27 CSS px tower art",
+    "v012": "wider outer ring so a shot aimed at the tower still shows a clear warning ring around the tower (v0.1.1 showed only an ~11 px rim)",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
         "d": {
-          "raw": "warning_decal",
-          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "raw": "warning_decal_v012",
+          "rawSha256": "322e39cda56fdf8087deebba15f41be03c398100429a3ae660b3bd14c8ae9116",
           "keyColour": [
-            66,
-            155,
+            61,
+            153,
             73
           ],
-          "measuredSpan": 668.0,
-          "scale": 0.2246
+          "measuredSpan": 857.0,
+          "scale": 0.3229
         }
       },
       "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
@@ -106,11 +107,11 @@
     "qa": {
       "frames": {
         "d[0]": {
-          "clippedFraction": 0.0015,
-          "edgeMarginPx": 4,
+          "clippedFraction": 0.001,
+          "edgeMarginPx": 11,
           "keyFringePx": 0,
           "greenRimPx": 0,
-          "magentaRimPx": 31
+          "magentaRimPx": 16
         }
       },
       "motion": {
@@ -125,19 +126,19 @@
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
       "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
       "bytes": {
-        "rgba": 31459,
-        "indexed": 10244
+        "rgba": 89284,
+        "indexed": 28681
       },
-      "psnrDb": 49.54,
+      "psnrDb": 48.81,
       "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
-      "maxChannelError": 18,
-      "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+      "maxChannelError": 33,
+      "sha256": "509328b46a05b862c3e338f33fc6ba4248fc8bc5bfc793382a522e24b49dba96",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
     },
     "originalImage": {
       "name": "coconut_warning_decal.png",
-      "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
-      "bytes": 31459,
+      "sha256": "5780ba670966f219ca580176dd72a01ec9da8d67a0811de81d6d830ee4179ca4",
+      "bytes": 89284,
       "inRepo": false,
       "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }

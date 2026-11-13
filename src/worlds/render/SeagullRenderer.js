@@ -1,6 +1,6 @@
 // SeagullRenderer: draws a Seagull from the Seagull sheet ("fly" loop) plus its ground shadow
 // (SeagullShadow, a separate image drawn under every enemy by WorldRenderers.shadows).
-// The v0.1.1 gull faces the camera, so it is never mirrored. Image frames only.
+// The Game Art gull (v0.1.1+) faces the camera, so it is never mirrored. Image frames only.
 LST.SeagullRenderer = class SeagullRenderer extends LST.SheetRenderer {
   constructor(library) { super("Seagull", library); this.shadow = new LST.SheetRenderer("SeagullShadow", library); }
   draw(ctx, e) {

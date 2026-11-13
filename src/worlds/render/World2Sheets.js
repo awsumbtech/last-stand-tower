@@ -1,9 +1,9 @@
-// Immutable v0.1.1 recommended picks; AtlasSheetAdapter owns atlas/slot mapping.
+// Immutable Game Art & Motion v0.1.2 recommended picks; AtlasSheetAdapter owns atlas/slot mapping.
 // Each JSON and quantized PNG is copied byte-for-byte from Game Art & Motion.
 LST.WORLD2_SHEETS = {
   BeachGround: "assets/sprites/world2/background/beach_bg_a.json",
   BeachSurf: "assets/sprites/world2/background/beach_surf.json",
-  HermitCrab: [{ url: "assets/sprites/world2/hermit_crab/hermit_crab_a.json", aliases: { walk_broken: "bare", hit_crack: "crack" } }],
+  HermitCrab: [{ url: "assets/sprites/world2/hermit_crab/hermit_crab_b.json", aliases: { walk_broken: "bare", hit_crack: "crack" } }],
   Seagull: "assets/sprites/world2/seagull/seagull_a.json",
   SeagullShadow: "assets/sprites/world2/seagull/seagull_a_shadow.json",
   CaptainCrabclaw: [

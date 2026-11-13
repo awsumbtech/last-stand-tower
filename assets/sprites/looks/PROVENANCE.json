@@ -7,6 +7,10 @@
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
     "originals": "no quantized copies: the delivered PNGs are the repo files (byte-identical). Raw generations stay in the delivery's _src/ (hashes in its _src/raw/SHA256SUMS)."
   },
+  "integration": {
+    "release": "Beach v0.1.2",
+    "date": "2026-11-12"
+  },
   "originalsCommitted": false,
   "files": {
     "IceCrust/IceCrust_a.json": {

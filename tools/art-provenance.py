@@ -19,7 +19,7 @@ Needs the delivery folders (they are not in the repo). Steps, all mechanical:
      for .q.png copies the quantized-from original (name, sha256, bytes, not in repo), and for JSON
      the dropped references. tools/world-test.js checks the repo files against it (fails on a
      missing file, an unlisted file or a hash change).
-Originals are NOT committed: the World 2 RGBA masters add 6.8 MB (over the ~3 MB budget); only
+Originals are NOT committed: the World 2 RGBA masters add 5.0 MB (v0.1.2) (over the ~3 MB budget); only
 their hashes are recorded. The looks have no quantized copies; their delivered PNGs are the repo files.
 """
 import argparse, hashlib, json, os, sys
@@ -112,7 +112,8 @@ def build(repo_dir, src_root, src_of, normalize, source, delivery_prov=None):
             p = os.path.join(repo_dir, rel)
             entry = {"sha256": sha(p), "bytes": os.path.getsize(p), **entry}
             files[rel] = entry
-    out = {"source": source, "originalsCommitted": False, "files": files}
+    # The looks delivery remains v0.1.0; recording the integration release must not relabel its source.
+    out = {"source": source, "integration": {"release": "Beach v0.1.2", "date": "2026-11-12"}, "originalsCommitted": False, "files": files}
     open(os.path.join(repo_dir, "PROVENANCE.json"), "w").write(json.dumps(out, indent=2, ensure_ascii=False) + "\n")
     print(f"{os.path.relpath(repo_dir, ROOT)}/PROVENANCE.json: {len(files)} files")
 
@@ -120,10 +121,10 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--world2", required=True); ap.add_argument("--looks", required=True); a = ap.parse_args()
     dp = json.load(open(os.path.join(a.world2, "PROVENANCE.json")))
     build(W2, a.world2, w2_src, normalize_w2, {
-        "delivery": "Game Art & Motion: last-stand-tower world2-beach", "version": "0.1.1", "date": "2026-11-12",
-        "picks": "FINAL-PICKS.md + CHANGELOG-v0.1.1.md (independent checker picks: background a, hermit crab a, seagull a, Crabclaw b, Elite shell c)",
+        "delivery": "Game Art & Motion: last-stand-tower world2-beach", "version": "0.1.2", "date": "2026-11-12",
+        "picks": "FINAL-PICKS.md v0.1.2 + CHANGELOG-v0.1.2.md + _checker/INDEPENDENT-SCORES.md v0.1.2 re-check (independent checker picks: background a, hermit crab b, seagull a, Crabclaw b, Elite shell c; verdict PASS, confidence 0.80)",
         "license": "Original art generated for Brian Awsumb's Last Stand Tower via Grok Bot GenerateImage; no third-party assets.",
-        "originals": "RGBA masters total 6.8 MB, over the ~3 MB repo budget: not committed, hashes below (quantizedFrom / originalImage)."}, dp)
+        "originals": "RGBA masters total 5.0 MB, over the ~3 MB repo budget: not committed, hashes below (quantizedFrom / originalImage)."}, dp)
     build(LOOKS, a.looks, lambda rel: rel.split("/", 1)[0] + "/recommended/" + rel.split("/", 1)[1], normalize_look, {
         "delivery": "Game Art & Motion: last-stand-tower element-looks", "version": "0.1.0", "date": "2026-11-12",
         "picks": "FINAL-PICKS.md (independent checker, confidence 0.84): BurnFlames a, IceCrust a, VenomDrips a, SparkCrackle c",

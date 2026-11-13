@@ -367,9 +367,9 @@
   },
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "image": "crabclaw_b.q.png",
-    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
     "size": {
       "w": 1542,
       "h": 1542
@@ -429,7 +429,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
+    "sha256": "f552c96ecc405e8d5c6080b72c2e3a57ec95423e13569382d5e602ee1c15f5c9",
     "entity": "crabclaw",
     "role": "World 2 boss (wave 20): lobs coconuts from range",
     "layerSet": {
@@ -448,6 +448,7 @@
     "variant": "b",
     "v011": "added idle (4@6 loop); throw regenerated so the release frame shows an empty claw",
     "scaleNote": "throw sheet scaled x0.885 so the hat width matches walk/idle (measured by _tools/scalecheck.py)",
+    "v012": "walk re-ordered to cells 0,1,2,1 (v0.1.1 cell 3 lifted the body and raised a claw: the 'hop' between frames 2 and 3)",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
@@ -649,14 +650,14 @@
           "centroidShiftPx": [
             5.8,
             6.8,
-            19.7,
-            18.7
+            6.8,
+            5.8
           ],
           "IoU": [
             0.857,
             0.847,
-            0.578,
-            0.603
+            0.847,
+            0.857
           ]
         },
         "idle": {
@@ -696,19 +697,19 @@
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
       "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
       "bytes": {
-        "rgba": 931679,
-        "indexed": 266030
+        "rgba": 859374,
+        "indexed": 246474
       },
-      "psnrDb": 48.08,
+      "psnrDb": 48.16,
       "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
-      "maxChannelError": 46,
-      "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
+      "maxChannelError": 59,
+      "sha256": "f552c96ecc405e8d5c6080b72c2e3a57ec95423e13569382d5e602ee1c15f5c9",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
     },
     "originalImage": {
       "name": "crabclaw_b.png",
-      "sha256": "c20892a3f7f95ada0b7e2ad14b261f1abe41acbe6676d031a254ad0ccbc06d71",
-      "bytes": 931679,
+      "sha256": "a3d7ced3dd3d1cb05c59b66eb911c3cced993cb19a4d184a4ebfc1ebb0cf039a",
+      "bytes": 859374,
       "inRepo": false,
       "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }

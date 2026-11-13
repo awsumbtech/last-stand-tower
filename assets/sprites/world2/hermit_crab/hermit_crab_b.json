@@ -1,6 +1,6 @@
 {
   "frames": {
-    "hermit_crab_a_walk_0": {
+    "hermit_crab_b_walk_0": {
       "frame": {
         "x": 0,
         "y": 0,
@@ -23,9 +23,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_1": {
+    "hermit_crab_b_walk_1": {
       "frame": {
         "x": 194,
         "y": 0,
@@ -48,9 +48,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_2": {
+    "hermit_crab_b_walk_2": {
       "frame": {
         "x": 388,
         "y": 0,
@@ -73,9 +73,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_3": {
+    "hermit_crab_b_walk_3": {
       "frame": {
         "x": 582,
         "y": 0,
@@ -98,9 +98,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_hit_crack_0": {
+    "hermit_crab_b_hit_crack_0": {
       "frame": {
         "x": 0,
         "y": 194,
@@ -125,7 +125,7 @@
       },
       "duration": 62
     },
-    "hermit_crab_a_hit_crack_1": {
+    "hermit_crab_b_hit_crack_1": {
       "frame": {
         "x": 194,
         "y": 194,
@@ -150,7 +150,7 @@
       },
       "duration": 62
     },
-    "hermit_crab_a_hit_crack_2": {
+    "hermit_crab_b_hit_crack_2": {
       "frame": {
         "x": 388,
         "y": 194,
@@ -175,7 +175,7 @@
       },
       "duration": 62
     },
-    "hermit_crab_a_hit_crack_3": {
+    "hermit_crab_b_hit_crack_3": {
       "frame": {
         "x": 582,
         "y": 194,
@@ -200,7 +200,7 @@
       },
       "duration": 62
     },
-    "hermit_crab_a_walk_broken_0": {
+    "hermit_crab_b_walk_broken_0": {
       "frame": {
         "x": 0,
         "y": 388,
@@ -223,9 +223,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_broken_1": {
+    "hermit_crab_b_walk_broken_1": {
       "frame": {
         "x": 194,
         "y": 388,
@@ -248,9 +248,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_broken_2": {
+    "hermit_crab_b_walk_broken_2": {
       "frame": {
         "x": 388,
         "y": 388,
@@ -273,9 +273,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_walk_broken_3": {
+    "hermit_crab_b_walk_broken_3": {
       "frame": {
         "x": 582,
         "y": 388,
@@ -298,9 +298,9 @@
         "x": 0.5,
         "y": 0.5
       },
-      "duration": 125
+      "duration": 100
     },
-    "hermit_crab_a_regrow_0": {
+    "hermit_crab_b_regrow_0": {
       "frame": {
         "x": 0,
         "y": 582,
@@ -325,7 +325,7 @@
       },
       "duration": 83
     },
-    "hermit_crab_a_regrow_1": {
+    "hermit_crab_b_regrow_1": {
       "frame": {
         "x": 194,
         "y": 582,
@@ -350,7 +350,7 @@
       },
       "duration": 83
     },
-    "hermit_crab_a_regrow_2": {
+    "hermit_crab_b_regrow_2": {
       "frame": {
         "x": 388,
         "y": 582,
@@ -375,7 +375,7 @@
       },
       "duration": 83
     },
-    "hermit_crab_a_regrow_3": {
+    "hermit_crab_b_regrow_3": {
       "frame": {
         "x": 582,
         "y": 582,
@@ -404,40 +404,40 @@
   "animations": {
     "walk": {
       "frames": [
-        "hermit_crab_a_walk_0",
-        "hermit_crab_a_walk_1",
-        "hermit_crab_a_walk_2",
-        "hermit_crab_a_walk_3"
+        "hermit_crab_b_walk_0",
+        "hermit_crab_b_walk_1",
+        "hermit_crab_b_walk_2",
+        "hermit_crab_b_walk_3"
       ],
-      "fps": 8,
+      "fps": 10,
       "loop": true
     },
     "hit_crack": {
       "frames": [
-        "hermit_crab_a_hit_crack_0",
-        "hermit_crab_a_hit_crack_1",
-        "hermit_crab_a_hit_crack_2",
-        "hermit_crab_a_hit_crack_3"
+        "hermit_crab_b_hit_crack_0",
+        "hermit_crab_b_hit_crack_1",
+        "hermit_crab_b_hit_crack_2",
+        "hermit_crab_b_hit_crack_3"
       ],
       "fps": 16,
       "loop": false
     },
     "walk_broken": {
       "frames": [
-        "hermit_crab_a_walk_broken_0",
-        "hermit_crab_a_walk_broken_1",
-        "hermit_crab_a_walk_broken_2",
-        "hermit_crab_a_walk_broken_3"
+        "hermit_crab_b_walk_broken_0",
+        "hermit_crab_b_walk_broken_1",
+        "hermit_crab_b_walk_broken_2",
+        "hermit_crab_b_walk_broken_3"
       ],
-      "fps": 8,
+      "fps": 10,
       "loop": true
     },
     "regrow": {
       "frames": [
-        "hermit_crab_a_regrow_0",
-        "hermit_crab_a_regrow_1",
-        "hermit_crab_a_regrow_2",
-        "hermit_crab_a_regrow_3"
+        "hermit_crab_b_regrow_0",
+        "hermit_crab_b_regrow_1",
+        "hermit_crab_b_regrow_2",
+        "hermit_crab_b_regrow_3"
       ],
       "fps": 12,
       "loop": false
@@ -445,9 +445,9 @@
   },
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
-    "version": "0.1.1",
-    "image": "hermit_crab_a.q.png",
-    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "version": "0.1.2",
+    "image": "hermit_crab_b.q.png",
+    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
     "size": {
       "w": 774,
       "h": 774
@@ -498,7 +498,7 @@
       "r": 48.6,
       "drawScale": 1.35,
       "units": "frame px",
-      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its leg-and-claw span (lowest 40% of the main body) = 100 px and its feet line sits at y = 140 (pivot + 44)"
+      "note": "like cartoon.js: body radius = hitbox x drawScale; art normalised so its round red body width = 59 px (same on-screen size as v0.1.1), body centre at x = 103, feet line at y = 140 (pivot + 44)"
     },
     "palette": {},
     "memory": {
@@ -507,7 +507,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
+    "sha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
     "entity": "hermit_crab",
     "role": "World 2 shielded enemy (Sprint 5 'Shielded': shell = shield, regrows once)",
     "proposedConfig": {
@@ -517,63 +517,63 @@
     "states": {
       "walk": "shell intact (shield up)",
       "hit_crack": "plays once when the shield breaks (4 frames @16: impact, cracks, burst, shell-less)",
-      "walk_broken": "shield down, soft abdomen exposed",
+      "walk_broken": "shield down: shell gone, soft pale abdomen exposed (different outline and value from the shelled walk)",
       "regrow": "plays once when the shell regrows (4 frames @12), ends on the full-shell pose, then back to walk"
     },
-    "variant": "a",
+    "variant": "b",
     "manifestNames": {
       "walk": "walk",
       "bare": "walk_broken",
       "crack": "hit_crack",
       "regrow": "regrow"
     },
-    "v011": "regenerated from a corrected model sheet (stalk eyes only); hit_crack now 4 frames, regrow 4 frames",
+    "v012": "readability pass for ~25 CSS px: scuttle walk (4 different leg poses); bare = claws thrown up in panic + limp pale shrimp tail: Y-shaped silhouette. Blind packet _checker/hermit_crab_v012/; picked (checker v0.1.2).",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
         "walk": {
-          "raw": "crab_a_walk_v011",
-          "rawSha256": "04ac31e6fa5162ad54695d1e794e348e7b2bc7036322ae9293e10ca0ad8f8900",
-          "keyColour": [
-            50,
-            184,
-            80
-          ],
-          "measuredSpan": 354.5,
-          "scale": 0.2821
-        },
-        "broken": {
-          "raw": "crab_a_broken_v011",
-          "rawSha256": "e6e0e61bcbec1550be7c4f6f1c9c3536a9e6035c0513fa7098031074799a3b1d",
-          "keyColour": [
-            48,
-            183,
-            79
-          ],
-          "measuredSpan": 395.5,
-          "scale": 0.2528
-        },
-        "crack": {
-          "raw": "crab_a_crack_v011",
-          "rawSha256": "9d00f1d1987ed2555bf46d7b52dbb163388567c3c3d888c7ea08e95a6f9582fc",
+          "raw": "crab_v012_walk_waddle",
+          "rawSha256": "4a0793762b1701ca2bffc047b516037f871e64164a1bfacbaa54a5b9d4121cce",
           "keyColour": [
             45,
-            181,
-            79
+            183,
+            80
           ],
-          "measuredSpan": 380.0,
-          "scale": 0.2632
+          "measuredSpan": 189.5,
+          "scale": 0.3113
+        },
+        "bare": {
+          "raw": "crab_v012_barewalk_b",
+          "rawSha256": "3f615b4fe7abae76bdabd14b8cc051a391286db65b6dcebe286b7926543f6915",
+          "keyColour": [
+            43,
+            182,
+            80
+          ],
+          "measuredSpan": 204.5,
+          "scale": 0.2885
+        },
+        "crack": {
+          "raw": "crab_v012_crack_b",
+          "rawSha256": "ec9fc43432e0a227265eead65e8a499127b1e9d3a77a23bf81b74cdef252c8e2",
+          "keyColour": [
+            46,
+            181,
+            76
+          ],
+          "measuredSpan": 205.0,
+          "scale": 0.2878
         },
         "regrow": {
-          "raw": "crab_a_regrow_v011",
-          "rawSha256": "2c2d7ed0d5840ba48c18f4d67ec1e5719713ff4b042016a4b517d1d4eafcb569",
+          "raw": "crab_v012_regrow_b",
+          "rawSha256": "f31424d92d08d72f3d88527f7de15cf00af09b57015c54be50408b6a45f410b3",
           "keyColour": [
-            49,
+            41,
             183,
-            78
+            75
           ],
-          "measuredSpan": 337.0,
-          "scale": 0.2967
+          "measuredSpan": 201.5,
+          "scale": 0.2928
         }
       },
       "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
@@ -582,251 +582,191 @@
     "qa": {
       "frames": {
         "walk[0]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 19,
+          "clippedFraction": 0.0008,
+          "edgeMarginPx": 15,
           "keyFringePx": 0,
           "greenRimPx": 0,
           "magentaRimPx": 0
         },
         "walk[1]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 19,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            0
-          ]
-        },
-        "walk[2]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 19,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            0
-          ]
-        },
-        "walk[3]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 19,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            0
-          ]
-        },
-        "broken[0]": {
-          "clippedFraction": 0.001,
-          "edgeMarginPx": 42,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -5
-          ]
-        },
-        "broken[1]": {
-          "clippedFraction": 0.001,
-          "edgeMarginPx": 42,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -6
-          ]
-        },
-        "broken[2]": {
-          "clippedFraction": 0.0009,
-          "edgeMarginPx": 41,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -6
-          ]
-        },
-        "broken[3]": {
-          "clippedFraction": 0.0009,
-          "edgeMarginPx": 20,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -6
-          ]
-        },
-        "crack[0]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 35,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -8
-          ]
-        },
-        "crack[1]": {
-          "clippedFraction": 0.001,
-          "edgeMarginPx": 31,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -6
-          ]
-        },
-        "crack[2]": {
-          "clippedFraction": 0.0013,
-          "edgeMarginPx": 27,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            -4
-          ]
-        },
-        "crack[3]": {
-          "clippedFraction": 0.001,
-          "edgeMarginPx": 40,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            -5
-          ]
-        },
-        "regrow[0]": {
           "clippedFraction": 0.0008,
-          "edgeMarginPx": 42,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            2,
-            -1
-          ]
-        },
-        "regrow[1]": {
-          "clippedFraction": 0.001,
-          "edgeMarginPx": 29,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            -1
-          ]
-        },
-        "regrow[2]": {
-          "clippedFraction": 0.0006,
-          "edgeMarginPx": 16,
-          "keyFringePx": 0,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            0
-          ]
-        },
-        "regrow[3]": {
-          "clippedFraction": 0.0006,
           "edgeMarginPx": 15,
           "keyFringePx": 0,
           "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            1
-          ]
+          "magentaRimPx": 0
+        },
+        "walk[2]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 13,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "walk[3]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 14,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bare[0]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 33,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bare[1]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bare[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "bare[3]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 32,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[0]": {
+          "clippedFraction": 0.0009,
+          "edgeMarginPx": 27,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[1]": {
+          "clippedFraction": 0.0015,
+          "edgeMarginPx": 28,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[2]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "crack[3]": {
+          "clippedFraction": 0.0013,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[0]": {
+          "clippedFraction": 0.0013,
+          "edgeMarginPx": 33,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[1]": {
+          "clippedFraction": 0.0012,
+          "edgeMarginPx": 34,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[2]": {
+          "clippedFraction": 0.0011,
+          "edgeMarginPx": 31,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
+        },
+        "regrow[3]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 23,
+          "keyFringePx": 0,
+          "greenRimPx": 0,
+          "magentaRimPx": 0
         }
       },
       "motion": {
         "walk": {
           "centroidShiftPx": [
-            1.3,
-            1.1,
-            0.5,
-            0.4
+            0.8,
+            1.6,
+            0.8,
+            1.3
           ],
           "IoU": [
-            0.943,
-            0.944,
-            0.979,
-            0.981
+            0.928,
+            0.896,
+            0.91,
+            0.914
           ]
         },
         "hit_crack": {
           "centroidShiftPx": [
-            2.4,
-            6.3,
-            3.5
+            2.8,
+            10.6,
+            1.9
           ],
           "IoU": [
-            0.851,
-            0.722,
-            0.748
+            0.576,
+            0.579,
+            0.852
           ]
         },
         "walk_broken": {
           "centroidShiftPx": [
-            0.9,
-            0.8,
-            0.4,
-            0.4
+            1.2,
+            1.4,
+            0.5,
+            0.8
           ],
           "IoU": [
-            0.946,
-            0.954,
-            0.97,
-            0.966
+            0.879,
+            0.874,
+            0.872,
+            0.856
           ]
         },
         "regrow": {
           "centroidShiftPx": [
-            6.5,
-            5.8,
-            0.7
+            4.2,
+            2.6,
+            6.7
           ],
           "IoU": [
-            0.83,
-            0.81,
-            0.964
+            0.72,
+            0.856,
+            0.701
           ]
         }
       }
     },
     "quantizedCopy": {
-      "image": "hermit_crab_a.q.png",
+      "image": "hermit_crab_b.q.png",
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
       "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
       "bytes": {
-        "rgba": 323685,
-        "indexed": 91854
+        "rgba": 331089,
+        "indexed": 95379
       },
-      "psnrDb": 47.86,
+      "psnrDb": 47.42,
       "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
-      "maxChannelError": 48,
-      "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
+      "maxChannelError": 54,
+      "sha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
     },
     "originalImage": {
-      "name": "hermit_crab_a.png",
-      "sha256": "02ce87b7a2ad7264710486d669585da2bdeefe2bd294d56a7745cb81a4df49ef",
-      "bytes": 323685,
+      "name": "hermit_crab_b.png",
+      "sha256": "3c301a906f28b53a6544b0359b26736d1d0ffbe8c65974f7e1e12ce2aeb5cd21",
+      "bytes": 331089,
       "inRepo": false,
       "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }

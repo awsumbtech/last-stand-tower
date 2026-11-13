@@ -2,15 +2,41 @@
 // TexturePacker grids (including gutters), aliases animation slots, and presents the same
 // strips interface as LookSheetLibrary. No repacking, painting, tints, or generated art.
 // Created by World2Sheets; lazy preload on world selection, retained for the page lifetime.
+// Frame order and fps come only from the JSON: `animations[name].frames` (a played sequence,
+// which may repeat cells, e.g. surf 0,1,2,3,2,1 or Crabclaw walk 0,1,2,1) and `.fps` / `.loop`.
+// An animation with no frame list falls back to its `meta.frameTags` range and direction
+// (forward / reverse / pingpong). Nothing here knows any sheet's sequence.
 LST.AtlasSheetAdapter = class AtlasSheetAdapter extends LST.LookSheetLibrary {
+  // Played frame ids for one animation, from the JSON alone.
+  static sequence(data, name) {
+    const anim = (data.animations || {})[name] || {};
+    if (Array.isArray(anim.frames) && anim.frames.length) return anim.frames.slice();
+    const tag = ((data.meta && data.meta.frameTags) || []).find((t) => t.name === name);
+    if (!tag) return [];
+    const ids = Object.keys(data.frames), run = ids.slice(tag.from, tag.to + 1);
+    if (tag.direction === "reverse") return run.reverse();
+    if (tag.direction === "pingpong") return run.concat(run.slice(1, -1).reverse());
+    return run;
+  }
+
+  static animationNames(data) {
+    const names = Object.keys(data.animations || {});
+    for (const t of (data.meta && data.meta.frameTags) || []) if (!names.includes(t.name)) names.push(t.name);
+    return names;
+  }
+
   static build(data, image, aliases = {}) {
     const strips = {}, meta = data.meta;
-    for (const [name, anim] of Object.entries(data.animations)) {
-      const frames = anim.frames.map((id) => data.frames[id]);
+    for (const name of LST.AtlasSheetAdapter.animationNames(data)) {
+      const anim = (data.animations || {})[name] || {};
+      const ids = LST.AtlasSheetAdapter.sequence(data, name);
+      const frames = ids.map((id) => data.frames[id]).filter(Boolean);
+      if (!frames.length) continue;
       const first = frames[0].frame;
       const a = new LST.SheetAnimation({ image: meta.image, frame: { w: first.w, h: first.h },
         count: frames.length, fps: anim.fps, loop: anim.loop }, meta.pivot, meta.body.r);
       a.image = image || null;
+      a.sequence = ids; // played frame ids, for tests and QA
       a.releaseFrame = meta.throwTiming && meta.throwTiming.releaseFrame;
       a.placement = meta.placement || null;
       a.draw = function (ctx, index, x, y, bodyR) {

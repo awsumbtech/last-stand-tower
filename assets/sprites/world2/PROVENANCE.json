@@ -1,11 +1,15 @@
 {
   "source": {
     "delivery": "Game Art & Motion: last-stand-tower world2-beach",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "date": "2026-11-12",
-    "picks": "FINAL-PICKS.md + CHANGELOG-v0.1.1.md (independent checker picks: background a, hermit crab a, seagull a, Crabclaw b, Elite shell c)",
+    "picks": "FINAL-PICKS.md v0.1.2 + CHANGELOG-v0.1.2.md + _checker/INDEPENDENT-SCORES.md v0.1.2 re-check (independent checker picks: background a, hermit crab b, seagull a, Crabclaw b, Elite shell c; verdict PASS, confidence 0.80)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower via Grok Bot GenerateImage; no third-party assets.",
-    "originals": "RGBA masters total 6.8 MB, over the ~3 MB repo budget: not committed, hashes below (quantizedFrom / originalImage)."
+    "originals": "RGBA masters total 5.0 MB, over the ~3 MB repo budget: not committed, hashes below (quantizedFrom / originalImage)."
+  },
+  "integration": {
+    "release": "Beach v0.1.2",
+    "date": "2026-11-12"
   },
   "originalsCommitted": false,
   "files": {
@@ -200,10 +204,10 @@
       ]
     },
     "coconut/coconut_warning_decal.json": {
-      "sha256": "fbc7a37f90db8fe7573f4113a1aa8c4f078d02f64878be2dd6373a66297055d0",
-      "bytes": 4308,
+      "sha256": "3cff661e965d8b7d97821465945229c4575139b6653927b82b2d48201ae319c4",
+      "bytes": 4692,
       "source": "coconut/coconut_warning_decal.json",
-      "sourceSha256": "b7faaeaaf44978d264a9b06e910dbb7e6c251b7dddef71a4127f6a2ceaafd9a2",
+      "sourceSha256": "c7da20d994dd5b96b5ff0fc04e67cd7a6d9457d60b431e416169f05723acdb0a",
       "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
       "droppedReferences": {
         "meta.image (delivery)": "coconut_warning_decal.png",
@@ -211,35 +215,35 @@
       },
       "generatedFrom": [
         {
-          "rawKey": "warning_decal",
-          "raw": "_src/raw/warning_decal.jpg",
-          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "rawKey": "warning_decal_v012",
+          "raw": "_src/raw/warning_decal_v012.jpg",
+          "rawSha256": "322e39cda56fdf8087deebba15f41be03c398100429a3ae660b3bd14c8ae9116",
           "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:23:10"
+          "time": "2026-11-12T22:05:23"
         }
       ]
     },
     "coconut/coconut_warning_decal.q.png": {
-      "sha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
-      "bytes": 10244,
+      "sha256": "509328b46a05b862c3e338f33fc6ba4248fc8bc5bfc793382a522e24b49dba96",
+      "bytes": 28681,
       "source": "coconut/coconut_warning_decal.q.png",
-      "sourceSha256": "c2e63d8d97fc402b7d964ec2e8f555a8e68616c167bdc70686ada21189d42844",
+      "sourceSha256": "509328b46a05b862c3e338f33fc6ba4248fc8bc5bfc793382a522e24b49dba96",
       "edit": "none (byte-identical copy)",
       "quantizedFrom": {
         "name": "coconut_warning_decal.png",
         "source": "coconut/coconut_warning_decal.png",
-        "sha256": "bfb7c76cfbad2d0cdc3a0090061088ae81385c5217762068f0bdf14b0fe99681",
-        "bytes": 31459,
+        "sha256": "5780ba670966f219ca580176dd72a01ec9da8d67a0811de81d6d830ee4179ca4",
+        "bytes": 89284,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
       },
       "generatedFrom": [
         {
-          "rawKey": "warning_decal",
-          "raw": "_src/raw/warning_decal.jpg",
-          "rawSha256": "3083cfd84f590fd2f37b71387b16f166f36c6a4ba8b869f921bbeef20727aa41",
+          "rawKey": "warning_decal_v012",
+          "raw": "_src/raw/warning_decal_v012.jpg",
+          "rawSha256": "322e39cda56fdf8087deebba15f41be03c398100429a3ae660b3bd14c8ae9116",
           "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:23:10"
+          "time": "2026-11-12T22:05:23"
         }
       ]
     },
@@ -333,10 +337,10 @@
       ]
     },
     "crabclaw/crabclaw_b.json": {
-      "sha256": "1b0805b5fef44141d4144cac6e6e12347ce038df7a51a0c12b4e1c79f5c973a8",
-      "bytes": 15890,
+      "sha256": "c3057004db5b5d7baed687544a08a12ba8291aa7895ea5cad3a93486350c4597",
+      "bytes": 16012,
       "source": "crabclaw/recommended/crabclaw_b.json",
-      "sourceSha256": "f3daad620256848238c06a4bc11f145b009ef505cf3dff87623ab34ccabb979c",
+      "sourceSha256": "186ada022de84616a544ba72d622495230f0544feb1bd9942107fa06f01673ea",
       "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
       "droppedReferences": {
         "meta.image (delivery)": "crabclaw_b.png",
@@ -376,16 +380,16 @@
       ]
     },
     "crabclaw/crabclaw_b.q.png": {
-      "sha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
-      "bytes": 266030,
+      "sha256": "f552c96ecc405e8d5c6080b72c2e3a57ec95423e13569382d5e602ee1c15f5c9",
+      "bytes": 246474,
       "source": "crabclaw/recommended/crabclaw_b.q.png",
-      "sourceSha256": "3e8879e4fda4b1f116eebe81a91726601e8606a53e69225b32073683281b8338",
+      "sourceSha256": "f552c96ecc405e8d5c6080b72c2e3a57ec95423e13569382d5e602ee1c15f5c9",
       "edit": "none (byte-identical copy)",
       "quantizedFrom": {
         "name": "crabclaw_b.png",
         "source": "crabclaw/recommended/crabclaw_b.png",
-        "sha256": "c20892a3f7f95ada0b7e2ad14b261f1abe41acbe6676d031a254ad0ccbc06d71",
-        "bytes": 931679,
+        "sha256": "a3d7ced3dd3d1cb05c59b66eb911c3cced993cb19a4d184a4ebfc1ebb0cf039a",
+        "bytes": 859374,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
       },
@@ -421,10 +425,10 @@
       ]
     },
     "crabclaw/crabclaw_b_angry.json": {
-      "sha256": "6961cd029a84757f9f5b278746edc3cefccc52429fbf69b1a8785fc243416a73",
-      "bytes": 15868,
+      "sha256": "e9a632c2e7db63b05bcfcf55a82af8f4a944cb16b646f6f99b84d462ae6e8466",
+      "bytes": 16143,
       "source": "crabclaw/recommended/crabclaw_b_angry.json",
-      "sourceSha256": "c6dc1553b07e2c84cd7e86f4cce6ace761ab916382d93af03f4f569ac73def2f",
+      "sourceSha256": "5b5107fe19eca34cc68ad51800b3ad4789b2ce9f1c2eac41addb08a8f0869e66",
       "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
       "droppedReferences": {
         "meta.image (delivery)": "crabclaw_b_angry.png",
@@ -462,16 +466,16 @@
       ]
     },
     "crabclaw/crabclaw_b_angry.q.png": {
-      "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
-      "bytes": 290388,
+      "sha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
+      "bytes": 295514,
       "source": "crabclaw/recommended/crabclaw_b_angry.q.png",
-      "sourceSha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
+      "sourceSha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
       "edit": "none (byte-identical copy)",
       "quantizedFrom": {
         "name": "crabclaw_b_angry.png",
         "source": "crabclaw/recommended/crabclaw_b_angry.png",
-        "sha256": "4e98c2213f845af54786f23804b11328e5b6727b83659652d793ade2d68c218b",
-        "bytes": 1057466,
+        "sha256": "56a50e30c2c299da5fbdf1d72f68de2ba8d3096dce0b52c1d2970cc4d63559b1",
+        "bytes": 1084697,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
       },
@@ -506,105 +510,31 @@
         }
       ]
     },
-    "hermit_crab/hermit_crab_a.json": {
-      "sha256": "6d1a6603182c10abcc31f547a28a8a4d33868e6814bacbee84886dbe7a7f70ae",
-      "bytes": 18249,
-      "source": "hermit_crab/recommended/hermit_crab_a.json",
-      "sourceSha256": "0358fbaa4c31860a47a703263e8cde40e6d35952b74a415ebbcd715f9227a7d7",
+    "hermit_crab/hermit_crab_b.json": {
+      "sha256": "5a7d2819ff8e0fa0fb2e1df919c66708e69af44e3e19c1e89bbadaaf6ffcde55",
+      "bytes": 17409,
+      "source": "hermit_crab/recommended/hermit_crab_b.json",
+      "sourceSha256": "a8b32ebe3dc01d3f8468b64162430416c2d0f846b722d7ebc16342b9c8c0ed98",
       "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
       "droppedReferences": {
-        "meta.image (delivery)": "hermit_crab_a.png",
+        "meta.image (delivery)": "hermit_crab_b.png",
         ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
-      },
-      "generatedFrom": [
-        {
-          "rawKey": "crab_a_model_v011",
-          "raw": "_src/raw/crab_a_model_v011.jpg",
-          "rawSha256": "e824252abd33d8d9b1c3697cd93a58b8c46609a8b6b549ca7526c34aedb38666",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:48:43"
-        },
-        {
-          "rawKey": "crab_a_walk_v011",
-          "raw": "_src/raw/crab_a_walk_v011.jpg",
-          "rawSha256": "04ac31e6fa5162ad54695d1e794e348e7b2bc7036322ae9293e10ca0ad8f8900",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:03"
-        },
-        {
-          "rawKey": "crab_a_broken_v011",
-          "raw": "_src/raw/crab_a_broken_v011.jpg",
-          "rawSha256": "e6e0e61bcbec1550be7c4f6f1c9c3536a9e6035c0513fa7098031074799a3b1d",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:39"
-        },
-        {
-          "rawKey": "crab_a_crack_v011",
-          "raw": "_src/raw/crab_a_crack_v011.jpg",
-          "rawSha256": "9d00f1d1987ed2555bf46d7b52dbb163388567c3c3d888c7ea08e95a6f9582fc",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:51:09"
-        },
-        {
-          "rawKey": "crab_a_regrow_v011",
-          "raw": "_src/raw/crab_a_regrow_v011.jpg",
-          "rawSha256": "2c2d7ed0d5840ba48c18f4d67ec1e5719713ff4b042016a4b517d1d4eafcb569",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:03"
-        }
-      ]
+      }
     },
-    "hermit_crab/hermit_crab_a.q.png": {
-      "sha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
-      "bytes": 91854,
-      "source": "hermit_crab/recommended/hermit_crab_a.q.png",
-      "sourceSha256": "6339f1a628cca771f7a89c1bb54459ca1b8b259638ef7545b2287c4caceb36e4",
+    "hermit_crab/hermit_crab_b.q.png": {
+      "sha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
+      "bytes": 95379,
+      "source": "hermit_crab/recommended/hermit_crab_b.q.png",
+      "sourceSha256": "9fecb24c7275342df70bc0dfdee19d0aa149dbc0cbbc08fc0bc7d19a7bff629f",
       "edit": "none (byte-identical copy)",
       "quantizedFrom": {
-        "name": "hermit_crab_a.png",
-        "source": "hermit_crab/recommended/hermit_crab_a.png",
-        "sha256": "02ce87b7a2ad7264710486d669585da2bdeefe2bd294d56a7745cb81a4df49ef",
-        "bytes": 323685,
+        "name": "hermit_crab_b.png",
+        "source": "hermit_crab/recommended/hermit_crab_b.png",
+        "sha256": "3c301a906f28b53a6544b0359b26736d1d0ffbe8c65974f7e1e12ce2aeb5cd21",
+        "bytes": 331089,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
-      },
-      "generatedFrom": [
-        {
-          "rawKey": "crab_a_model_v011",
-          "raw": "_src/raw/crab_a_model_v011.jpg",
-          "rawSha256": "e824252abd33d8d9b1c3697cd93a58b8c46609a8b6b549ca7526c34aedb38666",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:48:43"
-        },
-        {
-          "rawKey": "crab_a_walk_v011",
-          "raw": "_src/raw/crab_a_walk_v011.jpg",
-          "rawSha256": "04ac31e6fa5162ad54695d1e794e348e7b2bc7036322ae9293e10ca0ad8f8900",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:03"
-        },
-        {
-          "rawKey": "crab_a_broken_v011",
-          "raw": "_src/raw/crab_a_broken_v011.jpg",
-          "rawSha256": "e6e0e61bcbec1550be7c4f6f1c9c3536a9e6035c0513fa7098031074799a3b1d",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:39"
-        },
-        {
-          "rawKey": "crab_a_crack_v011",
-          "raw": "_src/raw/crab_a_crack_v011.jpg",
-          "rawSha256": "9d00f1d1987ed2555bf46d7b52dbb163388567c3c3d888c7ea08e95a6f9582fc",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:51:09"
-        },
-        {
-          "rawKey": "crab_a_regrow_v011",
-          "raw": "_src/raw/crab_a_regrow_v011.jpg",
-          "rawSha256": "2c2d7ed0d5840ba48c18f4d67ec1e5719713ff4b042016a4b517d1d4eafcb569",
-          "tool": "Grok Bot GenerateImage (cursor namespace)",
-          "time": "2026-11-12T20:50:03"
-        }
-      ]
+      }
     },
     "background/beach_bg_a.json": {
       "sha256": "cc1f92f08288a932fc07ce45670c09e0f8667dbbdd469ef803ab0baf7c3b285b",
@@ -651,10 +581,10 @@
       ]
     },
     "background/beach_surf.json": {
-      "sha256": "75b3d536848cba0dad64129fe7df58ad37fe96a6220290e89b819581e03c1a4a",
-      "bytes": 5402,
+      "sha256": "25e80ed2bcd0f200618113f9b300409676453b43902a2be8fbe228e51d4c4161",
+      "bytes": 6549,
       "source": "background/recommended/beach_surf.json",
-      "sourceSha256": "cf40689a3b05b1a05a4b322760fce541d273f85c83c7bd218d62f242033742aa",
+      "sourceSha256": "80ca957b3ee794446d6e6999c1d7662ea48d4a0dd03e104d8b794e541ca84342",
       "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
       "droppedReferences": {
         "meta.image (delivery)": "beach_surf.png",
@@ -671,16 +601,16 @@
       ]
     },
     "background/beach_surf.q.png": {
-      "sha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
-      "bytes": 474158,
+      "sha256": "c197f4b5e435a097a9749d6195087c9dcb51446653936e11e0a3723ec00e7434",
+      "bytes": 475321,
       "source": "background/recommended/beach_surf.q.png",
-      "sourceSha256": "c129f597428279f42b0e24f00c4f9aeddee4a18e753d7868cbbcfdf7d46b7f9a",
+      "sourceSha256": "c197f4b5e435a097a9749d6195087c9dcb51446653936e11e0a3723ec00e7434",
       "edit": "none (byte-identical copy)",
       "quantizedFrom": {
         "name": "beach_surf.png",
         "source": "background/recommended/beach_surf.png",
-        "sha256": "25a183ab749cbf5ca4dbcedd6511e35a4d9652d13ce0bcc54655f50e7d4d7bc7",
-        "bytes": 1191684,
+        "sha256": "19489f8b406bb3dfcaaed37ac1d4267b00105fb9dcc9f02123320d0bd3c08cfc",
+        "bytes": 1191538,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
       },
@@ -703,7 +633,30 @@
       "droppedReferences": {
         "meta.image (delivery)": "elite_shell_c.png",
         ".meta.provenance.prompts": "see _src/prompts.json (keys = raw names)"
-      }
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "elite_c_on",
+          "raw": "_src/raw/elite_c_on.jpg",
+          "rawSha256": "e8fb424e58f9bcb00e43d287bfbc415db72a7cd9a8cf3972c079034afbe6d06c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:52:54"
+        },
+        {
+          "rawKey": "elite_c_crack",
+          "raw": "_src/raw/elite_c_crack.jpg",
+          "rawSha256": "f38c71f7998793fddff0dbfca370adcc7f7b79dfdb7eabd6937756cd83f0c54a",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:56:24"
+        },
+        {
+          "rawKey": "elite_c_regrow",
+          "raw": "_src/raw/elite_c_regrow.jpg",
+          "rawSha256": "a4ba84e523eebc0255362e23c1e124914b832e5bfa10ce2194d607313611debc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:57:21"
+        }
+      ]
     },
     "elite_shell/elite_shell_c.q.png": {
       "sha256": "cb272d849083182808903a07766ad77a266b56b2e467db42be7502c5226efa8a",
@@ -718,7 +671,30 @@
         "bytes": 479556,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
-      }
+      },
+      "generatedFrom": [
+        {
+          "rawKey": "elite_c_on",
+          "raw": "_src/raw/elite_c_on.jpg",
+          "rawSha256": "e8fb424e58f9bcb00e43d287bfbc415db72a7cd9a8cf3972c079034afbe6d06c",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:52:54"
+        },
+        {
+          "rawKey": "elite_c_crack",
+          "raw": "_src/raw/elite_c_crack.jpg",
+          "rawSha256": "f38c71f7998793fddff0dbfca370adcc7f7b79dfdb7eabd6937756cd83f0c54a",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:56:24"
+        },
+        {
+          "rawKey": "elite_c_regrow",
+          "raw": "_src/raw/elite_c_regrow.jpg",
+          "rawSha256": "a4ba84e523eebc0255362e23c1e124914b832e5bfa10ce2194d607313611debc",
+          "tool": "Grok Bot GenerateImage (cursor namespace)",
+          "time": "2026-11-12T20:57:21"
+        }
+      ]
     }
   }
 }

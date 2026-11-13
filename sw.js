@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v21"; // World 2 review fixes: local-only dev door + DevRunGuard, overlay-only locked cards, no code status rings
+const VERSION = "v22"; // Beach art v0.1.2: hermit_crab_b, ping-pong surf, wide coconut warning decal, Crabclaw walk 0,1,2,1
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -155,7 +155,7 @@ const PRECACHE = [
   "assets/sprites/looks/VenomDrips/VenomDrips_a.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.png",
-  // World 2 (Beach) art, Game Art & Motion v0.1.1 recommended picks (tools/world-test.js checks each exists).
+  // World 2 (Beach) art, Game Art & Motion v0.1.2 recommended picks (tools/world-test.js checks each exists).
   "assets/sprites/world2/background/beach_bg_a.json",
   "assets/sprites/world2/background/beach_bg_a.q.png",
   "assets/sprites/world2/background/beach_surf.json",
@@ -176,8 +176,8 @@ const PRECACHE = [
   "assets/sprites/world2/crabclaw/crabclaw_b_angry.q.png",
   "assets/sprites/world2/elite_shell/elite_shell_c.json",
   "assets/sprites/world2/elite_shell/elite_shell_c.q.png",
-  "assets/sprites/world2/hermit_crab/hermit_crab_a.json",
-  "assets/sprites/world2/hermit_crab/hermit_crab_a.q.png",
+  "assets/sprites/world2/hermit_crab/hermit_crab_b.json",
+  "assets/sprites/world2/hermit_crab/hermit_crab_b.q.png",
   "assets/sprites/world2/seagull/seagull_a.json",
   "assets/sprites/world2/seagull/seagull_a.q.png",
   "assets/sprites/world2/seagull/seagull_a_shadow.json",

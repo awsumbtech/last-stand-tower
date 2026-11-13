@@ -10,8 +10,9 @@ LST.CoconutRenderer = class CoconutRenderer {
   }
 
   drawGround(ctx, c) {
-    // The decal's ring (refBodyR = ring radius) is drawn at the real danger radius around the
-    // landing spot (tower radius + hitRadius), so the aimed nut's ring shows outside the tower.
+    // v0.1.2: refBodyR 75 is the INNER life-ring outer radius, not the whole 300 px frame.
+    // bodyR = dangerR makes that inner ring the true danger zone (tower radius + hitRadius).
+    // The outer hazard band reaches ~1.83x dangerR so it stays visible outside the tower.
     if (c.state === "flying") return this.warn.drawStrip(ctx, "warn", this.warn.frameFor("warn", c.progress), c.tx, c.ty, c.dangerR || c.hitRadius);
     const t = c.t - c.flight;
     return this.nut.drawStrip(ctx, "splat", this.nut.frameFor("splat", t / c.splatLife), c.tx, c.ty, c.radius * 1.35);

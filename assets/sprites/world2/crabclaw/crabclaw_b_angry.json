@@ -377,9 +377,9 @@
   },
   "meta": {
     "app": "game-art last-stand-tower world2-beach (GenerateImage + mechanical post-process)",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "image": "crabclaw_b_angry.q.png",
-    "format": "RGBA8888 (Pillow); an indexed copy made with pngquant sits beside it as <name>.q.png",
+    "format": "RGBA8888 (Pillow, indexed .q.png copy alongside (pngquant 3.0.3) on the box)",
     "size": {
       "w": 1542,
       "h": 1542
@@ -439,7 +439,7 @@
     },
     "notBakedIn": "no squash/stretch, hit flash, low-HP tint, rotation or ground shadow (the code draws those)",
     "license": "Original art generated for Brian Awsumb's Last Stand Tower with Grok Bot GenerateImage; no third-party packs. Style reference: Brian's own enemy sprites.",
-    "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
+    "sha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
     "entity": "crabclaw",
     "phase": 2,
     "layerOf": "crabclaw_b",
@@ -451,6 +451,7 @@
     "aliases": {
       "walk_angry": "walk (same frames; MANIFEST name)"
     },
+    "v012": "walk re-ordered to cells 0,1,2,1 (v0.1.1 cell 3 lifted the body and raised a claw: the 'hop' between frames 2 and 3); per-sheet scaleMul {'walk': 1.071, 'idle': 1.077, 'throw': 1.045, 'hurt': 1.03} so the hat width matches phase 1 (v0.1.1 angry hat was ~7% smaller)",
     "provenance": {
       "generator": "Grok Bot GenerateImage (cursor namespace)",
       "sources": {
@@ -463,7 +464,7 @@
             100
           ],
           "measuredSpan": 460.0,
-          "scale": 0.5217
+          "scale": 0.5588
         },
         "idle": {
           "raw": "boss_b_angry_idle",
@@ -474,7 +475,7 @@
             101
           ],
           "measuredSpan": 457.0,
-          "scale": 0.5252
+          "scale": 0.5656
         },
         "throw": {
           "raw": "boss_b_angry_throw",
@@ -485,7 +486,7 @@
             102
           ],
           "measuredSpan": 423.0,
-          "scale": 0.5674
+          "scale": 0.5929
         },
         "hurt": {
           "raw": "boss_b_hurt",
@@ -496,7 +497,7 @@
             100
           ],
           "measuredSpan": 548.0,
-          "scale": 0.438
+          "scale": 0.4511
         }
       },
       "postProcess": "_tools/keying.py + _tools/sheet.py (key, un-mix, cut grid cells, scale per source sheet, register on anchor, atlas)",
@@ -506,70 +507,70 @@
       "frames": {
         "walk[0]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 71,
-          "keyFringePx": 162,
+          "edgeMarginPx": 62,
+          "keyFringePx": 190,
           "greenRimPx": 0,
           "magentaRimPx": 0
         },
         "walk[1]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 70,
-          "keyFringePx": 125,
+          "edgeMarginPx": 61,
+          "keyFringePx": 146,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
             1,
-            -13
+            -14
           ]
         },
         "walk[2]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 72,
-          "keyFringePx": 141,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -1,
-            15
-          ]
-        },
-        "walk[3]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 42,
-          "keyFringePx": 143,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -26,
-            9
-          ]
-        },
-        "idle[0]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 70,
-          "keyFringePx": 191,
+          "edgeMarginPx": 64,
+          "keyFringePx": 166,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
             0,
-            0
+            16
+          ]
+        },
+        "walk[3]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 31,
+          "keyFringePx": 144,
+          "greenRimPx": 0,
+          "magentaRimPx": 0,
+          "xcorrShift": [
+            -28,
+            10
+          ]
+        },
+        "idle[0]": {
+          "clippedFraction": 0.0005,
+          "edgeMarginPx": 61,
+          "keyFringePx": 224,
+          "greenRimPx": 0,
+          "magentaRimPx": 0,
+          "xcorrShift": [
+            -1,
+            1
           ]
         },
         "idle[1]": {
           "clippedFraction": 0.0006,
-          "edgeMarginPx": 69,
+          "edgeMarginPx": 60,
           "keyFringePx": 182,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
-            1,
-            -12
+            0,
+            -11
           ]
         },
         "idle[2]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 68,
-          "keyFringePx": 169,
+          "clippedFraction": 0.0004,
+          "edgeMarginPx": 58,
+          "keyFringePx": 212,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
@@ -579,70 +580,70 @@
         },
         "idle[3]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 72,
-          "keyFringePx": 176,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            1,
-            -6
-          ]
-        },
-        "throw[0]": {
-          "clippedFraction": 0.0005,
-          "edgeMarginPx": 71,
-          "keyFringePx": 234,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            0,
-            3
-          ]
-        },
-        "throw[1]": {
-          "clippedFraction": 0.0006,
-          "edgeMarginPx": 36,
-          "keyFringePx": 239,
-          "greenRimPx": 0,
-          "magentaRimPx": 0,
-          "xcorrShift": [
-            -16,
-            1
-          ]
-        },
-        "throw[2]": {
-          "clippedFraction": 0.0007,
-          "edgeMarginPx": 50,
-          "keyFringePx": 219,
+          "edgeMarginPx": 63,
+          "keyFringePx": 203,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
             2,
-            5
+            -6
+          ]
+        },
+        "throw[0]": {
+          "clippedFraction": 0.0004,
+          "edgeMarginPx": 65,
+          "keyFringePx": 243,
+          "greenRimPx": 0,
+          "magentaRimPx": 0,
+          "xcorrShift": [
+            -1,
+            0
+          ]
+        },
+        "throw[1]": {
+          "clippedFraction": 0.0006,
+          "edgeMarginPx": 28,
+          "keyFringePx": 272,
+          "greenRimPx": 0,
+          "magentaRimPx": 0,
+          "xcorrShift": [
+            -18,
+            -1
+          ]
+        },
+        "throw[2]": {
+          "clippedFraction": 0.0007,
+          "edgeMarginPx": 42,
+          "keyFringePx": 239,
+          "greenRimPx": 0,
+          "magentaRimPx": 0,
+          "xcorrShift": [
+            0,
+            2
           ]
         },
         "throw[3]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 68,
-          "keyFringePx": 231,
+          "edgeMarginPx": 20,
+          "keyFringePx": 258,
           "greenRimPx": 0,
           "magentaRimPx": 0,
           "xcorrShift": [
-            4,
-            4
+            2,
+            2
           ]
         },
         "hurt[0]": {
           "clippedFraction": 0.0006,
-          "edgeMarginPx": 70,
-          "keyFringePx": 91,
+          "edgeMarginPx": 67,
+          "keyFringePx": 75,
           "greenRimPx": 0,
           "magentaRimPx": 0
         },
         "hurt[1]": {
           "clippedFraction": 0.0005,
-          "edgeMarginPx": 59,
-          "keyFringePx": 78,
+          "edgeMarginPx": 53,
+          "keyFringePx": 75,
           "greenRimPx": 0,
           "magentaRimPx": 0
         }
@@ -650,42 +651,42 @@
       "motion": {
         "walk": {
           "centroidShiftPx": [
-            0.6,
+            0.7,
             2.5,
-            19.5,
-            17.5
+            2.5,
+            0.7
           ],
           "IoU": [
             0.831,
-            0.822,
-            0.586,
-            0.614
+            0.819,
+            0.819,
+            0.831
           ]
         },
         "idle_angry": {
           "centroidShiftPx": [
             5.9,
-            7.7,
-            12.7,
-            0.6
+            9.8,
+            14.0,
+            1.3
           ],
           "IoU": [
-            0.805,
-            0.606,
-            0.634,
+            0.803,
+            0.601,
+            0.635,
             0.875
           ]
         },
         "throw_angry": {
           "centroidShiftPx": [
-            28.3,
-            22.1,
-            4.5
+            28.6,
+            21.8,
+            5.9
           ],
           "IoU": [
-            0.589,
-            0.631,
-            0.777
+            0.59,
+            0.636,
+            0.776
           ]
         },
         "hurt": {
@@ -699,19 +700,19 @@
       "tool": "pngquant 3.0.3 (pip pngquant-cli, in _tools/.venv)",
       "settings": "--quality=85-100 --speed=1 --floyd=0.5 --strip",
       "bytes": {
-        "rgba": 1057466,
-        "indexed": 290388
+        "rgba": 1084697,
+        "indexed": 295514
       },
-      "psnrDb": 46.6,
+      "psnrDb": 46.05,
       "metric": "PSNR / max error on premultiplied RGBA (colour under alpha 0 ignored)",
-      "maxChannelError": 58,
-      "sha256": "b94d1d5c6ae7bb877e8ccce7d497aceffcece5163e58c943f17f6c994ffbbe5b",
+      "maxChannelError": 75,
+      "sha256": "b527b1242dbcfa71348d3a72f9b23559b54b87e00dac2734629e2c41f836966f",
       "note": "same layout as the RGBA original; use either (the RGBA original stays the master)"
     },
     "originalImage": {
       "name": "crabclaw_b_angry.png",
-      "sha256": "4e98c2213f845af54786f23804b11328e5b6727b83659652d793ade2d68c218b",
-      "bytes": 1057466,
+      "sha256": "56a50e30c2c299da5fbdf1d72f68de2ba8d3096dce0b52c1d2970cc4d63559b1",
+      "bytes": 1084697,
       "inRepo": false,
       "note": "RGBA master from the delivery; the repo ships the pngquant copy above (see ../PROVENANCE.json)"
     }
