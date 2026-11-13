@@ -22,6 +22,7 @@ jobs:
         run: |
           node tools/world-test.js
           node tools/elements-test.js
+          node tools/flow-test.js
       - name: Backyard deterministic sim (committed sim-ab hashes)
         run: node tools/sim-check.js
       - name: Install browser test dependencies

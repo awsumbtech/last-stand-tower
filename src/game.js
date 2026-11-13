@@ -1,13 +1,15 @@
 // Core game state and rules.
-// States: "menu" | "playing" | "paused" | "celebrate" (wave-clear party) | "upgrade" | "gameover" (results screen)
-//         | "victory" (finale beaten: party) | "cleared" (World cleared! screen).
-// "workshop" is the between-runs card unlock screen.
+// The run flow is a GameStateMachine (src/core/GameStateMachine.js) of GameState objects, one per
+// file in src/core/states/: menu, playing, paused, celebrate (wave-clear party), upgrade (ShopState),
+// gotcha, gameover (results screen), workshop (card unlocks), victory (finale beaten), cleared.
+// game.state reads / sets the current state's id.
 // Sound and vibration hooks live here (not in World) so the art-style demo stays silent.
 
 LST.Game = class Game extends LST.World {
   constructor(renderer) {
     super(renderer);
     this.events = new LST.EventBus(); // game events; effects and other parts subscribe (src/core/EventBus.js)
+    this.flow = new LST.GameStateMachine(); // run-flow state objects (src/core/states/*.js)
     this.state = "menu";
     this.speed = 1; // 1x or 2x game speed
     this.useWorld(LST.WorldRegistry.selected()); // sets world, director (wave source) and bestWave
@@ -15,6 +17,9 @@ LST.Game = class Game extends LST.World {
     this.ui = new LST.UI(this);
     this.ui.show("start");
   }
+
+  get state() { return this.flow ? this.flow.id : undefined; }
+  set state(id) { this.flow.set(id); }
 
   reset() {
     this.resetWorld();
@@ -578,43 +583,7 @@ LST.Game = class Game extends LST.World {
       return;
     }
     this.updateEffects(dt);
-    if (this.state === "playing" || this.state === "celebrate" || this.state === "upgrade" || this.state === "victory") this.runTime += dt;
-    if (this.state === "gameover" && this.resultsDelay > 0) {
-      this.resultsDelay -= dt;
-      if (this.resultsDelay <= 0) this.showResults();
-    }
-
-    if (this.state === "victory") {
-      this.victoryTimer -= dt;
-      if (Math.random() < dt * 6) this.spawnConfetti(LST.utils.rand(-200, 200), LST.utils.rand(-200, 100), 30);
-      if (this.victoryTimer <= 0) { this.state = "cleared"; this.ui.show("cleared"); LST.audio.play("unlock"); }
-      return;
-    }
-    if (this.state === "celebrate") {
-      this.celebrateTimer -= dt;
-      if (this.celebrateTimer <= 0) this.finishCelebration();
-      return;
-    }
-    if (this.state !== "playing") return;
-
-    // Low-HP slow-down eases from 35% speed back to normal.
-    let scale = 1;
-    if (this.slowmo > 0) {
-      this.slowmo -= dt;
-      scale = 0.35 + 0.65 * (1 - Math.max(0, this.slowmo) / 0.9);
-    }
-    // At 2x speed we run two normal-sized steps instead of one big one,
-    // so fast projectiles never skip over enemies.
-    for (let i = 0; i < this.speed && this.state === "playing"; i++) this.step(dt * scale);
-
-    if (this.lowHpActive && this.state === "playing") {
-      this.heartbeat -= dt;
-      if (this.heartbeat <= 0) {
-        LST.audio.play("heartbeat");
-        this.heartbeat = 1.3;
-      }
-    }
-    this.ui.updateHud();
+    this.flow.update(this, dt); // run clock + the current state's update (src/core/states/*.js)
   }
 
   step(dt) {
