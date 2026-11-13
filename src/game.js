@@ -10,7 +10,7 @@ LST.Game = class Game extends LST.World {
     this.events = new LST.EventBus(); // game events; effects and other parts subscribe (src/core/EventBus.js)
     this.state = "menu";
     this.speed = 1; // 1x or 2x game speed
-    this.bestWave = LST.utils.storage.get("lst.bestWave", 0);
+    this.useWorld(LST.WorldRegistry.selected()); // sets world, director (wave source) and bestWave
     this.reset();
     this.ui = new LST.UI(this);
     this.ui.show("start");
@@ -60,6 +60,27 @@ LST.Game = class Game extends LST.World {
     if (this.events) this.events.emit(LST.EVENTS.RUN_START, { game: this });
   }
 
+  // ---------- Worlds (src/worlds) ----------
+  // The world a run happens in. Its director answers every "what is wave N?" question.
+  useWorld(world) {
+    this.world = world;
+    this.director = world.createDirector();
+    this.bestWave = world.loadBest();
+    world.preloadArt();
+  }
+
+  // Start screen pick. Returns false for a locked world.
+  selectWorld(id) {
+    if (this.state !== "menu" && this.state !== "workshop") return false;
+    const w = LST.WorldRegistry.select(id);
+    if (!w) return false;
+    if (w !== this.world) this.useWorld(w);
+    return true;
+  }
+
+  // Gears multiplier for this run's payout: Piggy Bank x the world's Gear multiplier.
+  runGearMult() { return this.gearMult * this.world.gearMult; }
+
   // ---------- Flow ----------
 
   newGame() {
@@ -68,7 +89,7 @@ LST.Game = class Game extends LST.World {
     LST.audio.startMusic();
     LST.meta.applyToRun(this);
     this.events.emit(LST.EVENTS.RUN_START, { game: this }); // again, now with Workshop upgrades applied
-    const skip = LST.meta.headStartWave(this.bestWave);
+    const skip = LST.meta.headStartWave(this.bestWave, this.world.id);
     if (skip > 0) this.beginHeadStart(skip);
     else this.startNextWave();
   }
@@ -77,18 +98,18 @@ LST.Game = class Game extends LST.World {
   // hand k pays wave k's coins (kills + clear bonus), deals a free pick, and sells
   // extras at wave-k prices, exactly like playing them. "Auto" finishes the draft for you.
   beginHeadStart(skip) {
-    const income = [];
+    const income = [], D = this.director;
     for (let w = 1; w <= skip; w++) {
-      const m = LST.waves.multipliers(w);
-      let coins = LST.waves.clearBonus(w);
-      for (const ty of LST.waves.build(w).queue) coins += Math.max(1, Math.round(LST.CONFIG.enemies[ty].coins * m.coins * this.coinMult));
-      if (LST.waves.isBossWave(w)) coins += Math.round(LST.CONFIG.bosses.killCoins * this.coinMult);
+      const m = D.multipliers(w);
+      let coins = D.clearBonus(w);
+      for (const ty of D.build(w).queue) coins += Math.max(1, Math.round(LST.CONFIG.enemies[ty].coins * m.coins * this.coinMult));
+      if (D.isBossWave(w)) coins += Math.round(LST.CONFIG.bosses.killCoins * this.coinMult);
       income.push(coins);
     }
     this.headStart = skip;
-    this.bossWavesCleared = Math.floor(skip / LST.CONFIG.waves.bossEvery);
-    for (let w = 1; w <= skip; w++) if (LST.waves.isBossWave(w)) this.bossKills += 1;
-    if (skip >= LST.CONFIG.finale.wave) this.endless = true;
+    this.bossWavesCleared = D.bossWavesIn(skip);
+    for (let w = 1; w <= skip; w++) if (D.isBossWave(w)) this.bossKills += 1;
+    if (skip >= D.finaleWave) this.endless = true;
     this.draft = { hand: 0, of: skip, income };
     this.state = "upgrade";
     this.advanceDraft();
@@ -134,16 +155,17 @@ LST.Game = class Game extends LST.World {
 
   startNextWave() {
     this.wave += 1;
-    const { queue, interval } = LST.waves.build(this.wave);
+    const { queue, interval } = this.director.build(this.wave);
     this.spawnQueue = queue;
     this.spawnInterval = interval;
     this.spawnTimer = 0.3; // short breather before the first spawn
-    this.waveMult = LST.waves.multipliers(this.wave);
+    this.waveMult = this.director.multipliers(this.wave);
     this.waveIntro = 1.6;
     this.projectiles = [];
+    this.hazards = [];
     this.state = "playing";
     this.ui.show(null);
-    if (LST.waves.isFinale(this.wave)) {
+    if (this.director.isFinale(this.wave)) {
       // Boss-only finale: the lawn goes quiet, then King Mole digs in.
       this.finale = { intro: LST.CONFIG.finale.introTime, mole: null, won: false };
       this.waveIntro = 0;
@@ -192,10 +214,10 @@ LST.Game = class Game extends LST.World {
 
   // Wave cleared: a short celebration, then the upgrade shop.
   endWave() {
-    const bonus = LST.waves.clearBonus(this.wave);
+    const bonus = this.director.clearBonus(this.wave);
     this.coins += bonus;
     this.coinsEarned += bonus;
-    if (LST.waves.isBossWave(this.wave)) this.bossWavesCleared += 1;
+    if (this.director.isBossWave(this.wave)) this.bossWavesCleared += 1;
     // Overclock overheats after 3 cleared waves.
     if (this.overclock && this.overclock.hot && --this.overclock.waves <= 0) {
       this.overclock.hot = false;
@@ -240,7 +262,7 @@ LST.Game = class Game extends LST.World {
 
   openShop() {
     const n = LST.CONFIG.shop.cards;
-    const bossWave = this.wave % LST.CONFIG.waves.bossEvery === 0;
+    const bossWave = this.director.rareShop(this.wave); // Rare+ slot after gates (and Beach supply waves)
     const cards = LST.shopRules.draw(this.upgradeLevels, n, [], bossWave, { wave: this.wave });
     LST.meta.seeCards(cards.filter((c) => !c.trap).map((c) => c.id));
     this.shop = {
@@ -426,7 +448,7 @@ LST.Game = class Game extends LST.World {
     // Traps still waiting for their reveal go straight into the Codex.
     for (const p of this.pendingGotchas) if (meta.discoverTrap(p.id)) this.newCodex.push(p.id);
     this.pendingGotchas = [];
-    const gears = meta.gearsFor(won ? this.wave + 1 : this.wave, this.bossWavesCleared, this.gearMult, 0, this.bossKills);
+    const gears = meta.gearsFor(won ? this.wave + 1 : this.wave, this.bossWavesCleared, this.runGearMult(), 0, this.bossKills);
     const gearsBefore = meta.state.gears;
     meta.recordRun(gears.total);
     this.result = {
@@ -435,6 +457,7 @@ LST.Game = class Game extends LST.World {
       gearsAfter: meta.state.gears, nextUnlock: nextBefore, newBest: this.newBest, firstRun: meta.state.runs === 1, headStart: this.headStart,
       gearMult: this.gearMult, newCodex: this.newCodex.slice(),
       won, bossKills: this.bossKills, worldBonus: this.worldBonus, endless: this.endless,
+      world: this.world.id, worldGearMult: this.world.gearMult,
     };
   }
 
@@ -494,6 +517,7 @@ LST.Game = class Game extends LST.World {
 
   resetProgress() {
     LST.meta.resetAll();
+    this.useWorld(LST.WorldRegistry.selected());
     this.bestWave = 0;
     this.toMenu();
   }
@@ -536,7 +560,7 @@ LST.Game = class Game extends LST.World {
     if (wave > this.bestWave) {
       this.bestWave = wave;
       this.newBest = true;
-      LST.utils.storage.set("lst.bestWave", wave);
+      this.world.saveBest(wave);
     }
   }
 
@@ -598,17 +622,17 @@ LST.Game = class Game extends LST.World {
     if (f && !f.mole && !f.won) {
       f.intro -= dt;
       if (f.intro <= 0) {
-        f.mole = new LST.KingMole(this.waveMult);
-        if (this.renderer.halfW > this.renderer.halfH * 1.15) { f.mole.x = -f.mole.y; f.mole.y = 0; } // landscape: from the side
+        // The world's finale boss (King Mole / Captain Crabclaw); f.mole is "the finale boss".
+        f.mole = this.world.createFinaleBoss(this.waveMult, this);
         this.enemies.push(f.mole);
-        this.onMoleRise(f.mole);
-        LST.audio.play("boss");
+        this.world.finaleArrived(this, f.mole);
       }
     }
     this.updateSpawning(dt);
     this.tower.update(dt, this);
     this.updateList(this.enemies, dt);
     this.updateList(this.projectiles, dt);
+    if (this.hazards.length) this.updateList(this.hazards, dt); // Captain Crabclaw's coconuts
     if (this.hasStatus) LST.StatusEffects.tickAll(this, dt); // burn / venom / freeze (elemental cards)
     this.checkLowHp();
 
@@ -676,7 +700,7 @@ LST.Game = class Game extends LST.World {
       this.texts.push(new LST.FloatText(e.x, e.y - e.radius * 2.2, `+${bonus} BOSS BONUS`, "#ffd93d", "bonus"));
     }
     this.events.emit(LST.EVENTS.KILL, { enemy: e });
-    if (e.type === "mole") { this.onFinaleWon(e); return; }
+    if (e.finaleBoss) { this.onFinaleWon(e); return; }
     if (e.type === "boss") {
       this.hitStop = 0.16;
       this.flash = 1;
@@ -740,13 +764,13 @@ LST.Game = class Game extends LST.World {
     for (const e of this.enemies) if (!e.dead && e !== m) { e.dead = true; super.onEnemyKilled(e); }
     this.spawnHitSparks(m.x, m.y, "#ffd23f", 50, 320);
     this.spawnConfetti(0, -40, 160);
-    const bonus = LST.waves.clearBonus(this.wave);
+    const bonus = this.director.clearBonus(this.wave);
     this.coins += bonus;
     this.coinsEarned += bonus;
     this.bossWavesCleared += 1;
     this.score += this.wave * 200;
     this.saveBest(this.wave);
-    this.worldBonus = LST.meta.clearWorld("backyard", this.runTime);
+    this.worldBonus = LST.meta.clearWorld(this.world.id, this.runTime, this.world.gearMult);
     this.state = "victory";
     this.victoryTimer = 3.4;
     this.ui.show(null);
@@ -773,6 +797,32 @@ LST.Game = class Game extends LST.World {
     this.finishRun({ won: true });
     this.resultsDelay = 0;
     this.openWorkshop("results");
+  }
+
+  // Scripted bosses (src/bosses/BossScript.js): phase change or frenzy banner.
+  onBossPhase(boss, banner) {
+    if (!banner) return;
+    this.phaseBanner = { text: banner.text, sub: banner.sub, t: 2.2, max: 2.2 };
+    this.flash = 0.7;
+    this.shake = 1;
+    LST.audio.play("phase");
+    LST.audio.setTension(boss.phase + 1);
+    LST.haptics.buzz([60, 40, 60, 40, 120]);
+  }
+
+  // Captain Crabclaw walks on after the Beach finale intro.
+  onCrabclawArrive() {
+    this.shake = Math.min(1, this.shake + 0.4);
+    LST.audio.play("boss");
+    LST.haptics.buzz([60, 40, 140]);
+  }
+
+  onCoconutThrow() { LST.audio.play("windup", { pitch: 1.3 }); }
+
+  // A coconut lands on the tower: same damage path as a boss slam (armor, Thorns, shake).
+  onCoconutHit(c) {
+    const boss = c.boss && !c.boss.dead ? c.boss : { dead: true };
+    this.onBossSlam(boss, c.damage);
   }
 
   onTowerHit(e) {

@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v19"; // Status looks are image art: flame / ice / goo / spark sheets (assets/sprites/looks)
+const VERSION = "v20"; // World 2 (Beach) systems: worlds, level plan, crab / gull / Crabclaw, world select
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -35,12 +35,38 @@ const PRECACHE = [
   "src/entities.js",
   "src/world.js",
   "src/waves.js",
+  "src/enemies/parts/EnemyPart.js",
+  "src/enemies/parts/ShellShield.js",
+  "src/enemies/parts/Flyer.js",
+  "src/enemies/PartEnemy.js",
+  "src/enemies/EnemyArchetype.js",
+  "src/enemies/EnemyRegistry.js",
+  "src/enemies/BeachEnemies.js",
+  "src/bosses/BossScript.js",
+  "src/bosses/Coconut.js",
+  "src/bosses/CaptainCrabclaw.js",
+  "src/worlds/LevelPlan.js",
+  "src/worlds/ClassicWaveDirector.js",
+  "src/worlds/LevelDirector.js",
+  "src/worlds/WorldDefinition.js",
+  "src/worlds/WorldRegistry.js",
+  "src/worlds/Backyard.js",
+  "src/worlds/Beach.js",
   "src/render.js",
   "src/sprites/SpriteAtlas.js",
   "src/sprites/SpriteLibrary.js",
   "src/sprites/AnimationPlayer.js",
   "src/sprites/SheetAnimation.js",
   "src/sprites/LookSheetLibrary.js",
+  "src/worlds/render/World2Sheets.js",
+  "src/worlds/render/SheetRenderer.js",
+  "src/worlds/render/HermitCrabRenderer.js",
+  "src/worlds/render/SeagullRenderer.js",
+  "src/worlds/render/CrabclawRenderer.js",
+  "src/worlds/render/EliteShellRenderer.js",
+  "src/worlds/render/CoconutRenderer.js",
+  "src/worlds/render/BeachBackdrop.js",
+  "src/worlds/render/WorldRenderers.js",
   "src/sprites/SpriteTinter.js",
   "src/sprites/EyeLayer.js",
   "src/sprites/EnemyAnimationRules.js",
@@ -80,6 +106,8 @@ const PRECACHE = [
   "src/fx/FxOverlay.js",
   "src/fx/FxDirector.js",
   "src/ui/CardFlip.js",
+  "src/ui/WorldSelect.js",
+  "src/ui/WorldScreens.js",
   "src/ui.js",
   "src/game.js",
   "src/demo.js",
@@ -125,6 +153,8 @@ const PRECACHE = [
   "assets/sprites/looks/VenomDrips/VenomDrips_a.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.png",
+  // World 2 (Beach) sheets are added here when Game Art & Motion's files land (phase 2):
+  // addAll() fails the whole install on a missing file, so nothing is listed before it exists.
 ];
 
 const NETWORK_TIMEOUT_MS = 4000;

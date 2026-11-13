@@ -51,6 +51,8 @@ LST.UI = class UI {
       next: $("btn-next"),
     };
 
+    // World cards on the start screen (src/ui/WorldSelect.js).
+    this.worldSelect = LST.WorldSelect ? new LST.WorldSelect(game, $("world-select"), { onChange: () => this.renderStart() }) : null;
     $("btn-start").addEventListener("click", () => game.newGame());
     $("btn-restart").addEventListener("click", () => game.newGame());
     $("btn-workshop").addEventListener("click", () => game.openWorkshop("start"));
@@ -101,7 +103,7 @@ LST.UI = class UI {
       this.renderWorkshop({ tab: true });
     }));
     this.el.headStart.addEventListener("click", () => {
-      LST.meta.cycleHeadStart(game.bestWave);
+      LST.meta.cycleHeadStart(game.bestWave, game.world.id);
       LST.UI.pop(this.el.headStart, "bump");
       this.renderStart();
     });
@@ -199,13 +201,14 @@ LST.UI = class UI {
 
   renderStart() {
     const m = LST.meta;
+    if (this.worldSelect) this.worldSelect.render();
     this.el.startBest.textContent = this.game.bestWave;
     this.el.startGears.textContent = LST.utils.formatNumber(m.state.gears);
     this.el.startBadge.classList.toggle("hidden", !m.anyAffordable());
     // Head Start chip: tap to cycle the start wave (0, 5, 10 ... up to the max allowed).
-    const max = m.headStartMax(this.game.bestWave);
+    const max = m.headStartMax(this.game.bestWave, this.game.world.id);
     this.el.headStart.classList.toggle("hidden", max <= 0);
-    const hs = m.headStartWave(this.game.bestWave);
+    const hs = m.headStartWave(this.game.bestWave, this.game.world.id);
     this.el.headStartLabel.innerHTML = hs > 0 ? `Head Start: <b>wave ${hs + 1}</b>` : "Head Start: <b>off</b>";
     this.el.headStart.classList.toggle("off", hs <= 0);
     // One-time hello for players from before Gears existed.
@@ -257,7 +260,8 @@ LST.UI = class UI {
   renderCleared() {
     const g = this.game, wb = g.worldBonus || { bonus: 0, first: false };
     const $ = (id) => document.getElementById(id);
-    const runGears = LST.meta.gearsFor(g.wave + 1, g.bossWavesCleared, g.gearMult, 0, g.bossKills).total;
+    const runGears = LST.meta.gearsFor(g.wave + 1, g.bossWavesCleared, g.runGearMult(), 0, g.bossKills).total;
+    if (LST.WorldScreens) LST.WorldScreens.cleared(g);
     const sec = Math.round(g.runTime);
     $("cl-time").textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
     $("cl-kills").textContent = g.kills;
@@ -307,6 +311,7 @@ LST.UI = class UI {
     const piggy = $("res-g-piggy");
     piggy.classList.toggle("hidden", !(r.gearMult > 1));
     piggy.querySelector("b").textContent = `x${(r.gearMult || 1).toFixed(1)}`;
+    if (LST.WorldScreens) LST.WorldScreens.results(r);
     const nc = $("res-codex");
     nc.classList.toggle("hidden", !r.newCodex.length);
     nc.innerHTML = r.newCodex.length ? `${EYE_SVG}<span>New in the Codex: <b>${r.newCodex.map((id) => LST.cardById(id).name).join(", ")}</b></span>` : "";
@@ -440,7 +445,7 @@ LST.UI = class UI {
       el.style.setProperty("--accent", u.color);
       let note = lvl ? u.desc(lvl) : "Not built yet";
       if (u.id === "headStart") {
-        const cap = m.headStartMax(best), want = lvl * cfg.headStart.per;
+        const cap = m.headStartMax(best, this.game.world.id), want = lvl * cfg.headStart.per;
         note = lvl ? (cap < want ? `Up to wave ${want + 1} (best ${best} allows ${cap + 1})` : u.desc(lvl)) : "Skip early waves (and replay their shops)";
       }
       const nextTxt = maxed ? "Maxed" : `Next: ${u.desc(lvl + 1).replace(/^Start up to /, "")}`;
@@ -566,10 +571,13 @@ LST.UI = class UI {
     this.el.bossBar.classList.toggle("hidden", !boss);
     if (boss) {
       const mole = boss.type === "mole";
-      this.el.bossBar.classList.toggle("finale", mole);
-      this.el.bossName.textContent = mole ? "KING MOLE" : boss.charging ? "BIG RED IS CHARGING!" : "BIG RED";
+      this.el.bossBar.classList.toggle("finale", mole || !!boss.finaleBoss);
+      // Scripted bosses (src/bosses) name themselves; King Mole and Big Red as before.
+      this.el.bossName.textContent = boss.hudName || (mole ? "KING MOLE" : boss.charging ? "BIG RED IS CHARGING!" : "BIG RED");
       this.el.bossFill.style.width = (Math.max(0, boss.hp / boss.maxHp) * 100).toFixed(1) + "%";
-      this.el.bossPhase.textContent = mole ? `Phase ${boss.phase + 1} / 3` : "";
+      this.el.bossPhase.textContent = boss.hudPhase || (mole ? `Phase ${boss.phase + 1} / 3` : "");
+      // Phase ticks: King Mole's 3 thirds by default; a scripted boss with one HP gate shows a single mid tick.
+      this.el.bossBar.classList.toggle("pips-half", !!(boss.cfg && boss.cfg.phaseAt && boss.cfg.phaseAt.length === 1));
       this.el.bossBar.classList.toggle("under", !!boss.untargetable);
     }
   }

@@ -58,6 +58,7 @@
       <img class="logo" src="icons/icon-192.png" alt="" width="104" height="104" />
       <h1 class="title"><span>LAST STAND</span><span class="yellow">TOWER</span></h1>
       <p>Your tower shoots by itself. Survive the waves, grab coins, and power up between rounds!</p>
+      <div id="world-select" class="world-select" role="group" aria-label="Pick a world"></div>
       <button id="btn-start" class="btn big">Play</button>
       <button id="btn-headstart" class="headstart-chip hidden" aria-label="Head Start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3"/><path class="fill" d="M5 4h12l-2.5 4L17 12H5"/></svg><span id="headstart-label">Start at wave 1</span><i>&#8635;</i></button>
       <button id="btn-workshop" class="btn secondary workshop-btn"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><span>Workshop</span><i class="badge hidden" id="start-badge">!</i></button>
@@ -131,8 +132,8 @@
   <div id="screen-cleared" class="screen hidden">
     <div class="panel cleared">
       <div class="trophy" id="cl-trophy"><svg viewBox="0 0 64 64" aria-hidden="true"><path class="cup" d="M18 8h28v14c0 9-6 16-14 16S18 31 18 22z"/><path class="handle" d="M18 13H9v5c0 6 4 10 10 10M46 13h9v5c0 6-4 10-10 10"/><path class="cup" d="M28 38h8v8h-8z"/><path class="base" d="M20 46h24v8H20z"/><path class="star" d="M32 14l2.4 5 5.4.6-4 3.7 1.1 5.3L32 26l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6z"/></svg></div>
-      <h2 class="title small green">Backyard cleared!</h2>
-      <p class="cl-sub">King Mole has been sent back underground.</p>
+      <h2 class="title small green" id="cl-title">Backyard cleared!</h2>
+      <p class="cl-sub" id="cl-sub">King Mole has been sent back underground.</p>
       <div class="res-stats">
         <div><small>Time</small><b id="cl-time">0:00</b></div>
         <div><small>Kills</small><b id="cl-kills">0</b></div>
@@ -143,7 +144,7 @@
         <div class="gears-row"><span>This run so far</span><b id="cl-run">+0</b></div>
         <div class="gears-row total"><span>Gears banked</span><b id="cl-total">0</b></div>
       </div>
-      <p class="cl-next">Next world: <b>the Beach</b> (coming soon). Keep going for more Gears!</p>
+      <p class="cl-next" id="cl-next">Next world: <b>the Beach</b> is open! Pick it on the start screen.</p>
       <div class="res-buttons">
         <button id="btn-retire" class="btn secondary">Return to Workshop</button>
         <button id="btn-endless" class="btn">Continue (Endless) &#9654;</button>
@@ -181,6 +182,7 @@
         <div class="gears-row"><span>Bosses beaten <small id="res-g-boss-n">x0</small></span><b id="res-g-bosses">+0</b></div>
         <div class="gears-row world hidden" id="res-g-world"><span>World cleared</span><b>+0</b></div>
         <div class="gears-row piggy hidden" id="res-g-piggy"><span>Piggy Bank</span><b>x1.4</b></div>
+        <div class="gears-row worldmult hidden" id="res-g-worldmult"><span>Beach Gears</span><b>x1.6</b></div>
         <div class="gears-total" id="res-gears-total"><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg><b id="res-gears">+0</b><span>Gears</span></div>
       </div>
       <div class="res-codex hidden" id="res-codex"></div>
@@ -235,12 +237,38 @@
   <script src="src/entities.js"></script>
   <script src="src/world.js"></script>
   <script src="src/waves.js"></script>
+  <script src="src/enemies/parts/EnemyPart.js"></script>
+  <script src="src/enemies/parts/ShellShield.js"></script>
+  <script src="src/enemies/parts/Flyer.js"></script>
+  <script src="src/enemies/PartEnemy.js"></script>
+  <script src="src/enemies/EnemyArchetype.js"></script>
+  <script src="src/enemies/EnemyRegistry.js"></script>
+  <script src="src/enemies/BeachEnemies.js"></script>
+  <script src="src/bosses/BossScript.js"></script>
+  <script src="src/bosses/Coconut.js"></script>
+  <script src="src/bosses/CaptainCrabclaw.js"></script>
+  <script src="src/worlds/LevelPlan.js"></script>
+  <script src="src/worlds/ClassicWaveDirector.js"></script>
+  <script src="src/worlds/LevelDirector.js"></script>
+  <script src="src/worlds/WorldDefinition.js"></script>
+  <script src="src/worlds/WorldRegistry.js"></script>
+  <script src="src/worlds/Backyard.js"></script>
+  <script src="src/worlds/Beach.js"></script>
   <script src="src/render.js"></script>
   <script src="src/sprites/SpriteAtlas.js"></script>
   <script src="src/sprites/SpriteLibrary.js"></script>
   <script src="src/sprites/AnimationPlayer.js"></script>
   <script src="src/sprites/SheetAnimation.js"></script>
   <script src="src/sprites/LookSheetLibrary.js"></script>
+  <script src="src/worlds/render/World2Sheets.js"></script>
+  <script src="src/worlds/render/SheetRenderer.js"></script>
+  <script src="src/worlds/render/HermitCrabRenderer.js"></script>
+  <script src="src/worlds/render/SeagullRenderer.js"></script>
+  <script src="src/worlds/render/CrabclawRenderer.js"></script>
+  <script src="src/worlds/render/EliteShellRenderer.js"></script>
+  <script src="src/worlds/render/CoconutRenderer.js"></script>
+  <script src="src/worlds/render/BeachBackdrop.js"></script>
+  <script src="src/worlds/render/WorldRenderers.js"></script>
   <script src="src/sprites/SpriteTinter.js"></script>
   <script src="src/sprites/EyeLayer.js"></script>
   <script src="src/sprites/EnemyAnimationRules.js"></script>
@@ -280,6 +308,8 @@
   <script src="src/elements/looks/SparkCrackle.js"></script>
   <script src="src/fx/FxDirector.js"></script>
   <script src="src/ui/CardFlip.js"></script>
+  <script src="src/ui/WorldSelect.js"></script>
+  <script src="src/ui/WorldScreens.js"></script>
   <script src="src/ui.js"></script>
   <script src="src/game.js"></script>
   <script src="src/main.js"></script>

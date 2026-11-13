@@ -12,6 +12,10 @@
 //   node tools/sim.js --unlocked starter      # card pool: all (default) | starter | multishot,crit,...
 //   node tools/sim.js --campaign [--hours 10] # meta model: real Gears, card unlocks, Workshop upgrades, Head Start
 //   node tools/sim.js --strategy-seed 7       # reseed the bots' own choices (runs are always fully seeded)
+//   node tools/sim.js --world beach --meta-file snap.json --runs 20   # World 2 runs from a saved meta state
+//   node tools/sim.js --beach-campaign --strategies skilled --seeds 1-3 --beach-runs 8 --snap-dir DIR
+//        # Backyard campaign until King Mole is first beaten (snapshot cached in DIR), then Beach runs
+//        # with the same Gear-spending policy. Reports waves, run minutes, Crabclaw fight and wins.
 //
 // Notes: the sim steps at a fixed 1/60 s, 1x speed, desktop view (1280x800),
 // and skips hit-stop / slow-mo (a few seconds per run at most).
@@ -21,7 +25,7 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
-const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "elements/StatusEffect.js", "elements/Element.js", "elements/PairBonus.js", "elements/ElementRegistry.js", "elements/Ember.js", "elements/Frostbite.js", "elements/ChainSpark.js", "elements/Venom.js", "elements/Shatter.js", "meta.js", "entities.js", "world.js", "waves.js", "game.js"];
+const FILES = ["config.js", "utils.js", "core/EventBus.js", "upgrades.js", "traps.js", "elements/StatusEffect.js", "elements/Element.js", "elements/PairBonus.js", "elements/ElementRegistry.js", "elements/Ember.js", "elements/Frostbite.js", "elements/ChainSpark.js", "elements/Venom.js", "elements/Shatter.js", "meta.js", "entities.js", "world.js", "waves.js", "enemies/parts/EnemyPart.js", "enemies/parts/ShellShield.js", "enemies/parts/Flyer.js", "enemies/PartEnemy.js", "enemies/EnemyArchetype.js", "enemies/EnemyRegistry.js", "enemies/BeachEnemies.js", "bosses/BossScript.js", "bosses/Coconut.js", "bosses/CaptainCrabclaw.js", "worlds/LevelPlan.js", "worlds/ClassicWaveDirector.js", "worlds/LevelDirector.js", "worlds/WorldDefinition.js", "worlds/WorldRegistry.js", "worlds/Backyard.js", "worlds/Beach.js", "game.js"];
 const SOURCES = FILES.map((f) => [f, fs.readFileSync(path.join(ROOT, "src", f), "utf8")]);
 
 // ---------- CLI ----------
@@ -67,7 +71,10 @@ const UNLOCKED = opt("unlocked", "all");
 // upgrade check unless --elements is passed, so default sims stay byte-identical to main.
 const ELEMENTS = !!opt("elements", false);
 const lockableIds = (LST) => LST.CARDS.filter((c) => c.unlockCost && (ELEMENTS || !c.element)).map((c) => c.id);
-const USE_ABILITY = !opt("no-ability", false); // bots fire the ability when something is close or a boss winds up
+const USE_ABILITY = !opt("no-ability", false);
+const WORLD = String(opt("world", "backyard")); // which world playRun plays (Beach: src/worlds/Beach.js)
+// After a non-Backyard finale win the bot retires (paid as wave + 1) unless --endless; Backyard keeps going.
+const ENDLESS = !!opt("endless", false); // bots fire the ability when something is close or a boss winds up
 
 function loadGame(seed, unlocked = UNLOCKED) {
   const rand = mulberry32(seed);
@@ -242,8 +249,9 @@ const STRATEGIES = {
 // ---------- One run ----------
 // `meta` (optional) is a saved meta state ({ unlocked, upgrades, benched, ... }) plus `best`;
 // the run then uses the game's own Workshop upgrades and Head Start (LST.meta / game.beginHeadStart).
-function playRun(strategyName, seed, meta, unlocked) {
+function playRun(strategyName, seed, meta, unlocked, worldId = WORLD) {
   const { LST, game } = loadGame(seed, meta ? meta.unlocked : unlocked);
+  if (worldId !== "backyard") game.useWorld(LST.WorldRegistry.get(worldId)); // a model: skips the unlock check
   const strategy = STRATEGIES[strategyName];
   const waves = [];
   let cur = null, bossKills = 0, bossWavesSurvived = 0, bossWavesKilled = 0, finaleWon = false;
@@ -268,9 +276,9 @@ function playRun(strategyName, seed, meta, unlocked) {
   let startWave = 0;
   if (meta) {
     Object.assign(LST.meta.state, JSON.parse(JSON.stringify(meta)));
-    game.bestWave = meta.best || 0;
+    game.bestWave = (worldId === "backyard" ? meta.best : (meta.bestBy || {})[worldId]) || 0;
     LST.meta.applyToRun(game);
-    startWave = LST.meta.headStartWave(game.bestWave);
+    startWave = LST.meta.headStartWave(game.bestWave, worldId);
     if (startWave > 0) {
       game.beginHeadStart(startWave);
       // The draft replays the skipped waves' shops (a few seconds each); the last hand is a normal shop.
@@ -307,6 +315,7 @@ function playRun(strategyName, seed, meta, unlocked) {
     if (game.state === "victory") {
       finaleWon = true;
       realSeconds += 7; // party + World cleared! screen
+      if (worldId !== "backyard" && !ENDLESS) { cur.died = false; waves.push(cur); game.wave += 1; break; } // retire: paid as wave + 1
       game.state = "cleared";
       game.continueEndless(); // straight into Endless (Gears are paid when the run ends)
       cur.died = false;
@@ -316,12 +325,12 @@ function playRun(strategyName, seed, meta, unlocked) {
       strategy(LST, game, runStats, cur);
       continue;
     }
-    if (LST.waves.isBossWave(game.wave) && game.state === "celebrate") { bossWavesSurvived++; cur.bossKilled = game.bossKills > killsBefore; if (cur.bossKilled) bossWavesKilled++; cur.bossFight = cur.seconds; }
+    if (game.director.isBossWave(game.wave) && game.state === "celebrate") { bossWavesSurvived++; cur.bossKilled = game.bossKills > killsBefore; if (cur.bossKilled) bossWavesKilled++; cur.bossFight = cur.seconds; }
     const died = game.state !== "celebrate";
     cur.died = died;
     if (!died) {
       // Clear bonus was added in endWave; count it as earned.
-      cur.coinsEarned += LST.waves.clearBonus(game.wave);
+      cur.coinsEarned += game.director.clearBonus(game.wave);
       game.finishCelebration();
       while (game.state === "gotcha") game.dismissGotcha();
       realSeconds += CELEBRATE_SECONDS + SHOP_SECONDS;
@@ -343,8 +352,8 @@ function playRun(strategyName, seed, meta, unlocked) {
     strategy: strategyName, seed, deathWave: game.wave, startWave, realMinutes: realSeconds / 60,
     bought: runStats.bought, picks: runStats.picks, extras: runStats.extras, rerolls: runStats.rerolls, repairs: runStats.repairs, bossKills, waves,
     finalDps: towerDps(game.tower),
-    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared, game.gearMult, 0, game.bossKills).total + (game.worldBonus ? game.worldBonus.bonus : 0),
-    bossWavesSurvived, bossWavesKilled, bossEscapes: game.bossEscapes, finaleWon, reachedFinale: game.wave >= LST.CONFIG.finale.wave,
+    gears: LST.meta.gearsFor(game.wave, game.bossWavesCleared, game.runGearMult(), 0, game.bossKills).total + (game.worldBonus ? game.worldBonus.bonus : 0),
+    bossWavesSurvived, bossWavesKilled, bossEscapes: game.bossEscapes, finaleWon, reachedFinale: game.wave >= game.director.finaleWave,
     traps: game.trapLog.map((t) => t.id),
   };
 }
@@ -357,25 +366,31 @@ function playRun(strategyName, seed, meta, unlocked) {
 //      (Head Start only when the cap lets them use the new level), saving the rest
 //      toward the next card. Once every card is unlocked, all Gears go to upgrades.
 // Head Start is always used at its max.
-function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5)) {
+// opts (World 2 sims): { world, meta, gears, minutes, maxRuns, stopAtFinale, seedBase } continue a saved
+// campaign in another world; with none of them it is exactly the Backyard campaign it always was.
+function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5), opts = {}) {
   const { LST } = loadGame(1);
   const cfg = LST.CONFIG.meta;
   const order = LST.meta.lockable().filter((c) => ELEMENTS || !c.element).map((c) => [c.id, c.unlockCost]);
   const cost = (id, n) => { const u = cfg.upgrades[id]; return n >= u.max ? Infinity : u.costs ? u.costs[n] : Math.round(u.base * Math.pow(u.growth, n)); };
-  const meta = { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0, codex: { seen: [], traps: [] } };
-  let gears = 0, minutes = 0;
-  const events = {}, runs = [];
-  for (let run = 1; minutes < hours * 60 && run <= 2000; run++) {
-    const r = playRun(strategy, seed * 10000 + run, meta);
+  const world = opts.world || "backyard";
+  const meta = opts.meta || { unlocked: [], upgrades: {}, benched: [], headStartPick: null, best: 0, codex: { seen: [], traps: [] } };
+  let gears = opts.gears || 0, minutes = opts.minutes || 0;
+  const events = {}, runs = [], maxRuns = opts.maxRuns || 2000, seedBase = opts.seedBase || seed * 10000;
+  for (let run = 1; minutes < hours * 60 && run <= maxRuns; run++) {
+    const r = playRun(strategy, seedBase + run, meta, undefined, world);
     minutes += r.realMinutes;
     gears += r.gears;
-    meta.best = Math.max(meta.best, r.deathWave);
+    if (world === "backyard") meta.best = Math.max(meta.best, r.deathWave);
+    else (meta.bestBy = meta.bestBy || {})[world] = Math.max((meta.bestBy || {})[world] || 0, r.deathWave);
+    if (world !== "backyard" && meta.worlds && meta.worlds[world]) meta.worlds[world].best = meta.bestBy[world];
     runs.push({ run, start: r.startWave, wave: r.deathWave, minutes: +r.realMinutes.toFixed(1), at: +(minutes / 60).toFixed(2), gears: r.gears,
       levels: Object.values(meta.upgrades).reduce((a, b) => a + b, 0), cards: meta.unlocked.length, finaleWon: r.finaleWon,
       bossKilled: r.bossWavesKilled, bossSurvived: r.bossWavesSurvived,
       bossWaves: r.waves.filter((w) => w.bossKilled !== undefined).map((w) => [w.wave, w.bossKilled ? 1 : 0, Math.round(w.seconds)]),
       finaleSec: (() => { const f = r.waves.find((w) => w.wave === LST.CONFIG.finale.wave); return f ? Math.round(f.seconds) : null; })(),
       bossEscapes: r.bossEscapes || 0 });
+    if (opts.trace) runs[runs.length - 1].trace = r.waves.map((w) => [w.wave, Math.round(w.seconds), w.died ? 1 : 0, +(w.hpStart / w.maxHp).toFixed(2)]);
     for (const m of [20, 30, 40, 50, 60, 80, 100]) if (!events["wave" + m] && r.deathWave >= m) events["wave" + m] = { run, minutes: Math.round(minutes) };
     if (r.finaleWon && !events.finale) events.finale = { run, minutes: Math.round(minutes) };
     if (r.reachedFinale && !events.reach20) events.reach20 = { run, minutes: Math.round(minutes) };
@@ -393,7 +408,8 @@ function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5
         if (c === Infinity) return false;
         if (id !== "headStart") return true;
         const next = ((meta.upgrades.headStart || 0) + 1) * cfg.upgrades.headStart.per;
-        return next <= Math.floor((meta.best * cfg.headStartCap) / cfg.upgrades.headStart.per) * cfg.upgrades.headStart.per;
+        const best = world === "backyard" ? meta.best : Math.max(meta.best, (meta.bestBy || {})[world] || 0);
+        return next <= Math.floor((best * cfg.headStartCap) / cfg.upgrades.headStart.per) * cfg.upgrades.headStart.per;
       }).sort((a, b) => a[1] - b[1]);
       // Head Start first whenever usable and affordable: it's what keeps runs short.
       const hs = opts.find(([id]) => id === "headStart");
@@ -402,8 +418,9 @@ function campaign(strategy, seed, hours = 10, statShare = +opt("stat-share", 0.5
       budget -= pick[1]; gears -= pick[1];
       meta.upgrades[pick[0]] = (meta.upgrades[pick[0]] || 0) + 1;
     }
+    if (opts.stopAtFinale && r.finaleWon) break;
   }
-  return { strategy, seed, events, runs, order, upgrades: meta.upgrades, best: meta.best };
+  return { strategy, seed, events, runs, order, upgrades: meta.upgrades, best: meta.best, meta, gears, minutes };
 }
 
 // ---------- Main ----------
@@ -451,6 +468,58 @@ if (require.main === module) {
     console.log(`Upgrade check: ${budget} Gears on one upgrade, skilled, all cards, ${runs} runs`);
     console.table(rows);
     fs.writeFileSync(outPath, JSON.stringify(rows, null, 1));
+  } else if (opt("beach-campaign", false)) {
+    // World 2: a Backyard campaign until King Mole's first clear (cached snapshot), then Beach runs.
+    const [s0, s1] = String(opt("seeds", "1-4")).split("-").map(Number);
+    const beachRuns = +opt("beach-runs", 8), hours = +opt("hours", 4);
+    const snapDir = opt("snap-dir", "/tmp/lst-world2-snaps");
+    fs.mkdirSync(snapDir, { recursive: true });
+    const out = { args: args.join(" "), overrides: OVERRIDES, campaigns: [] };
+    for (const strategy of String(opt("strategies", "skilled")).split(",")) {
+      for (let s = s0; s <= (s1 || s0); s++) {
+        const snapPath = path.join(snapDir, `snap-${strategy}-${s}-h${hours}.json`);
+        let snap;
+        if (fs.existsSync(snapPath)) snap = JSON.parse(fs.readFileSync(snapPath, "utf8"));
+        else {
+          const c = campaign(strategy, s, hours, undefined, { stopAtFinale: true });
+          const won = c.runs.find((r) => r.finaleWon);
+          snap = { strategy, seed: s, meta: c.meta, gears: c.gears, minutes: c.minutes, backyardRuns: c.runs.length, clearedOnRun: won ? won.run : null };
+          fs.writeFileSync(snapPath, JSON.stringify(snap));
+        }
+        if (!snap.clearedOnRun) { out.campaigns.push({ strategy, seed: s, clearedBackyard: false }); process.stderr.write("x"); continue; }
+        const meta = JSON.parse(JSON.stringify(snap.meta));
+        meta.worlds = meta.worlds || {};
+        meta.worlds.backyard = Object.assign({ cleared: true, clears: 1, bestTime: 0 }, meta.worlds.backyard, { cleared: true });
+        const c = campaign(strategy, s, 1e6, undefined, { world: "beach", meta, gears: snap.gears, minutes: snap.minutes, maxRuns: beachRuns, seedBase: s * 10000 + 5000, trace: true });
+        out.campaigns.push({ strategy, seed: s, clearedBackyard: true, backyardRuns: snap.backyardRuns, backyardHours: +(snap.minutes / 60).toFixed(2),
+          upgradesAtUnlock: snap.meta.upgrades, cardsAtUnlock: snap.meta.unlocked.length, beach: c.runs });
+        process.stderr.write(".");
+      }
+    }
+    // Summary over every Beach run
+    const all = out.campaigns.filter((c) => c.beach).flatMap((c) => c.beach.map((r) => ({ ...r, strategy: c.strategy })));
+    const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr.length ? arr[Math.min(arr.length - 1, Math.floor(p * arr.length))] : null; };
+    const summary = {};
+    for (const strategy of [...new Set(all.map((r) => r.strategy))]) {
+      const rs = all.filter((r) => r.strategy === strategy);
+      const fin = rs.filter((r) => r.finaleSec != null);
+      const dist = {};
+      for (const r of rs) { const k = r.finaleWon ? "won" : r.wave >= 20 ? "lost at 20" : `${Math.floor((r.wave - 1) / 5) * 5 + 1}-${Math.floor((r.wave - 1) / 5) * 5 + 5}`; dist[k] = (dist[k] || 0) + 1; }
+      const firstWin = out.campaigns.filter((c) => c.strategy === strategy && c.beach).map((c) => { const w = c.beach.find((r) => r.finaleWon); return w ? w.run : null; });
+      summary[strategy] = {
+        runs: rs.length, winRate: +(rs.filter((r) => r.finaleWon).length / Math.max(1, rs.length)).toFixed(2),
+        reach20: +(fin.length / Math.max(1, rs.length)).toFixed(2), deathWaveDist: dist,
+        wave: { p25: q(rs.map((r) => r.wave), 0.25), median: q(rs.map((r) => r.wave), 0.5), p75: q(rs.map((r) => r.wave), 0.75) },
+        minutes: { median: q(rs.map((r) => r.minutes), 0.5), p90: q(rs.map((r) => r.minutes), 0.9), max: Math.max(...rs.map((r) => r.minutes)) },
+        minutesReach20: { median: q(fin.map((r) => r.minutes), 0.5), p90: q(fin.map((r) => r.minutes), 0.9), max: fin.length ? Math.max(...fin.map((r) => r.minutes)) : null },
+        crabclawSec: { median: q(fin.map((r) => r.finaleSec), 0.5), p10: q(fin.map((r) => r.finaleSec), 0.1), p90: q(fin.map((r) => r.finaleSec), 0.9) },
+        gateKillRate: +(rs.reduce((a, r) => a + r.bossKilled, 0) / Math.max(1, rs.reduce((a, r) => a + r.bossSurvived, 0))).toFixed(2),
+        firstWinOnBeachRun: firstWin,
+      };
+    }
+    out.summary = summary;
+    console.log(JSON.stringify(summary, null, 1));
+    fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
   } else if (opt("campaign", false)) {
     const n = +opt("campaigns", 12), hours = +opt("hours", 10);
     const q = (arr, p) => { arr = arr.slice().sort((a, b) => a - b); return arr[Math.min(arr.length - 1, Math.floor(p * arr.length))]; };

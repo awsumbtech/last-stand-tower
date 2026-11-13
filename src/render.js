@@ -93,8 +93,13 @@ LST.Renderer = class Renderer {
     );
     ctx.scale(this.scale, this.scale);
 
-    theme.background(ctx, this, scene);
+    // World 2 art (src/worlds/render/WorldRenderers.js): a world with its own ground owns the
+    // background layer; enemies / coconuts with a world renderer are drawn by it, from images only.
+    const W = LST.WorldRenderers || null;
+    const backdrop = W ? W.background(scene.world) : null;
+    if (backdrop) backdrop.draw(ctx, this, scene); else theme.background(ctx, this, scene);
     theme.range(ctx, scene.tower, this);
+    if (W && scene.hazards && scene.hazards.length) W.groundHazards(ctx, scene.hazards, this);
     if (fx) fx.drawUnder(ctx, scene, this);
     if (scene.tower.overdrive > 0) {
       // Overdrive: a hot orange pulse around the tower
@@ -107,10 +112,14 @@ LST.Renderer = class Renderer {
     }
     for (const p of scene.particles) theme.particle(ctx, p, this);
     if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
-    for (const e of scene.enemies) if (!e.corpse) theme.enemy(ctx, e, this); // a Corpse now owns its look
+    for (const e of scene.enemies) {
+      if (e.corpse) continue; // a Corpse now owns its look
+      if (!(W && W.enemy(ctx, e, this, () => theme.enemy(ctx, e, this)))) theme.enemy(ctx, e, this);
+    }
     if (fx) fx.drawProjectiles(ctx, scene);
     for (const p of scene.projectiles) theme.projectile(ctx, p, this);
     theme.tower(ctx, scene.tower, this);
+    if (W && scene.hazards && scene.hazards.length) W.airHazards(ctx, scene.hazards, this);
     if (fx) fx.drawWorld(ctx, scene);
     if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
     if (scene.confetti) for (const c of scene.confetti) (theme.confetti || LST.draw.confetti)(ctx, c, this);
@@ -132,7 +141,7 @@ LST.Renderer = class Renderer {
     } else if (scene.state === "playing" || scene.state === "paused") {
       if (fin && !fin.mole && !fin.won && fin.intro < LST.CONFIG.finale.introTime - 0.4) {
         const t = Math.min(2.6, fin.intro);
-        if (theme.bossBanner) theme.bossBanner(ctx, t, this, { total: 2.6, title: "FINALE!", sub: "King Mole rises!", color: "#ffffff" });
+        if (theme.bossBanner) theme.bossBanner(ctx, t, this, { total: 2.6, title: "FINALE!", sub: (scene.world && scene.world.copy.finaleSub) || "King Mole rises!", color: "#ffffff" });
         else theme.banner(ctx, "FINALE", Math.min(1, t), this);
       } else if (scene.phaseBanner) {
         const p = scene.phaseBanner;
