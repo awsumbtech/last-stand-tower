@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v24"; // ChillFrost look for slowed enemies (frozen tint removed) + docs/OO-MIGRATION.md
+const VERSION = "v24"; // ChillFrost v0.1.0 look for slowed enemies (frozen tint removed); neon/pixel hidden (ThemeSelector); docs/OO-MIGRATION.md
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -72,8 +72,6 @@ const PRECACHE = [
   "src/sprites/EyeLayer.js",
   "src/sprites/EnemyAnimationRules.js",
   "src/sprites/EnemySpriteRenderer.js",
-  "src/themes/neon.js",
-  "src/themes/pixel.js",
   "src/themes/cartoon/palette.js",
   "src/themes/cartoon/primitives.js",
   "src/themes/cartoon/enemy-fx.js",
@@ -87,6 +85,7 @@ const PRECACHE = [
   "src/themes/cartoon/effects.js",
   "src/themes/cartoon/text.js",
   "src/themes/cartoon/index.js",
+  "src/themes/ThemeSelector.js",
   "src/fx/FxPresets.js",
   "src/fx/ParticlePool.js",
   "src/fx/Emitter.js",
@@ -156,6 +155,11 @@ const PRECACHE = [
   "assets/sprites/looks/VenomDrips/VenomDrips_a.q.png",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.json",
   "assets/sprites/looks/SparkCrackle/SparkCrackle_c.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_b.json",
+  "assets/sprites/looks/ChillFrost/ChillFrost_b.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_b_attach.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_b_still.q.png",
+  "assets/sprites/looks/ChillFrost/ChillFrost_b_fade.q.png",
   // World 2 (Beach) art, Game Art & Motion v0.1.2 recommended picks (tools/world-test.js checks each exists).
   "assets/sprites/world2/background/beach_bg_a.json",
   "assets/sprites/world2/background/beach_bg_a.q.png",

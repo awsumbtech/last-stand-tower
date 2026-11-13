@@ -88,8 +88,6 @@
   <script src="src/sprites/EyeLayer.js"></script>
   <script src="src/sprites/EnemyAnimationRules.js"></script>
   <script src="src/sprites/EnemySpriteRenderer.js"></script>
-  <script src="src/themes/neon.js"></script>
-  <script src="src/themes/pixel.js"></script>
   <script src="src/themes/cartoon/palette.js"></script>
   <script src="src/themes/cartoon/primitives.js"></script>
   <script src="src/themes/cartoon/enemy-fx.js"></script>
@@ -103,11 +101,12 @@
   <script src="src/themes/cartoon/effects.js"></script>
   <script src="src/themes/cartoon/text.js"></script>
   <script src="src/themes/cartoon/index.js"></script>
+  <script src="src/themes/ThemeSelector.js"></script>
   <script src="src/demo.js"></script>
   <script src="src/pwa.js"></script>
   <script>
     (function () {
-      const ORDER = ["neon", "pixel", "cartoon"];
+      const ORDER = LST.ThemeSelector.available(); // cartoon only while neon / pixel are hidden (pending Brian)
       const canvas = document.getElementById("demo");
       const renderer = new LST.Renderer(canvas, LST.themes.cartoon);
       renderer.resize();

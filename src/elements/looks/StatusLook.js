@@ -22,6 +22,12 @@ LST.StatusLook = class StatusLook {
     const p = this.pick(sheet.strips, reduced), strip = p && sheet.strips[p[0]];
     return !!strip && strip.draw(ctx, p[1], e.x, e.y, LST.StatusLook.bodyR(e));
   }
+  // The state just ended. Return true to stay on a little longer (a fade-out one-shot) and report
+  // done when it has played; false (default) means remove now. reduced: reduced-motion setting.
+  release(reduced) { return false; }
+  get releasing() { return false; }
+  // The state came back while releasing: carry on as if freshly attached.
+  revive() {}
   detach() { this.enemy = null; }
   // Body size used by the cartoon theme (enemies.js: R = radius * 1.35)
   static bodyR(e) { return e.radius * 1.35; }

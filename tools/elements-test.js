@@ -208,7 +208,7 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
 
   const L = new LST.LookLayer(bus), R = LST.LookRegistry;
   ok(R.get("burn") === LST.BurnFlames && R.get("frozen") === LST.IceCrust && R.get("venom") === LST.VenomDrips && R.get("spark") === LST.SparkCrackle, "looks: registry maps burn/frozen/venom/spark to their classes");
-  ok([LST.BurnFlames, LST.IceCrust, LST.VenomDrips, LST.SparkCrackle].every((C) => C.prototype instanceof LST.StatusLook && LST.LOOK_SHEETS[C.sheet]), "looks: each look is its own StatusLook subclass with its own sheet");
+  ok([LST.BurnFlames, LST.IceCrust, LST.VenomDrips, LST.SparkCrackle, LST.ChillFrost].every((C) => C.prototype instanceof LST.StatusLook && LST.LOOK_SHEETS[C.sheet]), "looks: each look is its own StatusLook subclass with its own sheet");
   const mk = (type, x, radius = 20) => ({ type, x, y: 0, radius, age: 1 });
   const a = mk("tank", 0), b = mk("basic", 100), scene = { enemies: [a, b], hasStatus: false };
   let t = 0; const frame = (dt = 0.1, reduced = false) => { t += dt; calls.draws = []; L.render(ctx, scene, t, reduced); return calls.draws.length; };
@@ -293,9 +293,39 @@ for (const [label, els, want] of [["Ember + Frostbite", { ember: 1, frostbite: 1
   LST.StatusEffects.add(s1, new LST.Frozen(1)); scene.hasStatus = true; frame(0);
   ok(L.looksOf(s1).has("frozen") && !L.looksOf(s1).has("chill") && calls.draws.length === 1 && calls.draws[0][0] !== undefined && !Object.values(cfImg).includes(calls.draws[0][0]), "chill: frozen -> IceCrust only, ChillFrost hidden");
   s1.status.frozen.time = 0; frame(); ok(L.looksOf(s1).has("chill") && !L.looksOf(s1).has("frozen"), "chill: back on after the thaw while still slowed");
-  s1.slowTimer = 0; frame(); ok(!L.looksOf(s1) && L.count === 0 && frame() === 0, "chill: removed the frame the slow ends");
+  { const F = LST.lookSheets.get("ChillFrost").strips.fade;
+    ok(F && F.count >= 1 && !F.loop, "chill: the sheet has a fade one-shot");
+    s1.slowTimer = 0; frame(0);
+    const cf = L.looksOf(s1) && L.looksOf(s1).get("chill");
+    ok(cf && cf.releasing && calls.draws.length === 1 && calls.draws[0][0] === cfImg.fade && calls.draws[0][1] === 0, "chill: slow ends -> the fade one-shot plays (frame 0)");
+    frame(F.duration * 0.6); ok(L.looksOf(s1) && calls.draws.length === 1 && calls.draws[0][0] === cfImg.fade && calls.draws[0][1] === F.index(F.duration * 0.6) * 288, "chill: fade steps at its fps");
+    frame(F.duration * 0.5); ok(!L.looksOf(s1) && L.count === 0 && frame() === 0, "chill: removed once the fade has played");
+    s1.slowTimer = 2; frame(0); s1.slowTimer = 0; frame(0.05); s1.slowTimer = 2; frame(0);
+    const back = L.looksOf(s1).get("chill"); ok(back && !back.releasing && back.pick(LST.lookSheets.get("ChillFrost").strips, false)[0] === "attach", "chill: slowed again during the fade -> back to attach + loop, no second look");
+    s1.slowTimer = 0; frame(0, true); ok(!L.looksOf(s1), "chill: reduced motion -> no fade, removed the frame the slow ends");
+    s1.slowTimer = 2; frame(0); LST.StatusEffects.add(s1, new LST.Frozen(1)); frame(0); ok(!L.looksOf(s1).has("chill") && L.looksOf(s1).has("frozen"), "chill: freezing skips the fade (IceCrust takes over at once)");
+    s1.status.frozen.time = 0; s1.slowTimer = 0; frame(); frame(1); }
+  { s1.slowTimer = 2; frame(0); s1.dead = true; s1.slowTimer = 0; frame(0); ok(!L.looksOf(s1), "chill: a dead enemy gets no fade"); s1.dead = false; }
   s2.slowTimer = 4; subs[LST.EVENTS.RUN_START]({}); ok(L.count === 0, "chill: run start clears ChillFrost too");
   ok(calls.paths === 0, "looks: no path or shape call reached the canvas in any frame");
+}
+// ---------- Themes: neon / pixel hidden behind ThemeSelector.ALT_THEMES (pending Brian), not deleted ----------
+{
+  const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), styles = fs.readFileSync(path.join(ROOT, "styles.html"), "utf8"), sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+  const main = fs.readFileSync(path.join(ROOT, "src/main.js"), "utf8");
+  ok(["neon", "pixel"].every((t) => fs.existsSync(path.join(ROOT, "src/themes", t + ".js"))), "themes: neon.js and pixel.js are kept in the repo");
+  ok(["neon", "pixel"].every((t) => !html.includes(`src/themes/${t}.js`) && !styles.includes(`src/themes/${t}.js`) && !sw.includes(`"src/themes/${t}.js"`)), "themes: neon / pixel are out of the build path (not loaded by index.html or styles.html, not precached)");
+  ok([html, styles].every((h) => h.includes('src="src/themes/ThemeSelector.js"')) && sw.includes('"src/themes/ThemeSelector.js"'), "themes: ThemeSelector is loaded and precached");
+  ok(/LST\.ThemeSelector\.pick\(/.test(main) && !/LST\.themes\[styleId\]/.test(main) && /LST\.ThemeSelector\.available\(\)/.test(styles) && !/"neon", "pixel"/.test(styles), "themes: main.js and the styles.html picker go through ThemeSelector");
+  const sb = { LST: { themes: { cartoon: { id: "cartoon" } } } }; vm.createContext(sb);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "src/themes/ThemeSelector.js"), "utf8"), sb);
+  const TS = sb.LST.ThemeSelector;
+  ok(TS.ALT_THEMES === false && TS.available().join() === "cartoon", "themes: flag off -> only cartoon on offer");
+  for (const id of ["neon", "pixel", "cartoon", null, "x"]) ok(TS.pick(id) === sb.LST.themes.cartoon, `themes: ?style=${id} plays cartoon`);
+  sb.LST.themes.neon = { id: "neon" }; sb.LST.themes.pixel = { id: "pixel" };
+  ok(TS.pick("neon") === sb.LST.themes.cartoon, "themes: even with neon loaded, the flag keeps it hidden");
+  class On extends TS { static get ALT_THEMES() { return true; } }
+  ok(On.available().join() === "cartoon,neon,pixel" && On.pick("pixel") === sb.LST.themes.pixel, "themes: flag on -> neon / pixel come back (code kept)");
 }
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);

@@ -167,10 +167,10 @@ def main():
         {"release": "Beach v0.1.3 (hermit crab walk pass)", "date": "2026-11-12", "metadataEdits": ["crabclaw/crabclaw_b_angry.json meta.qa.frames re-measured (PR #5 review P3-2)"]})
     build(LOOKS, a.looks, lambda rel: rel.split("/", 1)[0] + "/recommended/" + rel.split("/", 1)[1], normalize_look, {
         "delivery": "Game Art & Motion: last-stand-tower element-looks", "version": "0.1.1", "date": "2026-11-12",
-        "picks": "FINAL-PICKS.md v0.1.1 + CHANGELOG-v0.1.1.md + _checker/v011/INDEPENDENT-SCORES.md (independent checker, PASS, confidence 0.85): BurnFlames a (1-pixel fix at (188,102)), SparkCrackle c (bolts in the corners), IceCrust a (round crust, snap last frame == hold), VenomDrips c (shipped as VenomDrips_a.*: bigger drips, cup-shaped goo)",
+        "picks": "FINAL-PICKS.md v0.1.1 + CHANGELOG-v0.1.1.md + _checker/v011/INDEPENDENT-SCORES.md (independent checker, PASS, confidence 0.85): BurnFlames a (1-pixel fix at (188,102)), SparkCrackle c (bolts in the corners), IceCrust a (round crust, snap last frame == hold), VenomDrips c (shipped as VenomDrips_a.*: bigger drips, cup-shaped goo). ChillFrost v0.1.0 (2026-11-13): ChillFrost/recommended/NOTES.md + _checker/chillfrost_v010/INDEPENDENT-SCORES.md (blind checker, 18/25, confidence 0.6): ChillFrost b (bead ring + sparkle flecks; loop-strip stray plum blob removed by drop_strays before promote)",
         "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
         "originals": "the repo ships the delivered pngquant .q.png copies (same at real size: in-browser A/B at every enemy radius, p99 <= 7/255 for r <= 18, <= 13/255 at boss r 44); RGBA masters are not committed, hashes below (quantizedFrom / strips.*.originalImage). Raw generations stay in the delivery's _src/."},
-        None, {"release": "Element looks v0.1.1", "date": "2026-11-12"})
+        None, {"release": "Element looks v0.1.1 + ChillFrost v0.1.0", "date": "2026-11-13"})
 
 if __name__ == "__main__":
     main()

@@ -1,9 +1,9 @@
 // Entry point: create the game, run the loop, wire keyboard shortcuts.
 (function () {
   const canvas = document.getElementById("game");
-  // Art style: cartoon by default; ?style=neon or ?style=pixel for comparison.
+  // Art style: cartoon. ?style= only picks a theme the ThemeSelector offers (neon / pixel are hidden).
   const styleId = new URLSearchParams(location.search).get("style");
-  const renderer = new LST.Renderer(canvas, LST.themes[styleId] || LST.themes.cartoon);
+  const renderer = new LST.Renderer(canvas, LST.ThemeSelector.pick(styleId));
   renderer.resize();
   window.addEventListener("resize", () => renderer.resize());
 

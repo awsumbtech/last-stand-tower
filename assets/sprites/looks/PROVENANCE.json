@@ -3,13 +3,13 @@
     "delivery": "Game Art & Motion: last-stand-tower element-looks",
     "version": "0.1.1",
     "date": "2026-11-12",
-    "picks": "FINAL-PICKS.md v0.1.1 + CHANGELOG-v0.1.1.md + _checker/v011/INDEPENDENT-SCORES.md (independent checker, PASS, confidence 0.85): BurnFlames a (1-pixel fix at (188,102)), SparkCrackle c (bolts in the corners), IceCrust a (round crust, snap last frame == hold), VenomDrips c (shipped as VenomDrips_a.*: bigger drips, cup-shaped goo)",
+    "picks": "FINAL-PICKS.md v0.1.1 + CHANGELOG-v0.1.1.md + _checker/v011/INDEPENDENT-SCORES.md (independent checker, PASS, confidence 0.85): BurnFlames a (1-pixel fix at (188,102)), SparkCrackle c (bolts in the corners), IceCrust a (round crust, snap last frame == hold), VenomDrips c (shipped as VenomDrips_a.*: bigger drips, cup-shaped goo). ChillFrost v0.1.0 (2026-11-13): ChillFrost/recommended/NOTES.md + _checker/chillfrost_v010/INDEPENDENT-SCORES.md (blind checker, 18/25, confidence 0.6): ChillFrost b (bead ring + sparkle flecks; loop-strip stray plum blob removed by drop_strays before promote)",
     "license": "Original generated art made for Brian Awsumb's Last Stand Tower; no third-party packs or licensed sheets.",
     "originals": "the repo ships the delivered pngquant .q.png copies (same at real size: in-browser A/B at every enemy radius, p99 <= 7/255 for r <= 18, <= 13/255 at boss r 44); RGBA masters are not committed, hashes below (quantizedFrom / strips.*.originalImage). Raw generations stay in the delivery's _src/."
   },
   "integration": {
-    "release": "Element looks v0.1.1",
-    "date": "2026-11-12"
+    "release": "Element looks v0.1.1 + ChillFrost v0.1.0",
+    "date": "2026-11-13"
   },
   "originalsCommitted": false,
   "files": {
@@ -108,6 +108,81 @@
         "source": "SparkCrackle/recommended/SparkCrackle_c.png",
         "sha256": "abb09bdef20d7380fd45ddae76bb7c44583e972f637d723ec1841fe1d05e290f",
         "bytes": 179683,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_b.json": {
+      "sha256": "8b43762f37150d238807994552b428f8f394ae88571401708543ef869bd2fb22",
+      "bytes": 7307,
+      "source": "ChillFrost/recommended/ChillFrost_b.json",
+      "sourceSha256": "744d23d62e651356588969a2ecc90e20f4f02eff45148741a58dfdb1a8e8d650",
+      "edit": "reference fixes only (tools/art-provenance.py); frames / pivots / radii / timings as delivered",
+      "droppedReferences": {
+        "strips.attach.image (delivery)": "ChillFrost_b_attach.png",
+        "strips.still.image (delivery)": "ChillFrost_b_still.png",
+        "strips.loop.image (delivery)": "ChillFrost_b.png",
+        "strips.fade.image (delivery)": "ChillFrost_b_fade.png",
+        ".provenance.raw": "_src/raw/chillfrost/chillfrost_b.jpg",
+        ".provenance.styleReference": "IceCrust v0.1.1 pick raw _src/raw/v011/ice_v011_a.jpg (same ice ink/cyan/white family; ChillFrost is a rim, not a shell)"
+      }
+    },
+    "ChillFrost/ChillFrost_b.q.png": {
+      "sha256": "cb683646f58f1983054196e1a98fad5afb2213cef0cf10f073323064c3369d40",
+      "bytes": 55997,
+      "source": "ChillFrost/recommended/ChillFrost_b.q.png",
+      "sourceSha256": "cb683646f58f1983054196e1a98fad5afb2213cef0cf10f073323064c3369d40",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_b.png",
+        "source": "ChillFrost/recommended/ChillFrost_b.png",
+        "sha256": "7895a602c59f5aa85bc0e05e4efe924ac611877e6af79aeb177573a8ec7358ac",
+        "bytes": 184747,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_b_attach.q.png": {
+      "sha256": "9269d2178e60c071fb91f86a0b2a2d15ce48df56b2ab952bef0611bd1e78ecab",
+      "bytes": 14265,
+      "source": "ChillFrost/recommended/ChillFrost_b_attach.q.png",
+      "sourceSha256": "9269d2178e60c071fb91f86a0b2a2d15ce48df56b2ab952bef0611bd1e78ecab",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_b_attach.png",
+        "source": "ChillFrost/recommended/ChillFrost_b_attach.png",
+        "sha256": "a95430790adaa9ccdcbb3e2a8d2c89164266fafcdabe8197363539472d91e83f",
+        "bytes": 43311,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_b_fade.q.png": {
+      "sha256": "2d6529fef0afda66092dec969351312dbab3151c2f51800a98808c5ece364484",
+      "bytes": 16522,
+      "source": "ChillFrost/recommended/ChillFrost_b_fade.q.png",
+      "sourceSha256": "2d6529fef0afda66092dec969351312dbab3151c2f51800a98808c5ece364484",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_b_fade.png",
+        "source": "ChillFrost/recommended/ChillFrost_b_fade.png",
+        "sha256": "069773081cd07a415dd7d431ea82676b84f578eb46965035d5072338e56f0251",
+        "bytes": 50188,
+        "inRepo": false,
+        "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
+      }
+    },
+    "ChillFrost/ChillFrost_b_still.q.png": {
+      "sha256": "92ccb735103c049ac362b7dec2ac70072e0ce87fbae6ad4d41916377a599842f",
+      "bytes": 15237,
+      "source": "ChillFrost/recommended/ChillFrost_b_still.q.png",
+      "sourceSha256": "92ccb735103c049ac362b7dec2ac70072e0ce87fbae6ad4d41916377a599842f",
+      "edit": "none (byte-identical copy)",
+      "quantizedFrom": {
+        "name": "ChillFrost_b_still.png",
+        "source": "ChillFrost/recommended/ChillFrost_b_still.png",
+        "sha256": "d5309584626b982804f0b027340ec9d477d7064f438935c3f6b36ea4dd5ba4ee",
+        "bytes": 46787,
         "inRepo": false,
         "tool": "pngquant 3.0.3 --quality=85-100 --speed=1 --floyd=0.5 --strip"
       }

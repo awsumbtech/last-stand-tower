@@ -1,0 +1,77 @@
+{
+ "backyard-chill-f0": [
+  "basic=chill",
+  "boss=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "beach-chill-f0": [
+  "basic=chill",
+  "crab=chill",
+  "crab=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "backyard-chill-f1": [
+  "basic=chill",
+  "boss=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "beach-chill-f1": [
+  "basic=chill",
+  "crab=chill",
+  "crab=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "backyard-chill-f2": [
+  "basic=chill",
+  "boss=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "beach-chill-f2": [
+  "basic=chill",
+  "crab=chill",
+  "crab=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "backyard-chill-f3": [
+  "basic=chill",
+  "boss=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "beach-chill-f3": [
+  "basic=chill",
+  "crab=chill",
+  "crab=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "backyard-reduced": [
+  "basic=chill",
+  "boss=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ],
+ "beach-reduced": [
+  "basic=chill",
+  "crab=chill",
+  "crab=chill",
+  "fast=chill",
+  "tank=chill",
+  "tank=frozen"
+ ]
+}

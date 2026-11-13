@@ -14,13 +14,20 @@ Rules for every PR below:
 
 ## Decisions (Brian, 2026-11-13 12:08 AM ET)
 1. **Hit flash:** one shared `HitFlash` overlay image object (`src/elements/looks/HitFlash.js`), not per-sheet hurt frames. Replaces TINT.flash / TINT.bossFlash.
-2. **Neon and pixel themes:** **pending Brian.** Not deleted. PR 5 hides them: they come out of the theme picker and the `?style=` build path behind a flag (off by default); the code stays until Brian decides. Cartoon is the game, and features are frozen.
+2. **Neon and pixel themes:** **pending Brian.** Not deleted. Hidden behind a flag instead (done early, in PR #5): `LST.ThemeSelector.ALT_THEMES` (`src/themes/ThemeSelector.js`) is off, so `index.html` / `styles.html` no longer load `src/themes/neon.js` / `pixel.js`, `sw.js` does not precache them, `?style=` is ignored and the styles.html picker lists cartoon only. The code stays until Brian decides. Cartoon is the game, and features are frozen.
 3. **Bars** (enemy HP, boss HP, unlock, ability cooldown): an image frame plus an image fill, owned by a `Bar` object (`src/ui/Bar.js`). Done late in the UI art PR.
 4. **Range ring, screen flash and finale dim:** images, each owned by an object (`RangeRing`, `ScreenFlash`, `FinaleDim`).
 5. **Particles:** fixed colour variants baked into the art. Never tint.
 6. **Slow as a proper status (N11):** only if all 4 Backyard sim hashes stay identical. Otherwise `Enemy.slowTimer` stays the source and `ChillFrost` reads it.
 7. **Big Red:** add a `ChargeGlow` overlay object (`src/bosses/looks/ChargeGlow.js`). Replaces TINT.charge.
-8. **ChillFrost now, in PR #5:** the frozen/slow tint is removed in PR #5 and `ChillFrost` (`src/elements/looks/ChillFrost.js`) owns the slowed look. The art comes from Game Art into `/workspace/lst-art/element-looks/ChillFrost/`. PR #5 is pushed once it lands.
+8. **ChillFrost now, in PR #5:** the frozen/slow tint is removed in PR #5 and `ChillFrost` (`src/elements/looks/ChillFrost.js`) owns the slowed look. Art: Game Art & Motion ChillFrost v0.1.0, variant b (`assets/sprites/looks/ChillFrost/ChillFrost_b.*`, sha256 in `assets/sprites/looks/PROVENANCE.json`).
+
+### Landed in PR #5 (2026-11-13)
+- `ChillFrost`: StatusLook, active while `Enemy.slowTimer > 0` and not frozen. Plays `attach` (2f @12 fps, once), then `loop` (4f @8 fps); `still` for reduced motion; `fade` (2f @12 fps, once) when the slow wears off. No fade when the enemy freezes (IceCrust takes over at once), dies, or with reduced motion. Draws nothing until its sheet loads.
+- `StatusLook.release()/revive()` and `LookLayer` support a look that fades out after its state ends (generic; only ChillFrost uses it).
+- Deleted: `TINT.frozen`, the frozen branch of `spriteTint`, King Mole's frozen sprite tint and the vector `#bfefff` fills. `SpriteTinter` stays only for hit flash + Big Red charge (removed in PR 1 with HitFlash / ChargeGlow).
+- Scans (tools/elements-test.js): status-ring scan over `src/fx`, `src/themes`, `src/sprites`; canvas shape/tint scan over `src/sprites` (SpriteTinter excepted until PR 1); no slow/frozen tint anywhere in `src/themes` or `src/sprites`. (A full shape scan over `src/themes` would fail on the planned PR 1–5 items, so it lands with them.)
+- Neon / pixel hidden behind `ThemeSelector.ALT_THEMES` (Decision 2).
 
 ---
 
@@ -187,7 +194,7 @@ Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchange
    - Art: layered tower sheet with face states, projectile sheet ×5 variants, range ring.
 5. **PR 5: Backgrounds and map** (E1–E2).
    - Adds BackyardBackdrop.
-   - Hides the neon/pixel themes behind a flag (off), out of the theme picker and the `?style=` build path. The code stays until Brian decides (pending Brian). Removes the `themes/cartoon` leftovers and the `LST.draw` helpers.
+   - Neon/pixel are already hidden behind `ThemeSelector.ALT_THEMES` (PR #5); their code stays until Brian decides (pending Brian). Removes the `themes/cartoon` leftovers and the `LST.draw` helpers.
    - Art: backyard_bg_a.
 6. **PR 6: UI art** (F1–F4).
    - Adds IconAtlas/UiIcon and the CardFrame images.

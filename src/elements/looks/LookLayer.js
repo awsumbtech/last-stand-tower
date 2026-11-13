@@ -22,6 +22,7 @@ LST.LookLayer = class LookLayer {
     const dt = this.last === null ? 0 : Math.max(0, time - this.last); this.last = time;
     this.enemies = scene.enemies;
     if (!scene.hasStatus && !this.byEnemy.size && !scene.enemies.some((e) => e.slowTimer > 0)) return; // slow (ChillFrost) is not a StatusEffect
+    this.reduced = !!reduced;
     this.sync(scene.enemies, dt); this.draw(ctx, reduced);
   }
   get count() { let n = 0; for (const m of this.byEnemy.values()) n += m.size; return n; }
@@ -29,7 +30,7 @@ LST.LookLayer = class LookLayer {
   add(e, id) {
     const Cls = LST.LookRegistry.get(id); if (!Cls) return null;
     let m = this.byEnemy.get(e); if (!m) this.byEnemy.set(e, (m = new Map()));
-    const old = m.get(id); if (old) { old.t = 0; return old; } // re-trigger: restart, never stack
+    const old = m.get(id); if (old) { old.revive(); old.t = 0; return old; } // re-trigger (or back during a fade): restart, never stack
     const look = new Cls().attach(e); m.set(id, look); return look;
   }
   remove(e, id) {
@@ -48,7 +49,8 @@ LST.LookLayer = class LookLayer {
       if (!e.status && !(e.slowTimer > 0) && !this.byEnemy.has(e)) continue;
       for (const [id, Cls] of LST.LookRegistry.statusLooks()) {
         const on = !!Cls.isActive(e), m = this.byEnemy.get(e), has = !!(m && m.has(id));
-        if (on && !has) this.add(e, id); else if (!on && has) this.remove(e, id);
+        if (on && (!has || m.get(id).releasing)) this.add(e, id);
+        else if (!on && has && !m.get(id).releasing && !m.get(id).release(this.reduced)) this.remove(e, id); // a look may fade out (ChillFrost)
       }
     }
     for (const [e, m] of [...this.byEnemy]) {
