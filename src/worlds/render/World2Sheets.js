@@ -1,4 +1,4 @@
-// Immutable Game Art & Motion v0.1.2 recommended picks; AtlasSheetAdapter owns atlas/slot mapping.
+// Immutable Game Art & Motion v0.1.3 recommended picks; AtlasSheetAdapter owns atlas/slot mapping.
 // Each JSON and quantized PNG is copied byte-for-byte from Game Art & Motion.
 LST.WORLD2_SHEETS = {
   BeachGround: "assets/sprites/world2/background/beach_bg_a.json",
