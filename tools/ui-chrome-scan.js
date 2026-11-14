@@ -2,8 +2,8 @@
 // UiChromeScanner: lists every style.css rule that draws UI chrome in code (backgrounds,
 // borders, gradients, box-shadows, rounded corners, outlines, filters, text outlines), and
 // checks that docs/OO-MIGRATION.md section F lists each selector (in backticks): with an owner
-// object and an image plan (F6), as an allowed code-styled chip (F7), as a banned recolor (F8)
-// or as an open question (F9).
+// object and an image plan (F6), as an allowed code-styled control (F7 chips, F9 text outlines
+// and focus rings), or as a banned recolor (F8). It prints the count per category.
 //   node tools/ui-chrome-scan.js          check coverage (exit 1 on a missing selector)
 //   node tools/ui-chrome-scan.js --json   print the rules as JSON
 const fs = require("fs"), path = require("path");
@@ -50,22 +50,55 @@ class UiChromeScanner {
     return out;
   }
 
-  // Backticked names in docs/OO-MIGRATION.md section F.
-  listed() {
+  // Section F of docs/OO-MIGRATION.md split by subsection: { "F": text before F6, F6, F7, F8, F9 }.
+  sections() {
     const doc = fs.readFileSync(path.join(this.root, "docs/OO-MIGRATION.md"), "utf8");
     const start = doc.indexOf("### F. UI art"), end = doc.indexOf("\n---", start);
-    const section = start < 0 ? "" : doc.slice(start, end < 0 ? undefined : end);
-    return new Set([...section.matchAll(/`([^`]+)`/g)].map((m) => m[1]));
+    const f = start < 0 ? "" : doc.slice(start, end < 0 ? undefined : end);
+    const out = {}, parts = f.split(/^#### (F\d+)\./m);
+    out.F = parts[0];
+    for (let i = 1; i < parts.length; i += 2) out[parts[i]] = parts[i + 1];
+    return out;
+  }
+
+  // selector -> category. F6 (and F1-F5): image art; F7 chips and F9 text outlines / focus
+  // rings: allowed code-styled controls (Decisions 11 and 13); F8: banned recolor.
+  categories() {
+    const CAT = { F: "image-art", F6: "image-art", F7: "allowed-code", F8: "banned-recolor", F9: "allowed-code" };
+    const map = new Map();
+    for (const [sec, text] of Object.entries(this.sections())) {
+      for (const m of text.matchAll(/`([^`]+)`/g)) {
+        const set = map.get(m[1]) || new Set();
+        set.add(CAT[sec] || "image-art");
+        map.set(m[1], set);
+      }
+    }
+    return map;
   }
 
   run(argv) {
     const rules = this.rules();
     if (argv.includes("--json")) { console.log(JSON.stringify(rules, null, 1)); return 0; }
-    const listed = this.listed(), sels = [...new Set(rules.map((r) => r.sel))];
-    const missing = sels.filter((s) => !listed.has(s));
-    for (const s of missing) console.log("FAIL ui-chrome: style.css `" + s + "` (line " + rules.find((r) => r.sel === s).line + ") is not listed in docs/OO-MIGRATION.md section F");
-    console.log(missing.length ? `\n${missing.length} FAILED` : `ALL PASS (${rules.length} chrome rules, ${sels.length} selectors, all listed in section F)`);
-    return missing.length ? 1 : 0;
+    const cats = this.categories(), sels = [...new Set(rules.map((r) => r.sel))], fails = [];
+    const lineOf = (s) => rules.find((r) => r.sel === s).line;
+    const count = { "image-art": 0, "allowed-code": 0, "banned-recolor": 0 };
+    for (const sel of sels) {
+      const c = cats.get(sel);
+      if (!c) { fails.push("style.css `" + sel + "` (line " + lineOf(sel) + ") is not listed in docs/OO-MIGRATION.md section F"); continue; }
+      if (c.size > 1) { fails.push("style.css `" + sel + "` is in more than one category: " + [...c].join(", ")); continue; }
+      count[[...c][0]]++;
+    }
+    // Text outlines and focus rings (rules that only paint those) are allowed code (Decision 13).
+    for (const r of rules) {
+      const only = r.kinds.every((k) => k === "text-outline") || (/:focus-visible$/.test(r.sel) && r.kinds.every((k) => k === "outline" || k === "radius"));
+      const c = cats.get(r.sel);
+      if (only && c && !c.has("allowed-code")) fails.push("style.css `" + r.sel + "` (line " + r.line + ") is a text outline / focus ring but not an allowed code-styled control (F9)");
+    }
+    const f9 = this.sections().F9 || "";
+    if (!/allowed code-styled control/.test(f9)) fails.push("F9 does not mark text outlines / focus rings as allowed code-styled controls");
+    for (const f of fails) console.log("FAIL ui-chrome: " + f);
+    console.log(fails.length ? `\n${fails.length} FAILED` : `ALL PASS (${rules.length} chrome rules, ${sels.length} selectors: ${count["image-art"]} image art, ${count["allowed-code"]} allowed code-styled, ${count["banned-recolor"]} banned recolor)`);
+    return fails.length ? 1 : 0;
   }
 }
 

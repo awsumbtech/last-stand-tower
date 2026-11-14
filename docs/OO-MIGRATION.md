@@ -1,23 +1,23 @@
 # Last Stand Tower: object-oriented migration plan
 
 Status: living plan. Audited at `fc3f443`. **Main is `99ea184`** (PR #5 merged, Nov 13). PR 7 (game flow) is on `oo-7-game-flow` (GitHub PR #6).
-Brian's direction (relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**): "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
+Brian's direction (Nov 12, 11:56 PM ET, his words relayed by Chief of Staff): "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
 
-How Brian's words reached this doc is noted on every decision: **direct** (Brian to this bot), **relayed by Chief of Staff** (CoS passed on his words), or "channel not recorded" where the brief did not say.
+Every rule and decision says whose call it is and how it arrived: **Brian's words, relayed by Chief of Staff** (CoS passed on his words or his card answer), or **a design call** by Tower Defense Games Dev that Chief of Staff endorsed (not Brian's words).
 
 Rules for every PR below:
 - One visual or system per class per file.
 - No code-drawn art and no tints/recolors used as a look. Images are drawn with `drawImage`; moving, scaling, rotating or fading (opacity) a real image is fine. White flashes and recolors stay banned (Decision 10).
-- UI chrome counts as drawn art: buttons, cards, panels, bars and tiles need authored images (Decision 11). Only the small chips in F7 stay code-styled.
+- UI chrome counts as drawn art: buttons, cards, panels, bars and tiles need authored images (Decision 11). The small chips in F7 and text outlines / focus rings in F9 stay code-styled (Decisions 11 and 13).
 - The backyard sims must stay byte-identical: `9abf01291693`, `b9a690d334ab`, `339ce064390e`, `9e0a4dc20206`. Render-only PRs cannot touch sim state. Logic PRs must keep the RNG call order the same.
 - Each PR needs a PR Verifier PASS.
 - Merges: Brian's standing yes (Nov 13, 8:06 AM ET, relayed by Chief of Staff with his exact words): each refactor PR may be merged and deployed by its game bot once PR Verifier passes it. No force-push.
-- PR Verifier findings: fix every finding, P1 through P3, in one pass before re-review, with no partial pushes (Brian, Nov 13; relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**).
+- PR Verifier findings: fix every finding, P1 through P3, in one pass before re-review, with no partial pushes (Brian's yes, Nov 13, 8:43 AM ET, relayed by Chief of Staff).
 
 ---
 
-## Decisions (all Brian's; date and channel on each item)
-Decisions 1, 3–8: Brian, 2026-11-13 12:08 AM ET (relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**).
+## Decisions (whose call and how it arrived, on each item)
+Decisions 1 and 3–8 are **Tower Defense Games Dev's design calls, endorsed by Chief of Staff on Nov 13 at 12:08 AM ET** ("All other design calls stand"). They are not Brian's words. Decisions 2 and 9–13 are Brian's, labelled on each item.
 1. **Hit flash:** one shared `HitFlash` overlay image object (`src/elements/looks/HitFlash.js`), not per-sheet hurt frames. Replaces TINT.flash / TINT.bossFlash.
 2. **Neon and pixel themes (Brian, Nov 14, 2:59 PM ET, relayed by Chief of Staff): they stay hidden behind the flag, not deleted.** Done in PR #5: `LST.ThemeSelector.ALT_THEMES` (`src/themes/ThemeSelector.js`) is off, so `index.html` / `styles.html` do not load `src/themes/neon.js` / `pixel.js`, `sw.js` does not precache them, `?style=` is ignored and the styles.html picker lists cartoon only. The files stay in the repo. No PR deletes them. Cartoon is the game.
 3. **Bars** (enemy HP, boss HP, unlock, ability cooldown): an image frame plus an image fill, owned by a `Bar` object (`src/ui/Bar.js`). Done late in the UI art PR.
@@ -30,9 +30,11 @@ Decisions 1, 3–8: Brian, 2026-11-13 12:08 AM ET (relay channel not recorded in
 10. **Fades and flashes (Brian, Nov 14, 2:59 PM ET, relayed by Chief of Staff):** opacity fades of real art are allowed. White flashes and recolors stay banned. What this changes in the plan:
     - Look fades are fine as authored frames **or** as an opacity fade of the look's own image (ChillFrost `fade`, IceCrust/BurnFlames end-of-status fades, LowHpVignette pulse, FinaleDim, ScreenScrim).
     - **HitFlash stays its own art** (Decision 1): an authored overlay sheet drawn on top of the enemy and faded out with opacity. It is never a white-out or recolor of the enemy sprite (`TINT.flash` / `TINT.bossFlash` and `SpriteTinter` are still deleted in PR 1).
-    - **ScreenFlash (B20)** was planned as a radial white `flash_burst.png`. A full-screen white flash is a white flash, so it is **not** built as white. PR 2 either drops the screen flash or uses an authored, non-white burst image faded with opacity. That choice is **open for Brian**. Until then B20 is blocked. The existing code flash (`render.js:184-187`) stays as it is and is off in reduced motion.
+    - **ScreenFlash (B20)** was planned as a radial white `flash_burst.png`. White flashes are banned, so it is not white. **Decided (Decision 12):** a non-white burst image that fades.
     - CSS: `opacity` on real images is allowed. `filter: grayscale()/saturate()/hue-rotate()` and `--accent` recolors of icons are banned (F8, F1).
-11. **UI chrome is drawn art (Brian, Nov 13; relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**):** buttons, cards, panels, bars and tiles styled in code (CSS backgrounds, borders, gradients, box-shadows, rounded panels) need real image art, each owned by an object. See F6 for every item in `style.css` and the HTML, with its owner and image plan. Brian allowed code styling for sliders, text boxes and small chips (his Simple PDF ruling, as passed on in the same brief). Last Stand Tower has no sliders or text boxes; its small chips are listed separately in F7 as **allowed code-styled controls**. This replaces the old F5 call that "button box-shadows stay CSS".
+11. **UI chrome is drawn art (Brian, Nov 13, 8:16 AM ET, relayed by Chief of Staff; the sliders / text boxes / small chips ruling: Brian, Nov 13, 8:48 AM ET (Simple PDF), relayed by Chief of Staff):** buttons, cards, panels, bars and tiles styled in code (CSS backgrounds, borders, gradients, box-shadows, rounded panels) need real image art, each owned by an object. See F6 for every item in `style.css` and the HTML, with its owner and image plan. Brian allowed code styling for sliders, text boxes and small chips (his Simple PDF ruling, Nov 13, 8:48 AM ET, relayed by Chief of Staff). Last Stand Tower has no sliders or text boxes; its small chips are listed separately in F7 as **allowed code-styled controls**. This replaces the old F5 call that "button box-shadows stay CSS".
+12. **Big-hit screen flash (B20) (Brian, Nov 14, 3:28 PM ET, his card answer relayed by Chief of Staff):** "use a non-white burst image that fades." B20 is unblocked: `ScreenFlash` (`src/fx/ScreenFlash.js`) owns an authored non-white burst image and fades it out with opacity (Decision 10). See B20 and PR 2.
+13. **Text outlines and focus rings (F9) (Brian, Nov 14, 3:28 PM ET, his card answer relayed by Chief of Staff):** "Text outlines and focus rings can stay in code." F9 T1 (text-shadow / text-stroke on live text) and Q1 (`:focus-visible` outlines) are decided: they are **allowed code-styled controls**, like the F7 chips. `tools/ui-chrome-scan.js` counts them in the allowed category.
 
 ### Landed in PR 7 (GitHub PR #6, `oo-7-game-flow`): N1 (flow slice), N2, N15
 Owner objects, one class per file:
@@ -147,7 +149,7 @@ The image check:
 | B17 | `FxRenderer.js:182-216` drawPool motes | Particle motes for bossKill, finaleWon, tierUp, elem* presets (`FxPresets.js:78-107`) | `MoteParticle` | Mote sprite set (round, star, flake, ember, venom drop) |
 | B18 | `FxRenderer.js:217-260` drawStreaks | Speed streaks (`streakBurst`) | `StreakParticle` | Streak sprite, with an ink-outlined variant |
 | B19 | `FxRenderer.js:264-290` drawPulses (ImpactSync) | Impact ring pulses | `ImpactPulse` | Ring sheet, 6 frames (can share B4) |
-| B20 | **PR 2, blocked (Decision 10).** `FxRenderer.js:294+` drawFlashes; `render.js:184-187` scene.flash | Full-screen white flash | `ScreenFlash`, `src/fx/ScreenFlash.js` | Decision 4 said an image owned by `ScreenFlash`; Decision 10 bans white flashes, so it is not white. Either drop it or use an authored non-white burst faded with opacity (**open for Brian**) |
+| B20 | **PR 2, decided (Decision 12).** `FxRenderer.js:294+` drawFlashes; `render.js:184-187` scene.flash | Big-hit screen flash (today a code-drawn white fill) | `ScreenFlash`, `src/fx/ScreenFlash.js` | **Non-white burst image that fades:** authored `screen_burst.png` (warm, non-white radial burst, cover-fit), owned by `ScreenFlash`. Created on a big hit, drawn with `drawImage` and faded out with opacity only (no tint, no white). Removed when its alpha reaches 0. Off in reduced motion, like today. The `render.js:184-187` white fill and the `FxRenderer` flash fills are deleted in PR 2 |
 | B21 | **PR 2, decided (Decision 9).** `render.js:173-182` | Red radial vignette at low tower HP | `LowHpVignette`, `src/fx/LowHpVignette.js` | **Real vignette art:** `vignette_red.png` full-screen (cover-fit), pulsed with opacity. No code-drawn vignette |
 | B22 | **PR 2.** `render.js:134-146` | Finale intro: the lawn dims | `FinaleDim`, `src/fx/FinaleDim.js` | **Decided (Decision 4):** `vignette_dark.png` owned by `FinaleDim` |
 | B23 | `text.js:22-52` FloatText kinds `coin` (spinning ellipse) and `crit` (starburst) | Coin icon next to "+N"; star behind crit numbers | `CoinPopText`, `CritPopText` (FloatText subclasses) | Coin spin, 6 frames; crit starburst, 1–2 frames. The number text stays text |
@@ -247,15 +249,15 @@ Last Stand Tower has no sliders or text boxes. These are the small, non-button t
 | X3 | Benched deck icon: `filter: grayscale(1)` | `.deck-card.benched .icon` (737) | src/ui.js:484 | `IconAtlas` benched variant | authored greyed icon variant per card (F1 sheet), opacity allowed |
 | X4 | HUD heart: SVG `fill: var(--red)` + drop-shadow filter | `.heart` (190) | index.html:31 | `UiIcon("heart")` (F2) | heart icon image with its shadow baked in |
 
-#### F9. Open questions for Brian: text outlines and focus rings
-Decision 11 names buttons, cards and panels. It does not say whether outlines on live text or keyboard focus rings count as drawn art. Each row below is a question for Brian. The current CSS is only what exists today, not a decision.
+#### F9. Text outlines and focus rings: allowed code-styled controls (Decision 13, Brian, Nov 14, 3:28 PM ET, his card answer relayed by Chief of Staff)
+Brian: "Text outlines and focus rings can stay in code." These stay CSS as **allowed code-styled controls**. `tools/ui-chrome-scan.js` puts F7 and F9 in the allowed category.
 
-| # | Question for Brian | style.css rules (line) | What exists today | Options |
-|---|---|---|---|---|
-| T1 | Do outlines and shadows on live text (the title, HP number, epic ribbon text, cooldown seconds, boss name) count as drawn art? | `.title` (85); `#hud-hp-text` (221); `.card.epic .ribbon` (353); `.ability .ab-cd` (940); `.boss-bar .boss-top b` (969); `.boss-bar .boss-top span` (973) | CSS `text-shadow` / `-webkit-text-stroke` on real text | (a) count them as text styling and keep them; (b) bake the outline into an authored bitmap font or word images (`TitleArt`, `NumberFont`) |
-| Q1 | Do keyboard focus rings count as drawn art? | `.card:focus-visible` (1093); `.card button.tag:focus-visible` (1099); `.card button.flip-marker:focus-visible` (1145); `.card-back button.flip-back:focus-visible` (1162) | CSS `outline` on `:focus-visible` (accessibility, rule I7/A) | (a) keep them as an accessibility indicator; (b) authored focus-frame images per card size (`FocusFrame`) |
+| # | Item | style.css rules (line) | Status |
+|---|---|---|---|
+| T1 | Text outlines / text-shadow on live text (title, HP number, epic ribbon text, cooldown seconds, boss name) | `.title` (85); `#hud-hp-text` (221); `.card.epic .ribbon` (353); `.ability .ab-cd` (940); `.boss-bar .boss-top b` (969); `.boss-bar .boss-top span` (973) | allowed code-styled control (Decision 13) |
+| Q1 | Keyboard focus rings (`:focus-visible` outlines, accessibility rule I7/A) | `.card:focus-visible` (1093); `.card button.tag:focus-visible` (1099); `.card button.flip-marker:focus-visible` (1145); `.card-back button.flip-back:focus-visible` (1162) | allowed code-styled control (Decision 13) |
 
-**Visual totals:** A 7, B 24, C 4, D 3, E 2, F 5 icon groups (about 75 icons or decorations), plus F6 25 code-styled chrome items (25 owner objects / variants) and F8 4 banned CSS recolors. F7 15 chip groups stay code-styled (allowed). That is about 40 canvas visual objects plus the UI art.
+**Visual totals:** A 7, B 24, C 4, D 3, E 2, F 5 icon groups (about 75 icons or decorations), plus F6 25 code-styled chrome items (25 owner objects / variants) and F8 4 banned CSS recolors. F7 15 chip groups and F9 2 groups (text outlines, focus rings) stay code-styled (allowed). That is about 40 canvas visual objects plus the UI art.
 
 ---
 
@@ -288,7 +290,7 @@ Decision 11 names buttons, cards and panels. It does not say whether outlines on
 | N24 | `FxRenderer` one class draws every FX kind | God renderer | Per-effect classes (section B). FxRenderer becomes a thin batcher |
 | N25 | `pwa.js` | IIFE that builds an inline toast | `UpdateNotifier` using the `Toast` screen |
 | N26 | `index.html` script-order loading on the global `LST` | Implicit dependencies | Keep the globals for now (no bundler). Order is documented per module. **Judgment** |
-| N27 | **Tool objects landed in PR 7.** `tools/ui-chrome-scan.js`, `tools/flow-test.js`, `tools/flow-state-sweep.js` | Scanner / test logic used to be loose module code | `UiChromeScanner` (`tools/ui-chrome-scan.js:11-70`): scans CSS + doc coverage; `FlowTest` (`tools/flow-test.js:14-169`): game-flow tests + git oracle; `FlowStateSweep` (`tools/flow-state-sweep.js:12-95`): all compat reads/writes mapped with file:line. Each owns its root path, methods and run result, created once by the one-line CLI entry point and discarded on exit. They change no game state outside the test sandbox. No loose functions (only class methods and callbacks inside them). `world-test.js` / `sim.js` edits add no functions; their pre-existing helpers are unchanged |
+| N27 | **Tool objects landed in PR 7.** `tools/ui-chrome-scan.js`, `tools/flow-test.js`, `tools/flow-state-sweep.js` | Scanner / test logic used to be loose module code | `UiChromeScanner` (`tools/ui-chrome-scan.js:11-103`): scans CSS + doc coverage and categories (image art / allowed code-styled / banned recolor); `FlowTest` (`tools/flow-test.js:14-169`): game-flow tests + git oracle; `FlowStateSweep` (`tools/flow-state-sweep.js:12-95`): all compat reads/writes mapped with file:line. Each owns its root path, methods and run result, created once by the one-line CLI entry point and discarded on exit. They change no game state outside the test sandbox. No loose functions (only class methods and callbacks inside them). `world-test.js` / `sim.js` edits add no functions; their pre-existing helpers are unchanged |
 
 ---
 
@@ -302,7 +304,7 @@ Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchange
 2. **PR 2: FX and particles** (B1–B24).
    - Adds the burst subclasses, ConfettiPiece, Spark/Mote/Streak particles, GlowSprite, TowerAuraView, ProjectileTrail, ChainBoltFx/ArcFlash, ImpactPulse, ScreenFlash, LowHpVignette, FinaleDim, CoinPop/CritPop text, BossBanner.
    - FxRenderer becomes a batcher.
-   - Art: 8 burst one-shots, confetti sheet, spark/mote/streak sprites, glow PNGs, aura ×3 tiers, trail strips ×5, bolt and flash sheets, **red vignette (B21, decided: real art)**, coin spin, crit star, boss banner band. The screen flash (B20) waits for Brian (Decision 10). (Biggest art ask; it could split into 2a bursts/particles and 2b glows/trails/screen.)
+   - Art: 8 burst one-shots, confetti sheet, spark/mote/streak sprites, glow PNGs, aura ×3 tiers, trail strips ×5, bolt and flash sheets, **red vignette (B21, decided: real art)**, **non-white screen burst (B20, decided: `screen_burst.png` faded with opacity)**, coin spin, crit star, boss banner band. (Biggest art ask; it could split into 2a bursts/particles and 2b glows/trails/screen.)
 3. **PR 3: Enemies and bosses** (C1–C4, N9, N10 for enemies, N23).
    - Adds EnemyView subclasses, the BigRed and KingMole classes and EnemyHpBar.
    - Deletes vectorBody, drawMole and the primitives.
@@ -318,7 +320,7 @@ Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchange
    - Adds IconAtlas/UiIcon and the CardFrame images.
    - Adds the F6 chrome objects (`src/ui/chrome/`): `Pill`, `UiButton`, `RoundButton`, `SettingRow`, `ScreenScrim`, `Panel`, `LogoBadge`, `InfoBox`, `StatTile`, `GearsBox`, `NextUnlockRow`, `CardFrame` (shop / workshop / deck / gotcha), `StampBadge`, `TabBar`, `CodexTile`, `AbilityButton`, `AbilityChip`, `WorldCard`. Their CSS backgrounds, borders, gradients and box-shadows are deleted, and the images are drawn as 9-slice `border-image` / `background-image` of authored PNGs.
    - Replaces the F8 recolor filters with authored state images.
-   - Adds a scan: `tools/ui-chrome-scan.js` (already in CI from PR 7) is tightened so only F7 chips, F9 text styling / focus rings and image-backed rules remain.
+   - Adds a scan: `tools/ui-chrome-scan.js` (already in CI from PR 7) is tightened so only the allowed code-styled controls (F7 chips, F9 text outlines and focus rings) and image-backed rules remain.
    - Adds the `Bar` object (frame + fill images) for HP, boss HP, unlock and cooldown bars, late in this PR.
    - Art: 33 card icons, about 16 UI icons with toggle states, coin, card frame set, shimmer, sparkle, bar frames and fills, and the F6 frame sets (buttons, round buttons, pills, panels, rows, tiles, tabs, world cards).
 7. **PR 7: Game flow** (N1 flow slice, N2, N15). **Landed** (GitHub PR #6): GameState, GameStateMachine, the 10 state classes and InputController. Art: none.
@@ -347,7 +349,7 @@ None. The only TD code is clones of last-stand-tower:
 2. **Neon/pixel themes:** delete them, or commission two more full art sets? (Answered Nov 14: keep hidden, not deleted.)
 3. **HP bars** (enemy, boss DOM bar, unlock bar, ability cooldown): keep as plain bars, or use image frames?
 4. **Range ring:** image, or keep as a plain stroke because it is a UI indicator?
-5. **Full-screen fills** (white screen flash, finale dim): plain alpha fills, or images?
+5. **Full-screen fills** (white screen flash, finale dim): plain alpha fills, or images? (Answered: images, Decision 4; the screen flash is a non-white burst image that fades, Decision 12.)
 6. **Text:** floating numbers and the WAVE banner are text (kept). Their ink outline and pop are text styling. Coin and crit decorations become art.
 7. **CSS:** buttons' box-shadows and keyframes stay CSS. Card rarity gradients, stripes and shimmer become images (recommended).
 8. **Particle colors:** particles are colored by `e.color`. Image art needs either a fixed palette of variants or neutral white art. Neutral white with a tint would break the no-tint rule, so use palette variants.
