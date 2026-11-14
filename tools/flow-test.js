@@ -4,7 +4,7 @@
 //   2. game.state reads / sets the GameStateMachine; unknown ids throw.
 //   3. The run clock counts in exactly playing / celebrate / upgrade / victory.
 //   4. InputController does what the old main.js keydown chain did, for every state x key x
-//      resultsDelay x Workshop-open combination (the old chain is kept below as the reference).
+//      resultsDelay x Workshop-open combination (the reference is src/main.js@99ea184, loaded with git show).
 //   5. Hiding the tab pauses only while playing.
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const ROOT = path.join(__dirname, "..");
@@ -61,36 +61,40 @@ for (const id of IDS) {
 { game.state = "celebrate"; let fin = 0; const k = game.finishCelebration; game.finishCelebration = () => { fin++; }; game.celebrateTimer = 0.15; game.update(0.1); game.update(0.1); ok(fin === 1, "flow: celebrate calls finishCelebration when its timer ends"); game.finishCelebration = k; }
 { game.state = "victory"; game.victoryTimer = 0.05; game.update(0.1); ok(game.state === "cleared", "flow: victory moves to cleared when its timer ends"); }
 
-// 4. InputController == the old main.js keydown chain
-function oldChain(game, e, inWorkshop, settings) {
-  if (inWorkshop && (e.code === "Escape" || e.code === "KeyW")) {
-    game.closeWorkshop();
-  } else if (e.code === "Space" || e.code === "KeyP" || e.code === "Escape") {
-    e.preventDefault();
-    game.togglePause();
-  } else if (e.code === "KeyW" && (game.state === "menu" || (game.state === "gameover" && !game.resultsDelay))) {
-    game.openWorkshop(game.state === "gameover" ? "results" : "start");
-  } else if (e.code === "KeyF") {
-    game.toggleSpeed();
-  } else if (e.code === "KeyQ" || e.code === "KeyE") {
-    game.useAbility();
-  } else if (e.code === "Enter" && game.state === "cleared") {
-    game.continueEndless();
-  } else if (e.code === "Enter" && game.state === "gotcha") {
-    game.dismissGotcha();
-  } else if (e.code === "Enter") {
-    if (game.state === "menu" || game.state === "workshop" || (game.state === "gameover" && !game.resultsDelay)) game.newGame();
-    else if (game.state === "upgrade") game.leaveShop();
-  } else if (game.state === "upgrade" && /^(Digit|Numpad)[1-3]$/.test(e.code)) {
-    game.takeCard(+e.code.slice(-1) - 1);
-  } else if (game.state === "upgrade" && e.code === "KeyR") {
-    game.rerollShop();
-  } else if (game.state === "upgrade" && e.code === "KeyH") {
-    game.repairTower();
-  } else if (e.code === "KeyM") {
-    settings.toggle("music");
-  }
-}
+// 4. InputController == the old main.js keydown chain. The oracle is the real old code: the
+//    keydown + visibilitychange listeners of src/main.js at main 99ea184 (the last main before
+//    PR 7), loaded with `git show` and run against stub DOM / game objects. Nothing is copied.
+const ORACLE_REV = "99ea184";
+const ORACLE = (() => {
+  let src;
+  try { src = require("child_process").execFileSync("git", ["show", ORACLE_REV + ":src/main.js"], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); }
+  catch (err) { console.log(`FAIL oracle: git show ${ORACLE_REV}:src/main.js failed (needs full git history, e.g. actions/checkout fetch-depth: 0)`); process.exit(1); }
+  const cur = { g: null, ws: false, settings: null }, listeners = {}, docListeners = {};
+  const proxyGame = new Proxy({}, { get: (t, k) => cur.g[k], set: (t, k, v) => { cur.g[k] = v; return true; } });
+  const sb = {
+    URLSearchParams, location: { search: "" }, performance: { now: () => 0 }, requestAnimationFrame() {},
+    document: {
+      getElementById: (id) => (id === "screen-workshop" ? { classList: { contains: (c) => c === "hidden" && !cur.ws } } : {}),
+      addEventListener: (ev, fn) => { docListeners[ev] = fn; }, get hidden() { return cur.hidden; },
+    },
+    LST: {
+      ThemeSelector: { pick: () => ({}) }, CONFIG: { MAX_DT: 0.05 },
+      Renderer: class { resize() {} }, Game: function () { return proxyGame; },
+      audio: { startMusic() {}, unlock() {}, unlocked: true },
+      settings: { toggle: (k) => cur.settings.toggle(k) },
+    },
+  };
+  sb.window = { addEventListener: (ev, fn, capture) => { if (!capture) listeners[ev] = fn; }, removeEventListener() {} };
+  vm.createContext(sb);
+  vm.runInContext(src, sb, { filename: `main.js@${ORACLE_REV}` });
+  if (!listeners.keydown || !docListeners.visibilitychange) { console.log(`FAIL oracle: main.js@${ORACLE_REV} registered no keydown / visibilitychange listener`); process.exit(1); }
+  return {
+    keyDown(game, e, inWorkshop, settings) { cur.g = game; cur.ws = inWorkshop; cur.settings = settings; listeners.keydown(e); },
+    visibility(game, hidden) { cur.g = game; cur.hidden = hidden; docListeners.visibilitychange(); },
+  };
+})();
+function oldChain(game, e, inWorkshop, settings) { ORACLE.keyDown(game, e, inWorkshop, settings); }
+ok(true, `oracle: loaded the keydown + visibilitychange listeners from src/main.js@${ORACLE_REV} via git show`);
 const ACTIONS = ["closeWorkshop", "togglePause", "openWorkshop", "toggleSpeed", "useAbility", "continueEndless", "dismissGotcha", "newGame", "leaveShop", "takeCard", "rerollShop", "repairTower"];
 const KEYS = ["Escape", "KeyW", "Space", "KeyP", "KeyF", "KeyQ", "KeyE", "Enter", "Digit1", "Digit2", "Digit3", "Digit4", "Numpad1", "Numpad3", "KeyR", "KeyH", "KeyM", "KeyA", "ArrowUp"];
 function spyGame(id, resultsDelay) {
@@ -114,6 +118,7 @@ ok(same === combos, `input: InputController matches the old keydown chain in all
 
 // 5. hidden tab
 for (const id of IDS) { const { g, log } = spyGame(id, 0); new LST.InputController(g, {}).visibilityChanged(true); ok((log.join() === "togglePause()") === (id === "playing"), `input: hiding the tab ${id === "playing" ? "pauses" : "does nothing"} in ${id}`); }
+for (const id of IDS) for (const hidden of [true, false]) { const A = spyGame(id, 0), B = spyGame(id, 0); ORACLE.visibility(A.g, hidden); new LST.InputController(B.g, {}).visibilityChanged(hidden); ok(A.log.join() === B.log.join(), `input: tab ${hidden ? "hidden" : "shown"} in ${id} matches main.js@${ORACLE_REV}`); }
 { const { g, log } = spyGame("playing", 0); new LST.InputController(g, {}).visibilityChanged(false); ok(!log.length, "input: showing the tab again does nothing"); }
 
 console.log(fails ? `\n${fails} FAILED (${passes} passed)` : `\nALL PASS (${passes} passed)`);
