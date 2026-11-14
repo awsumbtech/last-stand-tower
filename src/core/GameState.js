@@ -1,6 +1,6 @@
 // GameState: base class for one state of a run's flow (menu, playing, shop, ...). The
 // GameStateMachine holds one instance per id and calls update() once per frame.
-//   id            the state's name; game.state reads it (UI, render and tests compare it)
+//   id            the state's name; game.flow.is(id) / game.flow.set(id) use it
 //   runClock      true while the run timer (game.runTime) counts
 //   pausesWhenHidden  true when hiding the tab should pause (InputController)
 //   update(game, dt)  this state's per-frame work (after hit-stop and effects)

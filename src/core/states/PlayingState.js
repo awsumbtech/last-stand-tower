@@ -10,9 +10,9 @@ LST.PlayingState = LST.GameStateMachine.register(class PlayingState extends LST.
       game.slowmo -= dt;
       scale = 0.35 + 0.65 * (1 - Math.max(0, game.slowmo) / 0.9);
     }
-    for (let i = 0; i < game.speed && game.state === "playing"; i++) game.step(dt * scale);
+    for (let i = 0; i < game.speed && game.flow.is("playing"); i++) game.step(dt * scale);
 
-    if (game.lowHpActive && game.state === "playing") {
+    if (game.lowHpActive && game.flow.is("playing")) {
       game.heartbeat -= dt;
       if (game.heartbeat <= 0) {
         LST.audio.play("heartbeat");

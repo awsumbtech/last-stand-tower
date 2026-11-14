@@ -1,7 +1,9 @@
 # Last Stand Tower: object-oriented migration plan
 
 Status: living plan. Audited at `fc3f443`. **Main is `99ea184`** (PR #5 merged, Nov 13). PR 7 (game flow) is on `oo-7-game-flow` (GitHub PR #6).
-Brian's direction: "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
+Brian's direction (relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**): "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
+
+How Brian's words reached this doc is noted on every decision: **direct** (Brian to this bot), **relayed by Chief of Staff** (CoS passed on his words), or "channel not recorded" where the brief did not say.
 
 Rules for every PR below:
 - One visual or system per class per file.
@@ -9,27 +11,28 @@ Rules for every PR below:
 - UI chrome counts as drawn art: buttons, cards, panels, bars and tiles need authored images (Decision 11). Only the small chips in F7 stay code-styled.
 - The backyard sims must stay byte-identical: `9abf01291693`, `b9a690d334ab`, `339ce064390e`, `9e0a4dc20206`. Render-only PRs cannot touch sim state. Logic PRs must keep the RNG call order the same.
 - Each PR needs a PR Verifier PASS.
-- Merges: Brian's standing yes (Nov 13, 8:06 AM ET): each refactor PR may be merged and deployed by its game bot once PR Verifier passes it. No force-push.
-- PR Verifier findings: fix every finding, P1 through P3, in one pass before re-review, with no partial pushes (Brian, Nov 13).
+- Merges: Brian's standing yes (Nov 13, 8:06 AM ET, relayed by Chief of Staff with his exact words): each refactor PR may be merged and deployed by its game bot once PR Verifier passes it. No force-push.
+- PR Verifier findings: fix every finding, P1 through P3, in one pass before re-review, with no partial pushes (Brian, Nov 13; relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**).
 
 ---
 
-## Decisions (all Brian's: 1–8 on 2026-11-13 12:08 AM ET; 9–11 dated on each item)
+## Decisions (all Brian's; date and channel on each item)
+Decisions 1, 3–8: Brian, 2026-11-13 12:08 AM ET (relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**).
 1. **Hit flash:** one shared `HitFlash` overlay image object (`src/elements/looks/HitFlash.js`), not per-sheet hurt frames. Replaces TINT.flash / TINT.bossFlash.
-2. **Neon and pixel themes (Brian, Nov 14, 2:59 PM ET): they stay hidden behind the flag, not deleted.** Done in PR #5: `LST.ThemeSelector.ALT_THEMES` (`src/themes/ThemeSelector.js`) is off, so `index.html` / `styles.html` do not load `src/themes/neon.js` / `pixel.js`, `sw.js` does not precache them, `?style=` is ignored and the styles.html picker lists cartoon only. The files stay in the repo. No PR deletes them. Cartoon is the game.
+2. **Neon and pixel themes (Brian, Nov 14, 2:59 PM ET, relayed by Chief of Staff): they stay hidden behind the flag, not deleted.** Done in PR #5: `LST.ThemeSelector.ALT_THEMES` (`src/themes/ThemeSelector.js`) is off, so `index.html` / `styles.html` do not load `src/themes/neon.js` / `pixel.js`, `sw.js` does not precache them, `?style=` is ignored and the styles.html picker lists cartoon only. The files stay in the repo. No PR deletes them. Cartoon is the game.
 3. **Bars** (enemy HP, boss HP, unlock, ability cooldown): an image frame plus an image fill, owned by a `Bar` object (`src/ui/Bar.js`). Done late in the UI art PR.
 4. **Range ring, screen flash and finale dim:** images, each owned by an object (`RangeRing`, `ScreenFlash`, `FinaleDim`).
 5. **Particles:** fixed colour variants baked into the art. Never tint.
 6. **Slow as a proper status (N11):** only if all 4 Backyard sim hashes stay identical. Otherwise `Enemy.slowTimer` stays the source and `ChillFrost` reads it.
 7. **Big Red:** add a `ChargeGlow` overlay object (`src/bosses/looks/ChargeGlow.js`). Replaces TINT.charge.
 8. **ChillFrost now, in PR #5:** the frozen/slow tint is removed in PR #5 and `ChillFrost` (`src/elements/looks/ChillFrost.js`) owns the slowed look. Art: Game Art & Motion ChillFrost v0.1.1, variant c (`assets/sprites/looks/ChillFrost/ChillFrost_c.*`, sha256 in `assets/sprites/looks/PROVENANCE.json`; replaced v0.1.0 b). QA: `docs/qa/world2/*chill*` (index: `docs/qa/world2/chill-shots.json`).
-9. **Low-HP vignette (B21) (Brian, Nov 14, 2:59 PM ET):** it gets real vignette art (`vignette_red.png`, owned by `LowHpVignette`, `src/fx/LowHpVignette.js`). No code-drawn vignette: the `render.js:173-182` radial gradient is deleted in PR 2. Its pulse is an opacity fade of the image (Decision 10).
-10. **Fades and flashes (Brian, Nov 14):** opacity fades of real art are allowed. White flashes and recolors stay banned. What this changes in the plan:
+9. **Low-HP vignette (B21) (Brian, Nov 14, 2:59 PM ET, relayed by Chief of Staff):** it gets real vignette art (`vignette_red.png`, owned by `LowHpVignette`, `src/fx/LowHpVignette.js`). No code-drawn vignette: the `render.js:173-182` radial gradient is deleted in PR 2. Its pulse is an opacity fade of the image (Decision 10).
+10. **Fades and flashes (Brian, Nov 14, 2:59 PM ET, relayed by Chief of Staff):** opacity fades of real art are allowed. White flashes and recolors stay banned. What this changes in the plan:
     - Look fades are fine as authored frames **or** as an opacity fade of the look's own image (ChillFrost `fade`, IceCrust/BurnFlames end-of-status fades, LowHpVignette pulse, FinaleDim, ScreenScrim).
     - **HitFlash stays its own art** (Decision 1): an authored overlay sheet drawn on top of the enemy and faded out with opacity. It is never a white-out or recolor of the enemy sprite (`TINT.flash` / `TINT.bossFlash` and `SpriteTinter` are still deleted in PR 1).
     - **ScreenFlash (B20)** was planned as a radial white `flash_burst.png`. A full-screen white flash is a white flash, so it is **not** built as white. PR 2 either drops the screen flash or uses an authored, non-white burst image faded with opacity. That choice is **open for Brian**. Until then B20 is blocked. The existing code flash (`render.js:184-187`) stays as it is and is off in reduced motion.
     - CSS: `opacity` on real images is allowed. `filter: grayscale()/saturate()/hue-rotate()` and `--accent` recolors of icons are banned (F8, F1).
-11. **UI chrome is drawn art (Brian, Nov 13):** buttons, cards, panels, bars and tiles styled in code (CSS backgrounds, borders, gradients, box-shadows, rounded panels) need real image art, each owned by an object. See F6 for every item in `style.css` and the HTML, with its owner and image plan. Brian allowed code styling for sliders, text boxes and small chips (in Simple PDF). Last Stand Tower has no sliders or text boxes; its small chips are listed separately in F7 as **allowed code-styled controls**. This replaces the old F5 call that "button box-shadows stay CSS".
+11. **UI chrome is drawn art (Brian, Nov 13; relay channel not recorded in this bot's brief; **to confirm: direct or relayed by Chief of Staff**):** buttons, cards, panels, bars and tiles styled in code (CSS backgrounds, borders, gradients, box-shadows, rounded panels) need real image art, each owned by an object. See F6 for every item in `style.css` and the HTML, with its owner and image plan. Brian allowed code styling for sliders, text boxes and small chips (his Simple PDF ruling, as passed on in the same brief). Last Stand Tower has no sliders or text boxes; its small chips are listed separately in F7 as **allowed code-styled controls**. This replaces the old F5 call that "button box-shadows stay CSS".
 
 ### Landed in PR 7 (GitHub PR #6, `oo-7-game-flow`): N1 (flow slice), N2, N15
 Owner objects, one class per file:
@@ -42,27 +45,29 @@ Owner objects, one class per file:
 - N1 is only partly done: the flow left `Game`. The shop, abilities, workshop, finale and results stay in `Game` until PR 8.
 
 #### `game.state` is a compat getter/setter (removed in PR 9)
-`game.js:21-22`: `get state()` returns `this.flow.id`, and `set state(id)` calls `this.flow.set(id)`. It exists only so the remaining string reads and writes keep working while PR 8 and PR 9 move them onto state objects. **Removal step (PR 9, last commit):** delete `game.js:21-22`; switch the tools to `game.flow.id` / `game.flow.set()`; replace the flow-test compat checks (`flow-test.js:43-46`) with a check that `"state" in game` is false and that `rg "(this|game|g|scene)\.state\b" src` finds no game-flow use. The sims must stay identical; the tools only read the id.
+`game.js:21-22`: `get state()` returns `this.flow.id`, and `set state(id)` calls `this.flow.set(id)`. It exists only so the remaining string reads and writes keep working while PR 8 and PR 9 move them onto state objects. The state classes already use the machine directly: `PlayingState` calls `game.flow.is("playing")`, `VictoryState` calls `game.flow.set("cleared")`, and `GameStateMachine.is(id)` was added for this. `flow-test` checks that no state class uses `game.state`. **Removal step (PR 9, last commit):** delete `game.js:21-22` and switch every row below to `game.flow.is()` / `game.flow.set()`. Then `node tools/flow-state-sweep.js` must find 0 compat sites, and the flow-test compat checks become a check that `"state" in game` is false. The sims must stay identical; the tools only read the id.
 
-Every remaining `game.state` id comparison or write, and the PR that removes it:
+**Sweep:** `tools/flow-state-sweep.js` (`FlowStateSweep`, run on its own and by flow-test in CI) finds every `game.state`, `g.state`, `this.game.state`, `scene.state` and Game/DemoScene `this.state` read or write in `src/`, `tools/`, `sw.js` and `index.html`. It fails if any file:line is missing from this table. Last run: 95 sites on 79 lines, 0 unlisted. It skips other `.state` fields: `meta.state` (113 sites), Coconut / ShellShield / AudioContext / ServiceWorker `.state` (21), and comments (10). `sw.js` and `index.html` have none.
+
+Every remaining compat site, and the PR that removes it:
 
 | Where (current lines) | Use | Removed in | Becomes |
 |---|---|---|---|
 | `game.js:13` | constructor sets "menu" | PR 9 (compat removal) | `this.flow.set("menu")` |
 | `game.js:79` | `selectWorld` only from menu / workshop | PR 8 | `WorkshopController` asks `flow.current.allowsWorldPick` |
-| `game.js:121, 142, 262, 297, 379, 385, 405, 425, 763` | shop: Head Start draft enters / guards "upgrade"; finishCelebration, dismissGotcha and continueEndless enter it; takeCard / reroll / repair / leave guard on it | PR 8 | `ShopController` methods run only through `ShopState`; entries become `flow.set("upgrade")` inside the controller |
+| `game.js:121, 142, 262, 297, 346, 379, 385, 405, 425, 763` | shop: Head Start draft enters / guards "upgrade"; finishCelebration, dismissGotcha and continueEndless enter it; takeCard / returnableTrap (Appraisal trap return) / reroll / repair / leave guard on it | PR 8 | `ShopController` methods run only through `ShopState`; entries become `flow.set("upgrade")` inside the controller |
 | `game.js:173, 243, 253, 255, 375, 612` | wave flow: startNextWave → playing, endWave → celebrate, finishCelebration and dismissGotcha guards, `step` early-out | PR 8 | `WaveFlow` transitions in `PlayingState` / `CelebrateState` / `GotchaState` |
 | `game.js:192, 195` | abilities only while playing | PR 8 | `AbilitySystem` asks `flow.current` (`PlayingState.allowsAbility`) |
 | `game.js:437, 450, 747, 759, 769` | game over, finishRun, finale victory, continueEndless / retire guards on "cleared" | PR 8 | `RunRecorder` / `FinaleController` with `GameOverState`, `VictoryState`, `ClearedState` |
 | `game.js:478, 480, 488, 489, 545` | open / close Workshop, toMenu | PR 8 | `WorkshopController` with `WorkshopState` / `MenuState` |
-| `game.js:552-557` | togglePause playing ↔ paused | PR 8 | `PlayingState.pause()` / `PausedState.resume()` |
-| `render.js:133, 139, 141, 143, 174` | finale intro dim, banner per state, low-HP pulse only while playing | PR 8 (N12) | `RenderPipeline` layers read state flags (`showsFinaleIntro`, `banner`, `lowHpPulse`). `DemoScene` (`demo.js:7`, its own `state = "playing"` field, not a game flow) gets the same flags object |
-| `fx/FxDirector.js:137` | tower aura only in playing / celebrate / victory | PR 8 (N24) | a `towerAura` flag on those 3 states |
+| `game.js:552, 553, 556, 557` | togglePause playing ↔ paused | PR 8 | `PlayingState.pause()` / `PausedState.resume()` |
+| `render.js:133, 139, 141, 143, 174`; `demo.js:7` | render.js: finale intro dim, banner per state, low-HP pulse only while playing. **`demo.js:7`: `DemoScene` (the styles.html art demo, `extends World`, not `Game`) has its own plain `state` field set to "playing". It has no `flow`, and render.js reads it as `scene.state`.** | PR 8 (N12) | `RenderPipeline` layers read state flags (`showsFinaleIntro`, `banner`, `lowHpPulse`) from a `SceneFlags` object. `Game` gets it from `flow.current`. `DemoScene` drops its `state` field and passes a fixed "playing" `SceneFlags` |
+| `fx/FxDirector.js:137` | tower aura only in playing / celebrate / victory | PR 8 (N24) | a `towerAura` flag on those 3 states (the same `SceneFlags`) |
 | `ui.js:132, 190, 555` | Resume button, settings opened mid-run, HUD ability state | PR 9 (N14) | `PauseScreen` / `Hud` read `flow.current` |
-| `tools/sim.js:306, 315, 319, 328, 329, 335` | sim loop reads / sets the id | PR 9 (compat removal) | `game.flow.id` / `game.flow.set()` (sims must stay identical) |
-| `tools/world-test.js:52, 55, 156, 171, 385, 425, 427-429, 436-437, 470, 477-481, 494, 503` | test setup and run loops | PR 9 (compat removal) | `game.flow.id` / `game.flow.set()` |
-| `tools/card-layout-test.py:135, 227` | page setup | PR 9 (compat removal) | `game.flow.set("menu")`, `game.flow.id` |
-| `tools/flow-test.js:43-46, 51-62` | tests of the compat itself and the state updates | PR 9 (compat removal) | the `"state" in game` check above; the state tests use `game.flow` |
+| `tools/sim.js:306, 315, 319, 328, 329, 335` | sim loop reads / sets the id | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` (sims must stay identical) |
+| `tools/world-test.js:52, 55, 156, 171, 385, 425, 427-429, 436-437, 470, 477-481, 483, 494, 503` | test setup, run loops and messages (483: door-run finale assert) | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` |
+| `tools/card-layout-test.py:135, 227` | page setup | PR 9 (compat removal) | `game.flow.set("menu")`, `game.flow.is("playing")` |
+| `tools/flow-test.js:55, 59-62, 122, 155` | tests of the compat itself: 55 checks that no state class uses it, 59-62 the getter/setter and the `"state"` own-property check, 122 the stub getter the old main.js oracle needs, 155 a message | PR 9 (compat removal) | the `"state" in game` check above; the oracle stub keeps its own getter (the old code reads `game.state`) |
 
 ### Landed in PR #5 (2026-11-13)
 - `ChillFrost`: StatusLook, active while `Enemy.slowTimer > 0` and not frozen. Plays `attach` (2f @12 fps, once), then `loop` (4f @8 fps); `still` for reduced motion; `fade` (2f @12 fps, once) when the slow wears off. No fade when the enemy freezes (IceCrust takes over at once), dies, or with reduced motion. Draws nothing until its sheet loads.
@@ -182,7 +187,7 @@ The enemy views become `BasicView`, `FastView`, `TankView`, `BigRedView` and `Ki
 | F4 | `style.css` rarity and decoration gradients: 322-323, 551-552, 723-724 (rare/epic cards); 330, 576 (shimmer, sparkle); 514, 564, 732, 826, 857, 860, 1112 (stripes, locked, card back, codex unknown); 1150 (info back) | Card frames, shimmer, card backs | `CardFrame` CSS class backed by images (`assets/ui/`) | Card frame set: common, rare, epic, locked, back, codex-unknown, info-back; shimmer sweep strip; sparkle sprite |
 | F5 | `style.css:533-534, 928, 978, 984` (unlock bar, conic ability cooldown, boss HP fill); 45 `box-shadow`s; about 20 keyframes | Bars and chunky button shadows | `Bar` (`src/ui/Bar.js`); shadows go into the F6 frame images | **Decided (Decision 3):** HP / unlock / cooldown / boss bars become `Bar` objects (image frame + image fill, late in PR 6). **Changed by Decision 11:** box-shadows are chrome, so they are baked into the F6 frame images, not kept as CSS. Keyframes that only move, scale or fade stay CSS |
 
-#### F6. Code-styled UI chrome that needs authored image art (Brian, Nov 13: UI chrome counts as drawn art)
+#### F6. Code-styled UI chrome that needs authored image art (Decision 11: UI chrome counts as drawn art)
 Every `style.css` rule that paints a button, card, panel, bar or tile in code. `tools/ui-chrome-scan.js` lists them and fails CI if a selector is missing from this section. Line numbers are `style.css` lines.
 
 | # | Item | style.css rules (line) | Used in | Owner object | Authored-image plan |
@@ -213,7 +218,7 @@ Every `style.css` rule that paints a button, card, panel, bar or tile in code. `
 | U24 | Workshop ability picker tiles (on / locked / afford, per-ability icon tile) | `.ab-chip` (1010); `.ab-chip .ab-ico` (1015); `.ab-chip.on` (1022); `.ab-chip.on .ab-ico` (1023); `.ab-chip.on[data-ability="freeze"] .ab-ico` (1024); `.ab-chip.on[data-ability="overdrive"] .ab-ico` (1025); `.ab-chip` (1040) | src/ui.js:474 | `AbilityChip`, `src/ui/chrome/AbilityChip.js` | tile frame: normal, on, locked, afford; per-ability icon tile on/off |
 | U25 | World select cards: frame, pressed, selected (outline), picture strip | `.world-card` (1166); `.world-card:active` (1171); `.world-card.on` (1172); `.world-card .wc-pic` (1174) | src/ui/WorldSelect.js:36 | `WorldCard`, `src/ui/chrome/WorldCard.js` | world card frame: normal, pressed, selected; picture uses the world's backdrop art |
 
-#### F7. Allowed code-styled controls (Brian's ruling: small chips, sliders and text boxes may stay code-styled, as in Simple PDF)
+#### F7. Allowed code-styled controls (Decision 11: Brian's Simple PDF ruling, small chips, sliders and text boxes may stay code-styled)
 Last Stand Tower has no sliders or text boxes. These are the small, non-button text chips and badges. They stay CSS, marked **allowed code-styled control** so the verifier can see them.
 
 | # | Chip | style.css rules (line) | Used in | Status |
@@ -242,11 +247,13 @@ Last Stand Tower has no sliders or text boxes. These are the small, non-button t
 | X3 | Benched deck icon: `filter: grayscale(1)` | `.deck-card.benched .icon` (737) | src/ui.js:484 | `IconAtlas` benched variant | authored greyed icon variant per card (F1 sheet), opacity allowed |
 | X4 | HUD heart: SVG `fill: var(--red)` + drop-shadow filter | `.heart` (190) | index.html:31 | `UiIcon("heart")` (F2) | heart icon image with its shadow baked in |
 
-#### F9. Not chrome: text styling and focus rings (listed so the scan is complete)
-| # | Item | style.css rules (line) | Status |
-|---|---|---|---|
-| T1 | Text outline / text-shadow on live text (title, HP number, epic ribbon text, cooldown seconds, boss name) | `.title` (85); `#hud-hp-text` (221); `.card.epic .ribbon` (353); `.ability .ab-cd` (940); `.boss-bar .boss-top b` (969); `.boss-bar .boss-top span` (973) | stays CSS text styling (open question 6: text stays text). Not covered by the Nov 13 ruling either way; **open for Brian** |
-| Q1 | Keyboard focus rings | `.card:focus-visible` (1093); `.card button.tag:focus-visible` (1099); `.card button.flip-marker:focus-visible` (1145); `.card-back button.flip-back:focus-visible` (1162) | stays CSS (accessibility, I7/A rules). Not covered by the Nov 13 ruling either way; **open for Brian** |
+#### F9. Open questions for Brian: text outlines and focus rings
+Decision 11 names buttons, cards and panels. It does not say whether outlines on live text or keyboard focus rings count as drawn art. Each row below is a question for Brian. The current CSS is only what exists today, not a decision.
+
+| # | Question for Brian | style.css rules (line) | What exists today | Options |
+|---|---|---|---|---|
+| T1 | Do outlines and shadows on live text (the title, HP number, epic ribbon text, cooldown seconds, boss name) count as drawn art? | `.title` (85); `#hud-hp-text` (221); `.card.epic .ribbon` (353); `.ability .ab-cd` (940); `.boss-bar .boss-top b` (969); `.boss-bar .boss-top span` (973) | CSS `text-shadow` / `-webkit-text-stroke` on real text | (a) count them as text styling and keep them; (b) bake the outline into an authored bitmap font or word images (`TitleArt`, `NumberFont`) |
+| Q1 | Do keyboard focus rings count as drawn art? | `.card:focus-visible` (1093); `.card button.tag:focus-visible` (1099); `.card button.flip-marker:focus-visible` (1145); `.card-back button.flip-back:focus-visible` (1162) | CSS `outline` on `:focus-visible` (accessibility, rule I7/A) | (a) keep them as an accessibility indicator; (b) authored focus-frame images per card size (`FocusFrame`) |
 
 **Visual totals:** A 7, B 24, C 4, D 3, E 2, F 5 icon groups (about 75 icons or decorations), plus F6 25 code-styled chrome items (25 owner objects / variants) and F8 4 banned CSS recolors. F7 15 chip groups stay code-styled (allowed). That is about 40 canvas visual objects plus the UI art.
 
@@ -256,7 +263,7 @@ Last Stand Tower has no sliders or text boxes. These are the small, non-button t
 | # | Where | Problem | Becomes (class, file) |
 |---|---|---|---|
 | N1 | `game.js` (812 lines after PR 7), `Game extends World` | God class: run flow, shop, abilities, workshop, finale, results, boss events | **Flow slice landed in PR 7** (`game.flow`). The rest is split up as below (PR 8) |
-| N2 | **Landed in PR 7.** Was `game.js@99ea184:573-618` update. Now `game.js:578-587` update calls `this.flow.update`; `game.js:21-22` compat getter/setter | String state machine (`this.state === "playing"` and so on) | `GameStateMachine` (`src/core/GameStateMachine.js:5-26`) and `GameState` (`src/core/GameState.js:8-15`), plus `MenuState` (`states/MenuState.js:2-9`), `PlayingState` (`states/PlayingState.js:3-24`), `PausedState` (`states/PausedState.js:2-4`), `CelebrateState` (`states/CelebrateState.js:2-9`), `ShopState` ("upgrade", `states/ShopState.js:3-13`), `GotchaState` (`states/GotchaState.js:2-8`), `GameOverState` (`states/GameOverState.js:3-17`), `WorkshopState` (`states/WorkshopState.js:3-9`), `VictoryState` (`states/VictoryState.js:3-11`), `ClearedState` (`states/ClearedState.js:2-8`). Remaining id comparisons: see "`game.state` is a compat getter/setter" |
+| N2 | **Landed in PR 7.** Was `game.js@99ea184:573-618` update. Now `game.js:578-587` update calls `this.flow.update`; `game.js:21-22` compat getter/setter | String state machine (`this.state === "playing"` and so on) | `GameStateMachine` (`src/core/GameStateMachine.js:6-28`) and `GameState` (`src/core/GameState.js:8-15`), plus `MenuState` (`states/MenuState.js:2-9`), `PlayingState` (`states/PlayingState.js:3-24`), `PausedState` (`states/PausedState.js:2-4`), `CelebrateState` (`states/CelebrateState.js:2-9`), `ShopState` ("upgrade", `states/ShopState.js:3-13`), `GotchaState` (`states/GotchaState.js:2-8`), `GameOverState` (`states/GameOverState.js:3-17`), `WorkshopState` (`states/WorkshopState.js:3-9`), `VictoryState` (`states/VictoryState.js:3-11`), `ClearedState` (`states/ClearedState.js:2-8`). Remaining id comparisons: see "`game.state` is a compat getter/setter" |
 | N3 | `game.js:194-221` useAbility | `if id === "shockwave" / "freeze" / "overdrive"` | `AbilitySystem` plus `Shockwave`, `Freeze`, `Overdrive` (`src/abilities/*.js`). The `ui.js:686-690` icon, name and description maps move onto these classes |
 | N4 | `game.js` shop methods (open, price, take card, reroll, repair, mystery box, leave) | Mixed into Game | `ShopController` (`src/shop/ShopController.js`) |
 | N5 | `game.js:658-688` onEnemyKilled | `e.type === "boss"`, plus the `{basic,fast,tank,boss}[e.type]` pitch map | `RewardRules` / `KillFeedback` (`src/core/KillFeedback.js`); pitch and bonus live on the enemy archetype |
@@ -281,11 +288,12 @@ Last Stand Tower has no sliders or text boxes. These are the small, non-button t
 | N24 | `FxRenderer` one class draws every FX kind | God renderer | Per-effect classes (section B). FxRenderer becomes a thin batcher |
 | N25 | `pwa.js` | IIFE that builds an inline toast | `UpdateNotifier` using the `Toast` screen |
 | N26 | `index.html` script-order loading on the global `LST` | Implicit dependencies | Keep the globals for now (no bundler). Order is documented per module. **Judgment** |
+| N27 | **Tool objects landed in PR 7.** `tools/ui-chrome-scan.js`, `tools/flow-test.js`, `tools/flow-state-sweep.js` | Scanner / test logic used to be loose module code | `UiChromeScanner` (`tools/ui-chrome-scan.js:11-70`): scans CSS + doc coverage; `FlowTest` (`tools/flow-test.js:14-169`): game-flow tests + git oracle; `FlowStateSweep` (`tools/flow-state-sweep.js:12-95`): all compat reads/writes mapped with file:line. Each owns its root path, methods and run result, created once by the one-line CLI entry point and discarded on exit. They change no game state outside the test sandbox. No loose functions (only class methods and callbacks inside them). `world-test.js` / `sim.js` edits add no functions; their pre-existing helpers are unchanged |
 
 ---
 
 ## 3. Conversion order (single PRs, after PR #5)
-Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchanged, design-review OO gate, PR Verifier PASS, Brian's yes to merge.
+Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchanged, design-review OO gate, PR Verifier PASS, then merge under Brian's standing yes for refactor PRs (relayed by Chief of Staff, Nov 13, 8:06 AM ET).
 
 1. **PR 1: Status tints → looks, enemy overlays** (A1–A7).
    - Adds HitFlash (shared overlay), ChargeGlow, SlamTelegraph, DizzyStars, GroundShadow. (ChillFrost already ships in PR #5.)
@@ -298,7 +306,7 @@ Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchange
 3. **PR 3: Enemies and bosses** (C1–C4, N9, N10 for enemies, N23).
    - Adds EnemyView subclasses, the BigRed and KingMole classes and EnemyHpBar.
    - Deletes vectorBody, drawMole and the primitives.
-   - Art: none required. HP bar frame only if Brian wants bars as art.
+   - Art: none required here. The HP bar is a `Bar` with image frame + fill (Decision 3), drawn in PR 6.
 4. **PR 4: Tower and projectiles** (D1–D3).
    - Adds TowerView/TowerFace, ProjectileView and RangeRing.
    - Art: layered tower sheet with face states, projectile sheet ×5 variants, range ring.

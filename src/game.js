@@ -2,7 +2,7 @@
 // The run flow is a GameStateMachine (src/core/GameStateMachine.js) of GameState objects, one per
 // file in src/core/states/: menu, playing, paused, celebrate (wave-clear party), upgrade (ShopState),
 // gotcha, gameover (results screen), workshop (card unlocks), victory (finale beaten), cleared.
-// game.state reads / sets the current state's id.
+// game.state is a compat getter/setter over this.flow (game.js:21-22), removed in PR 9.
 // Sound and vibration hooks live here (not in World) so the art-style demo stays silent.
 
 LST.Game = class Game extends LST.World {
