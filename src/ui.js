@@ -69,7 +69,7 @@ LST.UI = class UI {
         const id = el.dataset.ability, cost = LST.CONFIG.abilities[id].unlockCost;
         if (!game.pickAbility(id)) {
           LST.UI.pop(el, "shake");
-          this.el.wsHint.innerHTML = `Need <b>${cost - m.state.gears}</b> more Gears for ${ABILITY_NAME[id]}.`;
+          this.el.wsHint.innerHTML = `Need <b>${cost - m.state.gears}</b> more Gears for ${LST.Ability.get(id).name}.`;
         }
       } else if (el.dataset.card) {
         if (el.classList.contains("owned")) return;
@@ -464,7 +464,7 @@ LST.UI = class UI {
     this.el.wsHint.innerHTML = opts.benched
       ? (m.isBenched(opts.benched) ? `<b>${m.card(opts.benched).name}</b> benched. It won't show up in the shop.` : `<b>${m.card(opts.benched).name}</b> is back in the deck.`)
       : `Tap a card to bench it (${n}/${max}). Benched cards stay out of the shop.`;
-    if (opts.ability) this.el.wsHint.innerHTML = `<b>${ABILITY_NAME[opts.ability]}</b> equipped: ${ABILITY_DESC[opts.ability]}.`;
+    if (opts.ability) this.el.wsHint.innerHTML = `<b>${LST.Ability.get(opts.ability).name}</b> equipped: ${LST.Ability.get(opts.ability).desc}.`;
     // Active ability strip: tap to equip (or unlock with Gears).
     const strip = document.createElement("div");
     strip.className = "ab-strip";
@@ -473,8 +473,8 @@ LST.UI = class UI {
       const b = document.createElement("button");
       b.className = "ab-chip" + (on ? " on" : "") + (owned ? "" : " locked") + (!owned && m.state.gears >= cost ? " afford" : "") + (opts.ability === id ? " bought" : "");
       b.dataset.ability = id;
-      b.setAttribute("aria-label", `${ABILITY_NAME[id]}: ${ABILITY_DESC[id]}. ${on ? "Equipped" : owned ? "Tap to equip" : cost + " Gears"}`);
-      b.innerHTML = `<span class="ab-ico">${ABILITY_ICON[id]}</span><span class="ab-txt"><b>${ABILITY_NAME[id]}</b><small>${on ? "Equipped" : owned ? ABILITY_DESC[id] : `${GEAR_SVG}${cost}`}</small></span>`;
+      b.setAttribute("aria-label", `${LST.Ability.get(id).name}: ${LST.Ability.get(id).desc}. ${on ? "Equipped" : owned ? "Tap to equip" : cost + " Gears"}`);
+      b.innerHTML = `<span class="ab-ico">${LST.Ability.get(id).icon}</span><span class="ab-txt"><b>${LST.Ability.get(id).name}</b><small>${on ? "Equipped" : owned ? LST.Ability.get(id).desc : `${GEAR_SVG}${cost}`}</small></span>`;
       strip.appendChild(b);
     }
     grid.appendChild(strip);
@@ -557,9 +557,9 @@ LST.UI = class UI {
     if (playing) {
       if (btn.dataset.id !== ab.id) {
         btn.dataset.id = ab.id;
-        btn.querySelector(".ab-icon").innerHTML = ABILITY_ICON[ab.id];
-        btn.setAttribute("aria-label", ABILITY_NAME[ab.id]);
-        btn.querySelector(".ab-name").textContent = ABILITY_NAME[ab.id];
+        btn.querySelector(".ab-icon").innerHTML = LST.Ability.get(ab.id).icon;
+        btn.setAttribute("aria-label", LST.Ability.get(ab.id).name);
+        btn.querySelector(".ab-name").textContent = LST.Ability.get(ab.id).name;
       }
       const k = ab.cd > 0 ? ab.cd / ab.max : 0;
       btn.style.setProperty("--cd", (k * 360).toFixed(1) + "deg");
@@ -681,13 +681,6 @@ LST.UI = class UI {
 };
 
 const GEAR_SVG = '<svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.22 4.28L10.11 1.16L13.89 1.16L14.78 4.28L15.49 4.58L18.33 3.00L21.00 5.67L19.42 8.51L19.72 9.22L22.84 10.11L22.84 13.89L19.72 14.78L19.42 15.49L21.00 18.33L18.33 21.00L15.49 19.42L14.78 19.72L13.89 22.84L10.11 22.84L9.22 19.72L8.51 19.42L5.67 21.00L3.00 18.33L4.58 15.49L4.28 14.78L1.16 13.89L1.16 10.11L4.28 9.22L4.58 8.51L3.00 5.67L5.67 3.00L8.51 4.58Z M12 8.4a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z"/></svg>';
-const ABILITY_NAME = { shockwave: "Shockwave", freeze: "Freeze", overdrive: "Overdrive" };
-const ABILITY_DESC = { shockwave: "Knock back + stun", freeze: "Slow all 60%, 4s", overdrive: "2x fire rate, 5s" };
-const ABILITY_ICON = {
-  shockwave: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" class="fill"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4M3.5 3.5a12 12 0 0 0 0 17M20.5 3.5a12 12 0 0 1 0 17"/></svg>',
-  freeze: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>',
-  overdrive: '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
-};
 const EYE_SVG = '<svg class="eye-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg>';
 const KIND_LABEL = { cursed: "Cursed", delayed: "Delayed cost", build: "Build-dependent", gamble: "Gamble", dud: "Dud", weak: "Nearly a dud" };
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>';

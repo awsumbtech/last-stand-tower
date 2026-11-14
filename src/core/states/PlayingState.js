@@ -1,9 +1,18 @@
 // PlayingState ("playing"): a wave is on. Eases the low-HP slow-mo, runs the sim steps (two
 // normal-size steps at 2x speed so fast shots never skip enemies), and beats the low-HP heart.
+// The ability works here only; pause() enters PausedState.
 LST.PlayingState = LST.GameStateMachine.register(class PlayingState extends LST.GameState {
   static get id() { return "playing"; }
   get runClock() { return true; }
   get pausesWhenHidden() { return true; }
+  get allowsAbility() { return true; }
+  get sceneFlags() { return LST.SceneFlags.PLAYING; }
+  togglePause(game) { this.pause(game); }
+  pause(game) {
+    game.flow.set("paused");
+    game.ui.show("pause");
+    LST.audio.duckMusic(true);
+  }
   update(game, dt) {
     let scale = 1;
     if (game.slowmo > 0) {

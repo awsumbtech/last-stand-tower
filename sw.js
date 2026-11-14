@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v26"; // Game flow: GameStateMachine + one GameState class per state, InputController
+const VERSION = "v27"; // OO game systems
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -110,6 +110,7 @@ const PRECACHE = [
   "src/ui/WorldSelect.js",
   "src/ui/WorldScreens.js",
   "src/ui.js",
+  "src/core/SceneFlags.js",
   "src/core/GameState.js",
   "src/core/GameStateMachine.js",
   "src/core/states/MenuState.js",
@@ -123,6 +124,19 @@ const PRECACHE = [
   "src/core/states/VictoryState.js",
   "src/core/states/ClearedState.js",
   "src/core/InputController.js",
+  "src/abilities/Ability.js",
+  "src/abilities/Shockwave.js",
+  "src/abilities/Freeze.js",
+  "src/abilities/Overdrive.js",
+  "src/abilities/AbilitySystem.js",
+  "src/shop/ShopController.js",
+  "src/core/RewardRules.js",
+  "src/core/KillFeedback.js",
+  "src/bosses/BossEventRouter.js",
+  "src/bosses/FinaleController.js",
+  "src/core/RunRecorder.js",
+  "src/core/WorkshopController.js",
+  "src/core/WaveFlow.js",
   "src/game.js",
   "src/demo.js",
   "src/main.js",

@@ -3,6 +3,7 @@
 LST.VictoryState = LST.GameStateMachine.register(class VictoryState extends LST.GameState {
   static get id() { return "victory"; }
   get runClock() { return true; }
+  get sceneFlags() { return LST.SceneFlags.VICTORY; }
   update(game, dt) {
     game.victoryTimer -= dt;
     if (Math.random() < dt * 6) game.spawnConfetti(LST.utils.rand(-200, 200), LST.utils.rand(-200, 100), 30);
