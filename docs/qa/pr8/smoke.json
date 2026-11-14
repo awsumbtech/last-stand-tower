@@ -1,0 +1,280 @@
+{
+ "url": "http://127.0.0.1:8766/index.html?debug=1",
+ "sw": "v27",
+ "steps": [
+  [
+   "menu",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "enemies": 0,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 0,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-start"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-01-menu-390x844.png"
+  ],
+  [
+   "wave 1 (tapped Play)",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 0,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "screen": ""
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-02-wave-390x844.png"
+  ],
+  [
+   "tapped the ability button (AbilitySystem.use -> Shockwave)",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 24.883399999999998,
+     "max": 25,
+     "flash": 0.7668000000000009
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "screen": ""
+   },
+   {
+    "label": "Shockwave",
+    "name": "Shockwave",
+    "stunned": 2
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-03-ability-shockwave-390x844.png"
+  ],
+  [
+   "Space -> PlayingState.pause()",
+   {
+    "flow": "paused",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 24.733299999999996,
+     "max": 25,
+     "flash": 0.4666000000000001
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-pause"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-04-paused-390x844.png"
+  ],
+  [
+   "Resume -> PausedState.resume()",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 24.33329999999999,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "screen": ""
+   }
+  ],
+  [
+   "wave cleared -> celebrate -> ShopController.enter() (tower damage x50 to speed it up)",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "enemies": 0,
+    "coins": 28,
+    "ability": {
+     "id": "shockwave",
+     "cd": 19.850200000000005,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-upgrade"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-05-shop-390x844.png"
+  ],
+  [
+   "took the free card",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "enemies": 0,
+    "coins": 28,
+    "ability": {
+     "id": "shockwave",
+     "cd": 19.850200000000005,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-upgrade"
+   },
+   {
+    "picked": true,
+    "levels": "{\"range\":1}"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-06-shop-card-taken-390x844.png"
+  ],
+  [
+   "QA jump: next wave = 5 (mini-boss)",
+   {
+    "flow": "playing",
+    "wave": 5,
+    "enemies": 6,
+    "coins": 36,
+    "ability": {
+     "id": "shockwave",
+     "cd": 14.383800000000114,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "screen": ""
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-07-miniboss-390x844.png"
+  ],
+  [
+   "mini-boss down (KillFeedback: bonus + hit-stop)",
+   {
+    "flow": "celebrate",
+    "wave": 5,
+    "enemies": 0,
+    "coins": 166,
+    "ability": {
+     "id": "shockwave",
+     "cd": 5.567600000000182,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": "celebrate",
+     "lowHpPulse": false,
+     "towerAura": true
+    },
+    "screen": ""
+   },
+   {
+    "bossKills": 1,
+    "bonusText": 1
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-08-miniboss-down-390x844.png"
+  ],
+  [
+   "tower falls -> RunRecorder.gameOver -> results",
+   {
+    "flow": "gameover",
+    "wave": 6,
+    "enemies": 8,
+    "coins": 166,
+    "ability": {
+     "id": "shockwave",
+     "cd": 1.1715844455557305,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-results"
+   },
+   {
+    "result": {
+     "wave": 6,
+     "kills": 21,
+     "bossKills": 1,
+     "won": false
+    }
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-09-gameover-390x844.png"
+  ],
+  [
+   "W -> WorkshopController.open('results')",
+   {
+    "flow": "gameover",
+    "wave": 6,
+    "enemies": 8,
+    "coins": 166,
+    "ability": {
+     "id": "shockwave",
+     "cd": 1.1715844455557305,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "screen": "screen-workshop"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8/pr8-10-workshop-390x844.png"
+  ]
+ ],
+ "errors": []
+}
