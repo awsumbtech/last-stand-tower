@@ -25,6 +25,7 @@ jobs:
           node tools/world-test.js
           node tools/elements-test.js
           node tools/flow-test.js
+          node tools/systems-test.js
           node tools/ui-chrome-scan.js
           node tools/flow-state-sweep.js
       - name: Backyard deterministic sim (committed sim-ab hashes)

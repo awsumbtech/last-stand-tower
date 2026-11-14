@@ -4,7 +4,7 @@
 LST.DemoScene = class DemoScene extends LST.World {
   constructor(renderer) {
     super(renderer);
-    this.state = "playing";
+    this.sceneFlags = LST.SceneFlags.PLAYING; // always mid-wave (no GameStateMachine here)
     this.tower.targets = 2;
     this.tower.fireRate = 2.4;
     this.cycle = ["basic", "fast", "tank", "basic", "fast", "boss", "basic", "fast", "tank", "fast"];

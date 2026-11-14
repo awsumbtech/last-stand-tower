@@ -150,9 +150,11 @@ class FlowTest {
 
   // 6. every compat site is listed in the doc
   checkSweep() {
-    const { flow, unlisted } = new FlowStateSweep(this.root).check();
+    const { flow, unlisted, stale, inCleared } = new FlowStateSweep(this.root).check();
     for (const s of unlisted) console.log(`  unlisted: ${s.file}:${s.line} ${s.key ? s.receiver : s.receiver + ".state"}`);
     this.ok(flow.length > 0 && !unlisted.length, `sweep: all ${flow.length} compat game.state / scene.state sites are listed with file:line in docs/OO-MIGRATION.md`);
+    this.ok(!stale.length, `sweep: no stale rows in the compat table (${stale.join(", ") || "none"})`);
+    this.ok(!inCleared.length, `sweep: no compat site left in the files PR 8 cleared (${inCleared.map((s) => s.file + ":" + s.line).join(", ") || "none"})`);
   }
 
   run() {

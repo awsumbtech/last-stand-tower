@@ -134,8 +134,7 @@ LST.FxDirector = class FxDirector {
     const s = q.scale;
     this.pools.world.setLimit(LST.FX_QUALITY.capWorld * Math.max(s, 0.25));
     this.pools.screen.setLimit(LST.FX_QUALITY.capScreen * Math.max(s, 0.35));
-    const st = scene.state;
-    if (st === "playing" || st === "celebrate" || st === "victory") this.aura.update(dt, scene.tower, this.pools.world, this.rng, s);
+    if (scene.sceneFlags.towerAura) this.aura.update(dt, scene.tower, this.pools.world, this.rng, s);
     this.pools.world.update(dt);
     this.pools.screen.update(dt);
     this.camera.update(dt);

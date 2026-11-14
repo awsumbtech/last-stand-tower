@@ -1,6 +1,6 @@
 # Last Stand Tower: object-oriented migration plan
 
-Status: living plan. Audited at `fc3f443`. **Main is `99ea184`** (PR #5 merged, Nov 13). PR 7 (game flow) is on `oo-7-game-flow` (GitHub PR #6).
+Status: living plan. Audited at `fc3f443`. **Main is `738409a`** (PR #6, OO PR 7 game flow, merged Nov 14, 3:40 PM ET; live as SW v26). PR 8 (game systems, N3–N7) is on `oo-8-game-systems`; N8, N12 and N24 were split out to PR 8b for review size.
 Brian's direction (Nov 12, 11:56 PM ET, his words relayed by Chief of Staff): "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
 
 Every rule and decision says whose call it is and how it arrived: **Brian's words, relayed by Chief of Staff** (CoS passed on his words or his card answer), or **a design call** by Tower Defense Games Dev that Chief of Staff endorsed (not Brian's words).
@@ -42,34 +42,48 @@ Owner objects, one class per file:
 - `GameStateMachine` (`src/core/GameStateMachine.js`): `game.flow`. It holds one instance per state, `set(id)` throws on an unknown id, and `update(game, dt)` runs the run clock and then the current state's update.
 - The 10 state classes (`src/core/states/`): `MenuState` ("menu"), `PlayingState` ("playing"), `PausedState` ("paused"), `CelebrateState` ("celebrate"), `ShopState` ("upgrade"), `GotchaState` ("gotcha"), `GameOverState` ("gameover"), `WorkshopState` ("workshop"), `VictoryState` ("victory"), `ClearedState` ("cleared").
 - `InputController` (`src/core/InputController.js`): created once in `main.js:31`. It owns the shared keys and the hidden-tab auto-pause. Keys used by one state live on that state's `onKey`.
-- `Game.update` (`game.js:578-587`) is now hit-stop, effects, then `this.flow.update(this, dt)`. Nothing in it checks a state string.
+- `Game.update` (`game.js:175-184` after PR 8) is now hit-stop, effects, then `this.flow.update(this, dt)`. Nothing in it checks a state string.
 - Proof: `tools/flow-test.js` checks the old `main.js` keydown and visibilitychange listeners, loaded from `src/main.js@99ea184` with `git show` (CI checks out with `fetch-depth: 0`). All 760 state × key × resultsDelay × Workshop-open cases match. The 4 sims are identical.
-- N1 is only partly done: the flow left `Game`. The shop, abilities, workshop, finale and results stay in `Game` until PR 8.
+- N1 flow slice only. PR 8 then moved the shop, abilities, workshop, finale, results and boss events out of `Game` (see "Landed in PR 8").
 
 #### `game.state` is a compat getter/setter (removed in PR 9)
-`game.js:21-22`: `get state()` returns `this.flow.id`, and `set state(id)` calls `this.flow.set(id)`. It exists only so the remaining string reads and writes keep working while PR 8 and PR 9 move them onto state objects. The state classes already use the machine directly: `PlayingState` calls `game.flow.is("playing")`, `VictoryState` calls `game.flow.set("cleared")`, and `GameStateMachine.is(id)` was added for this. `flow-test` checks that no state class uses `game.state`. **Removal step (PR 9, last commit):** delete `game.js:21-22` and switch every row below to `game.flow.is()` / `game.flow.set()`. Then `node tools/flow-state-sweep.js` must find 0 compat sites, and the flow-test compat checks become a check that `"state" in game` is false. The sims must stay identical; the tools only read the id.
+`game.js:40-41`: `get state()` returns `this.flow.id`, and `set state(id)` calls `this.flow.set(id)`. It exists only so the remaining string reads and writes keep working until PR 9 moves them onto state objects. PR 8 removed every compat use in `game.js` (except the constructor's, `game.js:32`), `render.js`, `FxDirector.js` and `demo.js`. The state classes already use the machine directly: `PlayingState` calls `game.flow.is("playing")`, `VictoryState` calls `game.flow.set("cleared")`, and `GameStateMachine.is(id)` was added for this. `flow-test` checks that no state class uses `game.state`. **Removal step (PR 9, last commit):** delete `game.js:40-41` and switch every row below to `game.flow.is()` / `game.flow.set()`. Then `node tools/flow-state-sweep.js` must find 0 compat sites, and the flow-test compat checks become a check that `"state" in game` is false. The sims must stay identical; the tools only read the id.
 
-**Sweep:** `tools/flow-state-sweep.js` (`FlowStateSweep`, run on its own and by flow-test in CI) finds every `game.state`, `g.state`, `this.game.state`, `scene.state` and Game/DemoScene `this.state` read or write in `src/`, `tools/`, `sw.js` and `index.html`. It fails if any file:line is missing from this table. Last run: 95 sites on 79 lines, 0 unlisted. It skips other `.state` fields: `meta.state` (113 sites), Coconut / ShellShield / AudioContext / ServiceWorker `.state` (21), and comments (10). `sw.js` and `index.html` have none.
+**Sweep:** `tools/flow-state-sweep.js` (`FlowStateSweep`, run on its own and by flow-test in CI) finds every `game.state`, `g.state`, `this.game.state`, `scene.state` and Game/DemoScene `this.state` read or write in `src/`, `tools/`, `sw.js` and `index.html`. It fails if any file:line is missing from this table, if a listed line no longer has a site (stale row, added in PR 8), or if a site appears in a file PR 8 cleared (its `cleared` list: `render.js`, `FxDirector.js`, `demo.js`, `SceneFlags.js` and the 13 system files; `game.js` may keep only line 32). Last run (PR 8): 51 sites on 39 lines, 0 unlisted, 0 stale, 0 in cleared files. It skips other `.state` fields: `meta.state` (113 sites), Coconut / ShellShield / AudioContext / ServiceWorker `.state` (21), and comments (10). `sw.js` and `index.html` have none.
 
 Every remaining compat site, and the PR that removes it:
 
 | Where (current lines) | Use | Removed in | Becomes |
 |---|---|---|---|
-| `game.js:13` | constructor sets "menu" | PR 9 (compat removal) | `this.flow.set("menu")` |
-| `game.js:79` | `selectWorld` only from menu / workshop | PR 8 | `WorkshopController` asks `flow.current.allowsWorldPick` |
-| `game.js:121, 142, 262, 297, 346, 379, 385, 405, 425, 763` | shop: Head Start draft enters / guards "upgrade"; finishCelebration, dismissGotcha and continueEndless enter it; takeCard / returnableTrap (Appraisal trap return) / reroll / repair / leave guard on it | PR 8 | `ShopController` methods run only through `ShopState`; entries become `flow.set("upgrade")` inside the controller |
-| `game.js:173, 243, 253, 255, 375, 612` | wave flow: startNextWave → playing, endWave → celebrate, finishCelebration and dismissGotcha guards, `step` early-out | PR 8 | `WaveFlow` transitions in `PlayingState` / `CelebrateState` / `GotchaState` |
-| `game.js:192, 195` | abilities only while playing | PR 8 | `AbilitySystem` asks `flow.current` (`PlayingState.allowsAbility`) |
-| `game.js:437, 450, 747, 759, 769` | game over, finishRun, finale victory, continueEndless / retire guards on "cleared" | PR 8 | `RunRecorder` / `FinaleController` with `GameOverState`, `VictoryState`, `ClearedState` |
-| `game.js:478, 480, 488, 489, 545` | open / close Workshop, toMenu | PR 8 | `WorkshopController` with `WorkshopState` / `MenuState` |
-| `game.js:552, 553, 556, 557` | togglePause playing ↔ paused | PR 8 | `PlayingState.pause()` / `PausedState.resume()` |
-| `render.js:133, 139, 141, 143, 174`; `demo.js:7` | render.js: finale intro dim, banner per state, low-HP pulse only while playing. **`demo.js:7`: `DemoScene` (the styles.html art demo, `extends World`, not `Game`) has its own plain `state` field set to "playing". It has no `flow`, and render.js reads it as `scene.state`.** | PR 8 (N12) | `RenderPipeline` layers read state flags (`showsFinaleIntro`, `banner`, `lowHpPulse`) from a `SceneFlags` object. `Game` gets it from `flow.current`. `DemoScene` drops its `state` field and passes a fixed "playing" `SceneFlags` |
-| `fx/FxDirector.js:137` | tower aura only in playing / celebrate / victory | PR 8 (N24) | a `towerAura` flag on those 3 states (the same `SceneFlags`) |
+| `game.js:32` | constructor sets "menu" | PR 9 (compat removal) | `this.flow.set("menu")` |
 | `ui.js:132, 190, 555` | Resume button, settings opened mid-run, HUD ability state | PR 9 (N14) | `PauseScreen` / `Hud` read `flow.current` |
 | `tools/sim.js:306, 315, 319, 328, 329, 335` | sim loop reads / sets the id | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` (sims must stay identical) |
 | `tools/world-test.js:52, 55, 156, 171, 385, 425, 427-429, 436-437, 470, 477-481, 483, 494, 503` | test setup, run loops and messages (483: door-run finale assert) | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` |
 | `tools/card-layout-test.py:135, 227` | page setup | PR 9 (compat removal) | `game.flow.set("menu")`, `game.flow.is("playing")` |
 | `tools/flow-test.js:55, 59-62, 122, 155` | tests of the compat itself: 55 checks that no state class uses it, 59-62 the getter/setter and the `"state"` own-property check, 122 the stub getter the old main.js oracle needs, 155 a message | PR 9 (compat removal) | the `"state" in game` check above; the oracle stub keeps its own getter (the old code reads `game.state`) |
+
+**Removed in PR 8** (main `738409a` lines; these are no longer compat sites, so they are not table rows):
+- `game.js:79` `selectWorld`: `WorkshopController.selectWorld` asks `flow.current.allowsWorldPick` (`MenuState`, `WorkshopState`) (`src/core/WorkshopController.js:10-17`).
+- `game.js:121, 142, 262, 297, 346, 379, 385, 405, 425, 763` shop: `ShopController` (`src/shop/ShopController.js`) guards with `flow.is("upgrade")` (its `open` getter, :9) and enters with `enter()` (:12-17) / `beginHeadStart` (`flow.set("upgrade")`, :36).
+- `game.js:173, 243, 253, 255, 375, 612` wave flow: `WaveFlow` (`src/core/WaveFlow.js`): `startNextWave` (:18), `afterStep` (:30), `endWave` (:60), `finishCelebration` (:69, :71), `dismissGotcha` (:83).
+- `game.js:192, 195` abilities: `AbilitySystem.ready()` / `use()` ask `flow.current.allowsAbility` (true only on `PlayingState`) (`src/abilities/AbilitySystem.js:11-15`).
+- `game.js:437, 450, 747, 759, 769`: `RunRecorder.gameOver` / `finishRun` (`src/core/RunRecorder.js:10, 24`), `FinaleController.won` / `continueEndless` / `retireToWorkshop` (`src/bosses/FinaleController.js:56, 69, 78`).
+- `game.js:478, 480, 488, 489, 545`: `WorkshopController.open` / `close` / `toMenu` (`src/core/WorkshopController.js:21-23, 33-34, 94`).
+- `game.js:552, 553, 556, 557` pause: `Game.togglePause` (`game.js:166`) calls `flow.current.togglePause`; `PlayingState.pause()` (`states/PlayingState.js:11-15`) and `PausedState.resume()` (`states/PausedState.js:6-10`); every other state ignores it.
+- `render.js:133, 139, 141, 143, 174` and `fx/FxDirector.js:137`: they read `scene.sceneFlags` (`render.js:132-143, 174`; `FxDirector.js:137`), a `SceneFlags` object (`src/core/SceneFlags.js`): `showsFinaleIntro`, `banner` ("wave" / "celebrate" / "victory" / null), `lowHpPulse`, `towerAura`. `Game.sceneFlags` (`game.js:43`) returns `flow.current.sceneFlags`; `GameState` returns `SceneFlags.NONE`, and `PlayingState` / `PausedState` / `CelebrateState` / `VictoryState` return PLAYING / PAUSED / CELEBRATE / VICTORY. `tools/systems-test.js` checks all 10 states against the old string checks. This is the state-flag slice of N12/N24; the layer and batcher split itself is PR 8b.
+- `demo.js:7`: `DemoScene` dropped its `state` field. It sets `this.sceneFlags = LST.SceneFlags.PLAYING` (`demo.js:7`); `styles.html` loads `SceneFlags.js`.
+
+### Landed in PR 8 (`oo-8-game-systems`): N3, N4, N5, N6, N7 and the PR 8 state checks
+`Game` (`game.js`, 812 → 262 lines) keeps the run's data, `reset`, `newGame`, `step`, low-HP, spawning and the World event hooks. Each public method that moved is now a one-line hand-off to its system (`game.js:99-166`, `251-261`), so `ui.js`, the states, `InputController` and the tools call the same names. Each system is created once in the `Game` constructor (`game.js:22-31`) with a back-reference to the game, and lives as long as the game. The RNG call order is unchanged; the 4 sims are identical.
+- **N3** `AbilitySystem` (`src/abilities/AbilitySystem.js:4-30`): `equip`, `ready`, `use`, `tick`. `Ability` base (`src/abilities/Ability.js:5-15`, registry by id) and `Shockwave` (`Shockwave.js:3-18`), `Freeze` (`Freeze.js:2-12`), `Overdrive` (`Overdrive.js:2-12`), each with its `name`, `desc`, `icon` (moved from the deleted `ui.js:684-690` maps; `ui.js` reads `LST.Ability.get(id)`) and `activate(game)`.
+- **N4** `ShopController` (`src/shop/ShopController.js:6-237`): `enter`, `beginHeadStart`, `advanceDraft`, `autoDraft` / `takeBest`, `deal`, `price`, `takeCard`, `openMysteryBox`, `returnableTrap`, `returnTrap`, `reroll`, `repair`, `canLeave`, `leave`. `game.shop` stays the shop's data (the UI reads it).
+- **N5** `RewardRules` (`src/core/RewardRules.js:4-12`): kill coins, score, the mini-boss bonus, and the pop pitch, read from the archetype: `CONFIG.enemies.*.popPitch` and `CONFIG.enemies.boss.killBonus` (`config.js:35-38`). `KillFeedback` (`src/core/KillFeedback.js:4-41`): `onKill` and `bossDown`. No `e.type === "boss"` and no pitch map left in `Game`.
+- **N6** `BossEventRouter` (`src/bosses/BossEventRouter.js:5-81`): windup, slam, charge, mole rise / burrow / phase, scripted phase banners (one `phaseBanner` method for both), Crabclaw arrival, coconuts, boss spawn. `FinaleController` (`src/bosses/FinaleController.js:5-83`): `begin`, `tick`, `holdsWave`, `won`, `continueEndless`, `retireToWorkshop`.
+- **N7** `RunRecorder` (`src/core/RunRecorder.js:5-58`): `gameOver`, `finishRun`, `showResults`, `saveBest`. `WorkshopController` (`src/core/WorkshopController.js:5-97`): `selectWorld`, `open`, `close`, `buyUpgrade`, `pickAbility`, `toggleBench`, `resetProgress`, `unlockCard`, `toMenu`.
+- Wave flow: `WaveFlow` (`src/core/WaveFlow.js:4-90`): `startNextWave`, `afterStep`, `endWave`, `finishCelebration`, `dismissGotcha`.
+- State flags: `GameState.allowsAbility` / `allowsWorldPick` / `sceneFlags` / `togglePause` (`src/core/GameState.js:17-20`); `SceneFlags` (`src/core/SceneFlags.js:9-22`).
+- Proof: `tools/systems-test.js` (`SystemsTest`, in CI): each system is one class in its own file, loaded by `index.html`, `sw.js` and the sim; every moved `Game` method is a one-line hand-off; each system driven directly does its job; `SceneFlags` match the old state checks in all 10 states; `DemoScene` has no `state` field.
+- **Split for review size:** N8 (`EnemySpawner` / `DamageSystem` / `FxSpawner`), N12 (`RenderPipeline` layers) and N24 (`FxRenderer` batcher) move to PR 8b. PR 8 is about 2,000 changed lines; the three together would add roughly 1,200 more.
 
 ### Landed in PR #5 (2026-11-13)
 - `ChillFrost`: StatusLook, active while `Enemy.slowTimer > 0` and not frozen. Plays `attach` (2f @12 fps, once), then `loop` (4f @8 fps); `still` for reduced motion; `fade` (2f @12 fps, once) when the slow wears off. No fade when the enemy freezes (IceCrust takes over at once), dies, or with reduced motion. Draws nothing until its sheet loads.
@@ -109,7 +123,7 @@ Per Decision 8, the frozen tint and its SpriteTinter use are removed in PR #5, a
 
 ## 1. Visual inventory (code-drawn art; audited at fc3f443, status refreshed at PR #5 v25)
 
-Status column: **done** = landed in PR #5; **PR n** = planned PR in section 3; line numbers are current on main `99ea184` (PR 7 changes only `game.js` and `main.js` among these files; section 2 gives their PR 7 lines).
+Status column: **done** = landed in PR #5; **PR n** = planned PR in section 3; line numbers are current on main `99ea184` (PR 7 changed only `game.js` and `main.js` among these files; PR 8 moved the `game.js` B-row sites into the system files named in the rows, and changed `render.js:132-143, 174` and `FxDirector.js:137` only for `SceneFlags`; section 2 gives the current lines).
 
 The image check:
 - **Real image files:** all enemy bodies (basic, fast body/face, tank, big_red, all King Mole sheets, with clips for walk/idle/death and boss attacks). The pupils (EyeLayer) are images too.
@@ -130,11 +144,11 @@ The image check:
 ### B. FX, particles and screen effects — 24 items
 | # | Where | Looks like / when | Owner | Art ask |
 |---|---|---|---|---|
-| B1 | `effects.js:10-82`, kind `shockwave` (`game.js:206`) | White ring, Shockwave ability | `ShockwaveRing`, `src/fx/bursts/ShockwaveRing.js` | Ring expand one-shot, 8 frames |
-| B2 | same, `freeze` (`game.js:211`) | Blue ring plus stars, Freeze ability | `FreezeBlast` | Ice ring and snowflake burst, 8 frames |
-| B3 | same, `overdrive` (`game.js:214`) | Orange ring, Overdrive starts | `OverdriveBurst` | Orange ring, 8 frames |
+| B1 | `effects.js:10-82`, kind `shockwave` (`abilities/Shockwave.js:15`) | White ring, Shockwave ability | `ShockwaveRing`, `src/fx/bursts/ShockwaveRing.js` | Ring expand one-shot, 8 frames |
+| B2 | same, `freeze` (`abilities/Freeze.js:10`) | Blue ring plus stars, Freeze ability | `FreezeBlast` | Ice ring and snowflake burst, 8 frames |
+| B3 | same, `overdrive` (`abilities/Overdrive.js:10`) | Orange ring, Overdrive starts | `OverdriveBurst` | Orange ring, 8 frames |
 | B4 | same, `slam` (`world.js:124`) | Red ring when the tower is hit | `SlamRing` | Red impact ring, 6 frames |
-| B5 | same, `dirt` (`game.js:708,715`) | Dirt puff, mole dig/rise | `DirtPuff` | Dirt clod puff, 6 frames |
+| B5 | same, `dirt` (`bosses/BossEventRouter.js:26,34`) | Dirt puff, mole dig/rise | `DirtPuff` | Dirt clod puff, 6 frames |
 | B6 | same, `splash` (`world.js:161`) | Splash-damage ring | `SplashRing` | Orange splash ring, 6 frames |
 | B7 | same, `hit` / crit (`world.js:115,140`) | Small hit star | `HitStar` | 4-frame hit star; crit variant |
 | B8 | same, `kill` (`world.js:177`) | "Pow" star when an enemy dies | `KillPow` | Pow star, 6 frames |
@@ -264,18 +278,18 @@ Brian: "Text outlines and focus rings can stay in code." These stay CSS as **all
 ## 2. Non-OO code inventory
 | # | Where | Problem | Becomes (class, file) |
 |---|---|---|---|
-| N1 | `game.js` (812 lines after PR 7), `Game extends World` | God class: run flow, shop, abilities, workshop, finale, results, boss events | **Flow slice landed in PR 7** (`game.flow`). The rest is split up as below (PR 8) |
-| N2 | **Landed in PR 7.** Was `game.js@99ea184:573-618` update. Now `game.js:578-587` update calls `this.flow.update`; `game.js:21-22` compat getter/setter | String state machine (`this.state === "playing"` and so on) | `GameStateMachine` (`src/core/GameStateMachine.js:6-28`) and `GameState` (`src/core/GameState.js:8-15`), plus `MenuState` (`states/MenuState.js:2-9`), `PlayingState` (`states/PlayingState.js:3-24`), `PausedState` (`states/PausedState.js:2-4`), `CelebrateState` (`states/CelebrateState.js:2-9`), `ShopState` ("upgrade", `states/ShopState.js:3-13`), `GotchaState` (`states/GotchaState.js:2-8`), `GameOverState` (`states/GameOverState.js:3-17`), `WorkshopState` (`states/WorkshopState.js:3-9`), `VictoryState` (`states/VictoryState.js:3-11`), `ClearedState` (`states/ClearedState.js:2-8`). Remaining id comparisons: see "`game.state` is a compat getter/setter" |
-| N3 | `game.js:194-221` useAbility | `if id === "shockwave" / "freeze" / "overdrive"` | `AbilitySystem` plus `Shockwave`, `Freeze`, `Overdrive` (`src/abilities/*.js`). The `ui.js:686-690` icon, name and description maps move onto these classes |
-| N4 | `game.js` shop methods (open, price, take card, reroll, repair, mystery box, leave) | Mixed into Game | `ShopController` (`src/shop/ShopController.js`) |
-| N5 | `game.js:658-688` onEnemyKilled | `e.type === "boss"`, plus the `{basic,fast,tank,boss}[e.type]` pitch map | `RewardRules` / `KillFeedback` (`src/core/KillFeedback.js`); pitch and bonus live on the enemy archetype |
-| N6 | `game.js:689-807` onSlamWindup, onBossCharge, mole events, finale | Boss event handlers in Game | `BossEventRouter` (`src/bosses/BossEventRouter.js`) plus `FinaleController` |
-| N7 | `game.js` results, best scores, workshop | Mixed in | `RunRecorder` (`src/core/RunRecorder.js`), `WorkshopController` |
-| N8 | `world.js` (205), type branch at 70 | Spawning, damage, splash and FX spawning in one class | `EnemySpawner`, `DamageSystem` (`src/core/DamageSystem.js`), `FxSpawner` (`src/fx/FxSpawner.js`) |
+| N1 | `game.js` (812 lines after PR 7; 262 after PR 8), `Game extends World` | God class: run flow, shop, abilities, workshop, finale, results, boss events | **Flow slice landed in PR 7** (`game.flow`). **Systems landed in PR 8** (N3–N7 below); `Game` keeps run data, `reset`, `newGame`, `step` and the World hooks, and hands each moved method to its system (`game.js:99-166, 251-261`) |
+| N2 | **Landed in PR 7.** Was `game.js@99ea184:573-618` update. Now `game.js:175-184` update calls `this.flow.update`; `game.js:40-41` compat getter/setter | String state machine (`this.state === "playing"` and so on) | `GameStateMachine` (`src/core/GameStateMachine.js:6-28`) and `GameState` (`src/core/GameState.js:8-15`), plus `MenuState` (`states/MenuState.js:2-9`), `PlayingState` (`states/PlayingState.js:3-24`), `PausedState` (`states/PausedState.js:2-4`), `CelebrateState` (`states/CelebrateState.js:2-9`), `ShopState` ("upgrade", `states/ShopState.js:3-13`), `GotchaState` (`states/GotchaState.js:2-8`), `GameOverState` (`states/GameOverState.js:3-17`), `WorkshopState` (`states/WorkshopState.js:3-9`), `VictoryState` (`states/VictoryState.js:3-11`), `ClearedState` (`states/ClearedState.js:2-8`). Remaining id comparisons: see "`game.state` is a compat getter/setter" |
+| N3 | **Landed in PR 8.** Was `game.js@738409a:192-220` useAbility | `if id === "shockwave" / "freeze" / "overdrive"` | `AbilitySystem` (`src/abilities/AbilitySystem.js:4-30`) plus `Ability` (`Ability.js:5-15`), `Shockwave` (`Shockwave.js:3-18`), `Freeze` (`Freeze.js:2-12`), `Overdrive` (`Overdrive.js:2-12`). The `ui.js@738409a:684-690` icon, name and description maps moved onto these classes (`ui.js` reads `LST.Ability.get(id)`) |
+| N4 | **Landed in PR 8.** Was `game.js@738409a:104-161, 266-434` (Head Start draft and shop) | Mixed into Game | `ShopController` (`src/shop/ShopController.js:6-237`) |
+| N5 | **Landed in PR 8.** Was `game.js@738409a:658-686` onEnemyKilled | `e.type === "boss"`, plus the `{basic,fast,tank,boss}[e.type]` pitch map | `RewardRules` (`src/core/RewardRules.js:4-12`) and `KillFeedback` (`src/core/KillFeedback.js:4-41`); pitch and bonus live on the archetype (`config.js:35-38`: `popPitch`, `killBonus`) |
+| N6 | **Landed in PR 8.** Was `game.js@738409a:689-799` boss events and finale (plus finale start 175-187 and intro 594-603) | Boss event handlers in Game | `BossEventRouter` (`src/bosses/BossEventRouter.js:5-81`) plus `FinaleController` (`src/bosses/FinaleController.js:5-83`) |
+| N7 | **Landed in PR 8.** Was `game.js@738409a:436-549, 568-574` (results, best wave, workshop, menu) | Mixed in | `RunRecorder` (`src/core/RunRecorder.js:5-58`), `WorkshopController` (`src/core/WorkshopController.js:5-97`); wave flow `WaveFlow` (`src/core/WaveFlow.js:4-90`) |
+| N8 | **PR 8b** (split from PR 8 for size). `world.js` (205), type branch at 70 | Spawning, damage, splash and FX spawning in one class | `EnemySpawner`, `DamageSystem` (`src/core/DamageSystem.js`), `FxSpawner` (`src/fx/FxSpawner.js`) |
 | N9 | `entities.js` (519): `Enemy.updateBoss` 156-202, `type==="boss"` at 134, `isBoss` at 113 | Big Red is a type branch inside Enemy | `BigRed extends Enemy` (`src/bosses/BigRed.js`) |
 | N10 | `entities.js` FloatText kinds 338, 345; Burst kinds; Particle, Confetti, Corpse, KingMole all in one file | One file for many entities, plus kind switches | One file each: `src/entities/*.js`, `src/bosses/KingMole.js`, FloatText and Burst subclasses (see B) |
 | N11 | `Enemy.slowTimer` / `slowAmount` ad-hoc fields (`entities.js:116-127, 443`; `BossScript.js:27`) | Slow is not a StatusEffect, unlike frozen/burn/venom | `Chill` StatusEffect (`src/elements/Chill.js`). **Sim risk:** it must keep the exact tick order. Optional, and last |
-| N12 | `render.js` Renderer | Theme dispatch, inline overdrive and finale, banner branches by state | `RenderPipeline` with ordered layer objects: `BackdropLayer`, `EnemyLayer`, `TowerLayer`, `FxLayer`, `HudCanvasLayer`, `OverlayLayer` |
+| N12 | **PR 8b** (split from PR 8 for size). `render.js` Renderer. Its state-string checks were removed in PR 8 (`SceneFlags`) | Theme dispatch, inline overdrive and finale, banner branches by state (now by `SceneFlags`) | `RenderPipeline` with ordered layer objects: `BackdropLayer`, `EnemyLayer`, `TowerLayer`, `FxLayer`, `HudCanvasLayer`, `OverlayLayer` |
 | N13 | `themes/cartoon/*.js` via `LST.CartoonKit.methods` | Procedural object-literal theme assembly | Removed. Every visual is a view class (sections A–E) |
 | N14 | `ui.js` (701): constructor 5-180 wires the DOM; inline `innerHTML` screens: start 202, results 277, workshop tabs 405-523, shop 587 | Screens built as strings inside one class | `Screen` base plus `StartScreen`, `ResultsScreen`, `ShopScreen`, `WorkshopScreen` (`CardsTab`, `UpgradesTab`, `DeckTab`, `CodexTab`), `PauseScreen`, `Hud`, `BossBar`, `Toast` (`src/ui/screens/*.js`) |
 | N15 | **Landed in PR 7.** Was `main.js@99ea184:30-64` (keydown chain 30-59, visibilitychange 62-64) | Keyboard `switch` on `game.state` | `InputController` (`src/core/InputController.js:5-40`), attached at `main.js:31`. Each state owns its own keys (`onKey`) |
@@ -287,10 +301,10 @@ Brian: "Text outlines and focus rings can stay in code." These stay CSS as **all
 | N21 | `config.js` LST.CONFIG, mutated at runtime by `CaptainCrabclaw.js:10,26` | Global mutable config | Frozen config plus per-archetype definitions in `EnemyRegistry`. No runtime writes |
 | N22 | `WorldRenderers.js:24` sets static `LST.SheetRenderer.reduced` each frame; type-keyed maps | Static mutable flag | Pass a `RenderContext {reduced, low}`; `WorldRendererRegistry` class |
 | N23 | `EnemyAnimationRules` keyed by type | Rules table outside the enemy views | Moved into each `EnemyView` |
-| N24 | `FxRenderer` one class draws every FX kind | God renderer | Per-effect classes (section B). FxRenderer becomes a thin batcher |
+| N24 | **PR 8b** (split from PR 8 for size). `FxRenderer` one class draws every FX kind (FxDirector's state check was removed in PR 8: `SceneFlags.towerAura`) | God renderer | Per-effect classes (section B). FxRenderer becomes a thin batcher |
 | N25 | `pwa.js` | IIFE that builds an inline toast | `UpdateNotifier` using the `Toast` screen |
 | N26 | `index.html` script-order loading on the global `LST` | Implicit dependencies | Keep the globals for now (no bundler). Order is documented per module. **Judgment** |
-| N27 | **Tool objects landed in PR 7.** `tools/ui-chrome-scan.js`, `tools/flow-test.js`, `tools/flow-state-sweep.js` | Scanner / test logic used to be loose module code | `UiChromeScanner` (`tools/ui-chrome-scan.js:11-103`): scans CSS + doc coverage and categories (image art / allowed code-styled / banned recolor); `FlowTest` (`tools/flow-test.js:14-169`): game-flow tests + git oracle; `FlowStateSweep` (`tools/flow-state-sweep.js:12-95`): all compat reads/writes mapped with file:line. Each owns its root path, methods and run result, created once by the one-line CLI entry point and discarded on exit. They change no game state outside the test sandbox. No loose functions (only class methods and callbacks inside them). `world-test.js` / `sim.js` edits add no functions; their pre-existing helpers are unchanged |
+| N27 | **Tool objects landed in PR 7 (and PR 8).** `tools/ui-chrome-scan.js`, `tools/flow-test.js`, `tools/flow-state-sweep.js`, `tools/systems-test.js` | Scanner / test logic used to be loose module code | `UiChromeScanner` (`tools/ui-chrome-scan.js:11-103`): scans CSS + doc coverage and categories (image art / allowed code-styled / banned recolor); `FlowTest` (`tools/flow-test.js:14-169`): game-flow tests + git oracle; `FlowStateSweep` (`tools/flow-state-sweep.js`): all compat reads/writes mapped with file:line, plus (PR 8) stale-row and cleared-file checks; `SystemsTest` (`tools/systems-test.js`, PR 8): the game systems own their behaviour. Each owns its root path, methods and run result, created once by the one-line CLI entry point and discarded on exit. They change no game state outside the test sandbox. No loose functions (only class methods and callbacks inside them). `world-test.js` / `sim.js` edits add no functions; their pre-existing helpers are unchanged |
 
 ---
 
@@ -324,8 +338,9 @@ Each PR is shippable on its own. Each one: unit tests, the 4 sim hashes unchange
    - Adds the `Bar` object (frame + fill images) for HP, boss HP, unlock and cooldown bars, late in this PR.
    - Art: 33 card icons, about 16 UI icons with toggle states, coin, card frame set, shimmer, sparkle, bar frames and fills, and the F6 frame sets (buttons, round buttons, pills, panels, rows, tiles, tabs, world cards).
 7. **PR 7: Game flow** (N1 flow slice, N2, N15). **Landed** (GitHub PR #6): GameState, GameStateMachine, the 10 state classes and InputController. Art: none.
-8. **PR 8: Game systems** (N3–N8, N24, N12). AbilitySystem/abilities, ShopController, KillFeedback, BossEventRouter, FinaleController, RunRecorder, WorkshopController, EnemySpawner/DamageSystem/FxSpawner, RenderPipeline layers. It removes every `game.state` comparison in `game.js`, `render.js` and `FxDirector.js` (see the compat map under PR 7). Art: none.
-9. **PR 9: UI screens** (N14, N25). Screen classes, Hud, BossBar, Toast, UpdateNotifier. It removes the `ui.js` state comparisons, then (last commit) **deletes the `game.state` compat getter/setter** (`game.js:21-22`) and moves the tools to `game.flow`. Art: none.
+8. **PR 8: Game systems** (N3–N7). AbilitySystem/abilities, ShopController, RewardRules/KillFeedback, BossEventRouter, FinaleController, RunRecorder, WorkshopController, WaveFlow. It removes every `game.state` comparison in `game.js` (except the constructor's), `render.js` and `FxDirector.js` (`SceneFlags`; `DemoScene` drops its `state`). SW v27. Art: none.
+   - **PR 8b** (split for review size): N8 EnemySpawner/DamageSystem/FxSpawner, N12 RenderPipeline layers, N24 FxRenderer batcher. Art: none.
+9. **PR 9: UI screens** (N14, N25). Screen classes, Hud, BossBar, Toast, UpdateNotifier. It removes the `ui.js` state comparisons, then (last commit) **deletes the `game.state` compat getter/setter** (`game.js:40-41`) and moves the tools to `game.flow`. Art: none.
 10. **PR 10: Stores, services and data** (N16–N22, optionally N11). MetaStore, AudioEngine/SfxLibrary/MusicSequencer, Settings/Haptics, Card/Trap registries, WaveCurve, frozen config, RenderContext. Art: none.
 
 The art PRs (1–6) are blocked on Game Art & Motion delivering. The logic PRs (7–10) need no art, so they can run while art is in production.
@@ -333,8 +348,8 @@ The art PRs (1–6) are blocked on Game Art & Motion delivering. The logic PRs (
 ---
 
 ## 4. Main notes
-- Main is `99ea184` (PR #5 merged Nov 13, 8:07 AM ET; live as SW v25). The old main `70bff8c` code-drawn LookKit looks and `FxRenderer.drawStatusRings` are gone from main.
-- `tools/sim-check.js` still compares against the committed hashes recorded at `70bff8c`; they are unchanged by PR #5 and PR 7.
+- Main is `738409a` (PR #6 / OO PR 7 merged Nov 14, 3:40 PM ET; live as SW v26). Before that `99ea184` (PR #5, Nov 13, 8:07 AM ET, SW v25). The old main `70bff8c` code-drawn LookKit looks and `FxRenderer.drawStatusRings` are gone from main.
+- `tools/sim-check.js` still compares against the committed hashes recorded at `70bff8c`; they are unchanged by PR #5, PR 7 and PR 8.
 
 ## 5. Other tower-defense repos under /workspace
 None. The only TD code is clones of last-stand-tower:

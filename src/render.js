@@ -129,18 +129,18 @@ LST.Renderer = class Renderer {
     for (const t of scene.texts) theme.text(ctx, t, this);
     ctx.restore();
 
-    const fin = scene.finale;
-    if (fin && !fin.mole && !fin.won && (scene.state === "playing" || scene.state === "paused")) {
+    const fin = scene.finale, flags = scene.sceneFlags; // SceneFlags (src/core/SceneFlags.js)
+    if (fin && !fin.mole && !fin.won && flags.showsFinaleIntro) {
       // Finale intro: the lawn goes dark, then the banner slams in.
       const total = LST.CONFIG.finale.introTime;
       ctx.fillStyle = `rgba(30, 15, 40, ${0.45 * Math.min(1, (total - fin.intro) / 0.5)})`;
       ctx.fillRect(0, 0, this.width, this.height);
     }
-    if (scene.state === "celebrate") {
+    if (flags.banner === "celebrate") {
       theme.banner(ctx, "WAVE CLEAR!", Math.min(1, scene.celebrateTimer / 0.35), this);
-    } else if (scene.state === "victory") {
+    } else if (flags.banner === "victory") {
       theme.banner(ctx, "VICTORY!", Math.min(1, scene.victoryTimer / 0.35), this);
-    } else if (scene.state === "playing" || scene.state === "paused") {
+    } else if (flags.banner === "wave") {
       if (fin && !fin.mole && !fin.won && fin.intro < LST.CONFIG.finale.introTime - 0.4) {
         const t = Math.min(2.6, fin.intro);
         if (theme.bossBanner) theme.bossBanner(ctx, t, this, { total: 2.6, title: "FINALE!", sub: (scene.world && scene.world.copy.finaleSub) || "King Mole rises!", color: "#ffffff" });
@@ -171,7 +171,7 @@ LST.Renderer = class Renderer {
   // Screen-space feedback shared by every theme: red low-HP vignette and white flash.
   // reduced (reduced motion): no white flash.
   drawOverlays(ctx, scene, reduced = false) {
-    const low = scene.lowHpActive && scene.state === "playing" ? 0.22 + 0.1 * Math.sin(this.time * 6) : 0;
+    const low = scene.lowHpActive && scene.sceneFlags.lowHpPulse ? 0.22 + 0.1 * Math.sin(this.time * 6) : 0;
     const v = Math.max(scene.vignette || 0, low);
     if (v > 0.01) {
       const w = this.width, h = this.height;
