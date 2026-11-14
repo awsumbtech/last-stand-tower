@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v25"; // ChillFrost v0.1.1 (cyan ice chips, rim inside the body edge, authored fade); neon/pixel hidden (ThemeSelector)
+const VERSION = "v26"; // Game flow: GameStateMachine + one GameState class per state, InputController
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -110,6 +110,19 @@ const PRECACHE = [
   "src/ui/WorldSelect.js",
   "src/ui/WorldScreens.js",
   "src/ui.js",
+  "src/core/GameState.js",
+  "src/core/GameStateMachine.js",
+  "src/core/states/MenuState.js",
+  "src/core/states/PlayingState.js",
+  "src/core/states/PausedState.js",
+  "src/core/states/CelebrateState.js",
+  "src/core/states/ShopState.js",
+  "src/core/states/GotchaState.js",
+  "src/core/states/GameOverState.js",
+  "src/core/states/WorkshopState.js",
+  "src/core/states/VictoryState.js",
+  "src/core/states/ClearedState.js",
+  "src/core/InputController.js",
   "src/game.js",
   "src/demo.js",
   "src/main.js",

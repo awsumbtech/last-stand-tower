@@ -398,7 +398,7 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
   const all = [...FILES, ...RENDER_FILES, ...UI_FILES, "core/DevFlags.js", "core/DevRunGuard.js"].map((f) => "src/" + f);
   ok(all.every((f) => html.includes(`src="${f}"`)), "index.html loads every World 2 script");
-  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v25"/.test(sw), "sw.js v25 precaches every World 2 script");
+  ok(all.every((f) => sw.includes(`"${f}"`)) && /const VERSION = "v26"/.test(sw), "sw.js v26 precaches every World 2 script");
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
   const at = (f) => scripts.indexOf("src/" + f);
   ok(at("waves.js") < at("enemies/parts/EnemyPart.js") && at("worlds/Beach.js") < at("game.js") && at("sprites/LookSheetLibrary.js") < at("worlds/render/World2Sheets.js") && at("worlds/render/WorldRenderers.js") < at("main.js"), "index.html script order: systems after waves.js, renderers after LookSheetLibrary, all before main.js");
@@ -420,14 +420,16 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   const { LST, game } = load(5);
   game.useWorld(LST.WorldRegistry.get("beach"));
   game.reset(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
-  const seen = new Set(); let maxHz = 0, err = null;
+  const seen = new Set(); let maxHz = 0, err = null, shopVisits = 0;
   try {
     for (let w = 0; w < 20 && !["cleared", "victory"].includes(game.state); w++) {
       game.startNextWave();
       for (let i = 0; i < 60 * 240 && game.state === "playing"; i++) { game.step(1 / 60); for (const e of game.enemies) seen.add(e.archetype || e.type); maxHz = Math.max(maxHz, game.hazards.length); }
-      if (game.state === "shop") game.state = "menu";
+      if (game.state === "celebrate") game.finishCelebration();
+      if (game.state === "upgrade") { shopVisits++; game.state = "menu"; } // leave the shop (its id is "upgrade")
     }
   } catch (e) { err = e; }
+  ok(shopVisits > 0, "smoke: the run reached the between-wave shop (\"upgrade\") and left it " + shopVisits + " times");
   ok(!err, "smoke: 20 Beach waves run without errors" + (err ? " (" + err.message + ")" : ""));
   ok(["basic", "crab", "gull", "boss", "bigRedElite", "crabclaw"].every((t) => seen.has(t)), "smoke: saw " + [...seen].join(", "));
   const fb = game.finale && game.finale.mole;
@@ -467,7 +469,7 @@ function devFlagsAt(href) {
   LST.DevFlags = Object.freeze({ enabled: true, local: true, unlocks: Object.freeze(["beach"]) });
   game.state = "menu";
   ok(game.selectWorld("beach") && game.world.id === "beach" && store["lst.meta"] === before && LST.meta.state.world === "backyard", "door run: picking the door-only Beach saves no world pick");
-  let err = null;
+  let err = null, doorShops = 0;
   try {
     game.newGame();
     ok(game.devRun === true && LST.DevRunGuard.active, "door run: newGame marks a door-only world run as a dev run");
@@ -475,9 +477,11 @@ function devFlagsAt(href) {
     for (let w = 0; w < 21 && !["cleared", "victory"].includes(game.state); w++) {
       if (game.state !== "playing") game.startNextWave();
       for (let i = 0; i < 60 * 240 && game.state === "playing"; i++) game.step(1 / 60);
-      if (game.state === "shop") game.state = "menu";
+      if (game.state === "celebrate") game.finishCelebration();
+      if (game.state === "upgrade") { doorShops++; game.state = "menu"; } // leave the shop (its id is "upgrade")
     }
     ok(["cleared", "victory"].includes(game.state) && LST.meta.worldCleared("beach") && LST.meta.state.worlds.beach.best > 0, "door run: the Beach finale was cleared in memory during the run (state " + game.state + ")");
+    ok(doorShops > 0, "door run: the run reached the between-wave shop (\"upgrade\") and left it " + doorShops + " times");
     game.finishRun({ won: true });
   } catch (e) { err = e; }
   ok(!err, "door run: ran start to finish without errors" + (err ? " (" + err.stack + ")" : ""));
