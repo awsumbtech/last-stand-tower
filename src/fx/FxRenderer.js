@@ -33,4 +33,3 @@ LST.FxRenderer = class FxRenderer {
   // Screen layer
   drawFlashes(ctx, camera, r) { this.flashes.draw(this, ctx, camera, r); }
 };
-LST.FxRenderer.FADE_STEPS = LST.ParticleBatch.FADE_STEPS;
