@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v27"; // OO game systems
+const VERSION = "v28"; // OO world split (EnemySpawner / DamageSystem / FxSpawner), RenderPipeline layers, FxRenderer batcher
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -33,6 +33,9 @@ const PRECACHE = [
   "src/elements/Shatter.js",
   "src/meta.js",
   "src/entities.js",
+  "src/core/EnemySpawner.js",
+  "src/core/DamageSystem.js",
+  "src/fx/FxSpawner.js",
   "src/world.js",
   "src/waves.js",
   "src/enemies/parts/EnemyPart.js",
@@ -52,6 +55,15 @@ const PRECACHE = [
   "src/worlds/WorldRegistry.js",
   "src/worlds/Backyard.js",
   "src/worlds/Beach.js",
+  "src/render/RenderLayer.js",
+  "src/render/OverdriveRing.js",
+  "src/render/BackdropLayer.js",
+  "src/render/EnemyLayer.js",
+  "src/render/TowerLayer.js",
+  "src/render/FxLayer.js",
+  "src/render/HudCanvasLayer.js",
+  "src/render/OverlayLayer.js",
+  "src/render/RenderPipeline.js",
   "src/render.js",
   "src/sprites/SpriteAtlas.js",
   "src/sprites/SpriteLibrary.js",
@@ -95,6 +107,14 @@ const PRECACHE = [
   "src/fx/TowerAura.js",
   "src/fx/ImpactSync.js",
   "src/fx/ScreenAnchors.js",
+  "src/fx/draw/GlowSprites.js",
+  "src/fx/draw/TowerGroundGlow.js",
+  "src/fx/draw/ProjectileTrails.js",
+  "src/fx/draw/ChainArcs.js",
+  "src/fx/draw/TextGlows.js",
+  "src/fx/draw/ParticleBatch.js",
+  "src/fx/draw/ImpactPulses.js",
+  "src/fx/draw/ImpactFlashes.js",
   "src/fx/FxRenderer.js",
   "src/elements/looks/StatusLook.js",
   "src/elements/looks/LookRegistry.js",

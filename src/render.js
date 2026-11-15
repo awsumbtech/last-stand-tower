@@ -1,4 +1,6 @@
-// Renderer: owns the canvas, sizing, the world transform and screen shake.
+// Renderer: owns the canvas, sizing, the theme and the pixel-art low-res pass. The frame itself
+// is a RenderPipeline of ordered layers (src/render/: BackdropLayer, EnemyLayer, TowerLayer,
+// FxLayer, HudCanvasLayer, OverlayLayer), which also owns the world transform and screen shake.
 // What things actually LOOK like is up to the active theme (src/themes/*.js).
 //
 // A theme is a plain object registered in LST.themes:
@@ -27,6 +29,7 @@ LST.Renderer = class Renderer {
     this.height = 0;
     this.time = 0;
     this.low = null; // offscreen canvas for pixel-art themes
+    this.pipeline = new LST.RenderPipeline(); // the frame's ordered layers (src/render/*.js)
     this.setTheme(theme || LST.themes.neon);
   }
 
@@ -79,111 +82,13 @@ LST.Renderer = class Renderer {
       this.px = 1 / this.scale;
     }
 
-    // World transform: origin at the center, plus screen shake.
-    // Effects (src/fx) are optional: this.fx is an FxDirector or null (styles.html demo).
-    const fx = this.fx;
-    const reduced = fx ? fx.reducedMotion : false;
-    const snap = (v) => (ps ? Math.round(v / ps) * ps : v);
-    const shakeAmt = reduced ? 0 : Math.max(scene.shake || 0, fx ? fx.shake : 0);
-    const shake = shakeAmt > 0 ? shakeAmt * 8 : 0;
-    ctx.save();
-    ctx.translate(
-      snap(this.width / 2 + (Math.random() - 0.5) * shake),
-      snap(this.height / 2 + (Math.random() - 0.5) * shake)
-    );
-    ctx.scale(this.scale, this.scale);
-
-    // World 2 art (src/worlds/render/WorldRenderers.js): a world with its own ground owns the
-    // background layer; enemies / coconuts with a world renderer are drawn by it, from images only.
-    const W = LST.WorldRenderers || null;
-    const backdrop = W ? W.background(scene.world) : null;
-    if (backdrop) backdrop.draw(ctx, this, scene); else theme.background(ctx, this, scene);
-    theme.range(ctx, scene.tower, this);
-    if (W && scene.hazards && scene.hazards.length) W.groundHazards(ctx, scene.hazards, this);
-    if (fx) fx.drawUnder(ctx, scene, this);
-    if (scene.tower.overdrive > 0) {
-      // Overdrive: a hot orange pulse around the tower
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(0, 0, scene.tower.radius * (1.9 + 0.25 * Math.sin(this.time * 18)), 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 159, 67, 0.35)";
-      ctx.fill();
-      ctx.restore();
-    }
-    for (const p of scene.particles) theme.particle(ctx, p, this);
-    if (theme.corpse && scene.corpses) for (const c of scene.corpses) theme.corpse(ctx, c, this);
-    if (W) W.shadows(ctx, scene.enemies, this); // World 2 baked shadows (gull) under every enemy
-    for (const e of scene.enemies) {
-      if (e.corpse) continue; // a Corpse now owns its look
-      const hud = theme.enemyHud ? () => theme.enemyHud(ctx, e, this) : null; // reuse the theme's HP bar
-      if (!(W && W.enemy(ctx, e, this, () => theme.enemy(ctx, e, this), hud))) theme.enemy(ctx, e, this);
-    }
-    if (fx) fx.drawProjectiles(ctx, scene);
-    for (const p of scene.projectiles) theme.projectile(ctx, p, this);
-    theme.tower(ctx, scene.tower, this);
-    if (W && scene.hazards && scene.hazards.length) W.airHazards(ctx, scene.hazards, this);
-    if (fx) fx.drawWorld(ctx, scene);
-    if (theme.burst) for (const b of scene.bursts) theme.burst(ctx, b, this);
-    if (scene.confetti) for (const c of scene.confetti) (theme.confetti || LST.draw.confetti)(ctx, c, this);
-    if (fx) fx.drawTextGlows(ctx, scene);
-    for (const t of scene.texts) theme.text(ctx, t, this);
-    ctx.restore();
-
-    const fin = scene.finale, flags = scene.sceneFlags; // SceneFlags (src/core/SceneFlags.js)
-    if (fin && !fin.mole && !fin.won && flags.showsFinaleIntro) {
-      // Finale intro: the lawn goes dark, then the banner slams in.
-      const total = LST.CONFIG.finale.introTime;
-      ctx.fillStyle = `rgba(30, 15, 40, ${0.45 * Math.min(1, (total - fin.intro) / 0.5)})`;
-      ctx.fillRect(0, 0, this.width, this.height);
-    }
-    if (flags.banner === "celebrate") {
-      theme.banner(ctx, "WAVE CLEAR!", Math.min(1, scene.celebrateTimer / 0.35), this);
-    } else if (flags.banner === "victory") {
-      theme.banner(ctx, "VICTORY!", Math.min(1, scene.victoryTimer / 0.35), this);
-    } else if (flags.banner === "wave") {
-      if (fin && !fin.mole && !fin.won && fin.intro < LST.CONFIG.finale.introTime - 0.4) {
-        const t = Math.min(2.6, fin.intro);
-        if (theme.bossBanner) theme.bossBanner(ctx, t, this, { total: 2.6, title: "FINALE!", sub: (scene.world && scene.world.copy.finaleSub) || "King Mole rises!", color: "#ffffff" });
-        else theme.banner(ctx, "FINALE", Math.min(1, t), this);
-      } else if (scene.phaseBanner) {
-        const p = scene.phaseBanner;
-        if (theme.bossBanner) theme.bossBanner(ctx, p.t, this, { total: p.max, title: p.text, sub: p.sub });
-        else theme.banner(ctx, p.text, Math.min(1, p.t), this);
-      } else if (scene.bossIntro > 0) {
-        if (theme.bossBanner) theme.bossBanner(ctx, scene.bossIntro, this);
-        else theme.banner(ctx, "BOSS", Math.min(1, scene.bossIntro), this);
-      } else if (scene.waveIntro > 0) {
-        theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), this);
-      }
-    }
-
-    this.drawOverlays(ctx, scene, reduced);
-    if (fx) fx.drawScreen(ctx, this);
+    this.pipeline.draw(this, ctx, scene); // ordered layers (src/render/RenderPipeline.js)
 
     if (ps) {
       const main = this.ctx;
       main.setTransform(1, 0, 0, 1, 0, 0);
       main.imageSmoothingEnabled = false;
       main.drawImage(this.low, 0, 0, this.low.width * ps * this.dpr, this.low.height * ps * this.dpr);
-    }
-  }
-
-  // Screen-space feedback shared by every theme: red low-HP vignette and white flash.
-  // reduced (reduced motion): no white flash.
-  drawOverlays(ctx, scene, reduced = false) {
-    const low = scene.lowHpActive && scene.sceneFlags.lowHpPulse ? 0.22 + 0.1 * Math.sin(this.time * 6) : 0;
-    const v = Math.max(scene.vignette || 0, low);
-    if (v > 0.01) {
-      const w = this.width, h = this.height;
-      const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.hypot(w, h) * 0.55);
-      g.addColorStop(0, "rgba(255, 40, 70, 0)");
-      g.addColorStop(1, `rgba(255, 40, 70, ${Math.min(0.75, v * 0.75)})`);
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
-    }
-    if (scene.flash > 0.01 && !reduced) { // softer when FX add their own bloom
-      ctx.fillStyle = `rgba(255, 255, 255, ${scene.flash * (this.fx ? 0.28 : 0.55)})`;
-      ctx.fillRect(0, 0, this.width, this.height);
     }
   }
 };

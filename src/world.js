@@ -1,9 +1,16 @@
 // Shared simulation pieces used by both the real game (game.js) and the
-// art-style demo scene (demo.js): entity lists, targeting, spawning, effects.
+// art-style demo scene (demo.js): entity lists, per-frame updates and targeting. Spawning is
+// EnemySpawner (src/core/EnemySpawner.js), slam / splash damage is DamageSystem
+// (src/core/DamageSystem.js), and the shared hit / kill / spark feedback is FxSpawner
+// (src/fx/FxSpawner.js). The methods below that hand off keep their names: entities, bosses,
+// Game (super.onX) and the sim call them.
 
 LST.World = class World {
   constructor(renderer) {
     this.renderer = renderer;
+    this.spawner = new LST.EnemySpawner(this);
+    this.damageSystem = new LST.DamageSystem(this);
+    this.fxSpawner = new LST.FxSpawner(this);
     this.resetWorld();
   }
 
@@ -47,34 +54,9 @@ LST.World = class World {
     list.length = j;
   }
 
-  // Spawn just outside a random point on the visible edge.
-  spawnEnemy(type, mult) {
-    const r = LST.CONFIG.enemies[type].radius;
-    const hw = this.renderer.halfW + r + 10;
-    const hh = this.renderer.halfH + r + 10;
-    let x, y;
-    // Pick an edge weighted by its length so spawns are uniform around the border.
-    if (Math.random() < hw / (hw + hh)) {
-      x = LST.utils.rand(-hw, hw);
-      y = Math.random() < 0.5 ? -hh : hh;
-    } else {
-      x = Math.random() < 0.5 ? -hw : hw;
-      y = LST.utils.rand(-hh, hh);
-    }
-    // Very tall screens would make enemies walk forever; pull them in.
-    const d = Math.hypot(x, y);
-    const max = LST.CONFIG.MAX_SPAWN_DIST;
-    if (d > max) { x *= max / d; y *= max / d; }
-    // The registry makes archetype enemies (Beach: crab, gull, Elite Big Red); any other id is a plain Enemy.
-    const enemy = LST.EnemyRegistry ? LST.EnemyRegistry.create(type, x, y, mult) : new LST.Enemy(type, x, y, mult);
-    const boss = enemy.type === "boss";
-    if (boss) { enemy.maxHp = enemy.hp = LST.CONFIG.enemies.boss.hp * Math.pow(mult.hp, LST.CONFIG.bosses.hpExp); }
-    const early = boss && LST.CONFIG.bosses.early[this.wave];
-    if (early) { enemy.maxHp *= early.hp; enemy.hp = enemy.maxHp; enemy.dmgMult *= early.dmg; }
-    this.enemies.push(enemy);
-    if (boss) this.onBossSpawn(enemy);
-    return enemy;
-  }
+  // Spawning (EnemySpawner)
+  spawnEnemy(type, mult) { return this.spawner.spawn(type, mult); }
+  spawnMinions(boss, types) { this.spawner.minions(boss, types); }
 
   // Up to `count` living enemies within `range`, nearest first.
   nearestEnemies(x, y, range, count) {
@@ -102,104 +84,19 @@ LST.World = class World {
     return near ? null : boss;
   }
 
-  // Bosses call in helpers next to themselves.
-  spawnMinions(boss, types) {
-    const m = this.waveMult || { hp: 1, speed: 1, damage: 1, coins: 1 };
-    types.forEach((type, i) => {
-      const a = Math.atan2(boss.y, boss.x) + (i - (types.length - 1) / 2) * 0.55;
-      const r = boss.radius + 26;
-      const x = boss.x + Math.cos(a) * r, y = boss.y + Math.sin(a) * r;
-      const e = LST.EnemyRegistry ? LST.EnemyRegistry.create(type, x, y, m) : new LST.Enemy(type, x, y, m);
-      e.age = 0;
-      this.enemies.push(e);
-      this.bursts.push(new LST.Burst(e.x, e.y, "#ffffff", 22, "hit"));
-    });
-  }
+  // Damage outside a single shot (DamageSystem)
+  onBossSlam(boss, damage) { this.damageSystem.bossSlam(boss, damage); }
+  splashDamage(center, amount, radius) { this.damageSystem.splash(center, amount, radius); }
 
-  // A telegraphed slam lands: the tower takes damage, Thorns bounces some back.
-  onBossSlam(boss, damage) {
-    const t = this.tower;
-    t.takeDamage(damage);
-    this.shake = Math.min(1, this.shake + 0.7);
-    this.bursts.push(new LST.Burst(t.x, t.y, "#ff4757", t.radius * 3.2, "slam"));
-    this.spawnHitSparks(t.x, t.y, "#ff4757", 16, 200);
-    this.texts.push(new LST.FloatText(t.x + LST.utils.rand(-10, 10), t.y - 40, "-" + Math.round(damage * (1 - t.armor)), "#ff4d6d", "damage"));
-    if (t.thorns > 0 && !boss.dead) {
-      const back = damage * t.thorns;
-      boss.takeDamage(back, this);
-      this.texts.push(new LST.FloatText(boss.x, boss.y - boss.radius * 1.6, "Thorns " + Math.round(back), "#66bb6a", "bonus"));
-    }
-  }
-
-  // ---------- Events from entities (subclasses add rewards etc.) ----------
+  // ---------- Events from entities: the shared feedback (FxSpawner); Game adds rewards and sound ----------
 
   onFire() {}
-
-  onHit(e, damage, crit) {
-    this.spawnHitSparks(e.x, e.y, e.color, crit ? 9 : 5);
-    this.bursts.push(new LST.Burst(e.x, e.y, crit ? "#ffd23f" : "#ffffff", e.radius * (crit ? 1.3 : 0.9), "hit"));
-    if (damage) {
-      const n = Math.max(1, Math.round(damage));
-      const x = e.x + LST.utils.rand(-8, 8);
-      const y = e.y - e.radius * 1.4 - 18; // above the enemy's HP bar
-      this.texts.push(crit
-        ? new LST.FloatText(x, y, n + "!", "#ffd23f", "crit")
-        : new LST.FloatText(x, y, String(n), "#ffffff", "hit"));
-    }
-  }
-
-  // Splash card: damage everything near an impact (not the enemy that was hit).
-  splashDamage(center, amount, radius) {
-    const r2 = radius * radius;
-    for (const e of this.enemies) {
-      if (e === center || e.dead) continue;
-      if (LST.utils.dist2(center.x, center.y, e.x, e.y) <= r2) {
-        e.takeDamage(amount, this);
-        e.hitFlash = 0.08;
-      }
-    }
-    this.bursts.push(new LST.Burst(center.x, center.y, "#ff9f43", radius * 0.8, "splash"));
-  }
-
-  spawnConfetti(x, y, count = 70) {
-    const colors = ["#ff6fb5", "#ffd23f", "#5ec8ff", "#3ddc84", "#ff9f43", "#8e6cff"];
-    for (let i = 0; i < count; i++) this.confetti.push(new LST.Confetti(x, y, colors[i % colors.length]));
-  }
-
-  onBossSpawn() {
-    this.bossIntro = 2.4;
-    this.shake = Math.min(1, this.shake + 0.5);
-  }
-
-  onEnemyKilled(e) {
-    this.spawnCorpse(e);
-    this.spawnHitSparks(e.x, e.y, e.color, 14, 160);
-    this.bursts.push(new LST.Burst(e.x, e.y, e.color, e.radius * 1.8, "kill"));
-    this.texts.push(new LST.FloatText(e.x, e.y - e.radius, "+" + e.coins, "#ffd93d", "coin"));
-  }
-
-  // The active theme decides whether a kill leaves a death animation, and for how long.
-  spawnCorpse(e) {
-    const theme = this.renderer && this.renderer.theme;
-    const life = theme && theme.corpseLife ? theme.corpseLife(e) : 0;
-    if (life > 0) this.corpses.push(e.corpse = new LST.Corpse(e, life));
-  }
-
-  onTowerHit(e) {
-    this.shake = Math.min(1, this.shake + 0.4);
-    this.spawnHitSparks(e.x, e.y, "#ff4d6d", 12, 140);
-    this.texts.push(new LST.FloatText(e.x, e.y, "-" + Math.round(e.damage), "#ff4d6d", "damage"));
-  }
-
-  spawnHitSparks(x, y, color, count, speed = 90) {
-    for (let i = 0; i < count; i++) {
-      this.particles.push(new LST.Particle(x, y, color, speed, LST.utils.rand(0.25, 0.55), LST.utils.rand(2, 4)));
-    }
-  }
-
-  spawnExplosion(x, y) {
-    this.spawnHitSparks(x, y, "#00f0ff", 60, 320);
-    this.spawnHitSparks(x, y, "#ff4d6d", 40, 240);
-    this.shake = 1;
-  }
+  onHit(e, damage, crit) { this.fxSpawner.hit(e, damage, crit); }
+  onEnemyKilled(e) { this.fxSpawner.kill(e); }
+  onTowerHit(e) { this.fxSpawner.towerHit(e); }
+  onBossSpawn(e) { this.fxSpawner.bossSpawn(e); }
+  spawnCorpse(e) { this.fxSpawner.corpse(e); }
+  spawnConfetti(x, y, count) { this.fxSpawner.confetti(x, y, count); }
+  spawnHitSparks(x, y, color, count, speed) { this.fxSpawner.sparks(x, y, color, count, speed); }
+  spawnExplosion(x, y) { this.fxSpawner.explosion(x, y); }
 };
