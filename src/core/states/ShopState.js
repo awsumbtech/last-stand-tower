@@ -3,6 +3,7 @@
 LST.ShopState = LST.GameStateMachine.register(class ShopState extends LST.GameState {
   static get id() { return "upgrade"; }
   get runClock() { return true; }
+  get screen() { return "upgrade"; }
   onKey(game, code) {
     if (code === "Enter") { game.leaveShop(); return true; }
     if (/^(Digit|Numpad)[1-3]$/.test(code)) { game.takeCard(+code.slice(-1) - 1); return true; }

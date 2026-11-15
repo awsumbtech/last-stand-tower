@@ -55,7 +55,7 @@ LST.FinaleController = class FinaleController {
     g.worldBonus = LST.meta.clearWorld(g.world.id, g.runTime, g.world.gearMult);
     g.flow.set("victory");
     g.victoryTimer = 3.4;
-    g.ui.show(null);
+    g.flow.current.showScreen(g);
     LST.audio.setTension(0);
     LST.audio.play("victory");
     LST.haptics.buzz([100, 50, 100, 50, 300]);

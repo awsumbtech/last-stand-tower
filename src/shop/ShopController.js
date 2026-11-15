@@ -13,7 +13,7 @@ LST.ShopController = class ShopController {
     const g = this.game;
     this.deal();
     g.flow.set("upgrade");
-    g.ui.show("upgrade");
+    g.flow.current.showScreen(g);
   }
 
   // Head Start: skip the first `skip` waves. Their shops are replayed as a quick draft:
@@ -35,7 +35,7 @@ LST.ShopController = class ShopController {
     g.draft = { hand: 0, of: skip, income };
     g.flow.set("upgrade");
     this.advanceDraft();
-    g.ui.show("upgrade");
+    g.flow.current.showScreen(g);
     LST.audio.play("waveClear");
   }
 

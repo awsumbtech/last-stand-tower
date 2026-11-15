@@ -7,10 +7,11 @@ LST.PlayingState = LST.GameStateMachine.register(class PlayingState extends LST.
   get pausesWhenHidden() { return true; }
   get allowsAbility() { return true; }
   get sceneFlags() { return LST.SceneFlags.PLAYING; }
+  get hudLive() { return true; }
   togglePause(game) { this.pause(game); }
   pause(game) {
     game.flow.set("paused");
-    game.ui.show("pause");
+    game.flow.current.showScreen(game);
     LST.audio.duckMusic(true);
   }
   update(game, dt) {

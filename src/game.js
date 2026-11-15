@@ -34,7 +34,7 @@ LST.Game = class Game extends LST.World {
     this.useWorld(LST.WorldRegistry.selected()); // sets world, director (wave source) and bestWave
     this.reset();
     this.ui = new LST.UI(this);
-    this.ui.show("start");
+    this.flow.current.showScreen(this); // MenuState: the start screen
   }
 
   get state() { return this.flow ? this.flow.id : undefined; }

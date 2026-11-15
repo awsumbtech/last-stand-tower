@@ -44,7 +44,7 @@ LST.RunRecorder = class RunRecorder {
 
   showResults() {
     this.game.resultsDelay = 0;
-    this.game.ui.show("results");
+    this.game.flow.current.showScreen(this.game); // GameOverState: the results
   }
 
   saveBest(wave) {
