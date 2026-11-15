@@ -1,0 +1,265 @@
+{
+ "url": "http://127.0.0.1:8766/index.html?debug=1",
+ "sw": "v28",
+ "steps": [
+  [
+   "menu",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "enemies": 0,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 0,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 0,
+    "texts": 0,
+    "screen": "screen-start"
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-01-menu-390x844.png"
+  ],
+  [
+   "wave 1 (tapped Play), shots landing: bursts, popups, FX motes",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 0,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 1,
+    "texts": 1,
+    "screen": ""
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-02-wave-fx-390x844.png"
+  ],
+  [
+   "tapped the ability button (Shockwave)",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "enemies": 6,
+    "coins": 0,
+    "ability": {
+     "id": "shockwave",
+     "cd": 24.866699999999998,
+     "max": 25,
+     "flash": 0.7333999999999997
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 1,
+    "texts": 1,
+    "screen": ""
+   },
+   {
+    "label": "Shockwave",
+    "name": "Shockwave",
+    "stunned": 4
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-03-ability-shockwave-390x844.png"
+  ],
+  [
+   "wave cleared -> shop (tower damage x50 to speed it up)",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "enemies": 0,
+    "coins": 28,
+    "ability": {
+     "id": "shockwave",
+     "cd": 19.21689999999999,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 0,
+    "texts": 0,
+    "screen": "screen-upgrade"
+   }
+  ],
+  [
+   "took the free card",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "enemies": 0,
+    "coins": 28,
+    "ability": {
+     "id": "shockwave",
+     "cd": 19.21689999999999,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 0,
+    "texts": 0,
+    "screen": "screen-upgrade"
+   }
+  ],
+  [
+   "QA jump: next wave = 5 (mini-boss via EnemySpawner)",
+   {
+    "flow": "playing",
+    "wave": 5,
+    "enemies": 6,
+    "coins": 36,
+    "ability": {
+     "id": "shockwave",
+     "cd": 13.7505000000001,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 0,
+    "texts": 2,
+    "screen": ""
+   },
+   {
+    "hp": 358.43464719474554,
+    "miniBoss": true
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-04-miniboss-390x844.png"
+  ],
+  [
+   "mini-boss down: bossKill FX motes drawn by ParticleBatch",
+   {
+    "flow": "playing",
+    "wave": 5,
+    "enemies": 6,
+    "coins": 119,
+    "ability": {
+     "id": "shockwave",
+     "cd": 9.850700000000156,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": true,
+     "banner": "wave",
+     "lowHpPulse": true,
+     "towerAura": true
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 64,
+     "drawn": 64
+    },
+    "bursts": 2,
+    "texts": 5,
+    "screen": ""
+   },
+   {
+    "bossKills": 1
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-04b-miniboss-down-fx-390x844.png"
+  ],
+  [
+   "tower falls -> RunRecorder.gameOver -> results",
+   {
+    "flow": "gameover",
+    "wave": 5,
+    "enemies": 4,
+    "coins": 119,
+    "ability": {
+     "id": "shockwave",
+     "cd": 7.671285658889064,
+     "max": 25,
+     "flash": 0
+    },
+    "flags": {
+     "showsFinaleIntro": false,
+     "banner": null,
+     "lowHpPulse": false,
+     "towerAura": false
+    },
+    "layers": "BackdropLayer>EnemyLayer>TowerLayer>FxLayer>HudCanvasLayer>OverlayLayer",
+    "fx": {
+     "particles": 0,
+     "drawn": 0
+    },
+    "bursts": 0,
+    "texts": 0,
+    "screen": "screen-results"
+   },
+   {
+    "result": {
+     "wave": 5,
+     "kills": 16,
+     "bossKills": 1,
+     "won": false
+    }
+   },
+   "/workspace/last-stand-tower/docs/qa/pr8b/pr8b-05-gameover-390x844.png"
+  ]
+ ],
+ "errors": []
+}

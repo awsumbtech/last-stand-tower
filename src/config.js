@@ -35,7 +35,7 @@ LST.CONFIG = {
     basic: { hp: 20, speed: 62, damage: 6, coins: 2, score: 10, radius: 12, color: "#ff2bd6", shape: "circle", popPitch: 1 },
     fast:  { hp: 10, speed: 115, damage: 4, coins: 2, score: 12, radius: 9, color: "#ffd93d", shape: "triangle", popPitch: 1.3 },
     tank:  { hp: 75, speed: 30, damage: 15, coins: 6, score: 30, radius: 18, color: "#ff8a3d", shape: "square", popPitch: 0.75 },
-    boss:  { hp: 400, speed: 26, damage: 28, coins: 40, score: 250, radius: 30, color: "#ff4d6d", shape: "hexagon", popPitch: 0.5, killBonus: true }, // mini-boss (see bosses); killBonus: pays bosses.killCoins
+    boss:  { hp: 400, speed: 26, damage: 28, coins: 40, score: 250, radius: 30, color: "#ff4d6d", shape: "hexagon", popPitch: 0.5, killBonus: true, miniBoss: true }, // mini-boss (see bosses); killBonus: pays bosses.killCoins; miniBoss: boss HP scaling + early-wave tuning (EnemySpawner)
     mole:  { hp: 1900, speed: 0, damage: 30, coins: 150, score: 3000, radius: 46, color: "#8d6e63", shape: "mole" },   // King Mole, the Backyard finale
   },
 

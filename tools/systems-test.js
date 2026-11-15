@@ -5,8 +5,13 @@
 //      loaded by the sim, and Game's public methods only hand off to it.
 //   2. Each object owns its behaviour: driven directly (not through Game) it does the job.
 //   3. SceneFlags give render.js / FxDirector exactly what the old state-string checks did, for
-//      every state, and DemoScene has no state field of its own.
-const fs = require("fs"), path = require("path"), vm = require("vm");
+//      every state (the old checks are read from render.js / FxDirector.js at 738409a with
+//      `git show`, not retyped), and DemoScene has no state field of its own.
+//   4. PR 8b's World split: EnemySpawner, DamageSystem and FxSpawner own spawning, slam / splash
+//      damage and the shared feedback; World only hands off, and a scripted run of the old
+//      world.js (git show 24349b8) leaves exactly the same world as the new objects.
+// The render pipeline and FX drawers are checked by tools/render-test.js.
+const fs = require("fs"), path = require("path"), vm = require("vm"), childProcess = require("child_process");
 
 class SystemsTest {
   constructor(root = path.join(__dirname, "..")) {
@@ -23,7 +28,17 @@ class SystemsTest {
       ["BossEventRouter", "src/bosses/BossEventRouter.js", "bossEvents"], ["FinaleController", "src/bosses/FinaleController.js", "finaleController"],
       ["RunRecorder", "src/core/RunRecorder.js", "runRecorder"], ["WorkshopController", "src/core/WorkshopController.js", "workshopController"],
       ["WaveFlow", "src/core/WaveFlow.js", "waveFlow"], ["SceneFlags", "src/core/SceneFlags.js", null],
+      ["EnemySpawner", "src/core/EnemySpawner.js", "spawner"], ["DamageSystem", "src/core/DamageSystem.js", "damageSystem"],
+      ["FxSpawner", "src/fx/FxSpawner.js", "fxSpawner"],
     ];
+    // World method -> [World property, object method]: World only hands these off (PR 8b).
+    this.WORLD_HANDOFFS = {
+      spawnEnemy: ["spawner", "spawn"], spawnMinions: ["spawner", "minions"], onBossSlam: ["damageSystem", "bossSlam"], splashDamage: ["damageSystem", "splash"],
+      onHit: ["fxSpawner", "hit"], onEnemyKilled: ["fxSpawner", "kill"], onTowerHit: ["fxSpawner", "towerHit"], onBossSpawn: ["fxSpawner", "bossSpawn"],
+      spawnCorpse: ["fxSpawner", "corpse"], spawnConfetti: ["fxSpawner", "confetti"], spawnHitSparks: ["fxSpawner", "sparks"], spawnExplosion: ["fxSpawner", "explosion"],
+    };
+    this.STATE_REV = "738409a"; // last render.js / FxDirector.js with state-string checks
+    this.WORLD_REV = "24349b8"; // last world.js before the PR 8b split
     // Game method -> [Game property, system method]: Game only hands these off.
     this.HANDOFFS = {
       selectWorld: ["workshopController", "selectWorld"], startNextWave: ["waveFlow", "startNextWave"], endWave: ["waveFlow", "endWave"],
@@ -50,6 +65,10 @@ class SystemsTest {
 
   ok(c, m) { if (c) this.passes++; else { this.fails++; console.log("FAIL " + m); } }
   read(rel) { return fs.readFileSync(path.join(this.root, rel), "utf8"); }
+  show(rev, file) {
+    try { return childProcess.execFileSync("git", ["show", rev + ":" + file], { cwd: this.root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); }
+    catch (e) { console.log(`FAIL oracle: git show ${rev}:${file} failed (needs full git history, e.g. actions/checkout fetch-depth: 0)`); process.exit(1); }
+  }
 
   // The game in a node sandbox (the sim's file list), UI / audio / haptics stubbed and logged.
   load() {
@@ -81,9 +100,9 @@ class SystemsTest {
       this.ok(!/^(function |const \w+ = (\(|function))/m.test(src), `files: ${file} has no loose module-level function`);
       this.ok(scripts.includes(file) && sw.includes(`"${file}"`) && this.FILES.includes(file.slice(4)), `files: ${name} is loaded by index.html, cached by sw.js and loaded by tools/sim.js`);
       this.ok(scripts.indexOf(file) < scripts.indexOf("src/game.js") || !prop, `files: ${name} loads before game.js`);
-      if (prop) this.ok(this.game[prop] instanceof this.LST[name] && this.game[prop].game === this.game, `files: game.${prop} is the run's ${name}`);
+      if (prop) this.ok(this.game[prop] instanceof this.LST[name] && (this.game[prop].game || this.game[prop].world) === this.game, `files: game.${prop} is the run's ${name}`);
     }
-    this.ok(/const VERSION = "v27"/.test(sw), "files: sw.js VERSION is v27");
+    this.ok(/const VERSION = "v28"/.test(sw), "files: sw.js VERSION is v28");
     for (const [m, [prop, fn]] of Object.entries(this.HANDOFFS)) {
       const g = this.game, sys = g[prop], keep = sys[fn], seen = [];
       sys[fn] = (...a) => { seen.push(a); return "ret:" + fn; };
@@ -173,23 +192,99 @@ class SystemsTest {
       for (const id of this.IDS.filter((i) => i !== "playing" && i !== "paused")) { g.flow.set(id); g.togglePause(); this.ok(g.flow.is(id), `pause: togglePause does nothing in ${id}`); } }
   }
 
-  // 3. SceneFlags vs the old render.js / FxDirector state-string checks, every state
+  // 3. SceneFlags vs the old render.js / FxDirector state-string checks, every state. The old
+  // conditions are cut out of the 738409a files and evaluated for each state id.
+  oldStateChecks() {
+    const r = this.show(this.STATE_REV, "src/render.js"), d = this.show(this.STATE_REV, "src/fx/FxDirector.js");
+    const cut = (src, re, what) => { const m = src.match(re); if (!m) { console.log(`FAIL oracle: ${what} not found at ${this.STATE_REV}`); process.exit(1); } return m[1]; };
+    const fn = (expr) => new Function("scene", "st", "return !!(" + expr + ");");
+    const finale = fn(cut(r, /if \(fin && !fin\.mole && !fin\.won && (\(scene\.state[^{]*\))\) \{/, "finale dim check"));
+    const celebrate = fn(cut(r, /if \((scene\.state === "celebrate")\) \{/, "celebrate banner check"));
+    const victory = fn(cut(r, /\} else if \((scene\.state === "victory")\) \{/, "victory banner check"));
+    const wave = fn(cut(r, /\} else if \((scene\.state === "playing" \|\| scene\.state === "paused")\) \{/, "wave banner check"));
+    const low = fn(cut(r, /const low = scene\.lowHpActive && (scene\.state === "playing") \?/, "low-HP pulse check"));
+    const aura = fn(cut(d, /if \((st === [^)]*)\) this\.aura\.update/, "tower aura check"));
+    return (id) => { const scene = { state: id }; return {
+      showsFinaleIntro: finale(scene, id),
+      banner: celebrate(scene, id) ? "celebrate" : victory(scene, id) ? "victory" : wave(scene, id) ? "wave" : null,
+      lowHpPulse: low(scene, id),
+      towerAura: aura(scene, id),
+    }; };
+  }
+
   checkSceneFlags() {
-    const { LST } = this, g = this.game;
+    const { LST } = this, g = this.game, oldChecks = this.oldStateChecks();
     for (const id of this.IDS) {
       g.flow.set(id);
-      const f = g.sceneFlags, old = {
-        showsFinaleIntro: id === "playing" || id === "paused",
-        banner: id === "celebrate" ? "celebrate" : id === "victory" ? "victory" : id === "playing" || id === "paused" ? "wave" : null,
-        lowHpPulse: id === "playing",
-        towerAura: id === "playing" || id === "celebrate" || id === "victory",
-      };
-      this.ok(f instanceof LST.SceneFlags && JSON.stringify(f) === JSON.stringify(old), `scene: ${id} SceneFlags match the old state checks ${JSON.stringify(old)}`);
+      const f = g.sceneFlags, old = oldChecks(id);
+      this.ok(f instanceof LST.SceneFlags && JSON.stringify(f) === JSON.stringify(old), `scene: ${id} SceneFlags match the state checks of render.js / FxDirector.js@${this.STATE_REV} ${JSON.stringify(old)}`);
     }
     const demo = new LST.DemoScene({ halfW: 310, halfH: 650 });
     this.ok(!("state" in demo) && demo.sceneFlags === LST.SceneFlags.PLAYING, "scene: DemoScene has no state field; it passes the fixed PLAYING SceneFlags");
     for (const f of ["src/render.js", "src/fx/FxDirector.js", "src/demo.js"]) this.ok(!/scene\.state|this\.state\b|st === "/.test(this.read(f)), `scene: ${f} has no state-string checks`);
     this.ok(/SceneFlags\.js/.test(this.read("styles.html")), "scene: styles.html loads SceneFlags for the demo");
+  }
+
+  // 4. PR 8b: World -> EnemySpawner / DamageSystem / FxSpawner
+  checkWorld() {
+    const { LST } = this, W = LST.World.prototype;
+    for (const [m, [prop, fn]] of Object.entries(this.WORLD_HANDOFFS)) {
+      const g = this.fresh(), sys = g[prop], keep = sys[fn], seen = [];
+      sys[fn] = (...a) => { seen.push(a); return "ret:" + fn; };
+      const ret = W[m].call(g, "a1", "a2", "a3");
+      sys[fn] = keep;
+      this.ok(seen.length === 1 && seen[0][0] === "a1" && W[m].toString().split("\n").length === 1, `handoff: World.${m} only hands off to ${prop}.${fn}`);
+      if (m === "spawnEnemy") this.ok(ret === "ret:spawn", "handoff: World.spawnEnemy returns the spawned enemy");
+    }
+    const wsrc = this.read("src/world.js");
+    this.ok(!/Math\.random|new LST\.(Burst|FloatText|Particle|Confetti|Corpse|Enemy)\b|takeDamage/.test(wsrc), "world.js: no spawning, damage or effect-making code left (moved to its object)");
+    const demo = new LST.DemoScene({ halfW: 310, halfH: 650 });
+    this.ok(demo.spawner instanceof LST.EnemySpawner && demo.damageSystem instanceof LST.DamageSystem && demo.fxSpawner instanceof LST.FxSpawner && demo.fxSpawner.world === demo, "world: DemoScene gets its own spawner, damage system and FX spawner");
+
+    // EnemySpawner: edge spawn, mini-boss HP curve + early tuning + BOSS banner, minions
+    { const g = this.fresh(); g.wave = 1; const m = { hp: 2, speed: 1, damage: 1, coins: 1 }, B = LST.CONFIG.bosses, early = B.early[1];
+      const e = g.spawner.spawn("boss", m), want = LST.CONFIG.enemies.boss.hp * Math.pow(2, B.hpExp) * (early ? early.hp : 1);
+      this.ok(g.enemies.includes(e) && Math.abs(e.maxHp - want) < 1e-9 && e.hp === e.maxHp && g.bossIntro > 0 && Math.hypot(e.x, e.y) <= LST.CONFIG.MAX_SPAWN_DIST + 1e-9, "spawner: a mini-boss gets the boss HP curve and early tuning, and starts the BOSS banner");
+      const b = g.spawner.spawn("basic", m); this.ok(b.maxHp !== want && g.spawner.isMiniBoss(e) && !g.spawner.isMiniBoss(b), "spawner: plain enemies keep their own HP; isMiniBoss reads CONFIG.enemies.*.miniBoss");
+      const n = g.enemies.length, bursts = g.bursts.length; g.spawner.minions(e, ["basic", "fast"]);
+      this.ok(g.enemies.length === n + 2 && g.bursts.length === bursts + 2 && g.enemies.slice(-2).every((x) => x.age === 0), "spawner: minions() places helpers beside the boss, each with a pop"); }
+    // DamageSystem: slam + thorns, splash
+    { const g = this.fresh(); const boss = this.enemy("basic", 50, 0); boss.hp = boss.maxHp = 100; g.tower.thorns = 0.5; const hp = g.tower.hp;
+      g.damageSystem.bossSlam(boss, 10);
+      this.ok(g.tower.hp === hp - 10 && boss.hp === 95 && g.texts.length >= 1, "damage: a slam hurts the tower and Thorns bounces half back to the boss");
+      const c = this.enemy("basic", 0, 0), near = this.enemy("basic", 20, 0), far = this.enemy("basic", 400, 0); [c, near, far].forEach((x) => (x.hp = x.maxHp = 50));
+      g.damageSystem.splash(c, 7, 60);
+      this.ok(c.hp === 50 && near.hp === 43 && far.hp === 50 && g.bursts.some((b) => b.style === "splash" || b.kind === "splash"), "damage: splash hurts enemies in the radius only (not the one hit) and bursts"); }
+    // FxSpawner: hit, kill, confetti, explosion
+    { const g = this.fresh(), F = g.fxSpawner, e = this.enemy("basic", 10, 10), p = g.particles.length;
+      F.hit(e, 12, true); this.ok(g.particles.length === p + 9 && g.texts.some((t) => t.text === "12!"), "fx: hit() makes the crit sparks and the 12! popup");
+      F.kill(e); this.ok(g.texts.some((t) => t.text === "+" + e.coins), "fx: kill() makes the coin popup");
+      const cf = g.confetti.length; F.confetti(0, 0); this.ok(g.confetti.length === cf + 70, "fx: confetti() defaults to 70 pieces");
+      const s0 = g.shake; F.explosion(0, 0); this.ok(g.particles.length > p + 9 && g.shake >= s0, "fx: explosion() makes sparks"); }
+
+    // Oracle: the same scripted run on world.js@24349b8 and on the split objects leaves the same world.
+    const a = this.worldRun(false), b = this.worldRun(true);
+    this.ok(a.length > 1000 && a === b, `world: a scripted spawn / hit / slam / splash / kill run matches world.js@${this.WORLD_REV} exactly (${a.length} chars of state)`);
+  }
+
+  worldRun(split) {
+    const files = this.FILES.filter((f) => split || !["core/EnemySpawner.js", "core/DamageSystem.js", "fx/FxSpawner.js"].includes(f));
+    const M = Object.create(Math); let seed = 12345; M.random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x80000000; };
+    const sb = { Math: M, console }; sb.window = sb; vm.createContext(sb);
+    for (const f of files) vm.runInContext(f === "world.js" && !split ? this.show(this.WORLD_REV, "src/world.js") : this.read("src/" + f), sb, { filename: f });
+    const L = sb.LST, theme = { corpseLife: () => 0.8 };
+    const w = new L.World({ halfW: 310, halfH: 650, theme });
+    const m = { hp: 1.5, speed: 1, damage: 1, coins: 1 };
+    for (const wave of [1, 3, 9]) { w.wave = wave; w.spawnEnemy("boss", m); w.spawnEnemy("basic", m); w.spawnEnemy("fast", m); }
+    const [e0, e1, e2] = w.enemies;
+    w.onHit(e1, 6, false); w.onHit(e2, 13, true); w.onHit(e2, 0, false);
+    w.tower.thorns = 0.4; w.onBossSlam(e0, 12); w.onTowerHit(e1);
+    w.splashDamage(e1, 5, 300); w.spawnMinions(e0, ["basic", "fast", "basic"]);
+    w.onEnemyKilled(e2); w.spawnCorpse(e1); w.spawnConfetti(1, 2); w.spawnConfetti(3, 4, 12); w.spawnHitSparks(0, 0, "#fff", 6); w.spawnExplosion(5, 5);
+    w.updateEffects(0.1);
+    const keys = ["tower", "enemies", "projectiles", "hazards", "particles", "texts", "bursts", "confetti", "corpses", "vignette", "flash", "shake", "bossIntro", "wave"];
+    const seen = new WeakSet();
+    return JSON.stringify(keys.map((k) => w[k]), (key, v) => (typeof v === "object" && v ? (seen.has(v) && !Array.isArray(v) ? "[ref]" : (seen.add(v), v)) : v)) + "|" + M.random();
   }
 
   run() {
@@ -201,6 +296,7 @@ class SystemsTest {
     this.checkBosses();
     this.checkRunAndFlow();
     this.checkSceneFlags();
+    this.checkWorld();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
   }
