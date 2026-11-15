@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # flow-test loads its oracle from git (src/main.js@99ea184)
+          fetch-depth: 0 # flow / systems / render tests load their oracles from git (git show)
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -26,6 +26,7 @@ jobs:
           node tools/elements-test.js
           node tools/flow-test.js
           node tools/systems-test.js
+          node tools/render-test.js
           node tools/ui-chrome-scan.js
           node tools/flow-state-sweep.js
       - name: Backyard deterministic sim (committed sim-ab hashes)

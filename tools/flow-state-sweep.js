@@ -5,7 +5,8 @@
 // docs/OO-MIGRATION.md under "`game.state` is a compat getter/setter". Other `.state` fields
 // (meta.state, Coconut, ShellShield, AudioContext, ServiceWorker) are classified and skipped.
 // It also fails on a stale row (a listed line that no longer has a site), and on any site in a
-// file PR 8 cleared (`cleared`: render.js, FxDirector, DemoScene and the game-system objects;
+// file PR 8 / 8b cleared (`cleared`: render.js, FxDirector, DemoScene, the game-system objects,
+// and PR 8b's world objects, render layers and FX drawers;
 // game.js keeps only the constructor's compat write, game.js:32, until PR 9).
 //   node tools/flow-state-sweep.js          check (exit 1 on an unlisted, stale or cleared-file site)
 //   node tools/flow-state-sweep.js --list   print every `.state` site with its class
@@ -18,12 +19,19 @@ class FlowStateSweep {
     this.flowReceivers = new Set(["game", "g", "this.game", "scene"]);
     this.flowThisFiles = new Set(["src/game.js", "src/demo.js"]);
     this.metaReceivers = /(^|\.)(meta|m|api)$/;
-    // Files with no compat site left after PR 8 (src/game.js: only the constructor line).
+    // Files with no compat site left after PR 8 / 8b (src/game.js: only the constructor line).
     this.cleared = ["src/render.js", "src/fx/FxDirector.js", "src/demo.js", "src/core/SceneFlags.js",
       "src/abilities/Ability.js", "src/abilities/Shockwave.js", "src/abilities/Freeze.js", "src/abilities/Overdrive.js",
       "src/abilities/AbilitySystem.js", "src/shop/ShopController.js", "src/core/RewardRules.js", "src/core/KillFeedback.js",
       "src/bosses/BossEventRouter.js", "src/bosses/FinaleController.js", "src/core/RunRecorder.js",
-      "src/core/WorkshopController.js", "src/core/WaveFlow.js"];
+      "src/core/WorkshopController.js", "src/core/WaveFlow.js",
+      // PR 8b
+      "src/world.js", "src/core/EnemySpawner.js", "src/core/DamageSystem.js", "src/fx/FxSpawner.js", "src/fx/FxRenderer.js",
+      "src/fx/draw/GlowSprites.js", "src/fx/draw/TowerGroundGlow.js", "src/fx/draw/ProjectileTrails.js", "src/fx/draw/ChainArcs.js",
+      "src/fx/draw/TextGlows.js", "src/fx/draw/ParticleBatch.js", "src/fx/draw/ImpactPulses.js", "src/fx/draw/ImpactFlashes.js",
+      "src/render/RenderLayer.js", "src/render/OverdriveRing.js", "src/render/BackdropLayer.js", "src/render/EnemyLayer.js",
+      "src/render/TowerLayer.js", "src/render/FxLayer.js", "src/render/HudCanvasLayer.js", "src/render/OverlayLayer.js",
+      "src/render/RenderPipeline.js"];
     this.gameJsAllowed = [32];
   }
 
@@ -103,7 +111,7 @@ class FlowStateSweep {
     const { flow, unlisted, stale, inCleared } = this.check();
     for (const s of unlisted) console.log(`FAIL flow-state: ${s.file}:${s.line} reads/writes ${s.key ? s.receiver : s.receiver + ".state"} but is not listed in docs/OO-MIGRATION.md`);
     for (const f of stale) console.log(`FAIL flow-state: docs/OO-MIGRATION.md lists ${f}, but that line has no compat site (stale row)`);
-    for (const s of inCleared) console.log(`FAIL flow-state: ${s.file}:${s.line} uses the compat API in a file PR 8 cleared (use game.flow / SceneFlags)`);
+    for (const s of inCleared) console.log(`FAIL flow-state: ${s.file}:${s.line} uses the compat API in a file PR 8 / 8b cleared (use game.flow / SceneFlags)`);
     const bad = unlisted.length + stale.length + inCleared.length;
     console.log(bad ? `\n${bad} FAILED` : `ALL PASS (${flow.length} compat game.state / scene.state sites, all listed with file:line; 0 stale rows; 0 in the ${this.cleared.length} cleared files)`);
     return bad ? 1 : 0;
