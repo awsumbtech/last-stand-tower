@@ -1,6 +1,6 @@
 // GameStateMachine: owns the run-flow state objects and which one is current. is(id) asks
-// which state is on and set(id) enters one. (Game keeps a compat getter/setter over it until
-// PR 9; state classes use the machine directly.) States register themselves
+// which state is on and set(id) enters one. (It is the only way to read or set the run state:
+// PR 9 removed Game's compat getter/setter.) States register themselves
 // (LST.GameStateMachine.register) when their file loads.
 // update(game, dt) is the per-frame step: the run clock, then the current state's own update.
 LST.GameStateMachine = class GameStateMachine {

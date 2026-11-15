@@ -117,7 +117,7 @@ class SystemsTest {
       "pop pitch map": /basic: 1, fast/, "finale intro": /finaleIntro|createFinaleBoss/, "Gears payout": /gearsFor|recordRun/, "Workshop": /seenWorkshop|unlockAbility/,
       "phase banners": /PHASE 2|phaseBanner = \{/, "wave clear": /celebrateTimer = 1\.6|gotchaQueue\.push/, "shop prices": /shopRules/ };
     for (const [what, re] of Object.entries(gone)) this.ok(!re.test(gsrc), `game.js: no ${what} code left (moved to its system)`);
-    this.ok((gsrc.match(/this\.state\b/g) || []).length === 1 && /^\s+this\.state = "menu";/m.test(gsrc), "game.js: the only compat state use left is the constructor's (PR 9)");
+    this.ok(!/this\.state\b|get state\(|set state\(/.test(gsrc) && /^\s+this\.flow\.set\("menu"\);/m.test(gsrc), "game.js: no compat state getter / setter or use left; the constructor calls flow.set(\"menu\") (PR 9)");
     const ui = ["src/ui.js", "src/ui/screens/AbilityButton.js", "src/ui/screens/workshop/DeckTab.js"].map((f) => this.read(f)).join("\n");
     this.ok(!/ABILITY_(NAME|DESC|ICON)/.test(ui) && /LST\.Ability\.get\([^)]+\)\.icon/.test(this.read("src/ui/screens/AbilityButton.js")) && /LST\.Ability\.get\([^)]+\)\.icon/.test(this.read("src/ui/screens/workshop/DeckTab.js")), "ui: ability names, descriptions and icons come from the Ability classes (AbilityButton, DeckTab)");
   }

@@ -303,7 +303,7 @@ function playRun(strategyName, seed, meta, unlocked, worldId = WORLD) {
     };
     let time = 0;
     const killsBefore = game.bossKills;
-    while (game.state === "playing" && time < 900) {
+    while (game.flow.is("playing") && time < 900) {
       if (USE_ABILITY && game.ability.cd <= 0 && game.enemies.some((e) => !e.dead && (e.windup > 0 || (!e.isBoss && e.x * e.x + e.y * e.y < 95 * 95)))) game.useAbility();
       game.step(DT);
       time += DT;
@@ -312,11 +312,11 @@ function playRun(strategyName, seed, meta, unlocked, worldId = WORLD) {
     cur.seconds = time;
     cur.realDps = cur.damageDealt / Math.max(1, time);
     realSeconds += time;
-    if (game.state === "victory") {
+    if (game.flow.is("victory")) {
       finaleWon = true;
       realSeconds += 7; // party + World cleared! screen
       if (worldId !== "backyard" && !ENDLESS) { cur.died = false; waves.push(cur); game.wave += 1; break; } // retire: paid as wave + 1
-      game.state = "cleared";
+      game.flow.set("cleared");
       game.continueEndless(); // straight into Endless (Gears are paid when the run ends)
       cur.died = false;
       waves.push(cur);
@@ -325,14 +325,14 @@ function playRun(strategyName, seed, meta, unlocked, worldId = WORLD) {
       strategy(LST, game, runStats, cur);
       continue;
     }
-    if (game.director.isBossWave(game.wave) && game.state === "celebrate") { bossWavesSurvived++; cur.bossKilled = game.bossKills > killsBefore; if (cur.bossKilled) bossWavesKilled++; cur.bossFight = cur.seconds; }
-    const died = game.state !== "celebrate";
+    if (game.director.isBossWave(game.wave) && game.flow.is("celebrate")) { bossWavesSurvived++; cur.bossKilled = game.bossKills > killsBefore; if (cur.bossKilled) bossWavesKilled++; cur.bossFight = cur.seconds; }
+    const died = !game.flow.is("celebrate");
     cur.died = died;
     if (!died) {
       // Clear bonus was added in endWave; count it as earned.
       cur.coinsEarned += game.director.clearBonus(game.wave);
       game.finishCelebration();
-      while (game.state === "gotcha") game.dismissGotcha();
+      while (game.flow.is("gotcha")) game.dismissGotcha();
       realSeconds += CELEBRATE_SECONDS + SHOP_SECONDS;
       const spentBefore = runStats.spent;
       strategy(LST, game, runStats, cur);

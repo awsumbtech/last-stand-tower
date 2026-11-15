@@ -23,7 +23,7 @@ class ScreenSnapshotTest:
       window.__reseed = (k) => { a = k >>> 0; };
       window.requestAnimationFrame = () => 0; window.cancelAnimationFrame = () => {}; })();"""
     CLICK = "(id) => document.getElementById(id).click()"
-    # [name, js run in the page] (only APIs both trees have: the old game.state compat is not used)
+    # [name, js run in the page] (only APIs both trees have; no compat state reads, so it runs on both)
     STEPS = [
         ["start", "() => {}"],
         ["settings", "() => document.getElementById('btn-settings').click()"],

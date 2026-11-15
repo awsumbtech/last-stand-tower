@@ -49,10 +49,10 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   ok(game.selectWorld("beach") === false && game.world.id === "backyard", "game.selectWorld refuses a locked world");
   LST.meta.clearWorld("backyard", 600);
   ok(R.isUnlocked("beach", LST.meta, null), "unlock: beating the Backyard finale opens the Beach");
-  game.state = "menu";
+  game.flow.set("menu");
   ok(game.selectWorld("beach") === true && game.world.id === "beach" && LST.meta.state.world === "beach" && game.director instanceof LST.LevelDirector, "select: picking the Beach switches world + director and saves the pick");
   ok(R.selected(LST.meta, null) === R.get("beach"), "select: saved pick comes back next load");
-  game.state = "playing";
+  game.flow.set("playing");
   ok(game.selectWorld("backyard") === false && game.world.id === "beach", "select: can't switch world mid-run");
   ok(game.runGearMult() === game.gearMult * 1.6, "results: run Gear multiplier = Piggy Bank x world (x1.6)");
 }
@@ -153,7 +153,7 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
   g.maxHp = g.hp = 1e9; game.enemies.push(g);
   g.applySlow(0.5, 3);
   ok(g.part(LST.Flyer) && !(g.slowTimer > 0) && !g.slowAmount, "gull: applySlow does nothing (Frost Shots / chill)");
-  game.ability.id = "freeze"; game.ability.cd = 0; game.state = "playing"; game.useAbility();
+  game.ability.id = "freeze"; game.ability.cd = 0; game.flow.set("playing"); game.useAbility();
   ok(!(g.slowTimer > 0), "gull: Freeze ability doesn't slow it");
   const p = () => { const s = new LST.Projectile(0, 0, g, 10, 500, false); s.elements = { frostbite: 3 }; game.tower.elements = s.elements; game.tower.slow = 0.3; s.slow = 0.3; s.slowTime = 2; s.strike(g, game); };
   for (let i = 0; i < 60; i++) { p(); LST.StatusEffects.tickAll(game, 1 / 60); }
@@ -168,7 +168,7 @@ const flags = (unlocks) => ({ enabled: true, unlocks });
 {
   const { LST, game } = load(3);
   game.useWorld(LST.WorldRegistry.get("beach"));
-  game.state = "playing"; game.tower.maxHp = game.tower.hp = 1e6;
+  game.flow.set("playing"); game.tower.maxHp = game.tower.hp = 1e6;
   const C = LST.CONFIG.crabclaw;
   const b = LST.WorldRegistry.get("beach").createFinaleBoss(MULT, game);
   ok(b instanceof LST.CaptainCrabclaw && b instanceof LST.BossScript && b.isBoss && b.finaleBoss && b.hudName === "CAPTAIN CRABCLAW" && b.hudPhase === "Phase 1 / 2", "crabclaw: finale boss, a BossScript, named on the boss bar");
@@ -382,7 +382,7 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   const ws = new LST.WorldSelect(game, null);
   let cards = ws.cards();
   ok(cards[0].open && cards[0].selected && !cards[1].open && /Beat Backyard wave 20 to unlock/.test(cards[1].lockText) && cards[1].gearMult === 1.6, "world cards: Backyard open + picked; Beach locked with 'Beat Backyard wave 20 to unlock', Gears x1.6");
-  LST.meta.clearWorld("backyard", 600); game.state = "menu"; game.selectWorld("beach"); cards = ws.cards();
+  LST.meta.clearWorld("backyard", 600); game.flow.set("menu"); game.selectWorld("beach"); cards = ws.cards();
   ok(cards[0].cleared && cards[1].open && cards[1].selected && !cards[1].dev, "world cards: after the Backyard clear the Beach is open (not a dev card) and picked");
   const el = {}; const doc = { getElementById: (id) => (el[id] = el[id] || { innerHTML: "", classList: { on: null, toggle(c, v) { this.on = v; } }, querySelector: () => (el[id + ":x"] = el[id + ":x"] || { textContent: "" }) }) };
   LST.WorldScreens.cleared(game, doc);
@@ -422,19 +422,19 @@ for (const dirRel of ["assets/sprites/world2", "assets/sprites/looks"]) {
   game.reset(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
   const seen = new Set(); let maxHz = 0, err = null, shopVisits = 0;
   try {
-    for (let w = 0; w < 20 && !["cleared", "victory"].includes(game.state); w++) {
+    for (let w = 0; w < 20 && !["cleared", "victory"].includes(game.flow.id); w++) {
       game.startNextWave();
-      for (let i = 0; i < 60 * 240 && game.state === "playing"; i++) { game.step(1 / 60); for (const e of game.enemies) seen.add(e.archetype || e.type); maxHz = Math.max(maxHz, game.hazards.length); }
-      if (game.state === "celebrate") game.finishCelebration();
-      if (game.state === "upgrade") { shopVisits++; game.state = "menu"; } // leave the shop (its id is "upgrade")
+      for (let i = 0; i < 60 * 240 && game.flow.is("playing"); i++) { game.step(1 / 60); for (const e of game.enemies) seen.add(e.archetype || e.type); maxHz = Math.max(maxHz, game.hazards.length); }
+      if (game.flow.is("celebrate")) game.finishCelebration();
+      if (game.flow.is("upgrade")) { shopVisits++; game.flow.set("menu"); } // leave the shop (its id is "upgrade")
     }
   } catch (e) { err = e; }
   ok(shopVisits > 0, "smoke: the run reached the between-wave shop (\"upgrade\") and left it " + shopVisits + " times");
   ok(!err, "smoke: 20 Beach waves run without errors" + (err ? " (" + err.message + ")" : ""));
   ok(["basic", "crab", "gull", "boss", "bigRedElite", "crabclaw"].every((t) => seen.has(t)), "smoke: saw " + [...seen].join(", "));
   const fb = game.finale && game.finale.mole;
-  if (!["cleared", "victory"].includes(game.state)) console.log("  smoke: wave", game.wave, "state", game.state, "boss", fb && fb.type, fb && Math.round(fb.hp) + "/" + Math.round(fb.maxHp), "mode", fb && fb.mode, "enemies", game.enemies.length);
-  ok(maxHz > 0 && ["cleared", "victory"].includes(game.state) && LST.meta.worldCleared("beach"), "smoke: Crabclaw threw coconuts and the Beach was cleared (state " + game.state + ")");
+  if (!["cleared", "victory"].includes(game.flow.id)) console.log("  smoke: wave", game.wave, "state", game.flow.id, "boss", fb && fb.type, fb && Math.round(fb.hp) + "/" + Math.round(fb.maxHp), "mode", fb && fb.mode, "enemies", game.enemies.length);
+  ok(maxHz > 0 && ["cleared", "victory"].includes(game.flow.id) && LST.meta.worldCleared("beach"), "smoke: Crabclaw threw coconuts and the Beach was cleared (state " + game.flow.id + ")");
 }
 
 // ---------- 11. Dev door: local hosts only, and a door run never writes the save ----------
@@ -467,20 +467,20 @@ function devFlagsAt(href) {
   LST.meta.state.gears = 250; LST.meta.state.runs = 4; LST.meta.save();
   const before = store["lst.meta"], beforeState = JSON.stringify(LST.meta.state), beforeKeys = Object.keys(store).sort().join();
   LST.DevFlags = Object.freeze({ enabled: true, local: true, unlocks: Object.freeze(["beach"]) });
-  game.state = "menu";
+  game.flow.set("menu");
   ok(game.selectWorld("beach") && game.world.id === "beach" && store["lst.meta"] === before && LST.meta.state.world === "backyard", "door run: picking the door-only Beach saves no world pick");
   let err = null, doorShops = 0;
   try {
     game.newGame();
     ok(game.devRun === true && LST.DevRunGuard.active, "door run: newGame marks a door-only world run as a dev run");
     game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
-    for (let w = 0; w < 21 && !["cleared", "victory"].includes(game.state); w++) {
-      if (game.state !== "playing") game.startNextWave();
-      for (let i = 0; i < 60 * 240 && game.state === "playing"; i++) game.step(1 / 60);
-      if (game.state === "celebrate") game.finishCelebration();
-      if (game.state === "upgrade") { doorShops++; game.state = "menu"; } // leave the shop (its id is "upgrade")
+    for (let w = 0; w < 21 && !["cleared", "victory"].includes(game.flow.id); w++) {
+      if (!game.flow.is("playing")) game.startNextWave();
+      for (let i = 0; i < 60 * 240 && game.flow.is("playing"); i++) game.step(1 / 60);
+      if (game.flow.is("celebrate")) game.finishCelebration();
+      if (game.flow.is("upgrade")) { doorShops++; game.flow.set("menu"); } // leave the shop (its id is "upgrade")
     }
-    ok(["cleared", "victory"].includes(game.state) && LST.meta.worldCleared("beach") && LST.meta.state.worlds.beach.best > 0, "door run: the Beach finale was cleared in memory during the run (state " + game.state + ")");
+    ok(["cleared", "victory"].includes(game.flow.id) && LST.meta.worldCleared("beach") && LST.meta.state.worlds.beach.best > 0, "door run: the Beach finale was cleared in memory during the run (state " + game.flow.id + ")");
     ok(doorShops > 0, "door run: the run reached the between-wave shop (\"upgrade\") and left it " + doorShops + " times");
     game.finishRun({ won: true });
   } catch (e) { err = e; }
@@ -491,7 +491,7 @@ function devFlagsAt(href) {
   ok(!LST.DevRunGuard.active && !game.devRun, "door run: guard released after finishRun");
   ok(game.world.id === "beach" && game.bestWave === game.world.loadBest() && game.bestWave === 0 && !game.newBest, "door run: game.bestWave re-read from the restored save after finishRun (" + game.bestWave + ")");
   // Quitting a door run mid-way (pause > Quit) also puts the save back and releases the guard.
-  game.state = "menu"; game.selectWorld("beach"); game.newGame(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
+  game.flow.set("menu"); game.selectWorld("beach"); game.newGame(); game.tower.maxHp = game.tower.hp = 1e7; game.tower.damage *= 60;
   for (let i = 0; i < 60 * 30; i++) game.step(1 / 60);
   game.saveBest(Math.max(game.wave, 3));
   const midBest = game.bestWave;
@@ -500,7 +500,7 @@ function devFlagsAt(href) {
   ok(store["lst.meta"] === before && JSON.stringify(LST.meta.state) === beforeState && !LST.DevRunGuard.active && !game.devRun, "door run: quitting mid-run leaves the save byte-unchanged and releases the guard");
   // Normal runs are untouched by the guard.
   LST.DevFlags = Object.freeze({ enabled: false, local: true, unlocks: Object.freeze([]) });
-  game.state = "menu"; game.selectWorld("backyard"); game.newGame();
+  game.flow.set("menu"); game.selectWorld("backyard"); game.newGame();
   ok(game.devRun === false && !LST.DevRunGuard.active, "normal run: no guard in the Backyard");
   game.wave = 3; game.finishRun({ won: false });
   ok(LST.meta.state.runs === 5 && store["lst.meta"] !== before, "normal run: results are saved as usual");

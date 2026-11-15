@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Game flow test (node, no browser): node tools/flow-test.js
 //   1. Every run-flow state is its own GameState class in its own file, registered by id.
-//   2. The game.state compat getter/setter reads / sets the GameStateMachine; unknown ids throw.
-//      State classes use game.flow (is / set), not the compat API.
+//   2. Game has no compat state getter / setter (removed in PR 9): game.flow (is / set / id) is the
+//      only way to read or set the run state; unknown ids throw. State classes use game.flow.
 //   3. The run clock counts in exactly playing / celebrate / upgrade / victory.
 //   4. InputController does what the old main.js keydown chain did, for every state x key x
 //      resultsDelay x Workshop-open combination (the reference is src/main.js@99ea184, loaded with git show).
 //   5. Hiding the tab pauses only while playing (and matches main.js@99ea184).
-//   6. Every remaining compat game.state / scene.state site is listed in docs/OO-MIGRATION.md (FlowStateSweep).
+//   6. FlowStateSweep finds 0 compat state sites in src/, tools/, sw.js and index.html.
 const fs = require("fs"), path = require("path"), vm = require("vm"), childProcess = require("child_process");
 const FlowStateSweep = require("./flow-state-sweep.js");
 
@@ -52,14 +52,14 @@ class FlowTest {
       const C = types[id], file = "src/core/states/" + C.name + ".js";
       this.ok(C.prototype instanceof LST.GameState && C.id === id, `flow: ${id} is a GameState subclass (${C.name})`);
       this.ok(fs.existsSync(path.join(this.root, file)) && html.includes(`src="${file}"`) && sw.includes(`"${file}"`), `flow: ${C.name} has its own file, loaded by index.html and cached by sw.js`);
-      this.ok(!/\bgame\.state\b/.test(this.read(file)), `flow: ${C.name} uses game.flow, not the game.state compat API`);
+      this.ok(!/\bgame\.state\b/.test(this.read(file)), `flow: ${C.name} uses game.flow (no compat state reads)`);
     }
     this.ok(["src/core/GameState.js", "src/core/GameStateMachine.js", "src/core/InputController.js"].every((f) => html.includes(`src="${f}"`) && sw.includes(`"${f}"`)), "flow: GameState, GameStateMachine, InputController are loaded and cached");
     this.ok(html.indexOf('src="src/core/states/ClearedState.js"') < html.indexOf('src="src/game.js"') && html.indexOf('src="src/core/GameStateMachine.js"') < html.indexOf('src="src/core/states/MenuState.js"'), "flow: script order machine -> states -> game.js");
-    this.ok(game.state === "menu" && game.flow.current instanceof LST.MenuState && game.flow.is("menu") && !game.flow.is("playing"), "flow: a new game starts in MenuState; flow.is(\"menu\") and the compat game.state read \"menu\"");
-    game.state = "upgrade"; this.ok(game.flow.current instanceof LST.ShopState && game.state === "upgrade", "flow: the compat setter game.state = \"upgrade\" enters ShopState");
-    { let threw = false; try { game.state = "nope"; } catch (e) { threw = true; } this.ok(threw && game.state === "upgrade", "flow: an unknown state id throws and leaves the state as it was"); }
-    this.ok(!Object.prototype.hasOwnProperty.call(game, "state"), "flow: state is not a loose field on Game (compat getter over the machine)");
+    this.ok(game.flow.id === "menu" && game.flow.current instanceof LST.MenuState && game.flow.is("menu") && !game.flow.is("playing"), "flow: a new game starts in MenuState; flow.is(\"menu\") and flow.id read \"menu\"");
+    game.flow.set("upgrade"); this.ok(game.flow.current instanceof LST.ShopState && game.flow.id === "upgrade", "flow: flow.set(\"upgrade\") enters ShopState");
+    { let threw = false; try { game.flow.set("nope"); } catch (e) { threw = true; } this.ok(threw && game.flow.id === "upgrade", "flow: an unknown state id throws and leaves the state as it was"); }
+    this.ok(!("state" in game) && Object.getOwnPropertyDescriptor(LST.Game.prototype, "state") === undefined, "flow: the compat state getter / setter is gone (\"state\" in game is false)");
     const main = this.read("src/main.js");
     this.ok(!/game\.state\s*===/.test(main) && !/addEventListener\("keydown"/.test(main) && /new LST\.InputController/.test(main), "flow: main.js has no state switch or keydown handler; it creates an InputController");
     const gsrc = this.read("src/game.js");
@@ -148,13 +148,13 @@ class FlowTest {
     { const { g, log } = this.spyGame("playing", 0); new IC(g, {}).visibilityChanged(false); this.ok(!log.length, "input: showing the tab again does nothing"); }
   }
 
-  // 6. every compat site is listed in the doc
+  // 6. no compat site left anywhere (PR 9 removed the getter / setter)
   checkSweep() {
-    const { flow, unlisted, stale, inCleared } = new FlowStateSweep(this.root).check();
-    for (const s of unlisted) console.log(`  unlisted: ${s.file}:${s.line} ${s.key ? s.receiver : s.receiver + ".state"}`);
-    this.ok(flow.length > 0 && !unlisted.length, `sweep: all ${flow.length} compat game.state / scene.state sites are listed with file:line in docs/OO-MIGRATION.md`);
-    this.ok(!stale.length, `sweep: no stale rows in the compat table (${stale.join(", ") || "none"})`);
-    this.ok(!inCleared.length, `sweep: no compat site left in the files PR 8 cleared (${inCleared.map((s) => s.file + ":" + s.line).join(", ") || "none"})`);
+    const { flow, stub, rows } = new FlowStateSweep(this.root).check();
+    for (const s of flow) console.log(`  compat site: ${s.file}:${s.line} ${s.key ? s.receiver : s.receiver + ".state"}`);
+    this.ok(!flow.length, `sweep: 0 compat state sites in src/, tools/, sw.js and index.html (found ${flow.length})`);
+    this.ok(stub.length === 1 && stub[0].file === "tools/flow-test.js", "sweep: the only \"state\" key left is this file's oracle stub (old main.js reads it)");
+    this.ok(!rows.length, `sweep: docs/OO-MIGRATION.md lists no compat rows (${rows.join(", ") || "none"})`);
   }
 
   run() {

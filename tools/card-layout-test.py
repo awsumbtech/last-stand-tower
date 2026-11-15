@@ -132,7 +132,7 @@ WORLD_VIEWPORTS = [(360, 740), (390, 844), (375, 667)]
 WORLD_CHECK = r"""async ({ open }) => {
   const fails = [], g = window.game;
   if (open) LST.meta.clearWorld("backyard", 600); else LST.meta.resetAll && LST.meta.resetAll();
-  g.state = "menu"; g.ui.show("start");
+  g.flow.set("menu"); g.ui.show("start");
   await new Promise((r) => setTimeout(r, 500));
   const cards = [...document.querySelectorAll("#world-select .world-card")];
   if (cards.length < 2) return ["world cards: expected 2, got " + cards.length];
@@ -224,7 +224,7 @@ def main():
             p.on("pageerror", lambda e: fails.append(f"{w}: page error {e}"))
             p.goto(BASE)
             p.wait_for_function("window.game && window.LST")
-            p.evaluate("""() => { const g = game; g.newGame(); if (g.state !== 'playing') { g.wave = 0; g.startNextWave(); }
+            p.evaluate("""() => { const g = game; g.newGame(); if (!g.flow.is('playing')) { g.wave = 0; g.startNextWave(); }
               g.enemies.length = 0; g.spawnQueue = []; g.endWave(); g.celebrateTimer = 0; g.gotchaQueue = []; g.finishCelebration(); g.ui.show('upgrade'); }""")
             p.wait_for_timeout(700)  # let deal-in animations settle
             for flip in (False, True):
