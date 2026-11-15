@@ -1,0 +1,257 @@
+{
+ "url": "http://127.0.0.1:8766/index.html?debug=1",
+ "sw": "v29",
+ "steps": [
+  [
+   "menu / world select (StartScreen)",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-start",
+    "hud": false,
+    "title": "LAST STANDTOWER",
+    "hasCompat": true
+   },
+   "pr9-01-menu-390x844.png"
+  ],
+  [
+   "settings from menu (PauseScreen, title Settings)",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-pause",
+    "hud": true,
+    "title": "Settings",
+    "hasCompat": true
+   },
+   "pr9-02-settings-390x844.png"
+  ],
+  [
+   "reset progress confirm (ConfirmScreen)",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-confirm",
+    "hud": true,
+    "title": "Reset progress?",
+    "hasCompat": true
+   },
+   "pr9-03-confirm-390x844.png"
+  ],
+  [
+   "Workshop: Cards tab (CardsTab)",
+   {
+    "flow": "workshop",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-workshop",
+    "hud": false,
+    "title": "Workshop",
+    "hasCompat": true
+   },
+   "pr9-04-workshop-cards-390x844.png"
+  ],
+  [
+   "Workshop: Upgrades tab (UpgradesTab)",
+   {
+    "flow": "workshop",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-workshop",
+    "hud": false,
+    "title": "Workshop",
+    "hasCompat": true
+   },
+   "pr9-05-workshop-upgrades-390x844.png"
+  ],
+  [
+   "Workshop: Deck tab (DeckTab)",
+   {
+    "flow": "workshop",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-workshop",
+    "hud": false,
+    "title": "Workshop",
+    "hasCompat": true
+   },
+   "pr9-06-workshop-deck-390x844.png"
+  ],
+  [
+   "Workshop: Codex tab, first entry open (CodexTab)",
+   {
+    "flow": "workshop",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-workshop",
+    "hud": false,
+    "title": "Workshop",
+    "hasCompat": true
+   },
+   "pr9-07-workshop-codex-390x844.png"
+  ],
+  [
+   "wave 1: HUD with ability button (Hud, AbilityButton)",
+   {
+    "flow": "playing",
+    "wave": 1,
+    "coins": 2,
+    "screen": "",
+    "hud": true,
+    "title": null,
+    "hasCompat": true
+   },
+   "pr9-08-hud-wave-390x844.png"
+  ],
+  [
+   "pause (PauseScreen, title Paused)",
+   {
+    "flow": "paused",
+    "wave": 1,
+    "coins": 2,
+    "screen": "screen-pause",
+    "hud": true,
+    "title": "Paused",
+    "hasCompat": true
+   },
+   "pr9-09-pause-390x844.png"
+  ],
+  [
+   "wave cleared -> shop (ShopScreen; tower damage x50 QA)",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "coins": 28,
+    "screen": "screen-upgrade",
+    "hud": true,
+    "title": "Wave 1 cleared!",
+    "hasCompat": true
+   },
+   "pr9-10-shop-390x844.png"
+  ],
+  [
+   "took the free card (card taken)",
+   {
+    "flow": "upgrade",
+    "wave": 1,
+    "coins": 28,
+    "screen": "screen-upgrade",
+    "hud": true,
+    "title": "Wave 1 cleared!",
+    "hasCompat": true
+   },
+   "pr9-11-shop-taken-390x844.png"
+  ],
+  [
+   "QA jump to wave 5: mini-boss with boss bar (BossBar)",
+   {
+    "flow": "playing",
+    "wave": 5,
+    "coins": 45,
+    "screen": "",
+    "hud": true,
+    "title": null,
+    "hasCompat": true
+   },
+   "pr9-12-boss-bar-390x844.png",
+   {
+    "bossBar": true
+   }
+  ],
+  [
+   "gotcha card (GotchaScreen; QA queued)",
+   {
+    "flow": "gotcha",
+    "wave": 5,
+    "coins": 77,
+    "screen": "screen-gotcha",
+    "hud": false,
+    "title": "Wait a minute\u2026",
+    "hasCompat": true
+   },
+   "pr9-13-gotcha-390x844.png"
+  ],
+  [
+   "tower falls -> game over results (ResultsScreen)",
+   {
+    "flow": "gameover",
+    "wave": 6,
+    "coins": 77,
+    "screen": "screen-results",
+    "hud": false,
+    "title": "Tower down!",
+    "hasCompat": true
+   },
+   "pr9-14-results-390x844.png"
+  ],
+  [
+   "Workshop opened over the results",
+   {
+    "flow": "gameover",
+    "wave": 6,
+    "coins": 77,
+    "screen": "screen-workshop",
+    "hud": false,
+    "title": "Workshop",
+    "hasCompat": true
+   },
+   "pr9-15-results-workshop-390x844.png"
+  ],
+  [
+   "Back from Workshop returns to the results",
+   {
+    "flow": "gameover",
+    "wave": 6,
+    "coins": 77,
+    "screen": "screen-results",
+    "hud": false,
+    "title": "Tower down!",
+    "hasCompat": true
+   },
+   "pr9-16-results-back-390x844.png"
+  ],
+  [
+   "world cleared (ClearedScreen; QA)",
+   {
+    "flow": "cleared",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-cleared",
+    "hud": false,
+    "title": "Backyard cleared!",
+    "hasCompat": true
+   },
+   "pr9-17-cleared-390x844.png"
+  ],
+  [
+   "reset confirmed: mini toast (Toast.mini)",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-start",
+    "hud": false,
+    "title": "LAST STANDTOWER",
+    "hasCompat": true
+   },
+   "pr9-18-toast-390x844.png"
+  ],
+  [
+   "update toast (Toast.offer, used by UpdateNotifier; QA)",
+   {
+    "flow": "menu",
+    "wave": 0,
+    "coins": 0,
+    "screen": "screen-start",
+    "hud": false,
+    "title": "LAST STANDTOWER",
+    "hasCompat": true
+   },
+   "pr9-19-update-toast-390x844.png"
+  ]
+ ],
+ "errors": []
+}
