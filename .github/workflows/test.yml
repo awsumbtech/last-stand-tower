@@ -27,6 +27,7 @@ jobs:
           node tools/flow-test.js
           node tools/systems-test.js
           node tools/render-test.js
+          node tools/ui-test.js
           node tools/ui-chrome-scan.js
           node tools/flow-state-sweep.js
       - name: Backyard deterministic sim (committed sim-ab hashes)
@@ -42,6 +43,8 @@ jobs:
           trap 'kill "$server" || true' EXIT
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/index.html > /dev/null && break; sleep 0.2; done
           python tools/card-layout-test.py http://127.0.0.1:8765/index.html
+      - name: Screen snapshots vs 2fb06e6 (git worktree)
+        run: python tools/screen-snapshot-test.py
 
   main-baseline:
     # The committed hashes must still be main's: rerun the same 4 configs on main 70bff8c

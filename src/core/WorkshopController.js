@@ -28,8 +28,8 @@ LST.WorkshopController = class WorkshopController {
 
   close() {
     const g = this.game;
-    if (g.workshopFrom === "results" && g.flow.is("gameover")) g.ui.show("results");
-    else { g.flow.set("menu"); g.ui.show("start"); }
+    if (g.workshopFrom === "results" && g.flow.is("gameover")) g.flow.current.showScreen(g); // the results
+    else { g.flow.set("menu"); g.flow.current.showScreen(g); }
   }
 
   buyUpgrade(id) {
@@ -90,7 +90,7 @@ LST.WorkshopController = class WorkshopController {
     if (g.devRun) { LST.DevRunGuard.end(); g.devRun = false; } // quit mid door run: put the save back
     g.reset();
     g.flow.set("menu");
-    g.ui.show("start");
+    g.flow.current.showScreen(g);
     LST.audio.duckMusic(false);
     LST.audio.startMusic();
   }

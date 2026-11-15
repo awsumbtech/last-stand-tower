@@ -2,7 +2,7 @@
 // The run flow is a GameStateMachine (src/core/GameStateMachine.js) of GameState objects, one per
 // file in src/core/states/: menu, playing, paused, celebrate (wave-clear party), upgrade (ShopState),
 // gotcha, gameover (results screen), workshop (card unlocks), victory (finale beaten), cleared.
-// game.state is a compat getter/setter over this.flow (game.js:40-41), removed in PR 9.
+// Read or set the run state only with this.flow (is / set / id / current); PR 9 removed the compat getter/setter.
 // The run's systems are one object each (PR 8), and Game's public methods hand off to them:
 //   abilitySystem       AbilitySystem (src/abilities/): the active ability
 //   shopController      ShopController (src/shop/): the shop and the Head Start draft
@@ -29,16 +29,14 @@ LST.Game = class Game extends LST.World {
     this.runRecorder = new LST.RunRecorder(this);
     this.workshopController = new LST.WorkshopController(this);
     this.waveFlow = new LST.WaveFlow(this);
-    this.state = "menu";
+    this.flow.set("menu");
     this.speed = 1; // 1x or 2x game speed
     this.useWorld(LST.WorldRegistry.selected()); // sets world, director (wave source) and bestWave
     this.reset();
     this.ui = new LST.UI(this);
-    this.ui.show("start");
+    this.flow.current.showScreen(this); // MenuState: the start screen
   }
 
-  get state() { return this.flow ? this.flow.id : undefined; }
-  set state(id) { this.flow.set(id); }
   // What render.js and FxDirector may show right now (the current state's SceneFlags).
   get sceneFlags() { return this.flow.current ? this.flow.current.sceneFlags : LST.SceneFlags.NONE; }
 

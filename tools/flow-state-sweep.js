@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-// FlowStateSweep: finds every read or write of the run-flow state id through the compat API
-// (`game.state`, `g.state`, `this.game.state`, `scene.state`, `this.state` in Game / DemoScene)
-// in src/, tools/, sw.js and index.html, and checks that each one is listed with file:line in
-// docs/OO-MIGRATION.md under "`game.state` is a compat getter/setter". Other `.state` fields
-// (meta.state, Coconut, ShellShield, AudioContext, ServiceWorker) are classified and skipped.
-// It also fails on a stale row (a listed line that no longer has a site), and on any site in a
-// file PR 8 / 8b cleared (`cleared`: render.js, FxDirector, DemoScene, the game-system objects,
-// and PR 8b's world objects, render layers and FX drawers;
-// game.js keeps only the constructor's compat write, game.js:32, until PR 9).
-//   node tools/flow-state-sweep.js          check (exit 1 on an unlisted, stale or cleared-file site)
+// FlowStateSweep: finds every read or write of the run-flow state id through the old compat API
+// (`game.state`, `g.state`, `this.game.state`, `scene.state`, `this.state` in Game / DemoScene, and the
+// "state" key on a game object) in src/, tools/, sw.js and index.html. PR 9 removed the compat
+// getter/setter (game.js:40-41 at 2fb06e6), so the sweep expects 0 sites and fails on any: read or
+// set the state with game.flow (is / set / id / current) and the SceneFlags.
+// Other `.state` fields (meta.state, Coconut, ShellShield, AudioContext, ServiceWorker) are classified
+// and skipped. One site is not a Game: flow-test's spyGame stub defines its own "state" getter because
+// the keyboard oracle it feeds is the old src/main.js@99ea184, which reads game.state. That one line is
+// allowed by its exact text (`oracleStub`), and only in tools/flow-test.js.
+// It also fails if docs/OO-MIGRATION.md still lists a compat row (file:line) under
+// "`game.state` is a compat getter/setter".
+//   node tools/flow-state-sweep.js          check (exit 1 on any compat site or listed row)
 //   node tools/flow-state-sweep.js --list   print every `.state` site with its class
 //                                            (flow | meta | comment | other)
 const fs = require("fs"), path = require("path");
@@ -19,20 +21,8 @@ class FlowStateSweep {
     this.flowReceivers = new Set(["game", "g", "this.game", "scene"]);
     this.flowThisFiles = new Set(["src/game.js", "src/demo.js"]);
     this.metaReceivers = /(^|\.)(meta|m|api)$/;
-    // Files with no compat site left after PR 8 / 8b (src/game.js: only the constructor line).
-    this.cleared = ["src/render.js", "src/fx/FxDirector.js", "src/demo.js", "src/core/SceneFlags.js",
-      "src/abilities/Ability.js", "src/abilities/Shockwave.js", "src/abilities/Freeze.js", "src/abilities/Overdrive.js",
-      "src/abilities/AbilitySystem.js", "src/shop/ShopController.js", "src/core/RewardRules.js", "src/core/KillFeedback.js",
-      "src/bosses/BossEventRouter.js", "src/bosses/FinaleController.js", "src/core/RunRecorder.js",
-      "src/core/WorkshopController.js", "src/core/WaveFlow.js",
-      // PR 8b
-      "src/world.js", "src/core/EnemySpawner.js", "src/core/DamageSystem.js", "src/fx/FxSpawner.js", "src/fx/FxRenderer.js",
-      "src/fx/draw/GlowSprites.js", "src/fx/draw/TowerGroundGlow.js", "src/fx/draw/ProjectileTrails.js", "src/fx/draw/ChainArcs.js",
-      "src/fx/draw/TextGlows.js", "src/fx/draw/ParticleBatch.js", "src/fx/draw/ImpactPulses.js", "src/fx/draw/ImpactFlashes.js",
-      "src/render/RenderLayer.js", "src/render/OverdriveRing.js", "src/render/BackdropLayer.js", "src/render/EnemyLayer.js",
-      "src/render/TowerLayer.js", "src/render/FxLayer.js", "src/render/HudCanvasLayer.js", "src/render/OverlayLayer.js",
-      "src/render/RenderPipeline.js"];
-    this.gameJsAllowed = [32];
+    // The old-main.js oracle's stub game (not a Game): its own getter, so the old code can read it.
+    this.oracleStub = { file: "tools/flow-test.js", text: 'Object.defineProperty(g, "state", { get() { return this.flow.id; } });' };
   }
 
   files() {
@@ -74,7 +64,7 @@ class FlowStateSweep {
     return "other";
   }
 
-  // file -> Set(line) listed in the doc's compat table.
+  // file -> Set(line) listed in the doc's compat table (there should be none left).
   listed(docText) {
     const start = docText.indexOf("#### `game.state` is a compat getter/setter");
     const end = docText.indexOf("\n### ", start + 1);
@@ -95,25 +85,26 @@ class FlowStateSweep {
     return map;
   }
 
-  // { flow, unlisted, stale: ["file:line"], inCleared } (sites are { file, line, ... })
+  isOracleStub(site) { return site.file === this.oracleStub.file && site.text === this.oracleStub.text; }
+
+  // { flow: every compat site (must be empty), stub: the oracle stub lines, rows: ["file:line"] still listed }
   check() {
     const doc = fs.readFileSync(path.join(this.root, "docs/OO-MIGRATION.md"), "utf8");
-    const listed = this.listed(doc), flow = this.sites().filter((s) => s.kind === "flow");
-    const unlisted = flow.filter((s) => !(listed.get(s.file) || new Set()).has(s.line));
-    const at = new Set(flow.map((s) => s.file + ":" + s.line)), stale = [];
-    for (const [file, lines] of listed) for (const n of lines) if (!at.has(file + ":" + n)) stale.push(file + ":" + n);
-    const inCleared = flow.filter((s) => this.cleared.includes(s.file) || (s.file === "src/game.js" && !this.gameJsAllowed.includes(s.line)));
-    return { flow, unlisted, stale, inCleared };
+    const all = this.sites().filter((s) => s.kind === "flow");
+    const stub = all.filter((s) => this.isOracleStub(s)), flow = all.filter((s) => !this.isOracleStub(s));
+    const rows = [];
+    for (const [file, lines] of this.listed(doc)) for (const n of lines) rows.push(file + ":" + n);
+    return { flow, stub, rows };
   }
 
   run(argv) {
-    if (argv.includes("--list")) { for (const s of this.sites()) console.log(`${s.kind.padEnd(7)} ${s.file}:${s.line}  ${s.key ? s.receiver : s.receiver + ".state"}`); return 0; }
-    const { flow, unlisted, stale, inCleared } = this.check();
-    for (const s of unlisted) console.log(`FAIL flow-state: ${s.file}:${s.line} reads/writes ${s.key ? s.receiver : s.receiver + ".state"} but is not listed in docs/OO-MIGRATION.md`);
-    for (const f of stale) console.log(`FAIL flow-state: docs/OO-MIGRATION.md lists ${f}, but that line has no compat site (stale row)`);
-    for (const s of inCleared) console.log(`FAIL flow-state: ${s.file}:${s.line} uses the compat API in a file PR 8 / 8b cleared (use game.flow / SceneFlags)`);
-    const bad = unlisted.length + stale.length + inCleared.length;
-    console.log(bad ? `\n${bad} FAILED` : `ALL PASS (${flow.length} compat game.state / scene.state sites, all listed with file:line; 0 stale rows; 0 in the ${this.cleared.length} cleared files)`);
+    if (argv.includes("--list")) { for (const s of this.sites()) console.log(`${s.kind.padEnd(7)} ${s.file}:${s.line}  ${s.key ? s.receiver : s.receiver + ".state"}${this.isOracleStub(s) ? "  (oracle stub, allowed)" : ""}`); return 0; }
+    const { flow, stub, rows } = this.check();
+    for (const s of flow) console.log(`FAIL flow-state: ${s.file}:${s.line} uses ${s.key ? s.receiver : s.receiver + ".state"}; the compat API is gone (use game.flow / SceneFlags)`);
+    if (stub.length > 1) console.log(`FAIL flow-state: the oracle stub line appears ${stub.length} times (allowed once)`);
+    for (const r of rows) console.log(`FAIL flow-state: docs/OO-MIGRATION.md still lists ${r} as a compat site`);
+    const bad = flow.length + (stub.length > 1 ? 1 : 0) + rows.length;
+    console.log(bad ? `\n${bad} FAILED` : `ALL PASS (0 compat game.state / scene.state sites in src/, tools/, sw.js and index.html; ${stub.length} oracle stub for main.js@99ea184 allowed; 0 compat rows in docs/OO-MIGRATION.md)`);
     return bad ? 1 : 0;
   }
 }

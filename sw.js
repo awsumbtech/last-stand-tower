@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v28"; // OO world split (EnemySpawner / DamageSystem / FxSpawner), RenderPipeline layers, FxRenderer batcher
+const VERSION = "v29"; // OO UI screens (one object per screen, switched by the state objects); game.state compat removed
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -129,6 +129,26 @@ const PRECACHE = [
   "src/ui/CardFlip.js",
   "src/ui/WorldSelect.js",
   "src/ui/WorldScreens.js",
+  "src/ui/UiIcons.js",
+  "src/ui/screens/Toast.js",
+  "src/ui/UpdateNotifier.js",
+  "src/ui/screens/Screen.js",
+  "src/ui/screens/StartScreen.js",
+  "src/ui/screens/ShopScreen.js",
+  "src/ui/screens/PauseScreen.js",
+  "src/ui/screens/ConfirmScreen.js",
+  "src/ui/screens/ResultsScreen.js",
+  "src/ui/screens/workshop/CardsTab.js",
+  "src/ui/screens/workshop/UpgradesTab.js",
+  "src/ui/screens/workshop/DeckTab.js",
+  "src/ui/screens/workshop/CodexTab.js",
+  "src/ui/screens/WorkshopScreen.js",
+  "src/ui/screens/GotchaScreen.js",
+  "src/ui/screens/ClearedScreen.js",
+  "src/ui/screens/AbilityButton.js",
+  "src/ui/screens/BossBar.js",
+  "src/ui/screens/Hud.js",
+  "src/ui/screens/SettingsToggles.js",
   "src/ui.js",
   "src/core/SceneFlags.js",
   "src/core/GameState.js",

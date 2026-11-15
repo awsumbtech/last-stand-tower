@@ -16,7 +16,7 @@ LST.WaveFlow = class WaveFlow {
     g.projectiles = [];
     g.hazards = [];
     g.flow.set("playing");
-    g.ui.show(null);
+    g.flow.current.showScreen(g);
     if (!g.finaleController.begin()) {
       LST.audio.setTension(g.endless ? 1 : 0);
       LST.audio.play("waveStart");
@@ -71,7 +71,7 @@ LST.WaveFlow = class WaveFlow {
     if (!g.flow.is("celebrate")) return;
     if (g.gotchaQueue.length) {
       g.flow.set("gotcha");
-      g.ui.show("gotcha");
+      g.flow.current.showScreen(g);
       LST.audio.play("gotcha");
       LST.haptics.buzz([40, 60, 120]);
       return;
@@ -84,7 +84,7 @@ LST.WaveFlow = class WaveFlow {
     const g = this.game;
     if (!g.flow.is("gotcha")) return;
     g.gotchaQueue.shift();
-    if (g.gotchaQueue.length) { g.ui.show("gotcha"); return; }
+    if (g.gotchaQueue.length) { g.flow.current.showScreen(g); return; }
     g.shopController.enter();
   }
 };
