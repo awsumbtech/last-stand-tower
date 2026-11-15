@@ -56,7 +56,6 @@ Every remaining compat site, and the PR that removes it:
 | Where (current lines) | Use | Removed in | Becomes |
 |---|---|---|---|
 | `game.js:32` | constructor sets "menu" | PR 9 (compat removal) | `this.flow.set("menu")` |
-| `ui.js:132, 190, 555` | Resume button, settings opened mid-run, HUD ability state | PR 9 (N14) | `PauseScreen` / `Hud` read `flow.current` |
 | `tools/sim.js:306, 315, 319, 328, 329, 335` | sim loop reads / sets the id | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` (sims must stay identical) |
 | `tools/world-test.js:52, 55, 156, 171, 385, 425, 427-429, 436-437, 470, 477-481, 483, 494, 503` | test setup, run loops and messages (483: door-run finale assert) | PR 9 (compat removal) | `game.flow.is()` / `game.flow.set()` |
 | `tools/card-layout-test.py:135, 227` | page setup | PR 9 (compat removal) | `game.flow.set("menu")`, `game.flow.is("playing")` |

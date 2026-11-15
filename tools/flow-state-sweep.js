@@ -31,7 +31,14 @@ class FlowStateSweep {
       "src/fx/draw/TextGlows.js", "src/fx/draw/ParticleBatch.js", "src/fx/draw/ImpactPulses.js", "src/fx/draw/ImpactFlashes.js",
       "src/render/RenderLayer.js", "src/render/OverdriveRing.js", "src/render/BackdropLayer.js", "src/render/EnemyLayer.js",
       "src/render/TowerLayer.js", "src/render/FxLayer.js", "src/render/HudCanvasLayer.js", "src/render/OverlayLayer.js",
-      "src/render/RenderPipeline.js"];
+      "src/render/RenderPipeline.js",
+      // PR 9
+      "src/ui.js", "src/pwa.js",
+      "src/ui/UiIcons.js", "src/ui/screens/Toast.js", "src/ui/UpdateNotifier.js", "src/ui/screens/Screen.js",
+      "src/ui/screens/StartScreen.js", "src/ui/screens/ShopScreen.js", "src/ui/screens/PauseScreen.js", "src/ui/screens/ConfirmScreen.js",
+      "src/ui/screens/ResultsScreen.js", "src/ui/screens/workshop/CardsTab.js", "src/ui/screens/workshop/UpgradesTab.js", "src/ui/screens/workshop/DeckTab.js",
+      "src/ui/screens/workshop/CodexTab.js", "src/ui/screens/WorkshopScreen.js", "src/ui/screens/GotchaScreen.js", "src/ui/screens/ClearedScreen.js",
+      "src/ui/screens/AbilityButton.js", "src/ui/screens/BossBar.js", "src/ui/screens/Hud.js", "src/ui/screens/SettingsToggles.js"];
     this.gameJsAllowed = [32];
   }
 
