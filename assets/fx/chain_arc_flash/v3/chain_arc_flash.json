@@ -1,0 +1,15 @@
+{
+ "frameW": 96,
+ "frameH": 96,
+ "count": 4,
+ "fps": 20,
+ "loop": false,
+ "anchor": [
+  48,
+  48
+ ],
+ "anchorMeaning": "struck enemy centre",
+ "image": "chain_arc_flash.png",
+ "version": "v3",
+ "sha256": "5a6450dbe41112ef3bb5bf69099bd0b81a508c23b5a65c87bb2ee904b41a2cf7"
+}

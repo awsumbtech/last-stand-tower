@@ -4,11 +4,13 @@
 //   index(t)  frame shown t seconds in (loops wrap, one-shots hold their last frame)
 //   done(t)   a one-shot has played through
 //   draw(ctx, i, x, y, bodyR)  frame i with its anchor on (x, y), scaled bodyR / refBodyR
+// A strip may sit on a row of a grid sheet (strip.y = the row's top, px); default 0.
 // Draws nothing (returns false) until its image is in: there is no drawn fallback.
 LST.SheetAnimation = class SheetAnimation {
   constructor(strip, anchor, refBodyR) {
     this.src = strip.image;
     this.fw = strip.frame.w; this.fh = strip.frame.h;
+    this.sy = strip.y || 0;
     this.count = Math.max(1, strip.count | 0);
     this.fps = strip.fps || 0;
     this.loop = !!strip.loop;
@@ -37,7 +39,7 @@ LST.SheetAnimation = class SheetAnimation {
   draw(ctx, i, x, y, bodyR) {
     if (!this.image) return false;
     const f = Math.max(0, Math.min(this.count - 1, i | 0)), [dx, dy, dw, dh] = this.rect(x, y, bodyR);
-    ctx.drawImage(this.image, f * this.fw, 0, this.fw, this.fh, dx, dy, dw, dh);
+    ctx.drawImage(this.image, f * this.fw, this.sy, this.fw, this.fh, dx, dy, dw, dh);
     return true;
   }
 };

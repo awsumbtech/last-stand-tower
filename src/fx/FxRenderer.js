@@ -1,12 +1,12 @@
 // FxRenderer: the effects batcher. It keeps the theme (LST.FX_THEMES: blend mode, glow strength,
-// ink outlines) and the glow sprites, counts drawn particles for QA, and hands each kind of
-// effect to its own drawer (src/fx/draw/*.js): TowerGroundGlow, ProjectileTrails, ChainArcs,
-// TextGlows, ParticleBatch, ImpactPulses, ImpactFlashes. FxDirector calls the same methods as
-// before.
+// ink outlines) and the effect manifest (FxManifest: assets/fx/fx.json and its art), counts
+// drawn particles for QA, and hands each kind of effect to its own drawer (src/fx/draw/*.js):
+// TowerGroundGlow, ProjectileTrails, ChainArcs, TextGlows, ParticleBatch, ImpactPulses,
+// ImpactFlashes. FxDirector calls the same methods as before.
 LST.FxRenderer = class FxRenderer {
-  constructor(doc) {
+  constructor(doc, effects = LST.fxManifest) {
     this.doc = doc;
-    this.sprites = new LST.GlowSprites(doc);
+    this.effects = effects;
     this.theme = LST.FX_THEMES.cartoon;
     this.frame = 0;
     this.drawn = 0; // particles drawn last frame (QA)
@@ -20,8 +20,9 @@ LST.FxRenderer = class FxRenderer {
   }
 
   setTheme(themeId) { this.theme = LST.FX_THEMES[themeId] || LST.FX_THEMES.cartoon; }
-  glow(color) { return this.sprites.get(color); }
-  static rgb(hex) { return LST.GlowSprites.rgb(hex); }
+  // The glow image fx.json names for a preset colour (null until loaded / if unnamed). Used by
+  // the drawers PR 10b converts (ParticleBatch, ProjectileTrails).
+  glow(color) { return this.effects ? this.effects.glow(color) : null; }
 
   // World layer (inside the renderer's world transform)
   drawUnder(ctx, tower, aura, time) { this.under.draw(this, ctx, tower, aura, time); }

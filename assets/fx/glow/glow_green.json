@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_green.png",
+ "version": "v1",
+ "sha256": "8f06d47e8ac4f39865730aa513df98e754eb112c681f5a30cc07aaa9a0f25009"
+}

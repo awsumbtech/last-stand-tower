@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_lime.png",
+ "version": "v1",
+ "sha256": "86068440427bfaa3b969c47bcf7eb46bd0a7aea8a46c0270d5b8f1c3bc84e4ec"
+}

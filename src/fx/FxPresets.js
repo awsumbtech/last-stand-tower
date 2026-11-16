@@ -42,7 +42,6 @@ LST.FX_PRESETS = {
       ["#ffb347", "#ffd23f", "#ff8a3d"],
       ["#ffd23f", "#ff7ac8", "#59c8ff", "#b06bff"],
     ],
-    groundGlow: [0.08, 0.55], // alpha of the soft glow under the tower at power 0 and 1
     tierPower: [1, 5, 11, 18], // power needed for tiers 1..4 (power = weighted cards this run + Workshop)
     maxPower: 24,
   },
@@ -58,19 +57,16 @@ LST.FX_PRESETS = {
     color: "#ffcf3a",
     critColor: "#ff9a3a",
   },
-  // One-shot soft glows (crits) and glows behind bright pickups (coin popups, crit numbers).
+  // One-shot soft glows (crits). The glows behind coin popups and crit numbers are fx.json
+  // entries (textGlow.coin, textGlow.crit) since PR 10a.
   glow: {
     shape: "glow",
     critRadius: 30,
     critLife: 0.22,
     critColor: "#ffd23f",
-    coinRadius: 22,
-    coinAlpha: 0.32,
-    critTextRadius: 30,
-    critTextAlpha: 0.38,
   },
-  // Expanding ring + soft bloom that goes with every impact.
-  ring: { life: 0.45, width: 9 },
+  // How long the ring + bloom pulse of every impact lasts. Its look is fx.json (impacts).
+  ring: { life: 0.45 },
 };
 
 LST.FX_IMPACTS = {

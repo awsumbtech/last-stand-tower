@@ -6,6 +6,8 @@
 //   FxCamera       shake + impact pulses                         (FxCamera.js)
 //   ImpactSync     bass thump + burst + pulse on the same frame  (ImpactSync.js)
 //   FxRenderer     theme-aware drawing                           (FxRenderer.js)
+//   FxManifest     assets/fx/fx.json: image effects by id + art  (FxManifest.js, SpriteEffect.js)
+//   EffectPlayer   plays any fx.json effect by id at a point     (EffectPlayer.js)
 //   FxOverlay      click-through canvas over the menus           (FxOverlay.js)
 //   ScreenAnchors  where a card / Workshop button is on screen   (ScreenAnchors.js)
 //   FrameStats     frame + draw time log                         (FrameStats.js)
@@ -27,7 +29,8 @@ LST.FxDirector = class FxDirector {
     this.pools = { world: new LST.ParticlePool(LST.FX_QUALITY.capWorld), screen: new LST.ParticlePool(LST.FX_QUALITY.capScreen) };
     this.camera = new LST.FxCamera(4);
     this.aura = new LST.TowerAura(LST.FX_PRESETS.aura);
-    this.renderer = new LST.FxRenderer(doc);
+    this.renderer = new LST.FxRenderer(doc, LST.fxManifest);
+    this.player = new LST.EffectPlayer(this.renderer.effects);
     this.looks = LST.LookLayer ? new LST.LookLayer(bus) : null; // status looks on enemies (src/elements/looks)
     this.overlay = new LST.FxOverlay(doc);
     this.anchors = new LST.ScreenAnchors(doc);
@@ -42,7 +45,12 @@ LST.FxDirector = class FxDirector {
     this.arcs = [];      // Chain Spark bolts: short-lived, max ARC_CAP, only exist after a hit
     this.offs = [];
     if (bus) this.subscribe(bus);
+    // The effect manifest and its art load in the background; effects draw nothing until then.
+    // Then entries with "on" start playing on their game event (data only, no code per effect).
+    if (this.effects) this.effects.preload().then(() => { if (bus && !this.disposed) this.subscribeTriggers(bus); });
   }
+
+  get effects() { return this.renderer.effects; }
 
   get reducedMotion() { return this.quality.reduced; }
   get shake() { return this.quality.reduced ? 0 : this.camera.shake; }
@@ -61,11 +69,22 @@ LST.FxDirector = class FxDirector {
     if (E.ELEMENT_HIT) on(E.ELEMENT_HIT, (e) => this.onElementHit(e));
   }
 
+  // fx.json entries with "on": "<EVENTS key>" play at the event's x, y.
+  subscribeTriggers(bus) {
+    for (const [id, key] of this.effects.triggers()) {
+      const type = LST.EVENTS[key];
+      if (type) this.offs.push(bus.on(type, (e) => { if (e && typeof e.x === "number") this.play(id, e.x, e.y); }));
+    }
+  }
+
+  // Play any fx.json effect by id at a world point (QA / console: LST.fxDirector.play(id, x, y)).
+  play(id, x, y, opts) { return this.player.play(id, x, y, opts); }
+
   // Event -> impact routing is data (LST.FX_ROUTES); a null route plays nothing.
   route(key) { return LST.FX_ROUTES ? LST.FX_ROUTES[key] || null : null; }
   fireRoute(key, x, y, opts) { const name = this.route(key); return name ? this.impacts.fire(name, x, y, opts) : null; }
 
-  dispose() { for (const off of this.offs) off(); this.offs = []; }
+  dispose() { for (const off of this.offs) off(); this.offs = []; this.disposed = true; }
 
   // ---------- Event handlers ----------
   onRunStart(game) {
@@ -75,6 +94,7 @@ LST.FxDirector = class FxDirector {
     this.aura.resetBaseline();
     this.pools.world.clear();
     this.camera.clear();
+    this.player.clear();
   }
 
   onCardTaken(e) {
@@ -138,6 +158,7 @@ LST.FxDirector = class FxDirector {
     this.pools.world.update(dt);
     this.pools.screen.update(dt);
     this.camera.update(dt);
+    this.player.update(dt);
     if (this.arcs.length) { for (const a of this.arcs) a.t += dt; this.arcs = this.arcs.filter((a) => a.t < a.life); }
   }
 
@@ -154,6 +175,7 @@ LST.FxDirector = class FxDirector {
     if (this.arcs.length) this.renderer.drawArcs(ctx, this.arcs, this.quality.low);
     this.renderer.drawPulses(ctx, this.camera, "world", this.frame, 1, this.quality.low);
     this.renderer.drawPool(ctx, this.pools.world, 1, this.quality.low);
+    this.player.draw(ctx, this.quality.low);
   }
   drawTextGlows(ctx, scene) { this.renderer.drawTextGlows(ctx, scene.texts); }
   drawScreen(ctx, r) { if (!this.quality.low) this.renderer.drawFlashes(ctx, this.camera, r); } // screen px, inside the game canvas

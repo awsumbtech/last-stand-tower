@@ -1,0 +1,25 @@
+{
+ "_fixture": "TEST FIXTURE ONLY (tools/fx-acceptance-test.py). Not game art: never listed in assets/fx/fx.json, sw.js or index.html.",
+ "strips": {
+  "main": {
+   "image": "acceptance_spark.png",
+   "size": {
+    "w": 128,
+    "h": 32
+   },
+   "frame": {
+    "w": 32,
+    "h": 32
+   },
+   "count": 4,
+   "fps": 8,
+   "loop": false
+  }
+ },
+ "anchor": {
+  "x": 16,
+  "y": 16,
+  "units": "frame px"
+ },
+ "refBodyR": 16
+}

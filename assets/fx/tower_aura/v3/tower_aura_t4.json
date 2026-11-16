@@ -1,0 +1,15 @@
+{
+ "frameW": 256,
+ "frameH": 256,
+ "count": 6,
+ "fps": 8,
+ "loop": true,
+ "anchor": [
+  128,
+  128
+ ],
+ "anchorMeaning": "tower foot / ground centre",
+ "image": "tower_aura_t4.png",
+ "version": "v3",
+ "sha256": "d7bb8a7fae01ad16febf18a46d14436bcd90f54980379c27c1ebbb74569d3d88"
+}

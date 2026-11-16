@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_pale.png",
+ "version": "v2",
+ "sha256": "6851576fcd19c3db5c0c776f255ea42fd2fbed95c98742d9e38dd5d09099ba8d"
+}

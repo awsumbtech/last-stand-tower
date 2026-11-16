@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_gold.png",
+ "version": "v1",
+ "sha256": "65f780d364dbcc59cd12613cec7bbc3d97b2b571537d43710a0cae2efa6040fc"
+}
