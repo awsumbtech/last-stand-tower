@@ -59,7 +59,7 @@ class ScreenSnapshotTest:
 
     def __init__(self, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."), race_ms=150):
         self.root = os.path.abspath(root)
-        self.race_ms = race_ms  # forced timer race: let the page's timers (music) run for this long before each step
+        self.race_ms = race_ms  # forced timer race: this tree's timers (music) run this long before each step, the oracle's don't
         self.passes = 0
         self.fails = 0
 
@@ -75,7 +75,7 @@ class ScreenSnapshotTest:
         threading.Thread(target=srv.serve_forever, daemon=True).start()
         return srv, "http://127.0.0.1:%d/index.html" % srv.server_address[1]
 
-    def run_tree(self, browser, url):
+    def run_tree(self, browser, url, race_ms=0):
         ctx = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, has_touch=True, is_mobile=True, service_workers="block")
         ctx.add_init_script(self.INIT)
         pg = ctx.new_page()
@@ -88,10 +88,10 @@ class ScreenSnapshotTest:
         self.visible = []
         for i, (name, js) in enumerate(self.STEPS):
             # Timers keep drawing random numbers between steps (the music scheduler's noise() hats, audio.js).
-            # The forced race lets them run first; then the reseed and the step run in ONE synchronous call,
+            # The forced race (this tree only, like CI's one-sided tick) lets them run first; then the reseed and the step run in ONE synchronous call,
             # so no timer can land between them (two calls let a music tick shift the card deal: CI run
             # 43907621954 attempt 1).
-            if self.race_ms: pg.wait_for_timeout(self.race_ms)
+            if race_ms: pg.wait_for_timeout(race_ms)
             pg.evaluate("([k, js]) => { window.__reseed(k); (0, eval)('(' + js + ')')(); }", [1000 + i, js])
             self.visible.append(pg.evaluate("() => [...document.querySelectorAll('.screen:not(.hidden)')].map((e) => e.id).join(',') + (document.getElementById('hud').classList.contains('hidden') ? '' : '+hud') + (document.getElementById('boss-bar').classList.contains('hidden') ? '' : '+boss')"))
             snaps.append(pg.evaluate("() => { const b = document.body.cloneNode(true); b.querySelectorAll('script').forEach((e) => e.remove()); [...b.childNodes].forEach((n) => { if (n.nodeType === 3 && !n.textContent.trim()) n.remove(); }); return b.className + '\\n' + b.innerHTML; }"))
@@ -134,7 +134,7 @@ class ScreenSnapshotTest:
             with sync_playwright() as p:
                 b = p.chromium.launch()
                 c1, _, old, e_old = self.run_tree(b, u_old)
-                c2, pg, new, e_new = self.run_tree(b, u_new)
+                c2, pg, new, e_new = self.run_tree(b, u_new, self.race_ms)  # timers run in this tree only: the CI race
                 for (name, _), a, z in zip(self.STEPS, old, new):
                     if a != z:
                         i = next((k for k in range(min(len(a), len(z))) if a[k] != z[k]), min(len(a), len(z)))
