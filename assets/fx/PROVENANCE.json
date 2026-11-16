@@ -809,7 +809,7 @@
  },
  "chain_arc_flash/v3/chain_arc_flash.png": {
   "version": "v3",
-  "supersedes": "chain_arc_flash/chain_arc_flash.png (v1, kept on disk for history)",
+  "supersedes": "chain_arc_flash/chain_arc_flash.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "5a6450dbe41112ef3bb5bf69099bd0b81a508c23b5a65c87bb2ee904b41a2cf7",
   "sheet": "chain_arc_flash/v3/chain_arc_flash.json",
   "frames": 4,
@@ -833,7 +833,7 @@
  },
  "chain_bolt/v3/chain_bolt.png": {
   "version": "v3",
-  "supersedes": "chain_bolt/chain_bolt.png (v1, kept on disk for history)",
+  "supersedes": "chain_bolt/chain_bolt.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "d3bcfb657f0e5991f28e1a4267510c02e6eb25612d53ee4d6e7f13057ca417c4",
   "sheet": "chain_bolt/v3/chain_bolt.json",
   "frames": 9,
@@ -878,7 +878,7 @@
  },
  "impact_ring/v3/impact_ring_blue.png": {
   "version": "v3",
-  "supersedes": "impact_ring/impact_ring_blue.png (v1, kept on disk for history)",
+  "supersedes": "impact_ring/impact_ring_blue.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "ac1efb20b2c6335c2305a316025e4dd2ae111041765f7c51bab38ac355ec610a",
   "sheet": "impact_ring/v3/impact_ring_blue.json",
   "frames": 6,
@@ -908,7 +908,7 @@
  },
  "impact_ring/v3/impact_ring_gold.png": {
   "version": "v3",
-  "supersedes": "impact_ring/impact_ring_gold.png (v1, kept on disk for history)",
+  "supersedes": "impact_ring/impact_ring_gold.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "f9af671c0bef9dc3cea52c50928c26104bac2cd91034db125d0d26b098233072",
   "sheet": "impact_ring/v3/impact_ring_gold.json",
   "frames": 6,
@@ -932,7 +932,7 @@
  },
  "impact_ring/v3/impact_ring_green.png": {
   "version": "v3",
-  "supersedes": "impact_ring/impact_ring_green.png (v1, kept on disk for history)",
+  "supersedes": "impact_ring/impact_ring_green.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "3ff94a50cdd4f2b5f0b5080e86f32db777e7759096f602ca1b70c892871ef967",
   "sheet": "impact_ring/v3/impact_ring_green.json",
   "frames": 6,
@@ -956,7 +956,7 @@
  },
  "impact_ring/v3/impact_ring_purple.png": {
   "version": "v3",
-  "supersedes": "impact_ring/impact_ring_purple.png (v1, kept on disk for history)",
+  "supersedes": "impact_ring/impact_ring_purple.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "a9c78bb5cf46547f6170511a3ef8b11cd15d85f7c454b93c7568f68ed5c47484",
   "sheet": "impact_ring/v3/impact_ring_purple.json",
   "frames": 6,
@@ -986,7 +986,7 @@
  },
  "impact_ring/v3/impact_ring_red.png": {
   "version": "v3",
-  "supersedes": "impact_ring/impact_ring_red.png (v1, kept on disk for history)",
+  "supersedes": "impact_ring/impact_ring_red.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "c8979e15e96ce13dd3be0255ca34daa84814cfa71066ba99c0b5250a9d961216",
   "sheet": "impact_ring/v3/impact_ring_red.json",
   "frames": 6,
@@ -1010,7 +1010,7 @@
  },
  "overdrive_aura/v3/overdrive_aura.png": {
   "version": "v3",
-  "supersedes": "overdrive_aura/overdrive_aura.png (v1, kept on disk for history)",
+  "supersedes": "overdrive_aura/overdrive_aura.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "ea80405f920fc5db5efd8dc7df1b5cf1e75384800ab520e5f0dac190559bb95d",
   "sheet": "overdrive_aura/v3/overdrive_aura.json",
   "frames": 6,
@@ -1034,7 +1034,7 @@
  },
  "tower_aura/v3/tower_aura_t0.png": {
   "version": "v3",
-  "supersedes": "tower_aura/tower_aura_t0.png (v1, kept on disk for history)",
+  "supersedes": "tower_aura/tower_aura_t0.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "b5d79c9dfd8aea79db42058468639d57b762c1345454f465066862c1da5940ab",
   "sheet": "tower_aura/v3/tower_aura_t0.json",
   "frames": 6,
@@ -1068,7 +1068,7 @@
  },
  "tower_aura/v3/tower_aura_t1.png": {
   "version": "v3",
-  "supersedes": "tower_aura/tower_aura_t1.png (v1, kept on disk for history)",
+  "supersedes": "tower_aura/tower_aura_t1.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "87a2a2176298a51339f803762c00f9d08a0dae7499abdb46159aec10724564c3",
   "sheet": "tower_aura/v3/tower_aura_t1.json",
   "frames": 6,
@@ -1102,7 +1102,7 @@
  },
  "tower_aura/v3/tower_aura_t2.png": {
   "version": "v3",
-  "supersedes": "tower_aura/tower_aura_t2.png (v1, kept on disk for history)",
+  "supersedes": "tower_aura/tower_aura_t2.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "6dd2f73d5a79a393bcd078d64e162cd45c7f2948dd27677134b8ae8450e1c004",
   "sheet": "tower_aura/v3/tower_aura_t2.json",
   "frames": 6,
@@ -1136,7 +1136,7 @@
  },
  "tower_aura/v3/tower_aura_t3.png": {
   "version": "v3",
-  "supersedes": "tower_aura/tower_aura_t3.png (v1, kept on disk for history)",
+  "supersedes": "tower_aura/tower_aura_t3.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "d62f6ffc26ed70351e7e282b8f38ff353749b2e0efd12b79df348df5f670cdbd",
   "sheet": "tower_aura/v3/tower_aura_t3.json",
   "frames": 6,
@@ -1170,7 +1170,7 @@
  },
  "tower_aura/v3/tower_aura_t4.png": {
   "version": "v3",
-  "supersedes": "tower_aura/tower_aura_t4.png (v1, kept on disk for history)",
+  "supersedes": "tower_aura/tower_aura_t4.png (v1, removed from the game tree in 864aadb; its hash is kept here for history)",
   "sha256": "d7bb8a7fae01ad16febf18a46d14436bcd90f54980379c27c1ebbb74569d3d88",
   "sheet": "tower_aura/v3/tower_aura_t4.json",
   "frames": 6,
