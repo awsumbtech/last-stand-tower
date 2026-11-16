@@ -300,7 +300,7 @@ Rules for every file:
 - No white flashes and no recolours: each colour is its own baked file.
 - Cores are a lighter tint of the same hue, never pure white.
 - Transparent PNG (pngquant `.q.png` + RGBA master), with a JSON sheet in the existing format (frames, frameTags, pivot, refBodyR / scaleRule).
-- Opacity fades are done in code (allowed). Rows 1–4 and 6–8 were asked for PR 10a on Nov 16 (`overdrive_aura`, `chain_bolt`, `chain_arc_flash`, `chain_node_glow`, `tower_aura_t0`–`t4`, `glow_<10 colours>`, `impact_ring_<5 colours>`); rows 5 and 9–13 are PR 10b.
+- Opacity fades are done in code (allowed). Rows 1–4 and 6–8 were asked for PR 10a on Nov 16 (`overdrive_aura`, `chain_bolt`, `chain_arc_flash`, `chain_node_glow`, `tower_aura_t0`–`t4`, `glow_<10 colours>`, `impact_ring_<5 colours>`). Row 5 (`screen_burst`) and `glow_pale` / `glow_yellow` were added for 10a on Nov 16 as v2, so row 5 landed in 10a (X3), and X13 still uses it in 10b. Rows 9–13 are PR 10b.
 
 | # | File | Frame size | Frames | What it shows | Replaces |
 |---|---|---|---|---|---|
@@ -310,7 +310,7 @@ Rules for every file:
 | 4 | `fx/chain_node_glow.png` | 64×64 | 1 | Soft yellow glow under each bolt node | X2 glow |
 | 5 | `fx/screen_burst.png` | 512×512 (cover-fit) | 1 (optional 3-frame one-shot) | Warm amber, **non-white** radial burst, fully transparent edges (Decision 12) | X3 ImpactFlashes, X13 white flash |
 | 6 | `fx/tower_aura_t0..t4.json/.png` (5 files) | 256×256 | 6, slow loop 4 fps | Ground glow under the tower per tier: t0 pale gold, t1 gold, t2 amber, t3 deep gold / orange, t4 rainbow (gold / pink / blue / purple) | X4 TowerGroundGlow |
-| 7 | `fx/glow_<name>.png` (10 files): gold, amber, pale, yellow, red, pink, blue, purple, orange-ember, green-venom | 64×64 | 1 | Soft round bloom, same-hue core | X5 GlowSprites and every `fx.glow(hex)` |
+| 7 | `fx/glow_<name>.png` (12 files as delivered: 10 v1 colours plus v2 `glow_pale` and `glow_yellow`) | 64×64 | 1 | Soft round bloom, same-hue core | X5 GlowSprites and every `fx.glow(hex)` |
 | 8 | `fx/impact_ring_<variant>.json/.png` (5): gold (default), red (tower hit / slam), blue (frost), green (venom), purple (epic card) | 192×192 | 6, one-shot | Expanding ring with the ink outline baked in, thinning as it grows | X6 ImpactPulses |
 | 9 | `fx/motes.json/.png` atlas | 32×32 cells | 1 each (+2-frame twinkle optional) | Round mote in 8 colours (gold, pale, pink, blue, red, purple, green, orange) plus star, snowflake, ember, venom drop | X7 motes |
 | 10 | `fx/streak_<variant>.json/.png` (4): gold, red, blue, pale | 64×16 | 3 (fade steps) | Ink-outlined speed streak, stretched along velocity | X7 streaks |
