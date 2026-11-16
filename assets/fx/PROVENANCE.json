@@ -1,11 +1,11 @@
 {
  "_about": {
-  "version": "v1 + v2 additions",
+  "version": "v1 + v2 additions + v3 subtle redo",
   "delivery": "LST PR10a effects manifest art for Tower Defense Games Dev",
   "date": "2026-11-16",
   "tool": "Grok Bot GenerateImage (cursor namespace); PixelLab not used",
   "generations": {
-   "total": 29,
+   "total": 47,
    "v1": {
     "total": 26,
     "kept": 24,
@@ -21,6 +21,21 @@
      "glow_pale",
      "glow_yellow"
     ],
+    "date": "2026-11-16"
+   },
+   "v3": {
+    "total": 18,
+    "kept": 13,
+    "rerolls": 5,
+    "rerolled": [
+     "impact_ring_blue (band too thin)",
+     "impact_ring_purple (frame 1 filled ball)",
+     "chain_bolt (pink segments, hair-thin core)",
+     "tower_aura_t4 x2 (near-white mixing zones; then single-colour frames)"
+    ],
+    "t4Swap": "2026-11-16: the shipped t4 was swapped from the colour-wheel draft (r2) to draft r1 for 0 near-white pixels; no new generation",
+    "note": "3 further GenerateImage calls were interrupted at 10:19 and produced no image",
+    "why": "Brian, Nov 16 10:17 AM ET: 'The new tower art is too bold need more subtlety'",
     "date": "2026-11-16"
    }
   },
@@ -791,5 +806,439 @@
    "scale": 0.6866485013623979
   },
   "license": "original generated art"
+ },
+ "chain_arc_flash/v3/chain_arc_flash.png": {
+  "version": "v3",
+  "supersedes": "chain_arc_flash/chain_arc_flash.png (v1, kept on disk for history)",
+  "sha256": "5a6450dbe41112ef3bb5bf69099bd0b81a508c23b5a65c87bb2ee904b41a2cf7",
+  "sheet": "chain_arc_flash/v3/chain_arc_flash.json",
+  "frames": 4,
+  "frameW": 96,
+  "frameH": 96,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/chain_arc_flash.jpg",
+  "sourceSha256": "1d6a060add17c826bd588310125d4bb1f7a7e8563bc56505aa7442366be7d2b9",
+  "prompt": "Subtle mobile game VFX sprite sheet: 2 columns x 2 rows of 4 equal square cells on a pure flat black background (#000000), no grid lines. A small, light, delicate one-shot electric spark pop on a struck enemy, centred in each cell, read left to right then top to bottom: frame 1 a small ring of a few short thin yellow spark lines snapping on; frame 2 a delicate ring of thin jagged yellow spark strokes with a few tiny four-point glints around an empty centre; frame 3 the sparks flying apart outward as short thin streaks; frame 4 a few tiny fading spark dots. Spark strokes are thin and tapered (about one twenty-fifth of the cell width at their thickest), saturated luminous yellow (#ffe14d) and golden yellow (#ffc61a) with a soft faint translucent yellow glow. NO dark outline, no black ink, no bold shapes, no white or pale core - yellow all the way through. The centre stays empty. Nothing touches the cell edges. Light touch, understated. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.37398373983739835
+  },
+  "license": "original generated art"
+ },
+ "chain_bolt/v3/chain_bolt.png": {
+  "version": "v3",
+  "supersedes": "chain_bolt/chain_bolt.png (v1, kept on disk for history)",
+  "sha256": "d3bcfb657f0e5991f28e1a4267510c02e6eb25612d53ee4d6e7f13057ca417c4",
+  "sheet": "chain_bolt/v3/chain_bolt.json",
+  "frames": 9,
+  "frameW": 256,
+  "frameH": 48,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/chain_bolt.jpg",
+  "sourceSha256": "032f36e7ecc305db42df561b5aa6cff71f6e09a2b2e9f366d596c505bcfac3f2",
+  "prompt": "Mobile game VFX sprites: three separate horizontal glowing lightning bolt lines stacked one above another on a pure flat black background (#000000), with wide empty black gaps between them. Each bolt runs from the far left edge to the far right edge of the image as a nearly straight line with a few small sharp jagged kinks (low zig-zag amplitude: each bolt stays inside a horizontal band about one tenth of the image width tall). Each bolt has a solid, crisp, saturated lemon-yellow core line (#ffe14d) of clearly visible, even thickness - about 2% of the image width thick (a medium-weight line, not hair-thin) - surrounded by a soft, translucent golden-yellow glow halo (#ffc800) about twice the core width on each side, fading to black. Every part of every bolt is yellow: NO pink, no magenta, no red, no purple, no blue, no white or pale core. NO dark outline, no black underlay, no ink, no stripes. Bolt 1 (top): a few gentle kinks. Bolt 2 (middle): more frequent small sharp kinks. Bolt 3 (bottom): medium kinks with one short forked spur. Clean and understated. No sparkles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "each bolt band cropped to its own bbox, uniform downscale so it spans exactly 256 px, centred vertically in the 48 px frame (no vertical stretch)",
+   "fade frames = opacity steps of the same painted bolt: alpha x1.0, x0.6, x0.25",
+   "layout rows = variants, cols = fade frames"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scales": [
+    0.213511259382819,
+    0.2129783693843594,
+    0.21333333333333335
+   ],
+   "bandHeights": [
+    23,
+    24,
+    34
+   ],
+   "fadeAlpha": [
+    1.0,
+    0.6,
+    0.25
+   ]
+  },
+  "license": "original generated art",
+  "rejectedDrafts": [
+   "_src/raw/v3/rejected/chain_bolt_r0.jpg"
+  ],
+  "rejectedPrompts": {
+   "chain_bolt_r0": "Subtle mobile game VFX sprites: three separate thin horizontal lightning bolt lines stacked one above another on a pure flat black background (#000000)... crisp thin saturated bright yellow core (about 1/50 of bolt length) with soft faint translucent yellow halo; no dark outline/underlay. [rejected: bolt 3 painted with pink/magenta segments, and the core came out hair-thin (~1-2 px at 256 wide)]"
+  }
+ },
+ "impact_ring/v3/impact_ring_blue.png": {
+  "version": "v3",
+  "supersedes": "impact_ring/impact_ring_blue.png (v1, kept on disk for history)",
+  "sha256": "ac1efb20b2c6335c2305a316025e4dd2ae111041765f7c51bab38ac355ec610a",
+  "sheet": "impact_ring/v3/impact_ring_blue.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/impact_ring_blue.jpg",
+  "sourceSha256": "4f5fd0110ed509817926107715b9c5f752f0709f16ba7e471b738a6feceda2bb",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small open ring (hollow, empty centre), each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a slim luminous line of soft saturated royal blue light (#2f6bff, deeper #1f4fe0 at its edges) of clearly visible, even thickness - about one fortieth of the largest ring's diameter, a light but solid line, not hair-thin - and the same thickness in every frame, with a soft faint blue glow. NO black or dark outline, no ink, no bold stripes, no white, pale or cyan core - royal blue all the way through. The centre of every ring is empty black, including frame 1 (no filled dot). Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.5609756097560976
+  },
+  "license": "original generated art",
+  "rejectedDrafts": [
+   "_src/raw/v3/rejected/impact_ring_blue_r0.jpg"
+  ],
+  "rejectedPrompts": {
+   "impact_ring_blue_r0": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small ring, each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a THIN, luminous line of soft saturated royal blue light (#2f6bff): its line thickness is about one twentieth of the largest ring's diameter and stays about the same in every frame. Soft, slightly glowing edges with only a faint, thin, darker blue rim (#1a3cb0). NO black or dark outline, no ink, no bold stripes, no white or pale core - blue all the way through. Elegant and understated. The centre of every ring is empty black. Nothing touches the cell edges. No text, nothing else.  [rejected: measured band 1.5-2.5 px, under the 3-5 px target]"
+  }
+ },
+ "impact_ring/v3/impact_ring_gold.png": {
+  "version": "v3",
+  "supersedes": "impact_ring/impact_ring_gold.png (v1, kept on disk for history)",
+  "sha256": "f9af671c0bef9dc3cea52c50928c26104bac2cd91034db125d0d26b098233072",
+  "sheet": "impact_ring/v3/impact_ring_gold.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/impact_ring_gold.jpg",
+  "sourceSha256": "138efd2dcfc1d5582548c1dfaa78e992837c592742de67a7a9d53c5b60397e3c",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small ring, each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a THIN, luminous line of soft saturated gold light (#ffc61a): its line thickness is about one twentieth of the largest ring's diameter and stays about the same in every frame. Soft, slightly glowing edges with only a faint, thin, darker gold rim (#c08a00). NO black or dark outline, no ink, no bold stripes, no white or pale core - gold all the way through. Elegant and understated. The centre of every ring is empty black. Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.580441640378549
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/v3/impact_ring_green.png": {
+  "version": "v3",
+  "supersedes": "impact_ring/impact_ring_green.png (v1, kept on disk for history)",
+  "sha256": "3ff94a50cdd4f2b5f0b5080e86f32db777e7759096f602ca1b70c892871ef967",
+  "sheet": "impact_ring/v3/impact_ring_green.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/impact_ring_green.jpg",
+  "sourceSha256": "dde912002f4fef8c11c504435b2c8ece64d3662fbef8620433f9b09691ad6281",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small ring, each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a THIN, luminous line of soft saturated leaf green light (#22d63a): its line thickness is about one twentieth of the largest ring's diameter and stays about the same in every frame. Soft, slightly glowing edges with only a faint, thin, darker green rim (#108a20). NO black or dark outline, no ink, no bold stripes, no white or pale core - green all the way through. Elegant and understated. The centre of every ring is empty black. Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.5542168674698795
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/v3/impact_ring_purple.png": {
+  "version": "v3",
+  "supersedes": "impact_ring/impact_ring_purple.png (v1, kept on disk for history)",
+  "sha256": "a9c78bb5cf46547f6170511a3ef8b11cd15d85f7c454b93c7568f68ed5c47484",
+  "sheet": "impact_ring/v3/impact_ring_purple.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/impact_ring_purple.jpg",
+  "sourceSha256": "9f485b7e760ae6312c7c91d8dc70e6f5e34ceb31dcbe5637f06ab978f12417ce",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small open ring (hollow, empty centre), each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a slim luminous line of soft saturated violet purple light (#9b4dff, deeper #6a2bd0 at its edges) of clearly visible, even thickness - about one fortieth of the largest ring's diameter, a light but solid line, not hair-thin - and the same thickness in every frame, with a soft faint violet glow. NO black or dark outline, no ink, no bold stripes, no white, pale or lavender-white core - violet all the way through. The centre of every ring is empty black, including frame 1 (no filled dot or glowing ball). Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.5508982035928144
+  },
+  "license": "original generated art",
+  "rejectedDrafts": [
+   "_src/raw/v3/rejected/impact_ring_purple_r0.jpg"
+  ],
+  "rejectedPrompts": {
+   "impact_ring_purple_r0": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small ring, each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a THIN, luminous line of soft saturated violet purple light (#9b4dff): its line thickness is about one twentieth of the largest ring's diameter and stays about the same in every frame. Soft, slightly glowing edges with only a faint, thin, darker violet rim (#5a20b0). NO black or dark outline, no ink, no bold stripes, no white or lavender-white core - violet all the way through. Elegant and understated. The centre of every ring is empty black. Nothing touches the cell edges. No text, nothing else.  [rejected: frame 1 painted as a filled glowing ball, band ~2.5 px]"
+  }
+ },
+ "impact_ring/v3/impact_ring_red.png": {
+  "version": "v3",
+  "supersedes": "impact_ring/impact_ring_red.png (v1, kept on disk for history)",
+  "sha256": "c8979e15e96ce13dd3be0255ca34daa84814cfa71066ba99c0b5250a9d961216",
+  "sheet": "impact_ring/v3/impact_ring_red.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/impact_ring_red.jpg",
+  "sourceSha256": "ae3e465123ee6e1f30066da553cd512af3898a66146138fbf1ea0cbe76066831",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. A delicate one-shot expanding shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small ring, each next frame larger, frame 6 the largest (about 85% of the cell) and fainter, starting to break into a few soft arcs. The ring is a THIN, luminous line of soft saturated red light (#ff2a2a): its line thickness is about one twentieth of the largest ring's diameter and stays about the same in every frame. Soft, slightly glowing edges with only a faint, thin, darker red rim (#b01010). NO black or dark outline, no ink, no bold stripes, no white or pink-white core - red all the way through. Elegant and understated. The centre of every ring is empty black. Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.5696594427244582
+  },
+  "license": "original generated art"
+ },
+ "overdrive_aura/v3/overdrive_aura.png": {
+  "version": "v3",
+  "supersedes": "overdrive_aura/overdrive_aura.png (v1, kept on disk for history)",
+  "sha256": "ea80405f920fc5db5efd8dc7df1b5cf1e75384800ab520e5f0dac190559bb95d",
+  "sheet": "overdrive_aura/v3/overdrive_aura.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/overdrive_aura.jpg",
+  "sourceSha256": "16a1d5eb0340cbce86323b3b72ef40b9cc949a8d5a8776caafcb1432b7220d1b",
+  "prompt": "Subtle mobile game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Each cell: a thin, soft heat ring seen from above around an invisible tower: a slim circular band of soft, translucent, glowing orange heat light (#ff7a1a, with warmer #ffa040 glints and deeper #d85a10 at its faint outer edge), with a few small, soft, wispy heat flickers rising off the band like gentle flames. The band is thin, about one twentieth of the ring diameter, soft-edged and luminous. The ring is centred, about 85% of the cell wide, with a big completely empty black centre. Flicker loop read left to right then top to bottom: the soft wisps and glints shift gently around the ring from frame to frame while the ring keeps the same size and position, and frame 6 leads smoothly back into frame 1. NO dark outline, no ink, no bold flame shapes, no white or yellow-white core - orange all the way through. Subtle and understated. Nothing touches the cell edges. No text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.8
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/v3/tower_aura_t0.png": {
+  "version": "v3",
+  "supersedes": "tower_aura/tower_aura_t0.png (v1, kept on disk for history)",
+  "sha256": "b5d79c9dfd8aea79db42058468639d57b762c1345454f465066862c1da5940ab",
+  "sheet": "tower_aura/v3/tower_aura_t0.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/tower_aura_t0.jpg",
+  "sourceSha256": "80dc7ff2300603544f47495cdee1f3ae2188cbbf1ac639403b05c337ec112c6f",
+  "prompt": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same very soft, faint ground glow seen from a 3/4 top-down view: a flattened horizontal ellipse-shaped pool of dim light on the ground, about 2.5 times wider than tall, about 75% of the cell width, centred. It has NO rim, no ring, no hard edge and no solid fill: it is brightest in the middle at only about half brightness and fades very gradually and smoothly all the way out to black, like a gentle haze. Colour: soft pale gold (#ffe08a, dim) - warm and clearly golden, never white or grey. Gentle slow breathing loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frames 2-3 very slightly larger and brighter, frames 4-5 easing back, frame 6 nearly the same as frame 1 so it loops seamlessly. Same size and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted",
+   "frame ORDER chosen from the 6 painted cells to make the loop seamless (smallest largest neighbour difference; repeats allowed, an outlier cell may be skipped) - see processParams.frameOrderFromRawCells; no pixel change"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.6847826086956522,
+   "frameOrderFromRawCells": [
+    2,
+    5,
+    3,
+    4,
+    3,
+    5
+   ],
+   "sourceRaw": "tower_aura_t0.jpg"
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/v3/tower_aura_t1.png": {
+  "version": "v3",
+  "supersedes": "tower_aura/tower_aura_t1.png (v1, kept on disk for history)",
+  "sha256": "87a2a2176298a51339f803762c00f9d08a0dae7499abdb46159aec10724564c3",
+  "sheet": "tower_aura/v3/tower_aura_t1.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/tower_aura_t1.jpg",
+  "sourceSha256": "73d90a441cd3d269addff5d08aefac5c8b82e95e51c919ecba70e395969c8139",
+  "prompt": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same very soft, faint ground glow seen from a 3/4 top-down view: a flattened horizontal ellipse-shaped pool of dim light on the ground, about 2.5 times wider than tall, about 75% of the cell width, centred. It has NO rim, no ring, no hard edge and no solid fill: it is brightest in the middle at only about half brightness and fades very gradually and smoothly all the way out to black, like a gentle haze. Colour: saturated gold (#ffc61a, dim) - clearly golden yellow, never white or pale. Gentle slow breathing loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frames 2-3 very slightly larger and brighter, frames 4-5 easing back, frame 6 nearly the same as frame 1 so it loops seamlessly. Same size and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted",
+   "frame ORDER chosen from the 6 painted cells to make the loop seamless (smallest largest neighbour difference; repeats allowed, an outlier cell may be skipped) - see processParams.frameOrderFromRawCells; no pixel change"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.8344370860927153,
+   "frameOrderFromRawCells": [
+    1,
+    3,
+    5,
+    3,
+    1,
+    4
+   ],
+   "sourceRaw": "tower_aura_t1.jpg"
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/v3/tower_aura_t2.png": {
+  "version": "v3",
+  "supersedes": "tower_aura/tower_aura_t2.png (v1, kept on disk for history)",
+  "sha256": "6dd2f73d5a79a393bcd078d64e162cd45c7f2948dd27677134b8ae8450e1c004",
+  "sheet": "tower_aura/v3/tower_aura_t2.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/tower_aura_t2.jpg",
+  "sourceSha256": "5deb7062f884802154e79a45ddac71acc2552b30a11dc50ba5bf67b4514aa07b",
+  "prompt": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same very soft, faint ground glow seen from a 3/4 top-down view: a flattened horizontal ellipse-shaped pool of dim light on the ground, about 2.5 times wider than tall, about 75% of the cell width, centred. It has NO rim, no ring, no hard edge and no solid fill: it is brightest in the middle at only about half brightness and fades very gradually and smoothly all the way out to black, like a gentle haze. Colour: warm amber (#ff9e10, dim), the colour of honey or amber resin - between gold and orange, never white, never brown. Gentle slow breathing loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frames 2-3 very slightly larger and brighter, frames 4-5 easing back, frame 6 nearly the same as frame 1 so it loops seamlessly. Same size and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted",
+   "frame ORDER chosen from the 6 painted cells to make the loop seamless (smallest largest neighbour difference; repeats allowed, an outlier cell may be skipped) - see processParams.frameOrderFromRawCells; no pixel change"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.7138810198300283,
+   "frameOrderFromRawCells": [
+    1,
+    2,
+    5,
+    3,
+    5,
+    2
+   ],
+   "sourceRaw": "tower_aura_t2.jpg"
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/v3/tower_aura_t3.png": {
+  "version": "v3",
+  "supersedes": "tower_aura/tower_aura_t3.png (v1, kept on disk for history)",
+  "sha256": "d62f6ffc26ed70351e7e282b8f38ff353749b2e0efd12b79df348df5f670cdbd",
+  "sheet": "tower_aura/v3/tower_aura_t3.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/tower_aura_t3.jpg",
+  "sourceSha256": "8d6726868c17589a32626615693afd47713b14f4db5599179bd392d9e4dc7dca",
+  "prompt": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same very soft, faint ground glow seen from a 3/4 top-down view: a flattened horizontal ellipse-shaped pool of dim light on the ground, about 2.5 times wider than tall, about 75% of the cell width, centred. It has NO rim, no ring, no hard edge and no solid fill: it is brightest in the middle at only about half brightness and fades very gradually and smoothly all the way out to black, like a gentle haze. Colour: saturated orange (#ff6a10, dim) - clearly orange, never white, never red. Gentle slow breathing loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frames 2-3 very slightly larger and brighter, frames 4-5 easing back, frame 6 nearly the same as frame 1 so it loops seamlessly. Same size and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted",
+   "frame ORDER chosen from the 6 painted cells to make the loop seamless (smallest largest neighbour difference; repeats allowed, an outlier cell may be skipped) - see processParams.frameOrderFromRawCells; no pixel change"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.711864406779661,
+   "frameOrderFromRawCells": [
+    1,
+    2,
+    5,
+    3,
+    5,
+    2
+   ],
+   "sourceRaw": "tower_aura_t3.jpg"
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/v3/tower_aura_t4.png": {
+  "version": "v3",
+  "supersedes": "tower_aura/tower_aura_t4.png (v1, kept on disk for history)",
+  "sha256": "d7bb8a7fae01ad16febf18a46d14436bcd90f54980379c27c1ebbb74569d3d88",
+  "sheet": "tower_aura/v3/tower_aura_t4.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/v3/tower_aura_t4_r1.jpg",
+  "sourceSha256": "9801d9164bf799ba4c78b87c1962ff923a75de4f3fefef8743eb07380b0ba317",
+  "prompt": "Subtle game VFX sprite sheet ... soft rainbow haze made ONLY of deep, fully saturated hues (ruby red, orange, golden yellow, emerald green, azure blue, violet) ... colours drift slowly around the ellipse each frame. [NOTE: the verbatim prompt text for this draft (r1) was not saved at generation time; this is a summary of it. Result: each cell painted as one deep saturated colour, no white]",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "frame cut: connected components assigned to their grid cell; registration on alpha bbox centre",
+   "ONE uniform downscale per asset (premultiplied LANCZOS); no erosion, morphology or thinning - line weights are as painted",
+   "frame ORDER chosen from the 6 painted cells to make the loop seamless (smallest largest neighbour difference; repeats allowed, an outlier cell may be skipped) - see processParams.frameOrderFromRawCells; no pixel change"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.6980609418282548,
+   "frameOrderFromRawCells": [
+    0,
+    1,
+    2,
+    1,
+    0,
+    5
+   ],
+   "sourceRaw": "tower_aura_t4_r1.jpg"
+  },
+  "license": "original generated art",
+  "rejectedDrafts": [
+   "_src/raw/v3/rejected/tower_aura_t4_r0.jpg",
+   "_src/raw/v3/rejected/tower_aura_t4_r2.jpg"
+  ],
+  "rejectedPrompts": {
+   "tower_aura_t4_r0": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same very soft, faint ground glow seen from a 3/4 top-down view: a flattened horizontal ellipse-shaped pool of dim light on the ground, about 2.5 times wider than tall, about 75% of the cell width, centred. It has NO rim, no rings, no hard edges, no bands and no solid fill: a gentle haze of dim light at only about half brightness that fades very gradually and smoothly out to black. Colour: a soft RAINBOW haze - saturated red, orange, yellow, green, cyan, blue and violet blending softly into each other around the ellipse like a faint oil-sheen or aurora, all dim, never white or pastel, with no hard concentric stripes. Slow shimmering loop across the 6 frames, read left to right then top to bottom: the colours drift slowly around the ellipse a little each frame and the glow breathes gently, frame 6 leading seamlessly back into frame 1. Same size and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.  [rejected: pale/near-white mixing zones (730 pure-white px after background removal)]",
+   "tower_aura_t4_r2": "Subtle game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. EVERY cell shows the SAME multicoloured ground glow (all six colours inside every single cell): a very soft, faint, flattened horizontal ellipse-shaped haze of dim light on the ground seen from 3/4 top-down, about 2.5 times wider than tall, about 75% of the cell width, centred, with no rim, no rings, no hard edges and no solid fill, fading smoothly out to black. Inside each ellipse the colours sit side by side as soft patches around the ellipse like a colour wheel laid flat: ruby red (#e0103a), orange (#ff6a00), golden yellow (#ffc000), emerald green (#00c050), azure blue (#0070ff) and violet (#8a2be2), each blending into its neighbour, and the middle of the ellipse a dim saturated violet-magenta. Every point is a strong pure colour at low brightness: NO white, no cream, no grey, no pastel, no pale or washed-out mixing zones. Slow loop across the 6 frames, read left to right then top to bottom: the colour wheel turns a little (about one sixth of a turn) each frame so frame 6 leads back into frame 1. Same size, brightness and centre in every cell. Subtle and understated. No outline, no tower, no objects, no sparkles, no text.  [kept 10:2x, then swapped out 2026-11-16: painted near-white/pure-white spot in the core (200 near-white px min-channel>235 at alpha>40, 38 pure-white); file kept as _src/raw/v3/rejected/tower_aura_t4_v3a.png]"
+  },
+  "replacedFile": {
+   "path": "_src/raw/v3/rejected/tower_aura_t4_v3a.png",
+   "sha256": "efc82bcb89288e668621f7e8b6ed742e76ca5fc782c4060fc23793d194feb4e9",
+   "fromRaw": "_src/raw/v3/rejected/tower_aura_t4_r2.jpg",
+   "frameOrderFromRawCells": [
+    1,
+    2,
+    1,
+    3,
+    5,
+    3
+   ]
+  },
+  "swap": {
+   "date": "2026-11-16",
+   "why": "Tower Defense Games Dev needs 0 near-white pixels for PR #10. The kept colour-wheel draft (r2, shipped as v3a) had a painted pale core: 200 near-white px (min channel >235 at alpha >40), 581 at min channel >=220, 38 pure white. No new generation (Brian has not approved a third reroll) and no painting over or recolouring in code, so the two rejected drafts were re-run through the exact v3 pipeline and r1 was the only one that qualified.",
+   "measured": "_qa/t4_candidates/measure.json",
+   "r1": {
+    "nearWhite_alpha>40": 0,
+    "pureWhite": 0,
+    "maxMinChannel": 46,
+    "maxHlsLightness": 0.59,
+    "peakAlpha": "0.61-0.91",
+    "denseShare": "<=0.001",
+    "loopSeam": 0.1638,
+    "meanStep": 0.0963,
+    "border": 1
+   },
+   "r0": "not used: 1293 near-white px, 692 pure white",
+   "tradeOff": "r1 paints each frame as ONE saturated colour, so the rainbow shows as a slow colour cycle over time, not a wheel inside each frame. The core is the same hue as each frame, with no white. The pipeline order optimiser picked cells [0,1,2,1,0,5] = red, orange, yellow, orange, red, violet, so the green and blue cells are not used. The loop seam (0.164) is weaker than v3a (0.088)."
+  }
  }
 }

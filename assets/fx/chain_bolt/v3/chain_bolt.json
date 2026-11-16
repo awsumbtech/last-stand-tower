@@ -15,6 +15,6 @@
  ],
  "anchorMeaning": "bolt runs from x=0 to x=255 along y=24; stretch along x, rotate about the left end",
  "image": "chain_bolt.png",
- "version": "v1",
- "sha256": "21789f30b6168487196f156c474b0871845da92fff8456b19b5970819110ee11"
+ "version": "v3",
+ "sha256": "d3bcfb657f0e5991f28e1a4267510c02e6eb25612d53ee4d6e7f13057ca417c4"
 }
