@@ -58,13 +58,13 @@ with sync_playwright() as p:
         run(n)
         shot("06-bosskill-flash-f%02d" % n, "Boss-kill flash: real mini-boss kill, %d frames after (%d ms); white X13 fill on main, amber screen_burst on 10b" % (n, round(n * 1000 / 60)), "() => ({ flash: game.flash })")
         shots[-1].append(info)
-    # 7. each streak variant: 8 bursts of 10 (2 x 4 grid), at 5 frames (fresh) and 14 frames (mid / fade)
+    # 7. each streak variant: 9 bursts of 10 (rows of 4), at 5 frames (fresh) and 14 frames (mid / fade)
     EACH = """(n) => { const fx = LST.fxDirector, t = game.tower, I = fx.impacts, pre = LST.FX_PRESETS ? LST.FX_PRESETS.streakBurst : LST.fxManifest.preset('streakBurst');
-      const V = [["pale", "#fff3a0"], ["gold", "#ffd23f"], ["amber", "#ffb347"], ["red", "#ff6b6b"], ["pink", "#ff7ac8"], ["cyan", "#7fe3ff"], ["green", "#8be04a"], ["soot", "#3a1200"]];
+      const V = [["pale", "#fff3a0"], ["gold", "#ffd23f"], ["amber", "#ffb347"], ["red", "#ff6b6b"], ["pink", "#ff7ac8"], ["cyan", "#7fe3ff"], ["green", "#8be04a"], ["lime", "#b4f06a"], ["soot", "#3a1200"]];
       V.forEach(([v, hex], i) => LST.Emitter.burst(fx.pools.world, I.rng, pre, t.x - 150 + (i % 4) * 100, t.y - 520 + ((i / 4) | 0) * 190, { count: 10, speedMul: 0.6, colors: [LST.FX_PRESETS ? hex : v], priority: true })); }"""
     for n in (5, 14):
         clear(); pg.evaluate(EACH, 0); step(n)
-        shot("07-streaks-each-f%02d" % n, "Each streak variant, %d frames: top row pale, gold, amber, red; lower row pink, cyan, green, soot (main: the hex each replaced)" % n, "() => ({ particles: LST.fxDirector.pools.world.count })")
+        shot("07-streaks-each-f%02d" % n, "Each streak variant, %d frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)" % n, "() => ({ particles: LST.fxDirector.pools.world.count })")
     # 8. each trail on its own: no element (base), then one element at a time, game running 75 frames
     for name, el in (("base", None), ("ember", "ember"), ("frost", "frostbite"), ("spark", "chainSpark"), ("venom", "venom")):
         clear()

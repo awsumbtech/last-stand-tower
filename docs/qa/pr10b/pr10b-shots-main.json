@@ -31,7 +31,7 @@
    {
     "shots": 1,
     "kinds": [
-     "#8be04a"
+     "#7fe3ff"
     ]
    }
   ],
@@ -57,7 +57,7 @@
    "pr10b-05-motes-t0-main-390x844.png",
    {
     "tier": 0,
-    "particles": 13
+    "particles": 12
    }
   ],
   [
@@ -66,7 +66,7 @@
    "pr10b-05-motes-t4-main-390x844.png",
    {
     "tier": 4,
-    "particles": 62
+    "particles": 66
    }
   ],
   [
@@ -93,18 +93,18 @@
   ],
   [
    "07-streaks-each-f05",
-   "Each streak variant, 5 frames: top row pale, gold, amber, red; lower row pink, cyan, green, soot (main: the hex each replaced)",
+   "Each streak variant, 5 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
    "pr10b-07-streaks-each-f05-main-390x844.png",
    {
-    "particles": 80
+    "particles": 90
    }
   ],
   [
    "07-streaks-each-f14",
-   "Each streak variant, 14 frames: top row pale, gold, amber, red; lower row pink, cyan, green, soot (main: the hex each replaced)",
+   "Each streak variant, 14 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
    "pr10b-07-streaks-each-f14-main-390x844.png",
    {
-    "particles": 80
+    "particles": 90
    }
   ],
   [

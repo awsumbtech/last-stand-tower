@@ -58,7 +58,7 @@
    "pr10b-05-motes-t0-10b-390x844.png",
    {
     "tier": 0,
-    "particles": 12
+    "particles": 13
    }
   ],
   [
@@ -67,7 +67,7 @@
    "pr10b-05-motes-t4-10b-390x844.png",
    {
     "tier": 4,
-    "particles": 65
+    "particles": 60
    }
   ],
   [
@@ -94,18 +94,18 @@
   ],
   [
    "07-streaks-each-f05",
-   "Each streak variant, 5 frames: top row pale, gold, amber, red; lower row pink, cyan, green, soot (main: the hex each replaced)",
+   "Each streak variant, 5 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
    "pr10b-07-streaks-each-f05-10b-390x844.png",
    {
-    "particles": 80
+    "particles": 90
    }
   ],
   [
    "07-streaks-each-f14",
-   "Each streak variant, 14 frames: top row pale, gold, amber, red; lower row pink, cyan, green, soot (main: the hex each replaced)",
+   "Each streak variant, 14 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
    "pr10b-07-streaks-each-f14-10b-390x844.png",
    {
-    "particles": 80
+    "particles": 90
    }
   ],
   [
@@ -146,7 +146,7 @@
    "Trail spark: chainSpark shots only, hit effects cleared",
    "pr10b-08-trail-spark-10b-390x844.png",
    {
-    "shots": 2,
+    "shots": 1,
     "kinds": [
      "spark"
     ]
@@ -157,7 +157,7 @@
    "Trail venom: venom shots only, hit effects cleared",
    "pr10b-08-trail-venom-10b-390x844.png",
    {
-    "shots": 2,
+    "shots": 1,
     "kinds": [
      "venom"
     ]

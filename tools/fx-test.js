@@ -91,7 +91,7 @@ class FxTest {
     // trails keep the head-at-right pivot; the vignettes and the dim fill the screen.
     const png = (f) => { const b = fs.readFileSync(path.join(this.root, "assets/fx", f)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
     const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
-    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
+    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
     for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
     const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
       const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
@@ -103,6 +103,10 @@ class FxTest {
     const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
     this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
       `art 10b: ${Object.keys(B).length} delivered v1 sheets at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
+    // Venom bursts (main: pale lime #e4ffb8, lime #b4f06a, green #8be04a) play streak_lime twice and green once (Game Art streak_lime, Nov 16).
+    const ven = data.impacts.elemVenom && data.impacts.elemVenom.colors;
+    this.ok(String(ven) === "lime,lime,green" && data.effects["streak.lime"] && data.effects["streak.lime"].sheet === "streak_lime" && prov["streak/streak_lime.png"],
+      `art 10b: the venom burst plays lime, lime, green (main's pale lime, lime, green) through streak.lime / streak_lime (got ${ven})`);
     const IMP = ["space", "burst", "colors", "radius", "bloomAlpha", "flash", "shake", "thump"];
     const imps = Object.entries(data.impacts), routes = Object.values(LST.FX_ROUTES).filter(Boolean);
     this.ok(imps.length >= 12 && imps.every(([, i]) => data.effects[i.ring] && data.effects[i.bloom] && IMP.every((k) => i[k] != null) && i.burst.count > 0) && routes.every((r) => data.impacts[r]),

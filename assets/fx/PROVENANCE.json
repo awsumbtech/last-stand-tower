@@ -43,13 +43,14 @@
   "license": "Original art generated for Brian Awsumb's Last Stand Tower; no third-party or licensed art, no copyrighted references. Style reference: Brian's own enemy sprites (assets/sprites/enemies/tank, basic).",
   "noCodeArt": "No shapes, gradients, rings, glows, tints, recolours, hue shifts or outline changes are drawn or applied by code. Code only removes the background, cuts/centres/scales frames and (chain_bolt only) applies opacity steps for fade frames.",
   "pr10b": {
-   "delivery": "LST PR10b effects art for Tower Defense Games Dev (OO-MIGRATION section G rows 9-13)",
+   "delivery": "LST PR10b effects art for Tower Defense Games Dev (OO-MIGRATION section G rows 9-13), plus streak_lime for PR #11",
    "date": "2026-11-16",
    "tool": "Grok Bot GenerateImage (cursor namespace)",
    "generations": {
-    "total": 34,
-    "kept": 16,
-    "rejected": 18,
+    "total": 37,
+    "kept": 17,
+    "rejected": 20,
+    "addedLater": "streak_lime (2026-11-16 12:33 request: venom bursts on grass; 3 generations, r1 kept)",
     "note": "streaks needed rerolls because the generator kept painting the three widths the same; the size-chart prompt (6-7 shrinking copies, 3 bands picked) fixed it for 7 of 8. vignette_red and vignette_dark were each rerolled for opacity layout."
    },
    "bar": "Brian (10a): subtle, thin, soft, match the weight of what each piece replaces, no heavy dark outlines",
@@ -1497,6 +1498,61 @@
   "rejectedDrafts": {
    "_src/raw/rejected/streak_green_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three slim teardrop-shaped speed dashes stacked in three rows, all pointing right and right-aligned at the same head position. Each dash has a rounded HEAD at the RIGHT end and a body tapering smoothly to a sharp point at the LEFT end; its length is about 4.5 times its thickness. Gentle size steps from top to bottom: TOP dash full size; MIDDLE dash only slightly smaller, 87% of the top (nearly as big); BOTTOM dash 73% of the top (about three quarters, NOT half). Fill: fresh leaf green (#6fd94a) with one lighter green stripe along the centre line (#b4f08f), a single centre stripe, not a ring, never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
    "_src/raw/rejected/streak_green_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in three sizes, stacked in three rows, all pointing right and right-aligned: LARGE on top, MEDIUM in the middle (a bit smaller than large, about 87%), SMALL at the bottom (about three quarters the size of large, 73%). The size difference must be visible at a glance. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: fresh leaf green (#6fd94a) with one lighter green stripe along the centre line (#b4f08f), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_lime.png": {
+  "version": "v1",
+  "sha256": "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
+  "sheet": "streak/streak_lime.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_lime.jpg",
+  "sourceSha256": "7f4837353e01ec3fdcc0de682e466953cd150ca614ee804c717ed6e0491a10e0",
+  "sourceDraft": "streak_lime_r1",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash: SEVEN copies stacked in seven rows, all pointing right and right-aligned at the same head position, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a sharp point at the LEFT end; its length about 4 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    234.0,
+    22.0,
+    144.0
+   ],
+   "paintedThicknessPx": [
+    72,
+    66,
+    63,
+    59,
+    57,
+    54,
+    49,
+    45,
+    40
+   ],
+   "pickedBands": [
+    1,
+    4,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.864,
+    0.742
+   ],
+   "scale": 0.10684474123539232
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_lime_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_lime_r2.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SEVEN copies stacked in seven rows, all pointing right, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side, short and fat: its length only about 3.5 times its thickness, a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
   }
  },
  "streak/streak_pale.png": {
