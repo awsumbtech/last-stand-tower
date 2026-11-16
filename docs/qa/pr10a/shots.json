@@ -1,7 +1,7 @@
 {
  "groundLuminance": {
-  "backyard": 176.5881320365658,
-  "beach": 214.722782991319
+  "backyard": 176.55745796819372,
+  "beach": 214.7983911318564
  },
  "shots": [
   [
@@ -78,25 +78,41 @@
    null
   ],
   [
+   "Screen flash on a boss kill (impactFlash, 3/27 frames) over its ring + burst (backyard)",
+   "pr10a-06-screen-flash-bosskill-backyard-390x844.png",
+   null
+  ],
+  [
+   "Projectile trails (gold, amber crits, yellow Chain Spark tints) and tower idle motes (pale / yellow; QA: motes switched on, off in the game), game running 75 frames (backyard)",
+   "pr10a-07-motes-trails-backyard-390x844.png",
+   {
+    "projectiles": 1,
+    "tinted": [
+     "#ffe14d"
+    ],
+    "particles": 5
+   }
+  ],
+  [
    "Chain Spark: chainBolt per hop (3 variant rows), chainArcFlash + chainNodeGlow per point (backyard)",
    "pr10a-02-chain-lightning-backyard-390x844.png",
    {
     "points": [
      [
-      166,
-      221
+      -122,
+      -111
      ],
      [
-      126,
-      -295
+      -76,
+      -146
      ],
      [
-      -116,
-      344
+      -21,
+      -164
      ],
      [
-      230,
-      -335
+      36,
+      -161
      ]
     ],
     "arcs": 1
@@ -119,7 +135,7 @@
   ]
  ],
  "errors": [],
- "note": "390x844 @2x, headless Chromium, SW blocked. Game loop stopped and frames stepped by hand (1/60 s) so each effect is caught at a set point in its life; enemies frozen. groundLuminance = mean luma of the empty ground: Backyard is the darkest world (impact ring ink outline checked there). Beach kept for the impact shots only. pr10a-compare-main-vs-pr10a-backyard.png: the same script on main ca3e982 (top) vs this branch (bottom).",
+ "note": "390x844 @2x, headless Chromium, SW blocked. Game loop stopped and frames stepped by hand (1/60 s) so each effect is caught at a set point in its life; enemies frozen except in 07 (game runs 75 frames). groundLuminance = mean luma of the empty ground: Backyard is the darkest world (impact ring ink outline checked there). Beach kept for the impact shots only. Art: Game Art v1 + v2 (screen_burst, glow_pale, glow_yellow). pr10a-compare-main-vs-pr10a-backyard.png: the same script on main ca3e982 (top) vs this branch (bottom).",
  "extra": [
   "pr10a-contact-sheet.png",
   "pr10a-compare-main-vs-pr10a-backyard.png"
