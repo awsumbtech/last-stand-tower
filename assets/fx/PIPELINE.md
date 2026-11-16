@@ -26,3 +26,26 @@ pngquant isn't installed in this folder's pipeline; PNGs are RGBA from Pillow (o
 - `python3 _tools/selfcheck.py` now also covers `*/v3/*.json`. `python3 _tools/provenance.py` swaps 13 fx.manifest.json paths to v3 and leaves the other 14 entries unchanged.
 - `python3 _tools/preview_v3.py` -> `preview_v3_390x844.png` (+ `_qa/preview_v3_390x844@2x.png`): v1 vs v3 at in-game size, on dark-ground and grass scenes. Also writes `contact_v3_2x.png` (every v3 frame at 2x, shown on dark ground, grass and checker). The v1 and v2 previews are untouched.
 - t4 swap (2026-11-16): `tower_aura/v3/tower_aura_t4.png` now comes from draft r1 (`_src/raw/v3/tower_aura_t4_r1.jpg`; `SRC` override in process_v3.py), because it has 0 near-white pixels. The earlier colour-wheel file is kept as `_src/raw/v3/rejected/tower_aura_t4_v3a.png` (from raw `rejected/tower_aura_t4_r2.jpg`). Candidate measurements: `python3 _tools/t4_candidates.py` -> `_qa/t4_candidates/measure.json`. No new generation and no pixel edits.
+
+---
+
+# PIPELINE: LST PR10b effects (for Tower Defense Games Dev, assets/fx/fx.json, OO-MIGRATION section G rows 9-13)
+
+16 PNGs, each with a sibling JSON: `motes/motes`, `streak/streak_{pale,gold,amber,red,pink,cyan,green,soot}`, `trail/trail_{base,ember,frost,spark,venom}`, `vignette/vignette_{red,dark}`.
+Every colour is its own generation (the motes atlas is one generation with 8 separately painted dots). Nothing is tinted or recoloured; the game only fades opacity.
+
+1. Generate (Grok Bot GenerateImage, 34 generations: 16 kept + 18 rejected). Prompts: `_src/prompts.json` (`kept` maps each raw to its draft). Raws: `_src/raw/` (+ `rejected/`), hashes in `_src/raw/SHA256SUMS`.
+   - Streaks are painted on a flat key colour (magenta; green behind pink; cyan behind soot) as a size chart of the same dash, 6-7 shrinking copies, with the thin #2b1d3a ink line painted in (soot: no outline).
+   - Trails, motes and vignette_red are painted on pure black. vignette_dark is a dark-purple ink wash painted on white paper.
+2. Process (`python3 _tools/process.py`, helpers in `_tools/common.py` and `_tools/keying.py`):
+   - streaks: key removal, then cut the three bands whose painted thickness ratios are nearest 1 : 0.87 : 0.73 (fresh / mid / fade). One uniform scale per asset (fresh band fitted to 64x16), head right-aligned (pivot right-centre).
+   - trails: black un-mix, one uniform scale to fit 128x24, head right-aligned.
+   - motes: black un-mix, 8 dots cut, one uniform scale so the alpha>=0.5 dot is 60% of the 32 px cell.
+   - vignettes: un-mix, 720x1280 raw resized to 720x1560 (the phone shape, drawn stretched in game), one whole-image opacity factor (red: corners to 75%; dark: mean to 45%).
+   - Final: edge colour bleed under alpha 0.1, rgb 0 at alpha 0. Writes `_tools/process_report.json`.
+3. Self-check (`python3 _tools/selfcheck.py` -> `_qa/selfcheck.{json,txt}`): sizes, RGBA and transparency, frame counts, near-white scan (any pixel with R,G,B all >=245, and the stricter min channel >235), hue per file and per mote cell, streak line widths per frame, painted outline width, trail band and core height, vignette opacity at the corners, top/bottom middles, side middles and centre.
+4. Manifest and provenance (`python3 _tools/provenance.py`): `fx.manifest.json`, `PROVENANCE.json`, `_src/raw/SHA256SUMS`.
+5. Previews (`python3 _tools/preview.py`): `preview_390x844.png` (+ `_qa/preview_390x844@2x.png`) at in-game size on dark ground and grass, `_qa/preview_vignettes_390x844.png` (full-screen vignettes at 100% and the 22% pulse), and `contact_2x.png`. The ground, the blobs and the labels are QA scaffolding. The mote blooms underneath are the PR10a `glow_<colour>` sheets.
+
+Run order: process -> selfcheck -> provenance -> preview.
+Draw sizes assumed in the preview (CSS px): streak 8-50 long x 4.2-4.5 thick, trail 30x6 at 75%, mote radius 1-3 over a 20 px glow, vignettes stretched to 390x844.

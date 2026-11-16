@@ -1,0 +1,15 @@
+{
+ "frameW": 128,
+ "frameH": 24,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "pivot": [
+  128,
+  12
+ ],
+ "pivotMeaning": "head at the right end; tail fades to clear on the left",
+ "image": "trail_ember.png",
+ "version": "v1",
+ "sha256": "6dbe3dba66125fa49cdf1b45e7683f8e9d9f565b8d4e351e94cb8362fb11c16a"
+}

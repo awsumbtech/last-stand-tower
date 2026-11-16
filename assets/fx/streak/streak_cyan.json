@@ -1,0 +1,21 @@
+{
+ "frameW": 64,
+ "frameH": 16,
+ "count": 3,
+ "fps": 12,
+ "loop": false,
+ "frames": [
+  "fresh",
+  "mid",
+  "fade"
+ ],
+ "pivot": [
+  64,
+  8
+ ],
+ "pivotMeaning": "head at the right end; stretch along the velocity",
+ "ink": "#2b1d3a (painted, thin)",
+ "image": "streak_cyan.png",
+ "version": "v1",
+ "sha256": "e72f649859f989440df1a08d39b4dd85c7440338b8adc7ec46fbbfd587edcbb5"
+}

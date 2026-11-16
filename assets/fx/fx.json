@@ -28,7 +28,23 @@
   "tower_aura_t1": "tower_aura/v3/tower_aura_t1.json",
   "tower_aura_t2": "tower_aura/v3/tower_aura_t2.json",
   "tower_aura_t3": "tower_aura/v3/tower_aura_t3.json",
-  "tower_aura_t4": "tower_aura/v3/tower_aura_t4.json"
+  "tower_aura_t4": "tower_aura/v3/tower_aura_t4.json",
+  "motes": "motes/motes.json",
+  "streak_pale": "streak/streak_pale.json",
+  "streak_gold": "streak/streak_gold.json",
+  "streak_amber": "streak/streak_amber.json",
+  "streak_red": "streak/streak_red.json",
+  "streak_pink": "streak/streak_pink.json",
+  "streak_cyan": "streak/streak_cyan.json",
+  "streak_green": "streak/streak_green.json",
+  "streak_soot": "streak/streak_soot.json",
+  "trail_base": "trail/trail_base.json",
+  "trail_ember": "trail/trail_ember.json",
+  "trail_frost": "trail/trail_frost.json",
+  "trail_spark": "trail/trail_spark.json",
+  "trail_venom": "trail/trail_venom.json",
+  "vignette_red": "vignette/vignette_red.json",
+  "vignette_dark": "vignette/vignette_dark.json"
  },
  "effects": {
   "overdriveAura": {
@@ -813,9 +829,9 @@
   },
   "trail": {
    "what": "Projectile comet tail (trail.<variant>: base, or the shot's element trail) + a glow per shot",
-   "stretch": 0.05,
-   "maxLength": 48,
-   "height": 9,
+   "stretch": 0.075,
+   "maxLength": 72,
+   "height": 20,
    "elementLength": 1.15,
    "glowRadius": 19,
    "glowAlpha": 0.75,

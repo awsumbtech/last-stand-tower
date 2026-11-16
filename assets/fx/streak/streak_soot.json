@@ -1,0 +1,21 @@
+{
+ "frameW": 64,
+ "frameH": 16,
+ "count": 3,
+ "fps": 12,
+ "loop": false,
+ "frames": [
+  "fresh",
+  "mid",
+  "fade"
+ ],
+ "pivot": [
+  64,
+  8
+ ],
+ "pivotMeaning": "head at the right end; stretch along the velocity",
+ "ink": null,
+ "image": "streak_soot.png",
+ "version": "v1",
+ "sha256": "5191ea56d2c9b538df35eccf526e77d56b2374bffc023f764db5b34ea809b3a0"
+}

@@ -32,7 +32,7 @@ LST.FxManifest = class FxManifest {
       for (const [id, s] of Object.entries(json.strips)) strips[id] = new LST.SheetAnimation(s, json.anchor, json.refBodyR || s.frame.w / 2);
       return { strips };
     }
-    const rows = json.rows || 1, cols = json.cols || json.count, a = json.anchor || [json.frameW / 2, json.frameH / 2];
+    const rows = json.rows || 1, cols = json.cols || json.count, a = json.anchor || json.pivot || [json.frameW / 2, json.frameH / 2]; // pivot: 10b streak / trail head
     for (let r = 0; r < rows; r++) {
       const strip = { image: json.image, frame: { w: json.frameW, h: json.frameH }, count: cols, fps: json.fps, loop: !!json.loop, y: r * json.frameH };
       strips[rows > 1 ? "r" + r : "main"] = new LST.SheetAnimation(strip, { x: a[0], y: a[1] }, json.refBodyR || json.frameW / 2);

@@ -86,6 +86,23 @@ class FxTest {
     const notV3 = v3.filter((id) => { const j = data.sheets[id], png = j && path.dirname(j) + "/" + JSON.parse(this.read("assets/fx/" + j)).image; return !png || !prov[png] || prov[png].version !== "v3"; });
     const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && q.supersedes.startsWith(path.relative("assets/fx", f) + " ")); });
     this.ok(!notV3.length && !superseded.length, `art v3: ${v3.length} redone sheets play the v3 files (not v3: ${notV3.join(", ") || "none"}); no superseded file ships (${superseded.join(", ") || "none"})`);
+    // PR 10b art (Game Art & Motion PR10b v1, section G rows 9-13): the delivered sheets at their
+    // delivered sizes; a mote's frame is its variant's cell by the atlas's own names; streaks and
+    // trails keep the head-at-right pivot; the vignettes and the dim fill the screen.
+    const png = (f) => { const b = fs.readFileSync(path.join(this.root, "assets/fx", f)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+    const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
+    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
+    for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
+    const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
+      const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
+      return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== "v1" || j.version !== "v1" || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
+        || (dir === "streak" || dir === "trail") && !(j.pivot && j.pivot[0] === j.frameW && j.pivot[1] === j.frameH / 2);
+    }).map(([id]) => id);
+    const cells = JSON.parse(this.read("assets/fx/motes/motes.json")).cells || [];
+    const moteBad = Object.entries(data.effects).filter(([k]) => k.startsWith("mote.")).filter(([k, e]) => e.sheet !== "motes" || e.frame !== cells.indexOf(k.slice(5)) || e.frame < 0).map(([k]) => k);
+    const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
+    this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
+      `art 10b: ${Object.keys(B).length} delivered v1 sheets at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
     const IMP = ["space", "burst", "colors", "radius", "bloomAlpha", "flash", "shake", "thump"];
     const imps = Object.entries(data.impacts), routes = Object.values(LST.FX_ROUTES).filter(Boolean);
     this.ok(imps.length >= 12 && imps.every(([, i]) => data.effects[i.ring] && data.effects[i.bloom] && IMP.every((k) => i[k] != null) && i.burst.count > 0) && routes.every((r) => data.impacts[r]),
