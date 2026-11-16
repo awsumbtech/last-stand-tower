@@ -29,9 +29,9 @@
  },
  "effects": {
   "overdriveAura": {
-   "what": "Overdrive heat ring around the tower while Overdrive runs (was OverdriveRing: a disc of radius 1.9 x tower radius). The 256 px frame's edge sits at 1.9 x radius",
+   "what": "Overdrive heat ring around the tower while Overdrive runs (was OverdriveRing: an orange disc pulsing to 1.65-2.15 x tower radius). The art's flames end near the frame edge, so the frame's half-width is 2.25 x radius: the flames reach past the tower sprite as far as the old disc did",
    "sheet": "overdrive_aura",
-   "size": 1.9
+   "size": 2.25
   },
   "towerAura": {
    "what": "Ground glow under the tower, one sheet per aura tier, bigger and stronger with tower power (was TowerGroundGlow; sizes matched to its glow by alpha-mass radius)",

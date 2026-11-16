@@ -266,9 +266,9 @@ class RenderTest {
       this.ok(all.every((l) => /^ctx\.(save|restore|translate|rotate|drawImage)\(|^ctx\.(globalAlpha|globalCompositeOperation)=/.test(l)), `fx 10a (low=${low}): every call is one of save, restore, translate, rotate, drawImage, globalAlpha, globalCompositeOperation`);
       const blends = all.filter((l) => l.startsWith("ctx.globalCompositeOperation=")).map((l) => JSON.parse(l.slice(29)));
       this.ok(blends.every((b) => ["source-over", "screen", "lighter"].includes(b)), `fx 10a (low=${low}): blends are only source-over / screen / lighter (no tinting composite ops): ${[...new Set(blends)].join(", ")}`);
-      // overdrive: the overdrive_aura sheet centred on the tower, R = size 1.9 x radius 26
+      // overdrive: the overdrive_aura sheet centred on the tower, R = size 2.25 x radius 26
       const od = imgs("overdrive");
-      this.ok(od.length === 1 && od[0].img === "overdrive_aura" && near(od[0].dw, 2 * 1.9 * 26) && near(od[0].dx, -1.9 * 26) && near(od[0].dy, -1.9 * 26), `fx 10a: OverdriveRing plays "overdriveAura": overdrive_aura centred on the tower, sized by its radius (${JSON.stringify(od[0])})`);
+      this.ok(od.length === 1 && od[0].img === "overdrive_aura" && near(od[0].dw, 2 * 2.25 * 26) && near(od[0].dx, -2.25 * 26) && near(od[0].dy, -2.25 * 26), `fx 10a: OverdriveRing plays "overdriveAura": overdrive_aura centred on the tower, sized by its radius (${JSON.stringify(od[0])})`);
       // tower aura: tier 1 sheet, R = 26 x (2.22 + 1.38 x 0.6), alpha (0.08 + 0.47 x 0.6) x (0.9 + 0.1 sin(1.3 x 2.4))
       const un = imgs("under"), R1 = 26 * (2.22 + 1.38 * 0.6), a1 = (0.08 + 0.47 * 0.6) * (0.9 + 0.1 * Math.sin(1.3 * 2.4));
       const aUnder = c.under.find((l) => l.startsWith("ctx.globalAlpha="));
