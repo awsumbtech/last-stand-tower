@@ -7,9 +7,11 @@
 //      the new pipeline, for every run-flow state and every scene case (finale intro, phase /
 //      boss / wave banners, low HP, flash, Overdrive, hazards, corpses, World 2 bodies, no FX,
 //      reduced motion, a pixel theme, a theme without its optional parts).
-//   2. FxRenderer at 24349b8 and the new batcher + drawers draw the same calls for the drawers
-//      PR 10a did not convert (projectile trails, particle pools), for every FX theme and both
-//      quality levels (glow images come from fx.json now, so the glow image is normalised).
+//   2. PR 10b: ProjectileTrails and ParticleBatch draw only fx.json effects by variant (trail.<v>,
+//      glow.<v>, mote.<v>, streak.<v>) with the old sizes, lengths, angles and opacity curves, for
+//      every FX theme and both quality levels, and nothing at all until the art is in. In 1 the
+//      low-HP vignette, white flash and finale dim are the fx.json effects lowHpVignette,
+//      screenFlash and finaleDim, at the old strengths.
 //   3. PR 10a: the converted drawers (OverdriveRing, TowerGroundGlow, ChainArcs, TextGlows,
 //      ImpactPulses, ImpactFlashes) draw only fx.json effects: drawImage of the sheet the entry
 //      names, at the placement its settings give, with no shape, gradient or colour calls, and
@@ -107,6 +109,7 @@ class RenderTest {
     r.resize();
     LST.draw.confetti = rec.stub("draw", { confetti: null }).confetti;
     const effects = { name: "effects", draw: (id, ctx, at) => { rec.log.push(`effects.draw(${JSON.stringify(id)},${rec.fmt(ctx)},${JSON.stringify(at)})`); return true; } };
+    LST.fxManifest = effects; // the screen layers ask it when there is no FxDirector (PR 10b)
     r.fx = c.noFx ? null : rec.stub("fx", { drawUnder: null, drawProjectiles: null, drawWorld: null, drawTextGlows: null, drawScreen: null }, { name: "fx", reducedMotion: !!c.reduced, shake: 0.3, effects });
     const scene = this.scene(id, c);
     rec.log.length = 0;
@@ -130,6 +133,36 @@ class RenderTest {
     return { out, hits };
   }
 
+  // PR 10b: the low-HP vignette, the white flash and the finale dim are fx.json effects now
+  // ("lowHpVignette", "screenFlash", "finaleDim"). The old frames drew a radial gradient + fillRect,
+  // a white fillRect and a dark fillRect; both become VIGNETTE(v) / FLASH(a) / DIM(k) markers with
+  // the strength each one had (old gradient edge = 0.75 v, old dim = 0.45 k), so everything else is
+  // still compared call for call and the strengths must match.
+  normScreen(log, old) {
+    const out = [], hits = [], r9 = (v) => Math.round(v * 1e9) / 1e9, full = (a) => a.x === 0 && a.y === 0 && a.w === 390 && a.h === 844;
+    for (let i = 0; i < log.length; i++) {
+      const l = log[i];
+      if (old) {
+        let m;
+        if (/^ctx\.createRadialGradient\(195,422,117,195,422,/.test(l) && (m = /^ctx\.(grad\d+)\.addColorStop\(1,rgba\(255, 40, 70, ([\d.e-]+)\)\)$/.exec(log[i + 2])) && log[i + 3] === `ctx.fillStyle=<ctx.${m[1]}>` && log[i + 4] === "ctx.fillRect(0,0,390,844)") {
+          out.push(`VIGNETTE(${r9(Number(m[2]) / 0.75)})`); hits.push("v"); i += 4; continue;
+        }
+        if ((m = /^ctx\.fillStyle="rgba\(255, 255, 255, ([\d.e-]+)\)"$/.exec(l)) && log[i + 1] === "ctx.fillRect(0,0,390,844)") { out.push(`FLASH(${r9(Number(m[1]))})`); hits.push("f"); i++; continue; }
+        if ((m = /^ctx\.fillStyle="rgba\(30, 15, 40, ([\d.e-]+)\)"$/.exec(l)) && log[i + 1] === "ctx.fillRect(0,0,390,844)") { out.push(`DIM(${r9(Number(m[1]) / 0.45)})`); hits.push("d"); i++; continue; }
+      } else {
+        const m = /^effects\.draw\("(lowHpVignette|screenFlash|finaleDim)",<ctx>,(\{.*\})\)$/.exec(l);
+        if (m) {
+          const a = JSON.parse(m[2]);
+          if (m[1] === "lowHpVignette" && full(a)) { out.push(`VIGNETTE(${r9(a.alpha)})`); hits.push("v"); continue; }
+          if (m[1] === "screenFlash" && a.x === 195 && a.y === 422 && a.base === 844) { out.push(`FLASH(${r9(a.alpha)})`); hits.push("f"); continue; }
+          if (m[1] === "finaleDim" && full(a)) { out.push(`DIM(${r9(a.alpha)})`); hits.push("d"); continue; }
+        }
+      }
+      out.push(l);
+    }
+    return { out, hits };
+  }
+
   checkRenderer() {
     this.loadStateFlags();
     const cur = this.RENDER_FILES.map((f) => [f, this.read("src/" + f)]);
@@ -140,11 +173,14 @@ class RenderTest {
       lowHp: { lowHp: true, vignette: 0.4, flash: 0.5 }, overdrive: { overdrive: true, hazards: true, corpses: true, shake: 0.6 }, backdrop: { backdrop: true, hazards: true },
       noFx: { noFx: true, flash: 0.5, lowHp: true }, reduced: { reduced: true, flash: 0.5, shake: 1 }, pixel: { pixel: true, wave: true }, minimal: { minimal: true, boss: true, phase: true, finale: 1.0 }, noW: { noW: true },
     };
-    let n = 0, same24 = 0, same73 = 0, firstBad = null, odCases = 0, odOk = 0;
+    let n = 0, same24 = 0, same73 = 0, firstBad = null, odCases = 0, odOk = 0, screenHits = 0, screenSame = 0;
     for (const id of this.IDS) for (const [cn, c] of Object.entries(CASES)) {
       n++;
       const raw = this.drawFrame(cur, id, c), now = this.normOverdrive(raw, false);
       const o24 = this.normOverdrive(this.drawFrame(oldOrder, id, c), true), o73 = this.normOverdrive(this.drawFrame(oldState, id, c), true);
+      const sNow = this.normScreen(now.out, false), s24 = this.normScreen(o24.out, true), s73 = this.normScreen(o73.out, true);
+      now.out = sNow.out; o24.out = s24.out; o73.out = s73.out; screenHits += s24.hits.length;
+      if (s24.hits.join() === sNow.hits.join()) screenSame += s24.hits.length;
       const a = JSON.stringify(now.out) === JSON.stringify(o24.out);
       const b = JSON.stringify(now.out) === JSON.stringify(o73.out);
       if (a) same24++; if (b) same73++;
@@ -156,10 +192,11 @@ class RenderTest {
         if (o24.hits.length === 1 && at && at.x === 0 && at.y === 0 && at.base === 26 && typeof at.t === "number") odOk++;
       }
     }
-    this.ok(same24 === n, `render: the RenderPipeline draws exactly what render.js@${this.ORDER_REV} drew, call for call, in all ${n} state x scene cases, except the Overdrive pulse (${same24}/${n}${firstBad ? ", first diff " + firstBad : ""})`);
+    this.ok(same24 === n, `render: the RenderPipeline draws exactly what render.js@${this.ORDER_REV} drew, call for call, in all ${n} state x scene cases, except the Overdrive pulse and the PR 10b screen effects (${same24}/${n}${firstBad ? ", first diff " + firstBad : ""})`);
+    this.ok(screenHits > 30 && screenSame === screenHits, `render 10b: where render.js@${this.ORDER_REV} drew the vignette gradient, the white flash or the finale dim fill, the pipeline plays "lowHpVignette" / "screenFlash" / "finaleDim" once, over the screen (the flash centred, long side), at the same strength, in the same place in the layer order, with or without FX (${screenSame}/${screenHits})`);
     this.ok(odCases > 0 && odOk === odCases, `render: where render.js@${this.ORDER_REV} filled the Overdrive arc, the pipeline asks the effects for "overdriveAura" once, on the tower (x 0, y 0, base = radius 26), in the same place in the layer order (${odOk}/${odCases} cases)`);
     this.ok(same73 === n, `render: SceneFlags pick the same finale dim, banner and low-HP pulse as the state-string checks of render.js@${this.STATE_REV}, in all ${n} cases (${same73}/${n})`);
-    this.ok(this.sampleCalls > 30, `render: the recorder sees the frame (${this.sampleCalls} calls in playing/lowHp)`);
+    this.ok(this.sampleCalls > 20, `render: the recorder sees the frame (${this.sampleCalls} calls in playing/lowHp)`);
   }
 
   // ---------- 2. FxRenderer: old vs new (unconverted drawers) ----------
@@ -174,46 +211,70 @@ class RenderTest {
   }
 
   pool(LST, n) {
-    const p = { name: "pool", count: n, palette: ["#ff0000", "#00ff00", "#3355ff"] };
+    const p = { name: "pool", count: n, palette: ["gold", "pale", "amber"] };
     for (const k of ["x", "y", "vx", "vy", "life", "maxLife", "size", "shape", "color", "minLen", "stretch"]) p[k] = [];
     const S = LST.FX_SHAPE;
     for (let i = 0; i < n; i++) {
       p.x.push(i * 7 - 20); p.y.push(i * 3); p.vx.push(i % 3 ? 40 : 0); p.vy.push(-30 + i); p.maxLife.push(1); p.life.push(((i * 37) % 100) / 100 + 0.01);
-      p.size.push(2 + (i % 4)); p.shape.push([S.STREAK, S.SOFT, S.GLOW][i % 3]); p.color.push(i % 3); p.minLen.push(4); p.stretch.push(0.05);
+      p.size.push(2 + (i % 4)); p.shape.push([S.STREAK, S.SOFT, S.GLOW][i % 3]); p.color.push(((i / 3) | 0) % 3); p.minLen.push(4); p.stretch.push(0.05);
     }
     return p;
   }
 
-  // A test manifest whose glowColors name one stub glow image for every colour the calls use.
-  glowManifest(LST) {
-    const m = new LST.FxManifest("assets/fx/fx.json"), colors = ["#ff0000", "#00ff00", "#3355ff", "#ffcf3a", "#ff9a3a", "#66ccff", "#ff6633"];
-    m.setData({ glowColors: Object.fromEntries(colors.map((c) => [c, "g"])) });
-    m.install("g", { strips: { main: { image: "g.png", frame: { w: 64, h: 64 }, count: 1 } }, anchor: { x: 32, y: 32 }, refBodyR: 32 }, { main: { name: "glowImg" } });
-    return m;
-  }
-
-  fxCalls(sources, themeId, low, isNew) {
-    const rec = new DrawRecorder(), sb = this.fxSandbox(sources, rec), LST = sb.LST;
-    const doc = { createElement: () => ({ name: "glowCanvas", width: 0, height: 0, getContext: () => rec.ctx("glow") }) };
-    const fx = isNew ? new LST.FxRenderer(doc, this.glowManifest(LST)) : new LST.FxRenderer(doc), ctx = rec.ctx("ctx");
+  // PR 10b: ProjectileTrails and ParticleBatch play fx.json effects by variant, with the real
+  // fx.json (stub art per sheet, or none), the old opacity / size maths, and nothing else.
+  particleCalls(withArt, low, themeId) {
+    const rec = new DrawRecorder(), sb = this.fxSandbox(this.FX_FILES.map((f) => [f, this.read("src/" + f)]), rec), LST = sb.LST;
+    const { m } = this.fxManifest(LST, withArt), fx = new LST.FxRenderer({}, m), ctx = rec.ctx("ctx"), out = {};
     fx.setTheme(themeId);
-    fx.drawProjectiles(ctx, [{ x: 10, y: 5, vx: 300, vy: 40 }, { x: -4, y: 9, vx: 0, vy: 0 }, { x: 30, y: -8, vx: -200, vy: 100, crit: true }, { x: 1, y: 2, vx: 90, vy: 90, tint: "#66ccff" }, { x: 3, y: 2, vx: 80, vy: -90, tint: "#ff6633" }], low);
-    fx.drawPool(ctx, this.pool(LST, 17), 1.5, low);
-    rec.log.push("drawn=" + fx.drawn);
-    // The old glow sprites were canvases painted on first use ("glow." calls); the new glow is an
-    // fx.json image. Same drawImage calls, same place; only the image differs.
-    return rec.log.filter((l) => !l.startsWith("glow.")).map((l) => l.replace(/<glowCanvas>|<glowImg>/g, "<GLOW>"));
+    const mark = (k, fn) => { const i = rec.log.length; fn(); out[k] = rec.log.slice(i); };
+    const shots = [{ x: 10, y: 5, vx: 300, vy: 40 }, { x: -4, y: 9, vx: 0, vy: 0 }, { x: 30, y: -8, vx: -200, vy: 100, crit: true }, { x: 1, y: 2, vx: 900, vy: 900, trail: "frost" }, { x: 3, y: 2, vx: 80, vy: -90, trail: "ember" }];
+    mark("trails", () => fx.drawProjectiles(ctx, shots, low));
+    const pool = this.pool(LST, 17);
+    mark("pool", () => fx.drawPool(ctx, pool, 1.5, low));
+    return { out, fx, pool, shots };
   }
 
-  checkFxRenderer() {
-    const cur = this.FX_FILES.map((f) => [f, this.read("src/" + f)]);
-    const old = [["FxRenderer.js@" + this.ORDER_REV, this.show(this.ORDER_REV, "src/fx/FxRenderer.js")]];
-    let n = 0, same = 0, calls = 0;
+  checkParticles() {
+    const near = (a, b) => Math.abs(a - b) < 1e-6, R = RenderTest.img, S = { STREAK: 0, SOFT: 1, GLOW: 2 };
+    const ALLOWED = /^ctx\.(save|restore|translate|rotate|drawImage)\(|^ctx\.(globalAlpha|globalCompositeOperation)=/;
+    const data = JSON.parse(this.read("assets/fx/fx.json")), T = data.presets.trail, ink = data.presets.streakBurst.inkWidth;
     for (const th of ["cartoon", "neon", "pixel", "unknown"]) for (const low of [false, true]) {
-      n++; const a = this.fxCalls(cur, th, low, true), b = this.fxCalls(old, th, low, false); calls += a.length;
-      if (JSON.stringify(a) === JSON.stringify(b)) same++; else this.ok(false, `fx: ${th}/low=${low} differs from FxRenderer.js@${this.ORDER_REV}`);
+      const { out, fx, pool, shots } = this.particleCalls(true, low, th), all = [...out.trails, ...out.pool], theme = data.themes[th] || data.themes.cartoon;
+      this.ok(all.length > 40 && all.every((l) => ALLOWED.test(l)), `fx 10b (${th}, low=${low}): ProjectileTrails and ParticleBatch only save / restore, translate / rotate, set opacity / blend and drawImage (${all.length} calls; no stroke, path, arc, fill or colour)`);
+      // Trails: one stretched trail.<variant> per moving shot, head on the shot, length min(48, speed x 0.05) (x 1.15 for element shots), height 9.
+      const tr = out.trails.map(R).filter(Boolean), trails = tr.filter((d) => d.img.startsWith("trail_")), glows = tr.filter((d) => d.img.startsWith("glow_"));
+      const moving = shots.filter((p) => p.vx || p.vy), lens = moving.map((p) => Math.min(T.maxLength, Math.hypot(p.vx, p.vy) * T.stretch) * (p.trail ? T.elementLength : 1));
+      this.ok(JSON.stringify(trails.map((d) => d.img)) === JSON.stringify(["trail_base", "trail_base", "trail_frost", "trail_ember"]) && trails.every((d, i) => near(d.dw, lens[i]) && near(d.dh, T.height)),
+        `fx 10b (${th}, low=${low}): every moving shot plays trail.<its element trail, else base> stretched behind it (lengths ${lens.map((l) => l.toFixed(1)).join(", ")}, height ${T.height}); a still shot has none`);
+      const rots = out.trails.filter((l) => l.startsWith("ctx.rotate(")).slice(0, 4).map((l) => Number(l.slice(11, -1)));
+      this.ok(rots.length === 4 && moving.every((p, i) => near(rots[i], Math.atan2(p.vy, p.vx))), `fx 10b (${th}, low=${low}): each trail is rotated to its shot's velocity`);
+      const tA = out.trails.filter((l) => l.startsWith("ctx.globalAlpha=")).map((l) => Number(l.slice(16)));
+      this.ok(tA.slice(0, 4).every((a) => near(a, Math.min(1, theme.trailAlpha))), `fx 10b (${th}, low=${low}): trails at the theme's trail opacity (${theme.trailAlpha})`);
+      const wantG = low ? [] : ["glow_gold", "glow_gold", "glow_amber", "glow_cyan", "glow_orange"], wantR = [T.glowRadius, T.glowRadius, T.critGlowRadius, T.glowRadius * T.elementGlowMul, T.glowRadius * T.elementGlowMul];
+      this.ok(JSON.stringify(glows.map((d) => d.img)) === JSON.stringify(wantG) && glows.every((d, i) => near(d.dw, 2 * wantR[i])) && (low || out.trails.includes(`ctx.globalCompositeOperation=${JSON.stringify(theme.blend)}`)),
+        `fx 10b (${th}, low=${low}): shot glows ${low ? "are skipped in low quality" : "play glow.gold / amber (crit) / the element's glow at the old radii, in the theme blend"}`);
+      // Pool: glow under motes and crit glows (pass 1), mote cores (pass 2), then streaks with the fade step's frame.
+      const pd = out.pool.map(R).filter(Boolean), pal = pool.palette, n = pool.count;
+      const idx = (sh) => [...Array(n).keys()].filter((i) => pool.shape[i] === sh);
+      const soft = idx(S.SOFT), glow = idx(S.GLOW), streak = idx(S.STREAK);
+      const glowOrder = [...Array(n).keys()].filter((i) => pool.shape[i] !== S.STREAK);
+      const wantPool = [...glowOrder.map((i) => "glow_" + pal[pool.color[i]]), ...soft.map(() => "motes"), ...streak.map((i) => "streak_" + pal[pool.color[i]])];
+      this.ok(JSON.stringify(pd.map((d) => d.img)) === JSON.stringify(wantPool), `fx 10b (${th}, low=${low}): a pool draws glow.<variant> under ${glowOrder.length} motes / crit glows, then ${soft.length} mote.<variant> cores, then ${streak.length} streak.<variant>`);
+      const mR = (i) => Math.max(1.2 * 1.5, pool.size[i] * 0.24) * data.effects["mote." + pal[pool.color[i]]].size;
+      const motes = pd.filter((d) => d.img === "motes");
+      this.ok(motes.every((d, k) => near(d.dw, 2 * mR(soft[k]))), `fx 10b (${th}, low=${low}): mote cores at the old core radius (max(1.2 px, 0.24 x size)) x the entry's size`);
+      const streaks = pd.filter((d) => d.img.startsWith("streak_")), step = (i) => Math.min(2, ((1 - pool.life[i] / pool.maxLife[i]) * 3) | 0);
+      this.ok(streaks.length === streak.length && streaks.every((d, k) => { const i = streak[k], sp = Math.hypot(pool.vx[i], pool.vy[i]) || 1; return d.sx === step(i) * 64 && near(d.dh, pool.size[i] + ink * 1.5) && near(d.dw, Math.max(pool.minLen[i], sp * pool.stretch[i])); }),
+        `fx 10b (${th}, low=${low}): streaks play the frame of their fade step (fresh / mid / fade), stretched to the old length (max(minLen, speed x stretch)), height = width + the old ink edge (${ink} px x unit)`);
+      const pA = out.pool.filter((l) => l.startsWith("ctx.globalAlpha=")).map((l) => Number(l.slice(16)));
+      const wantA = [...glowOrder.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return (pool.shape[i] === S.SOFT ? Math.min(1, (1 - f) * 6) * Math.pow(f, 0.6) * 0.85 : f) * theme.glow; }),
+        ...soft.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return Math.min(1, (1 - f) * 6) * Math.pow(f, 0.5) * 0.95; }), ...streak.map((i) => Math.min(1, (1 - (step(i) + 0.5) / 3) * 1.8))].map((a) => Math.min(1, a)).filter((a) => a >= 0.01);
+      this.ok(pA.length === wantA.length && pA.every((a, i) => near(a, wantA[i])), `fx 10b (${th}, low=${low}): every particle keeps the old opacity curve (${pA.length} draws)`);
+      this.ok(fx.drawn === n, `fx 10b: the batcher still counts drawn particles for QA (${fx.drawn})`);
     }
-    this.ok(same === n && calls > 200, `fx: the drawers PR 10a did not convert (ProjectileTrails, ParticleBatch) draw exactly what FxRenderer.js@${this.ORDER_REV} drew, for every FX theme and quality, with fx.json glow images (${same}/${n}, ${calls} calls)`);
+    const none = this.particleCalls(false, false, "cartoon"), drawn = [...none.out.trails, ...none.out.pool];
+    this.ok(drawn.length === 0, `fx 10b: with no art loaded, trails and particles draw nothing at all (no fallback; ${drawn.length} calls)`);
   }
 
   // ---------- 3. PR 10a: the converted drawers play fx.json effects ----------
@@ -321,7 +382,7 @@ class RenderTest {
 
   run() {
     this.checkRenderer();
-    this.checkFxRenderer();
+    this.checkParticles();
     this.checkConverted();
     this.checkStructure();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);

@@ -27,7 +27,7 @@ LST.ElementRegistry.register(new (class ChainSpark extends LST.Element {
       `dealing ${Math.round(S.share * 100)}% of the hit's damage to each. More levels: +1 jump.`;
   }
 })({
-  id: "chainSpark", element: "lightning", name: "Chain Spark", rarity: "epic", color: "#ffe14d", unlockCost: 220, maxLevel: 2,
+  id: "chainSpark", element: "lightning", name: "Chain Spark", trail: "spark", rarity: "epic", color: "#ffe14d", unlockCost: 220, maxLevel: 2,
   icon: '<path d="M13 2L5 13h6l-2 9 9-12h-6.5z"/>',
   stats: { chance: 0.3, jumps: [2, 1], share: 0.85, radius: 130 },
 }));

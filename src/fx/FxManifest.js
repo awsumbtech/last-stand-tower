@@ -9,14 +9,15 @@
 //
 //   draw(id, ctx, at)  draws effect `id` (false if the id is unknown or its art is not in)
 //   effect(id)         the SpriteEffect for an id (null if fx.json has no such entry)
-//   impact(name)       the ring / bloom effect ids fx.json gives an ImpactSync impact
-//   glow(color)        the glow image fx.json names for a preset colour (PR 10b replaces this)
+//   impact(name)       an ImpactSync impact: its ring / bloom effect ids and its settings
+//   preset(id)         emitter / drawer settings (streakBurst, aura, trail, glow, ring)
+//   theme(id)          per art style blend, glow strength and trail opacity
 //   triggers()         [id, eventKey] for entries that play on a game event ("on")
 LST.FxManifest = class FxManifest {
   constructor(url) {
     this.url = url;
     this.base = url.slice(0, url.lastIndexOf("/") + 1);
-    this.data = { sheets: {}, effects: {}, impacts: {}, glowColors: {} };
+    this.data = { sheets: {}, effects: {}, impacts: {}, presets: {}, themes: {} };
     this.sheets = {};   // sheet id -> { strips } once every strip image is in
     this.failed = {};
     this.cache = {};    // effect id -> SpriteEffect
@@ -40,7 +41,7 @@ LST.FxManifest = class FxManifest {
   }
 
   setData(data) {
-    this.data = Object.assign({ sheets: {}, effects: {}, impacts: {}, glowColors: {} }, data);
+    this.data = Object.assign({ sheets: {}, effects: {}, impacts: {}, presets: {}, themes: {} }, data);
     this.cache = {};
   }
 
@@ -96,11 +97,8 @@ LST.FxManifest = class FxManifest {
 
   impact(name) { return (name && this.data.impacts[name]) || null; }
 
-  glow(color) {
-    const id = color && this.data.glowColors[String(color).toLowerCase()];
-    const sheet = id ? this.sheet(id) : null, strip = sheet && sheet.strips.main;
-    return strip && strip.ready ? strip.image : null;
-  }
+  preset(id) { return this.data.presets[id] || null; }
+  theme(id) { return this.data.themes[id] || null; }
 
   triggers() {
     return Object.entries(this.data.effects).filter(([, e]) => e.on).map(([id, e]) => [id, e.on]);

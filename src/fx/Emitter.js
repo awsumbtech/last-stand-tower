@@ -1,4 +1,4 @@
-// Emitter: turns preset data (LST.FX_PRESETS) into particles in a ParticlePool.
+// Emitter: turns preset data (fx.json "presets", read through FxManifest) into particles in a ParticlePool.
 //   Emitter.burst(pool, rng, preset, x, y, opts)  one-shot radial burst (streakBurst)
 //   new Emitter.Stream(preset)                    continuous emitter with a rate accumulator (aura)
 

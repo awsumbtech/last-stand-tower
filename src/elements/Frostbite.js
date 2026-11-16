@@ -41,7 +41,7 @@ LST.ElementRegistry.register(new (class Frostbite extends LST.Element {
       `Bosses: ${S.bossFreeze}s, then ${S.bossCooldown}s cooldown.` + this.pairText();
   }
 })({
-  id: "frostbite", element: "ice", name: "Frostbite", rarity: "rare", color: "#7fe3ff", unlockCost: 110, maxLevel: 3,
+  id: "frostbite", element: "ice", name: "Frostbite", trail: "frost", rarity: "rare", color: "#7fe3ff", unlockCost: 110, maxLevel: 3,
   icon: '<path d="M12 2v20M4 6.5l16 11M4 17.5l16-11"/><path d="M9 4l3 2.5L15 4M9 20l3-2.5 3 2.5"/><circle cx="12" cy="12" r="2.6"/>',
   stats: { every: 3, freeze: [0.65, 0.2], bossFreeze: 0.2, bossCooldown: 4, chill: 0.15, chillTime: 1.5 },
 }));

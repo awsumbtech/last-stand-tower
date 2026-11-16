@@ -8,22 +8,22 @@
 // visuals are first drawn at the end of this same requestAnimationFrame.
 
 LST.ImpactSync = class ImpactSync {
-  constructor({ audio, camera, pools, rng, clock, quality, presets, impacts }) {
+  // effects: the FxManifest (fx.json "impacts" and "presets"; nothing fires until it is in).
+  constructor({ audio, camera, pools, rng, clock, quality, effects }) {
     this.audio = audio;
     this.camera = camera;
     this.pools = pools;     // { world, screen }
     this.rng = rng;
     this.clock = clock;     // { frame, time }
     this.quality = quality;
-    this.presets = presets;
-    this.impacts = impacts;
+    this.effects = effects;
     this.last = {};         // impact name -> clock.time (throttle)
     this.log = [];          // last 16 fires (QA)
   }
 
   fire(name, x, y, opts = {}) {
-    const cfg = this.impacts[name];
-    if (!cfg) return null;
+    const cfg = this.effects.impact(name), burst = this.effects.preset("streakBurst"), ring = this.effects.preset("ring");
+    if (!cfg || !cfg.burst || !burst || !ring) return null;
     const now = this.clock.time;
     if (cfg.throttle && now - (this.last[name] == null ? -1e9 : this.last[name]) < cfg.throttle) return null;
     this.last[name] = now;
@@ -43,12 +43,12 @@ LST.ImpactSync = class ImpactSync {
     const visualFrame = this.clock.frame;
     const pool = cfg.space === "screen" ? this.pools.screen : this.pools.world;
     const colors = opts.colors || cfg.colors;
-    const made = LST.Emitter.burst(pool, this.rng, this.presets.streakBurst, x, y, {
+    const made = LST.Emitter.burst(pool, this.rng, burst, x, y, {
       count: cfg.burst.count, speedMul: cfg.burst.speedMul * (opts.speedMul || 1) * (cfg.space === "screen" ? 0.55 : 1),
       colors, scale: q.scale, priority: true,
     });
-    const pulse = this.camera.pulse(cfg.space, x, y, cfg.ring * (opts.ringMul || 1),
-      reduced ? 0 : cfg.bloom, reduced ? 0 : cfg.flash, opts.tint || colors[1] || "#ffffff", this.presets.ring.life, visualFrame);
+    const pulse = this.camera.pulse(cfg.space, x, y, cfg.radius * (opts.ringMul || 1),
+      reduced ? 0 : cfg.bloomAlpha, reduced ? 0 : cfg.flash, colors[1] || colors[0], ring.life, visualFrame);
     if (!reduced && cfg.shake) this.camera.addShake(cfg.shake);
 
     const rec = { name, frame: visualFrame, audioFrame, visualFrame, audioTime, particles: made, pulse, firstDrawFrame: -1 };
