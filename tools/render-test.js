@@ -265,8 +265,8 @@ class RenderTest {
       const motes = pd.filter((d) => d.img === "motes");
       this.ok(motes.every((d, k) => near(d.dw, 2 * mR(soft[k]))), `fx 10b (${th}, low=${low}): mote cores at the old core radius (max(1.2 px, 0.24 x size)) x the entry's size`);
       const streaks = pd.filter((d) => d.img.startsWith("streak_")), step = (i) => Math.min(2, ((1 - pool.life[i] / pool.maxLife[i]) * 3) | 0);
-      this.ok(streaks.length === streak.length && streaks.every((d, k) => { const i = streak[k], sp = Math.hypot(pool.vx[i], pool.vy[i]) || 1; return d.sx === step(i) * 64 && near(d.dh, pool.size[i] + ink * 1.5) && near(d.dw, Math.max(pool.minLen[i], sp * pool.stretch[i])); }),
-        `fx 10b (${th}, low=${low}): streaks play the frame of their fade step (fresh / mid / fade), stretched to the old length (max(minLen, speed x stretch)), height = width + the old ink edge (${ink} px x unit)`);
+      this.ok(streaks.length === streak.length && streaks.every((d, k) => { const i = streak[k], sp = Math.hypot(pool.vx[i], pool.vy[i]) || 1; return d.sx === Math.floor(((step(i) + 0.5) / 3) * 4) * 64 && near(d.dh, pool.size[i] + ink * 1.5) && near(d.dw, Math.max(pool.minLen[i], sp * pool.stretch[i])); }),
+        `fx 10b (${th}, low=${low}): streaks play the frame of their fade step (fresh / mid / fade: progress (step + 0.5) / 3 through the strip; the stub strip has 4 frames), stretched to the old length (max(minLen, speed x stretch)), height = width + the old ink edge (${ink} px x unit)`);
       const pA = out.pool.filter((l) => l.startsWith("ctx.globalAlpha=")).map((l) => Number(l.slice(16)));
       const wantA = [...glowOrder.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return (pool.shape[i] === S.SOFT ? Math.min(1, (1 - f) * 6) * Math.pow(f, 0.6) * 0.85 : f) * theme.glow; }),
         ...soft.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return Math.min(1, (1 - f) * 6) * Math.pow(f, 0.5) * 0.95; }), ...streak.map((i) => Math.min(1, (1 - (step(i) + 0.5) / 3) * 1.8))].map((a) => Math.min(1, a)).filter((a) => a >= 0.01);
@@ -284,7 +284,7 @@ class RenderTest {
   fxManifest(LST, withArt) {
     const m = new LST.FxManifest("assets/fx/fx.json"), data = JSON.parse(this.read("assets/fx/fx.json"));
     m.setData(data);
-    if (withArt) for (const id of Object.keys(data.sheets)) {
+    if (withArt) for (const id of new Set([...Object.keys(data.sheets), ...Object.values(data.effects).flatMap((e) => [].concat(e.sheet))])) {
       const strip = (img) => ({ image: img, frame: { w: 64, h: 64 }, count: 4, fps: 8, loop: false });
       m.install(id, { strips: { main: strip("m.png"), r0: strip("a.png"), r1: strip("b.png"), r2: strip("c.png") }, anchor: { x: 32, y: 32 }, refBodyR: 32 },
         { main: { name: id }, r0: { name: id + "#r0" }, r1: { name: id + "#r1" }, r2: { name: id + "#r2" } });
