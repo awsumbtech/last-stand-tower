@@ -1,0 +1,20 @@
+{
+ "frameW": 256,
+ "frameH": 48,
+ "count": 9,
+ "fps": 24,
+ "loop": false,
+ "cols": 3,
+ "rows": 3,
+ "layout": "rows = 3 jagged variants, cols = 3 fade frames (alpha 1.0, 0.6, 0.25)",
+ "variants": 3,
+ "fadeFrames": 3,
+ "anchor": [
+  0,
+  24
+ ],
+ "anchorMeaning": "bolt runs from x=0 to x=255 along y=24; stretch along x, rotate about the left end",
+ "image": "chain_bolt.png",
+ "version": "v1",
+ "sha256": "21789f30b6168487196f156c474b0871845da92fff8456b19b5970819110ee11"
+}

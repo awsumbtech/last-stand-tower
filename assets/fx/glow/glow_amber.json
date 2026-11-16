@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_amber.png",
+ "version": "v1",
+ "sha256": "cd3f5a3462692e109576789c5fbff0ce1f434b84cc6e1a0044f0f166edb75a92"
+}

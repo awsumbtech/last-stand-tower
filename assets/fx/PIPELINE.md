@@ -1,0 +1,12 @@
+# PIPELINE: LST PR10a effects v1 (for Tower Defense Games Dev, assets/fx/fx.json)
+
+Objects: one image-backed effect object per fx.manifest.json entry (24 sheets). Each colour is its own generated painting; nothing is tinted or recoloured. The game only fades opacity.
+
+1. Generate (Grok Bot GenerateImage, 26 generations: 24 kept + 2 rerolls of tower_aura_t2). Prompts: `_src/prompts.json` (full text per file in PROVENANCE.json). Raws: `_src/raw/` (+ `rejected/`), hashes in `_src/raw/SHA256SUMS`. Inked effects (overdrive ring, bolts, arc flash, impact rings) were painted on a flat key colour with Brian's tank/basic sprites as the style reference (`_src/style_ref_enemies.png`). Soft glows and ground auras were painted on pure black, no outline.
+2. Process (`python3 _tools/process.py`): key removal (`_tools/keying.py`, from world2-beach) or black un-mix for glows; frame cut by grid cell; bbox-centre registration; one uniform premultiplied LANCZOS downscale per asset; chain_bolt fade frames = opacity x1.0/0.6/0.25. Writes `<group>/<id>.png` + `<id>.json` and `_tools/process_report.json`.
+3. Self-check (`python3 _tools/selfcheck.py` -> `_qa/selfcheck.json`, `_qa/selfcheck.txt`): frame size, non-empty, border alpha (clipping), near-white share, mean hue + saturation, loop seam, centre clear.
+4. Previews (`python3 _tools/preview.py`): `preview_390x844.png` (+ `_qa/preview_390x844@2x.png`) and `contact_2x.png`. Ground, stand-in tower and labels are QA scaffolding only. `_tools/board.py` -> `_qa/board.png`.
+5. Manifest + provenance (`python3 _tools/provenance.py`): `fx.manifest.json`, `PROVENANCE.json`.
+
+Assumed in-game draw sizes used by the preview (CSS px, portrait 0.629 px/world unit, tower radius 26): overdrive_aura 72, tower_aura 90, chain_bolt 64 long x 12, chain_arc_flash 28, chain_node_glow 14, glow 20, impact_ring 48 (largest frame).
+pngquant isn't installed in this folder's pipeline; PNGs are RGBA from Pillow (optimize). Shipped sheets total about 3.2 MB.

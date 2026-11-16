@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "glow_pink.png",
+ "version": "v1",
+ "sha256": "9a33a6aa4d8b7aa55dfeb57d51cd4d8aff58d6d85cf306864124f84b336a60ef"
+}

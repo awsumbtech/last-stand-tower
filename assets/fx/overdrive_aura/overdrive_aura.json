@@ -1,0 +1,15 @@
+{
+ "frameW": 256,
+ "frameH": 256,
+ "count": 6,
+ "fps": 12,
+ "loop": true,
+ "anchor": [
+  128,
+  128
+ ],
+ "anchorMeaning": "tower centre",
+ "image": "overdrive_aura.png",
+ "version": "v1",
+ "sha256": "9cb053e48593e46bc692bc11a63ef8413b53f8c3e69e9a485686d2d0306f9e61"
+}

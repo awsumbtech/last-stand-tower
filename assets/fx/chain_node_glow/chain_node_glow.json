@@ -1,0 +1,15 @@
+{
+ "frameW": 64,
+ "frameH": 64,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  32,
+  32
+ ],
+ "blendHint": "normal or lighter",
+ "image": "chain_node_glow.png",
+ "version": "v1",
+ "sha256": "b5448b7b5b6d6de34759df1d1b3519d97c278e3161b545fb528ae708bda29dd5"
+}

@@ -1,0 +1,15 @@
+{
+ "frameW": 192,
+ "frameH": 192,
+ "count": 6,
+ "fps": 20,
+ "loop": false,
+ "anchor": [
+  96,
+  96
+ ],
+ "anchorMeaning": "impact centre",
+ "image": "impact_ring_blue.png",
+ "version": "v1",
+ "sha256": "38e6efc22cd5f84b2f74f0268c268757fc56829f57f752a00d1b1edbd25032b2"
+}

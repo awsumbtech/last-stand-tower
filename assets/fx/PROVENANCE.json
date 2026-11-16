@@ -1,0 +1,673 @@
+{
+ "_about": {
+  "version": "v1",
+  "delivery": "LST PR10a effects manifest art for Tower Defense Games Dev",
+  "date": "2026-11-16",
+  "tool": "Grok Bot GenerateImage (cursor namespace); PixelLab not used",
+  "generations": {
+   "total": 26,
+   "kept": 24,
+   "rerolls": 2,
+   "rerolled": "tower_aura_t2 (x2: first two read as gold, same hue as t1)"
+  },
+  "rawHashes": "_src/raw/SHA256SUMS",
+  "license": "Original art generated for Brian Awsumb's Last Stand Tower; no third-party or licensed art, no copyrighted references. Style reference: Brian's own enemy sprites (assets/sprites/enemies/tank, basic).",
+  "noCodeArt": "No shapes, gradients, rings, glows, tints, recolours, hue shifts or outline changes are drawn or applied by code. Code only removes the background, cuts/centres/scales frames and (chain_bolt only) applies opacity steps for fade frames."
+ },
+ "chain_arc_flash/chain_arc_flash.png": {
+  "sha256": "10db850d744fbc9179cce8fc6b47808b7d2c381f7b3587c5f1c849202c872aa5",
+  "sheet": "chain_arc_flash/chain_arc_flash.json",
+  "frames": 4,
+  "frameW": 96,
+  "frameH": 96,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/chain_arc_flash.jpg",
+  "sourceSha256": "e556ad7dc9c38760940e477477a172c0f08973a66ee9e38ab7d22232adf9a4fa",
+  "prompt": "Mobile game effect sprite sheet in the flat cartoon style of the reference characters (use the reference ONLY for its line and colour style; do not draw the characters). 2 columns x 2 rows of 4 equal square cells on a flat solid royal blue background (#1a3cff), no grid lines. A one-shot electric spark ring that pops on a struck enemy, centred in each cell, read left to right then top to bottom: frame 1 a small tight ring of short yellow spark zig-zags snapping on; frame 2 a full round ring of jagged yellow electric zig-zags with little four-point star sparks; frame 3 the ring breaking apart outward into separate spark bits; frame 4 a few small spark bits fading out. The centre of the ring stays empty in every frame. Colours: bright yellow (#ffe14d) and golden yellow (#ffc61a) with a thick dark purple-navy ink outline (#2b1d3a) on every spark. Yellow, NOT white: no white flash, no white core. Nothing touches the cell edges. Flat cartoon vector, no text.",
+  "referenceImages": [
+   "_src/style_ref_enemies.png"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    45.0,
+    111.0,
+    248.0
+   ],
+   "scale": 0.22439024390243903
+  },
+  "license": "original generated art"
+ },
+ "chain_bolt/chain_bolt.png": {
+  "sha256": "21789f30b6168487196f156c474b0871845da92fff8456b19b5970819110ee11",
+  "sheet": "chain_bolt/chain_bolt.json",
+  "frames": 9,
+  "frameW": 256,
+  "frameH": 48,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/chain_bolt.jpg",
+  "sourceSha256": "fa5e073944e69a60d07d86a1b28d541dce6b41f42ecccaba63f120cec7aab027",
+  "prompt": "Mobile game effect sprites in the flat cartoon style of the reference characters (use the reference ONLY for its line and colour style; do not draw the characters). Three separate horizontal cartoon lightning bolt segments stacked one above another on a flat solid magenta background (#ff00ff), with wide empty magenta gaps between them. Each bolt is a long thin jagged zig-zag electric line running straight from the far left edge to the far right edge of the image, chunky bright yellow (#ffe14d) with a slightly lighter yellow core stripe (#fff27a), wrapped in a thick dark purple-navy ink underlay outline (#2b1d3a). Bolt 1 (top): a few large zig-zags. Bolt 2 (middle): many small sharp zig-zags. Bolt 3 (bottom): medium zig-zags with one small forked spur. Each bolt is thin, its height about one eighth of its length. Flat cartoon vector, no white, no glow haze, no sparkles, no text.",
+  "referenceImages": [
+   "_src/style_ref_enemies.png"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "each bolt band cropped to its own bbox, uniform downscale so it spans exactly 256 px (x=0..255), centred vertically in the 48 px frame (bolt about 21-23 px tall; no vertical stretch, so the ink is not thickened)",
+   "fade frames = opacity steps of the same painted bolt: alpha x1.0, x0.6, x0.25",
+   "layout rows = variants (top/middle/bottom bolt of the raw), cols = fade frames"
+  ],
+  "processParams": {
+   "key": [
+    231.0,
+    60.0,
+    147.0
+   ],
+   "scales": [
+    0.20915032679738563,
+    0.2089795918367347,
+    0.2089795918367347
+   ],
+   "boltHeights": [
+    23,
+    21,
+    22
+   ],
+   "fadeAlpha": [
+    1.0,
+    0.6,
+    0.25
+   ]
+  },
+  "license": "original generated art"
+ },
+ "chain_node_glow/chain_node_glow.png": {
+  "sha256": "b5448b7b5b6d6de34759df1d1b3519d97c278e3161b545fb528ae708bda29dd5",
+  "sheet": "chain_node_glow/chain_node_glow.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/chain_node_glow.jpg",
+  "sourceSha256": "c4aa8c98047358b48a3c641153fadd5fc96d0ccc3cc3a5dd8b91cb0fdca5cc0b",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated electric yellow (#ffe14d), like the soft glow under a lightning spark. Its core in the middle is a denser, more intense deep saturated yellow (#ffd400) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08207653637016517,
+   "centre": [
+    508.53371232764226,
+    505.44140458568955
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_amber.png": {
+  "sha256": "cd3f5a3462692e109576789c5fbff0ce1f434b84cc6e1a0044f0f166edb75a92",
+  "sheet": "glow/glow_amber.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_amber.jpg",
+  "sourceSha256": "8debef38d5fe0a7cfbbca3c45a3806495bf5e376adeeaca750b1bd2b3cb3d9fe",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated amber (#ffa000). Its core in the middle is a denser, more intense deep saturated amber (#ff9000) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08184980560671168,
+   "centre": [
+    510.92506847104426,
+    512.9353443657797
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_blue.png": {
+  "sha256": "c719c7b3c3bf411bf594d13e7afe187b262bcec0d06b85353661f8e55ec3be7a",
+  "sheet": "glow/glow_blue.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_blue.jpg",
+  "sourceSha256": "25a125042a36ef011737e35f27eb7f5e97beb14de581ad43d67b4e6e70750fe9",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated royal blue (#2f6bff). Its core in the middle is a denser, more intense deep saturated blue (#1f55ff) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08792174964281789,
+   "centre": [
+    508.2282359812295,
+    501.06771532096553
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_cyan.png": {
+  "sha256": "15bace5f1712f128fb46990848de7019455021478e520a2128788b22513c1bca",
+  "sheet": "glow/glow_cyan.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_cyan.jpg",
+  "sourceSha256": "776eba96af22fa8320aa5b3409638c2d6f8f882bf0cad7163e3a1fccffe6cbe4",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated cyan (#19d9ff). Its core in the middle is a denser, more intense deep saturated cyan (#00c8ff) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08117706747843734,
+   "centre": [
+    508.8214733292513,
+    507.84860573563583
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_gold.png": {
+  "sha256": "65f780d364dbcc59cd12613cec7bbc3d97b2b571537d43710a0cae2efa6040fc",
+  "sheet": "glow/glow_gold.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_gold.jpg",
+  "sourceSha256": "d69ab070460614a68541b0eb65a8bf62132d9a7b95a69eb0c7c3ab6d9d173373",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated gold (#ffc61a). Its core in the middle is a denser, more intense deep saturated gold (#ffb800) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08417508417508417,
+   "centre": [
+    510.0209198198298,
+    512.143783758176
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_green.png": {
+  "sha256": "8f06d47e8ac4f39865730aa513df98e754eb112c681f5a30cc07aaa9a0f25009",
+  "sheet": "glow/glow_green.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_green.jpg",
+  "sourceSha256": "303609acb7d4465e4d9f91daf8abd17800dddf75aff81a84999ff401032b8e3b",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated green (#22d63a). Its core in the middle is a denser, more intense deep saturated green (#10c82a) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.09376465072667603,
+   "centre": [
+    508.47451593458766,
+    507.664203109077
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_lime.png": {
+  "sha256": "86068440427bfaa3b969c47bcf7eb46bd0a7aea8a46c0270d5b8f1c3bc84e4ec",
+  "sheet": "glow/glow_lime.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_lime.jpg",
+  "sourceSha256": "2454f0e35a5c2cf9762c559fc0f9c167742bafcefe6eaa7d371bb53a475fd117",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated lime green (#a8ff1f). Its core in the middle is a denser, more intense deep saturated lime (#98f000) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.09230414214837891,
+   "centre": [
+    509.18610328457436,
+    507.7254116897683
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_orange.png": {
+  "sha256": "3788c438bbb2f9f6436421577c82ecc3390de08d287e5b85984272c9598d95b1",
+  "sheet": "glow/glow_orange.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_orange.jpg",
+  "sourceSha256": "87afbfb97412ca4bc1c08e600b25fc91560ff838f98bd81cd088949400a4aaed",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated orange (#ff7a1a). Its core in the middle is a denser, more intense deep saturated orange (#ff6a00) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08441489922971404,
+   "centre": [
+    510.3567121491077,
+    503.7963550573342
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_pink.png": {
+  "sha256": "9a33a6aa4d8b7aa55dfeb57d51cd4d8aff58d6d85cf306864124f84b336a60ef",
+  "sheet": "glow/glow_pink.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_pink.jpg",
+  "sourceSha256": "29ded82b7b6657be3ae8f2cd4401331617c0e1619b6474b0e679c2c711f2b556",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated hot pink (#ff4fb8). Its core in the middle is a denser, more intense deep saturated hot pink magenta (#ff2aa8) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08689040947105463,
+   "centre": [
+    510.48143943733197,
+    507.0487043747571
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_purple.png": {
+  "sha256": "6117d3137602a827dded1500e0138a8b97150f8383c354c9212f8e3512a5ec93",
+  "sheet": "glow/glow_purple.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_purple.jpg",
+  "sourceSha256": "bf4b5c9a706b167dc5b154f01929f672c32d2f3bba46e3513d069f3c0a1fa16d",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated violet purple (#9b4dff). Its core in the middle is a denser, more intense deep saturated purple (#8a2bff) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.07776805677068144,
+   "centre": [
+    508.15309928581576,
+    506.32237111846626
+   ]
+  },
+  "license": "original generated art"
+ },
+ "glow/glow_red.png": {
+  "sha256": "333f7fdab284c269dfb68bc0b6bae50c40dc6476543341f290cee77717559daf",
+  "sheet": "glow/glow_red.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_red.jpg",
+  "sourceSha256": "4281059a201b5ef6088201f262013295ddb88e6be8f74e07205621b7795b1ca8",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated red (#ff2a2a). Its core in the middle is a denser, more intense deep saturated red (#ff1a1a) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08051529790660224,
+   "centre": [
+    512.1857688539542,
+    506.32311572193515
+   ]
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/impact_ring_blue.png": {
+  "sha256": "38e6efc22cd5f84b2f74f0268c268757fc56829f57f752a00d1b1edbd25032b2",
+  "sheet": "impact_ring/impact_ring_blue.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/impact_ring_blue.jpg",
+  "sourceSha256": "caeacd0dca0a3ad3528eec10700e1bff8ffc07b537930aca4629b42e7cddd0fb",
+  "prompt": "_impactTemplate KEY='bright green background (#00c000)', RING='royal blue (#2f6bff) with a lighter sky-blue inner highlight stripe (#6aa0ff)'",
+  "referenceImages": [
+   "_src/style_ref_enemies.png",
+   "_src/raw/impact_ring_gold.jpg"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    47.0,
+    191.0,
+    93.0
+   ],
+   "scale": 0.5380116959064327
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/impact_ring_gold.png": {
+  "sha256": "2f2e2ade314fe1fc4da804bb13ac01cc9e5c7b51239ccba978e8e52f41537b63",
+  "sheet": "impact_ring/impact_ring_gold.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/impact_ring_gold.jpg",
+  "sourceSha256": "1926d69425d6999fc3ac90a9a7f1fba1e363477aabef5d4fe3d30db18cad6784",
+  "prompt": "Mobile game effect sprite sheet in the flat cartoon style of the reference characters (use the reference ONLY for its line and colour style; do not draw the characters). 3 columns x 2 rows of 6 equal cells on a flat solid royal blue background (#1a3cff), no grid lines, no borders. One-shot expanding impact shockwave ring seen from above, centred in each cell, read left to right then top to bottom: frame 1 a small thick ring, each next frame larger and a bit thinner, frame 5 large and thin, frame 6 the largest and thinnest, starting to break into short dashes. The ring is saturated gold (#ffc61a) with a lighter gold inner highlight stripe (#ffe066) and a thick dark purple-navy ink outline (#2b1d3a) along both its inner and outer edges. The centre of every ring is empty (blue background shows through). The largest ring fills about 90% of its cell; nothing touches the cell edges. Flat bright cartoon vector, no white, no glow haze, no text.",
+  "referenceImages": [
+   "_src/style_ref_enemies.png"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    34.0,
+    100.0,
+    236.0
+   ],
+   "scale": 0.5427728613569321
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/impact_ring_green.png": {
+  "sha256": "310c88309c29c53a408bcd5bd2ba52afe353c1bb5ddb87576c04a95aa90b432b",
+  "sheet": "impact_ring/impact_ring_green.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/impact_ring_green.jpg",
+  "sourceSha256": "d4a30828fcbdc670d61ed06f054c210bca1f95248efaeb18af177293a1735776",
+  "prompt": "_impactTemplate KEY='magenta background (#ff00ff)', RING='leaf green (#22d63a) with a lighter green inner highlight stripe (#6aeb6a)'",
+  "referenceImages": [
+   "_src/style_ref_enemies.png",
+   "_src/raw/impact_ring_gold.jpg"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    211.0,
+    20.0,
+    105.0
+   ],
+   "scale": 0.5380116959064327
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/impact_ring_purple.png": {
+  "sha256": "8d80a3bdd55677c5ef34f85a2cbb9335cc47b9e8b9e0bb8a04d8aafc6e2a681c",
+  "sheet": "impact_ring/impact_ring_purple.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/impact_ring_purple.jpg",
+  "sourceSha256": "952419674ca65d4155e3a5c03d3ac9b7cb9d1b2f67e263dee792386a58039a6d",
+  "prompt": "_impactTemplate KEY='bright green background (#00c000)', RING='violet purple (#9b4dff) with a lighter lavender-violet inner highlight stripe (#b98aff)'",
+  "referenceImages": [
+   "_src/style_ref_enemies.png",
+   "_src/raw/impact_ring_gold.jpg"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    69.0,
+    197.0,
+    80.0
+   ],
+   "scale": 0.5380116959064327
+  },
+  "license": "original generated art"
+ },
+ "impact_ring/impact_ring_red.png": {
+  "sha256": "79d884b77cb31ab5deda21441a952d644d554d9271830a1de71f095bd3d3eaee",
+  "sheet": "impact_ring/impact_ring_red.json",
+  "frames": 6,
+  "frameW": 192,
+  "frameH": 192,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/impact_ring_red.jpg",
+  "sourceSha256": "1254d712da4fb371d25466970c4165846d1c30884b2aee524d926e65778a5666",
+  "prompt": "_impactTemplate KEY='royal blue background (#1a3cff)', RING='cherry red (#ff2a2a) with a lighter red-coral inner highlight stripe (#ff6a5a)'",
+  "referenceImages": [
+   "_src/style_ref_enemies.png",
+   "_src/raw/impact_ring_gold.jpg"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    22.0,
+    96.0,
+    242.0
+   ],
+   "scale": 0.5459940652818991
+  },
+  "license": "original generated art"
+ },
+ "overdrive_aura/overdrive_aura.png": {
+  "sha256": "9cb053e48593e46bc692bc11a63ef8413b53f8c3e69e9a485686d2d0306f9e61",
+  "sheet": "overdrive_aura/overdrive_aura.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/overdrive_aura.jpg",
+  "sourceSha256": "d3be579ab0137c05614b64431dc2a59f867345a822970e08f878ab4f579a67e1",
+  "prompt": "Mobile game effect sprite sheet in the flat cartoon style of the reference characters (use the reference ONLY for its line and colour style; do not draw the characters). 3 columns x 2 rows of 6 equal cells on a flat solid royal blue background (#1a3cff), no grid lines, no borders. Each cell: a cartoon heat ring seen from above, a circular ring of chunky orange flame tongues and heat swirls (orange #ff7a1a, highlights #ffb02e, shadows #e04a10), every flame tongue wrapped in a thick dark purple-navy ink outline (#2b1d3a). The ring is centred with a big empty round centre (the hole is about 55% of the ring diameter and shows only the blue background). The ring fills about 85% of the cell and never touches the cell edges. Flicker loop read left to right then top to bottom: the flame tongues sway and flicker around the ring from frame to frame while the ring keeps the same size and position, and frame 6 leads smoothly back into frame 1. Flat bright cartoon vector, no tower, no white, no text.",
+  "referenceImages": [
+   "_src/style_ref_enemies.png"
+  ],
+  "cleanup": [
+   "flat key-colour background removal (_tools/keying.py: border-median key, smoothstep alpha, enclosed key pockets, speck drop, key un-mix + edge bleed)",
+   "frame cut: connected components assigned to their grid cell",
+   "registration: each frame centred on its alpha bbox centre (chain_arc_flash: on the main ring component)",
+   "one common uniform downscale per asset (premultiplied LANCZOS), so relative frame sizes from the raw are kept"
+  ],
+  "processParams": {
+   "key": [
+    33.0,
+    100.0,
+    227.0
+   ],
+   "scale": 0.7607361963190185
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/tower_aura_t0.png": {
+  "sha256": "f62c49f84247d4fb6bd2bbe0e940940525b0aa341234f5709298fd3ba6e3d3bf",
+  "sheet": "tower_aura/tower_aura_t0.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/tower_aura_t0.jpg",
+  "sourceSha256": "f069c273f5b1dc2a4d3d76298dcb54ee60e1a2bab9a4b0f70effe8ecd0d7a010",
+  "prompt": "_auraTemplate with COLOUR = 'soft pale gold (#ffe08a) with warm light gold (#f5cd5c) - a gentle pale gold, clearly golden yellow, never white, no white centre. Lower intensity than a strong glow.' (frame 3 'brightest'); reference image: tower_aura_t1 raw",
+  "referenceImages": [
+   "_src/raw/tower_aura_t1.jpg"
+  ],
+  "cleanup": [
+   "black-background removal as for glows",
+   "frame cut: components assigned to their 3x2 grid cell",
+   "registration on alpha bbox centre; one common uniform downscale per asset (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.7078651685393258
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/tower_aura_t1.png": {
+  "sha256": "a445577da66cf2cd90b0f59529b880f6b8a98862aca0edd62fbbbd98f028e722",
+  "sheet": "tower_aura/tower_aura_t1.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/tower_aura_t1.jpg",
+  "sourceSha256": "f2aaca8b0d40362677b4985264d3b1ef5b59193d7bd877860acb60797f160c3b",
+  "prompt": "Game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same soft glowing ground aura seen from a 3/4 top-down view: a flattened horizontal ellipse of soft light lying flat on the ground, about 2.5 times wider than tall, about 80% of the cell width, centred in the cell. It is a smooth soft bloom with a slightly brighter soft rim and a gentler glowing inner area, colour pure saturated gold (#ffc61a) with deeper gold (#e8a800) - never white, no white centre, no pale or pastel tones. The glow fades smoothly to pure black before the cell edges. Gentle slow breathing pulse loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frame 2 slightly larger and brighter, frame 3 brightest and largest, frame 4 slightly shrinking, frame 5 slightly dimmer, frame 6 nearly the same as frame 1 so the loop is seamless. Same centre position in every cell. No outline, no tower, no objects, no sparkles, no text.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal as for glows",
+   "frame cut: components assigned to their 3x2 grid cell",
+   "registration on alpha bbox centre; one common uniform downscale per asset (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.6942148760330579
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/tower_aura_t2.png": {
+  "sha256": "8cb13d41206ae9f00aee2b1e8481061dc75bbce677da1e2509ba29f7fd92262c",
+  "sheet": "tower_aura/tower_aura_t2.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/tower_aura_t2.jpg",
+  "sourceSha256": "ec0555e8f42568ebf710c7df61b984caa1d31c19ab6195dcfae7fbaa3572c39b",
+  "prompt": "Game VFX sprite sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same soft glowing ground aura seen from a 3/4 top-down view: a flattened horizontal ellipse of soft light lying flat on the ground, about 2.5 times wider than tall, about 80% of the cell width, centred in the cell. Smooth soft bloom with a slightly brighter soft rim and a gentler glowing inner area. Colour: saturated dark AMBER orange (#ff8c00), the colour of a traffic-light amber lamp or a pumpkin-amber jewel, with deeper burnt amber (#cc6a00) at the rim. Clearly orange-amber, not yellow, not gold, not lemon. Never white, no white or yellow centre, no pale tones. The glow fades smoothly to pure black before the cell edges. Gentle slow breathing pulse loop across the 6 frames, read left to right then top to bottom: frame 1 calm, frame 2 slightly larger and brighter, frame 3 brightest, frame 4 slightly shrinking, frame 5 slightly dimmer, frame 6 nearly the same as frame 1 so the loop is seamless. Same size and centre position in every cell. No outline, no tower, no objects, no sparkles, no text. (no reference image; reroll 2 of 2)",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal as for glows",
+   "frame cut: components assigned to their 3x2 grid cell",
+   "registration on alpha bbox centre; one common uniform downscale per asset (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.7682926829268293
+  },
+  "license": "original generated art",
+  "rejectedDrafts": [
+   "_src/raw/rejected/tower_aura_t2_r0.jpg",
+   "_src/raw/rejected/tower_aura_t2_r1.jpg"
+  ]
+ },
+ "tower_aura/tower_aura_t3.png": {
+  "sha256": "042136c8ecc87cc964e73cd72cb3dc6d1e66777589103e1c0b431e09bd9a9de7",
+  "sheet": "tower_aura/tower_aura_t3.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/tower_aura_t3.jpg",
+  "sourceSha256": "d84a49a983cb23d16e313ba189f8e3a571bcebb71afbaa1e02bc0c8cffccaa95",
+  "prompt": "_auraTemplate with COLOUR = 'pure saturated orange (#ff7a1a) with deep orange (#e85a00) - never white, no white centre, no pale tones, stronger and more intense than a gold glow.'; reference: tower_aura_t1 raw",
+  "referenceImages": [
+   "_src/raw/tower_aura_t1.jpg"
+  ],
+  "cleanup": [
+   "black-background removal as for glows",
+   "frame cut: components assigned to their 3x2 grid cell",
+   "registration on alpha bbox centre; one common uniform downscale per asset (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.7
+  },
+  "license": "original generated art"
+ },
+ "tower_aura/tower_aura_t4.png": {
+  "sha256": "84972a3d7d128d61dd456e656ddb284f1ae4eea9cc19a5b5664c10ca2c54435e",
+  "sheet": "tower_aura/tower_aura_t4.json",
+  "frames": 6,
+  "frameW": 256,
+  "frameH": 256,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/tower_aura_t4.jpg",
+  "sourceSha256": "d42abd0de466697d2b904f70470192711f80f84c8ad1ed73ff8a8c1f19642dc3",
+  "prompt": "Game VFX sprite sheet with the same layout as the reference sheet: 3 columns x 2 rows of 6 equal cells on a pure flat black background (#000000), no grid lines, no borders. Every cell shows the same soft glowing ground aura seen from a 3/4 top-down view: a flattened horizontal ellipse of soft light lying flat on the ground, about 2.5 times wider than tall, about 80% of the cell width, centred in the cell. A smooth soft RAINBOW bloom: the glowing rim runs through saturated red, orange, yellow, green, cyan, blue and violet around the ellipse, blending softly into each other, with a softer rainbow-tinted inner glow. All colours fully saturated, never white, no white centre, no pastel. The glow fades smoothly to pure black before the cell edges. Slow shimmering loop across the 6 frames, read left to right then top to bottom: the rainbow colours slowly rotate around the ellipse a little each frame and the glow breathes gently, frame 6 leading seamlessly back into frame 1. Same size and centre position in every cell. No outline, no tower, no objects, no sparkles, no text. (reference: tower_aura_t1 raw)",
+  "referenceImages": [
+   "_src/raw/tower_aura_t1.jpg"
+  ],
+  "cleanup": [
+   "black-background removal as for glows",
+   "frame cut: components assigned to their 3x2 grid cell",
+   "registration on alpha bbox centre; one common uniform downscale per asset (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.6866485013623979
+  },
+  "license": "original generated art"
+ }
+}
