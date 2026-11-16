@@ -3,8 +3,8 @@
 
 PR 9 split ui.js into one object per screen. The oracle is the real UI at 2fb06e6 (git worktree,
 nothing copied). Both trees are served locally and driven through the same script of clicks and
-game calls in headless Chromium, with Math.random seeded (again before every step) and requestAnimationFrame stopped (so
-no frame runs and nothing depends on timing). After every step the whole <body> markup of the
+game calls in headless Chromium, with Math.random seeded (again in the same call as every step, after the page's timers have run for
+race_ms, so a music tick can't shift the stream) and requestAnimationFrame stopped (so no frame runs). After every step the whole <body> markup of the
 two pages (minus the <script> loader tags and the blank text between body children) must be identical: every screen (start, settings, confirm, workshop tabs and codex,
 HUD, boss bar, pause, shop, card taken, gotcha, dying, results, workshop over the results,
 cleared, toast). Then, on this tree only, it checks that each screen object owns its root
@@ -57,8 +57,9 @@ class ScreenSnapshotTest:
         ["menu-again", "() => { game.toMenu(); }"],
     ]
 
-    def __init__(self, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")):
+    def __init__(self, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."), race_ms=150):
         self.root = os.path.abspath(root)
+        self.race_ms = race_ms  # forced timer race: let the page's timers (music) run for this long before each step
         self.passes = 0
         self.fails = 0
 
@@ -86,9 +87,12 @@ class ScreenSnapshotTest:
         snaps = []
         self.visible = []
         for i, (name, js) in enumerate(self.STEPS):
-            # Reseed per step: timers (music, toasts) also draw random numbers between steps.
-            pg.evaluate("(k) => window.__reseed(k)", 1000 + i)
-            pg.evaluate(js)
+            # Timers keep drawing random numbers between steps (the music scheduler's noise() hats, audio.js).
+            # The forced race lets them run first; then the reseed and the step run in ONE synchronous call,
+            # so no timer can land between them (two calls let a music tick shift the card deal: CI run
+            # 43907621954 attempt 1).
+            if self.race_ms: pg.wait_for_timeout(self.race_ms)
+            pg.evaluate("([k, js]) => { window.__reseed(k); (0, eval)('(' + js + ')')(); }", [1000 + i, js])
             self.visible.append(pg.evaluate("() => [...document.querySelectorAll('.screen:not(.hidden)')].map((e) => e.id).join(',') + (document.getElementById('hud').classList.contains('hidden') ? '' : '+hud') + (document.getElementById('boss-bar').classList.contains('hidden') ? '' : '+boss')"))
             snaps.append(pg.evaluate("() => { const b = document.body.cloneNode(true); b.querySelectorAll('script').forEach((e) => e.remove()); [...b.childNodes].forEach((n) => { if (n.nodeType === 3 && !n.textContent.trim()) n.remove(); }); return b.className + '\\n' + b.innerHTML; }"))
         return ctx, pg, snaps, errs
@@ -152,4 +156,4 @@ class ScreenSnapshotTest:
         return 1 if self.fails else 0
 
 if __name__ == "__main__":
-    sys.exit(ScreenSnapshotTest().run())
+    sys.exit(ScreenSnapshotTest(race_ms=int(os.environ.get("SNAPSHOT_RACE_MS", "150"))).run())
