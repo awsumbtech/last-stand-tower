@@ -76,6 +76,11 @@ class FxTest {
     const v2 = ["screen_burst/screen_burst.png", "glow/glow_pale.png", "glow/glow_yellow.png"];
     this.ok(v2.every((f) => prov[f] && prov[f].version === "v2") && data.effects.impactFlash.sheet === "screen_burst" && data.glowColors["#ffffff"] === "glow_pale" && data.glowColors["#ffe14d"] === "glow_yellow",
       "art v2: screen_burst, glow_pale, glow_yellow are delivered v2 files; impactFlash plays screen_burst (Decision 12), white / pale glows use glow_pale, yellow ones glow_yellow");
+    // v3 subtle redo (Brian, Nov 16 10:17 AM ET): these sheets must be the v3 files, and no superseded file ships.
+    const v3 = ["chain_arc_flash", "chain_bolt", "overdrive_aura", ...["gold", "red", "blue", "green", "purple"].map((c) => "impact_ring_" + c), ...[0, 1, 2, 3, 4].map((t) => "tower_aura_t" + t)];
+    const notV3 = v3.filter((id) => { const j = data.sheets[id], png = j && path.dirname(j) + "/" + JSON.parse(this.read("assets/fx/" + j)).image; return !png || !prov[png] || prov[png].version !== "v3"; });
+    const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && q.supersedes.startsWith(path.relative("assets/fx", f) + " ")); });
+    this.ok(!notV3.length && !superseded.length, `art v3: ${v3.length} redone sheets play the v3 files (not v3: ${notV3.join(", ") || "none"}); no superseded file ships (${superseded.join(", ") || "none"})`);
     this.ok(Object.keys(LST.FX_IMPACTS).every((n) => data.impacts[n] && data.effects[data.impacts[n].ring] && data.effects[data.impacts[n].bloom]), `fx.json: every impact (${Object.keys(LST.FX_IMPACTS).length}) names a ring and a bloom effect that exist`);
     // Colours that reach a glow image today (ParticleBatch glows / motes, ProjectileTrails glows).
     const P = LST.FX_PRESETS, elems = fs.readdirSync(path.join(this.root, "src/elements")).filter((f) => f.endsWith(".js")).map((f) => /color: "(#[0-9a-f]{6})"/i.exec(this.read("src/elements/" + f))).filter(Boolean).map((m) => m[1]);

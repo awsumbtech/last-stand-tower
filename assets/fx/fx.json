@@ -1,9 +1,9 @@
 {
  "format": "lst-fx/1",
- "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 + v2 additions (screen_burst, glow_pale, glow_yellow), Nov 16 2026 (PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
+ "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 + v2 additions (screen_burst, glow_pale, glow_yellow) + v3 subtle redo (impact rings, chain bolt, arc flash, overdrive aura, tower aura t0-t4 in <effect>/v3/), Nov 16 2026 (PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
  "sheets": {
-  "chain_arc_flash": "chain_arc_flash/chain_arc_flash.json",
-  "chain_bolt": "chain_bolt/chain_bolt.json",
+  "chain_arc_flash": "chain_arc_flash/v3/chain_arc_flash.json",
+  "chain_bolt": "chain_bolt/v3/chain_bolt.json",
   "chain_node_glow": "chain_node_glow/chain_node_glow.json",
   "glow_amber": "glow/glow_amber.json",
   "glow_blue": "glow/glow_blue.json",
@@ -17,18 +17,18 @@
   "glow_purple": "glow/glow_purple.json",
   "glow_red": "glow/glow_red.json",
   "glow_yellow": "glow/glow_yellow.json",
-  "impact_ring_blue": "impact_ring/impact_ring_blue.json",
-  "impact_ring_gold": "impact_ring/impact_ring_gold.json",
-  "impact_ring_green": "impact_ring/impact_ring_green.json",
-  "impact_ring_purple": "impact_ring/impact_ring_purple.json",
-  "impact_ring_red": "impact_ring/impact_ring_red.json",
-  "overdrive_aura": "overdrive_aura/overdrive_aura.json",
+  "impact_ring_blue": "impact_ring/v3/impact_ring_blue.json",
+  "impact_ring_gold": "impact_ring/v3/impact_ring_gold.json",
+  "impact_ring_green": "impact_ring/v3/impact_ring_green.json",
+  "impact_ring_purple": "impact_ring/v3/impact_ring_purple.json",
+  "impact_ring_red": "impact_ring/v3/impact_ring_red.json",
+  "overdrive_aura": "overdrive_aura/v3/overdrive_aura.json",
   "screen_burst": "screen_burst/screen_burst.json",
-  "tower_aura_t0": "tower_aura/tower_aura_t0.json",
-  "tower_aura_t1": "tower_aura/tower_aura_t1.json",
-  "tower_aura_t2": "tower_aura/tower_aura_t2.json",
-  "tower_aura_t3": "tower_aura/tower_aura_t3.json",
-  "tower_aura_t4": "tower_aura/tower_aura_t4.json"
+  "tower_aura_t0": "tower_aura/v3/tower_aura_t0.json",
+  "tower_aura_t1": "tower_aura/v3/tower_aura_t1.json",
+  "tower_aura_t2": "tower_aura/v3/tower_aura_t2.json",
+  "tower_aura_t3": "tower_aura/v3/tower_aura_t3.json",
+  "tower_aura_t4": "tower_aura/v3/tower_aura_t4.json"
  },
  "effects": {
   "overdriveAura": {
@@ -62,7 +62,7 @@
    "blend": "screen"
   },
   "chainBolt": {
-   "what": "Chain Spark bolt stretched along each hop; row = one of 3 jagged variants, columns = fresh / mid / fade (was ChainArcs strokes; the art's 23 px bolt band drawn about 29 px tall, like the old jag envelope)",
+   "what": "Chain Spark bolt stretched along each hop; row = one of 3 jagged variants, columns = fresh / mid / fade (was ChainArcs strokes). v3 art (4 px soft core, no dark underlay) drawn at 0.8: about 8 px visible line with a 3 px core, main's 7.5 px stroke weight",
    "sheet": "chain_bolt",
    "strip": [
     "r0",
@@ -70,7 +70,7 @@
     "r2"
    ],
    "fit": "segment",
-   "size": 1.25,
+   "size": 0.8,
    "minLength": 56,
    "spreadAngle": 2.1,
    "fade": {
@@ -79,7 +79,7 @@
    }
   },
   "chainArcFlash": {
-   "what": "Spark ring on each struck enemy for the first 55% of the bolt's life (was the white ChainArcs rings, radius 10 to 22); last frame's ring at radius 22",
+   "what": "Light spark ring on each struck enemy for the first 55% of the bolt's life (was the white ChainArcs rings, radius 10 to 22); v3 art, last ring near radius 22",
    "sheet": "chain_arc_flash",
    "size": 35,
    "fade": {
@@ -108,11 +108,11 @@
    "blend": "screen"
   },
   "impactRing.gold": {
-   "what": "Expanding gold impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "what": "Expanding thin gold impact ring over the pulse's life (was ImpactPulses strokes). v3 art: ring band about 3% of the frame radius, peak ring at 0.39 -> 0.9 of the half-frame, so 0.3 -> 1.11 x the impact's ring radius starts it near 0.12 R and ends it on R like main's stroke",
    "sheet": "impact_ring_gold",
    "size": {
-    "from": 0.6,
-    "to": 1.18,
+    "from": 0.3,
+    "to": 1.11,
     "by": "progress",
     "ease": "outCubic"
    },
@@ -121,11 +121,11 @@
    }
   },
   "impactRing.red": {
-   "what": "Expanding red impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "what": "Expanding thin red impact ring over the pulse's life (was ImpactPulses strokes). v3 art: ring band about 3% of the frame radius, peak ring at 0.39 -> 0.9 of the half-frame, so 0.3 -> 1.11 x the impact's ring radius starts it near 0.12 R and ends it on R like main's stroke",
    "sheet": "impact_ring_red",
    "size": {
-    "from": 0.6,
-    "to": 1.18,
+    "from": 0.3,
+    "to": 1.11,
     "by": "progress",
     "ease": "outCubic"
    },
@@ -134,11 +134,11 @@
    }
   },
   "impactRing.blue": {
-   "what": "Expanding blue impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "what": "Expanding thin blue impact ring over the pulse's life (was ImpactPulses strokes). v3 art: ring band about 3% of the frame radius, peak ring at 0.39 -> 0.9 of the half-frame, so 0.3 -> 1.11 x the impact's ring radius starts it near 0.12 R and ends it on R like main's stroke",
    "sheet": "impact_ring_blue",
    "size": {
-    "from": 0.6,
-    "to": 1.18,
+    "from": 0.3,
+    "to": 1.11,
     "by": "progress",
     "ease": "outCubic"
    },
@@ -147,11 +147,11 @@
    }
   },
   "impactRing.green": {
-   "what": "Expanding green impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "what": "Expanding thin green impact ring over the pulse's life (was ImpactPulses strokes). v3 art: ring band about 3% of the frame radius, peak ring at 0.39 -> 0.9 of the half-frame, so 0.3 -> 1.11 x the impact's ring radius starts it near 0.12 R and ends it on R like main's stroke",
    "sheet": "impact_ring_green",
    "size": {
-    "from": 0.6,
-    "to": 1.18,
+    "from": 0.3,
+    "to": 1.11,
     "by": "progress",
     "ease": "outCubic"
    },
@@ -160,11 +160,11 @@
    }
   },
   "impactRing.purple": {
-   "what": "Expanding purple impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "what": "Expanding thin purple impact ring over the pulse's life (was ImpactPulses strokes). v3 art: ring band about 3% of the frame radius, peak ring at 0.39 -> 0.9 of the half-frame, so 0.3 -> 1.11 x the impact's ring radius starts it near 0.12 R and ends it on R like main's stroke",
    "sheet": "impact_ring_purple",
    "size": {
-    "from": 0.6,
-    "to": 1.18,
+    "from": 0.3,
+    "to": 1.11,
     "by": "progress",
     "ease": "outCubic"
    },

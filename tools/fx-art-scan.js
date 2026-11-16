@@ -5,8 +5,9 @@
 // GlowSprites. This scan fails if any of those files (or the manifest objects) draws a shape or
 // gradient, sets a colour, tints / filters an image, or branches on an effect kind, and if
 // fx.json names a colour or a tinting blend for an effect. It also proves it can see each banned
-// call by scanning a planted line for every rule.
-const fs = require("fs"), path = require("path");
+// call by scanning a planted line for every rule, and fails on near-white pixels in any PNG under
+// assets/fx (white is banned in effect art), with a planted PNG as its self-test.
+const fs = require("fs"), path = require("path"), zlib = require("zlib");
 
 class FxArtScan {
   constructor(root = path.join(__dirname, "..")) {
@@ -62,9 +63,81 @@ class FxArtScan {
       this.ok(["source-over", "screen", "lighter", undefined].includes(e.blend), `fx.json ${id}: blend ${e.blend} is a plain composite (source-over / screen / lighter)`);
       for (const s of [].concat(e.sheet)) this.ok(data.sheets[s], `fx.json ${id}: sheet ${s} is listed in "sheets"`);
     }
+    // 4. No near-white pixels in any shipped effect PNG (white is banned in effects; Decision 12).
+    const white = FxArtScan.png(FxArtScan.makePng(2, 1, [255, 255, 255, 255, 255, 200, 120, 255]));
+    this.ok(FxArtScan.nearWhite(white) === 1, "self-test: the PNG reader decodes a planted image and finds its one near-white pixel");
+    const pngs = this.walkAll("assets/fx").filter((f) => f.endsWith(".png"));
+    let checked = 0;
+    for (const f of pngs) {
+      let img;
+      try { img = FxArtScan.png(fs.readFileSync(path.join(this.root, f))); } catch (err) { this.ok(false, `${f}: cannot read (${err.message})`); continue; }
+      const n = FxArtScan.nearWhite(img);
+      this.ok(n === 0, `${f}: ${n} near-white pixels (R, G and B >= ${FxArtScan.WHITE}, alpha >= ${FxArtScan.WHITE_ALPHA}); white is banned in effect art`);
+      checked++;
+    }
+    this.pngCount = checked;
     for (const f of this.fails) console.log("FAIL fx-art: " + f);
-    console.log(this.fails.length ? `\n${this.fails.length} FAILED (${this.passes} passed)` : `ALL PASS (${this.passes} passed: ${this.FILES.length} files, ${Object.keys(data.effects).length} fx.json effects, 0 fill / stroke / arc / gradient / colour / tint / kind-branch calls)`);
+    console.log(this.fails.length ? `\n${this.fails.length} FAILED (${this.passes} passed)` : `ALL PASS (${this.passes} passed: ${this.FILES.length} files, ${Object.keys(data.effects).length} fx.json effects, ${this.pngCount} PNGs with 0 near-white pixels, 0 fill / stroke / arc / gradient / colour / tint / kind-branch calls)`);
     return this.fails.length ? 1 : 0;
+  }
+
+  walkAll(dir) {
+    const out = [];
+    for (const e of fs.readdirSync(path.join(this.root, dir), { withFileTypes: true })) {
+      const rel = dir + "/" + e.name;
+      if (e.isDirectory()) out.push(...this.walkAll(rel)); else out.push(rel);
+    }
+    return out;
+  }
+
+  // Pixels whose R, G and B are all >= WHITE with alpha >= WHITE_ALPHA.
+  static nearWhite({ w, h, px }) {
+    let n = 0;
+    for (let i = 0; i < w * h * 4; i += 4) if (px[i] >= FxArtScan.WHITE && px[i + 1] >= FxArtScan.WHITE && px[i + 2] >= FxArtScan.WHITE && px[i + 3] >= FxArtScan.WHITE_ALPHA) n++;
+    return n;
+  }
+
+  // Minimal PNG reader: 8-bit RGBA / RGB, not interlaced (what the art pipeline writes). Returns { w, h, px } (RGBA).
+  static png(buf) {
+    if (buf.readUInt32BE(0) !== 0x89504e47) throw new Error("not a PNG");
+    let o = 8, w = 0, h = 0, ch = 0;
+    const idat = [];
+    while (o < buf.length) {
+      const len = buf.readUInt32BE(o), type = buf.toString("ascii", o + 4, o + 8), d = buf.subarray(o + 8, o + 8 + len);
+      if (type === "IHDR") {
+        w = d.readUInt32BE(0); h = d.readUInt32BE(4);
+        const depth = d[8], ct = d[9], il = d[12];
+        if (depth !== 8 || (ct !== 6 && ct !== 2) || il) throw new Error(`unsupported PNG (depth ${depth}, colour type ${ct}, interlace ${il})`);
+        ch = ct === 6 ? 4 : 3;
+      } else if (type === "IDAT") idat.push(d);
+      else if (type === "IEND") break;
+      o += 12 + len;
+    }
+    const raw = zlib.inflateSync(Buffer.concat(idat)), stride = w * ch, px = new Uint8Array(w * h * 4);
+    let prev = new Uint8Array(stride), cur = new Uint8Array(stride);
+    for (let y = 0; y < h; y++) {
+      const ft = raw[y * (stride + 1)], line = raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1));
+      for (let x = 0; x < stride; x++) {
+        const a = x >= ch ? cur[x - ch] : 0, b = prev[x], c = x >= ch ? prev[x - ch] : 0;
+        let v = line[x];
+        if (ft === 1) v += a; else if (ft === 2) v += b; else if (ft === 3) v += (a + b) >> 1;
+        else if (ft === 4) { const p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c); v += pa <= pb && pa <= pc ? a : pb <= pc ? b : c; }
+        cur[x] = v & 255;
+      }
+      for (let x = 0; x < w; x++) { const s = x * ch, t = (y * w + x) * 4; px[t] = cur[s]; px[t + 1] = cur[s + 1]; px[t + 2] = cur[s + 2]; px[t + 3] = ch === 4 ? cur[s + 3] : 255; }
+      [prev, cur] = [cur, prev];
+    }
+    return { w, h, px };
+  }
+
+  // A tiny RGBA PNG (self-test only): rgba = [r, g, b, a, ...] row-major.
+  static makePng(w, h, rgba) {
+    const crcT = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; crcT[n] = c >>> 0; }
+    const crc = (b) => { let c = 0xffffffff; for (const x of b) c = crcT[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+    const chunk = (t, d) => { const l = Buffer.alloc(4); l.writeUInt32BE(d.length); const td = Buffer.concat([Buffer.from(t, "ascii"), d]); const c = Buffer.alloc(4); c.writeUInt32BE(crc(td)); return Buffer.concat([l, td, c]); };
+    const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 6;
+    const rows = []; for (let y = 0; y < h; y++) rows.push(Buffer.from([0, ...rgba.slice(y * w * 4, (y + 1) * w * 4)]));
+    return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(Buffer.concat(rows))), chunk("IEND", Buffer.alloc(0))]);
   }
 
   walk(dir) {
@@ -76,6 +149,9 @@ class FxArtScan {
     return out;
   }
 }
+
+FxArtScan.WHITE = 245;       // near-white: R, G and B all at least this
+FxArtScan.WHITE_ALPHA = 26;  // ... on a pixel at least 10% opaque
 
 module.exports = FxArtScan;
 if (require.main === module) process.exit(new FxArtScan().run());
