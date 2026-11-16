@@ -1,6 +1,6 @@
 # Last Stand Tower: object-oriented, data-driven migration plan
 
-Status: living plan. **Main is `ca3e982`**: PR 9 (GitHub PR #9: N14 UI screens, N25 UpdateNotifier, `game.state` compat removed) merged Nov 15, 9:26 AM ET, live as SW v29. Before that, PR 8b merged as `2fb06e6` (Nov 15, 8:30 AM ET, SW v28) and PR 8 as `24349b8` (Nov 14, 4:08 PM ET, SW v27). The first audit was at `fc3f443`. The data-driven gap audit (section G) was run at `ca3e982`. **PR 10a** (FX manifest + image-backed FX) is on `oo-10a-fx-manifest`.
+Status: living plan. **Main is `ca3e982`**: PR 9 (GitHub PR #9: N14 UI screens, N25 UpdateNotifier, `game.state` compat removed) merged Nov 15, 9:26 AM ET, live as SW v29. Before that, PR 8b merged as `2fb06e6` (Nov 15, 8:30 AM ET, SW v28) and PR 8 as `24349b8` (Nov 14, 4:08 PM ET, SW v27). The first audit was at `fc3f443`. The data-driven gap audit (section G) was run at `ca3e982`. **PR 10a** (FX manifest + image-backed FX, with Game Art & Motion's PR10a effects v1, Nov 16) is on `oo-10a-fx-manifest`, open for Brian's look check (shots in `docs/qa/pr10a/`).
 
 Brian's directions, his words relayed by Chief of Staff:
 - **Nov 12, 11:56 PM ET:** "Fix everything to object orientated... EVERYTHING... Not just art. All of it object orientated."
@@ -331,14 +331,22 @@ Each PR ships on its own. Each one needs:
 
 **No placeholder or code-made art ships.** A PR whose art has not arrived pushes its branch and opens no PR until the art lands. The gap ids are from section G.
 
-1. **PR 10a: FX manifest + image-backed FX** (X1, X2, X3, X4, X5, X6, X8). **On `oo-10a-fx-manifest`.**
-   - **Data:** `assets/fx/fx.json` lists effects by id. Each entry names its sheet (an art JSON in the Game Art & Motion "strips" format) and its settings: size rule, blend, opacity curve, pulse, offset, and low-quality skip. The art JSON carries frames, fps, loop / one-shot and anchor.
+1. **PR 10a: FX manifest + image-backed FX** (X1, X2, X3, X4, X5, X6, X8). **Built on `oo-10a-fx-manifest`; PR open, waiting on Brian's look check.**
+   - **Data:** `assets/fx/fx.json` lists effects by id. Each entry names its sheet (an art JSON in a Game Art & Motion format: "strips", or the flat FX sheet the v1 delivery uses, where a grid sheet gives one strip per row) and its settings: size rule, blend, opacity curve, pulse, offset, and low-quality skip. The art JSON carries frames, fps, loop / one-shot and anchor.
    - **Objects:** `FxManifest` (fetch loader, like `LookSheetLibrary`), one generic `SpriteEffect` (sheet, frames, fps, loop / one-shot, anchor, scale, blend, opacity fade only), and `EffectPlayer` (plays any id at a point, with zero code).
-   - **Converted to entries:** OverdriveRing (`overdriveAura`), ChainArcs (`chainBolt`, `chainArcFlash`, `chainNodeGlow`), ImpactFlashes (`impactFlash`; it uses `glow_pale` until 10b points the same entry at `screen_burst`, a data-only swap), TowerGroundGlow (`towerAura`, one sheet per tier), ImpactPulses (`impactRing.*` and `impactBloom.*`, picked by impact name), and TextGlows (`textGlow.<kind>`). Callers ask by id.
+   - **Converted to entries:** OverdriveRing (`overdriveAura`), ChainArcs (`chainBolt`, `chainArcFlash`, `chainNodeGlow`), ImpactFlashes (`impactFlash`; it uses `glow_gold` until 10b points the same entry at `screen_burst`, a data-only swap), TowerGroundGlow (`towerAura`, one sheet per tier), ImpactPulses (`impactRing.*` and `impactBloom.*`, picked by impact name), and TextGlows (`textGlow.<kind>`). Callers ask by id.
    - **Deleted:** GlowSprites, the radial-gradient recolour engine. The 10b drawers (ParticleBatch, ProjectileTrails) get named glow images through a colour-to-glow table in `fx.json` until 10b names variants.
    - **Offline cache:** `sw.js` v30 reads `fx.json` at install and caches every sheet JSON and PNG it lists.
    - **Tests:** a data-only acceptance test (temp entry + PNG fixture plays with zero code edits), render-test updates, and `tools/fx-art-scan.js` (fails on fill / stroke / arc / gradient / tint calls in the converted files).
    - **Art (asked of Game Art & Motion, Nov 16):** `overdrive_aura`, `chain_bolt`, `chain_arc_flash`, `chain_node_glow`, `tower_aura_t0`–`t4`, `glow_<10 colours>`, `impact_ring_<5 colours>` (section G art list rows 1–4 and 6–8).
+   - **Art landed (Game Art & Motion PR10a effects v1, Nov 16):** 24 sheets in `assets/fx/` (sub-folders per effect), byte-identical to the delivery, with its `PROVENANCE.json` and `LICENSE.md`; about 3.4 MB. `fx.json` is built from the delivery's `fx.manifest.json` in our schema. The delivered glow colours are amber, blue, cyan, gold, green, lime, orange, pink, purple and red (no pale or yellow): pale / yellow / white uses map to gold, frost and shatter blooms to cyan, venom blooms to lime.
+   - **Sizes (a design call: match the look each effect replaces, not the delivery preview).** Game Art's preview assumed fixed CSS sizes; ours follow the old drawing (CSS px at the phone's 0.629 px per world unit):
+     - overdrive: frame half-width 2.25 x tower radius (about 74 px; preview 72), so the flames reach as far as the old disc's pulse;
+     - tower aura: 2.22 to 3.6 x tower radius by tower power (about 73 to 118 px; preview 90), matched to the old glow's alpha mass;
+     - chain bolt: stretched along each hop, about 18 px thick (preview 64 x 12), matching the old jag envelope;
+     - arc flash 44 px (preview 28; its last ring at the old radius 22) and node glow 30 px (preview 14; the old radius 24);
+     - glows: coin 22, crit 30, impact flash half the screen's long side, blooms 0.35 to 0.7 x the impact ring (preview 20);
+     - impact rings: relative to each impact's ring radius (30 to 320 world units), ending on it as the old stroke did (preview 48 px fixed). Small element rings match the old look. Big rings (boss kill, finale, tier-up, cards) come out much thicker than the old 3 to 12 px stroke, because the art's band scales with the ring. That is a look question for Brian (`docs/qa/pr10a/pr10a-03b`, `-03c`).
 2. **PR 10b: The rest of the canvas FX** (X7, X12, X13, X14, P2, P3).
    - ParticleBatch motes and streaks and ProjectileTrails become `fx.json` entries.
    - The low-HP vignette (Decision 9), screen burst (Decision 12) and finale dim (Decision 4) also become entries.

@@ -1,0 +1,127 @@
+{
+ "groundLuminance": {
+  "backyard": 176.5881320365658,
+  "beach": 214.722782991319
+ },
+ "shots": [
+  [
+   "Overdrive aura on the tower (overdriveAura, overdrive_aura 6 frames @12 fps) (backyard)",
+   "pr10a-01-overdrive-backyard-390x844.png",
+   {
+    "overdrive": 4,
+    "R": 49.4
+   }
+  ],
+  [
+   "Element impact rings + blooms at 8/27 frames, real size: ember (red ring, gold bloom) / frost (blue, cyan) top, venom (green, lime) / shatter (blue, cyan) low, spark (gold) top (backyard)",
+   "pr10a-03a-impacts-elements-backyard-390x844.png",
+   null
+  ],
+  [
+   "Boss-kill impact (gold ring to radius 210 + gold bloom) at 6/27 frames (backyard)",
+   "pr10a-03b-impacts-bosskill-backyard-390x844.png",
+   null
+  ],
+  [
+   "Boss-kill impact (gold ring to radius 210 + gold bloom) at 16/27 frames (backyard)",
+   "pr10a-03c-impacts-bosskill-backyard-390x844.png",
+   null
+  ],
+  [
+   "Tower aura tier 0 (towerAura, tower_aura_t0; power 0.6) (backyard)",
+   "pr10a-04-tower-aura-t0-backyard-390x844.png",
+   {
+    "tier": 0,
+    "intensity": 0.025
+   }
+  ],
+  [
+   "Tower aura tier 1 (towerAura, tower_aura_t1; power 3) (backyard)",
+   "pr10a-04-tower-aura-t1-backyard-390x844.png",
+   {
+    "tier": 1,
+    "intensity": 0.125
+   }
+  ],
+  [
+   "Tower aura tier 2 (towerAura, tower_aura_t2; power 8) (backyard)",
+   "pr10a-04-tower-aura-t2-backyard-390x844.png",
+   {
+    "tier": 2,
+    "intensity": 0.333
+   }
+  ],
+  [
+   "Tower aura tier 3 (towerAura, tower_aura_t3; power 14) (backyard)",
+   "pr10a-04-tower-aura-t3-backyard-390x844.png",
+   {
+    "tier": 3,
+    "intensity": 0.583
+   }
+  ],
+  [
+   "Tower aura tier 4 (towerAura, tower_aura_t4; power 24) (backyard)",
+   "pr10a-04-tower-aura-t4-backyard-390x844.png",
+   {
+    "tier": 4,
+    "intensity": 1
+   }
+  ],
+  [
+   "QA view: towerAura t0..t4 drawn off the tower (top to bottom, at powers 0.6 / 3 / 8 / 14 / 24) so the art shows without the sand pad over it (backyard)",
+   "pr10a-04x-tower-aura-tiers-off-tower-backyard-390x844.png",
+   null
+  ],
+  [
+   "Text glows: gold behind coin popups (textGlow.coin), amber behind crit numbers (textGlow.crit) (backyard)",
+   "pr10a-05-text-glows-backyard-390x844.png",
+   null
+  ],
+  [
+   "Chain Spark: chainBolt per hop (3 variant rows), chainArcFlash + chainNodeGlow per point (backyard)",
+   "pr10a-02-chain-lightning-backyard-390x844.png",
+   {
+    "points": [
+     [
+      166,
+      221
+     ],
+     [
+      126,
+      -295
+     ],
+     [
+      -116,
+      344
+     ],
+     [
+      230,
+      -335
+     ]
+    ],
+    "arcs": 1
+   }
+  ],
+  [
+   "Element impact rings + blooms at 8/27 frames, real size: ember (red ring, gold bloom) / frost (blue, cyan) top, venom (green, lime) / shatter (blue, cyan) low, spark (gold) top (beach)",
+   "pr10a-03a-impacts-elements-beach-390x844.png",
+   null
+  ],
+  [
+   "Boss-kill impact (gold ring to radius 210 + gold bloom) at 6/27 frames (beach)",
+   "pr10a-03b-impacts-bosskill-beach-390x844.png",
+   null
+  ],
+  [
+   "Boss-kill impact (gold ring to radius 210 + gold bloom) at 16/27 frames (beach)",
+   "pr10a-03c-impacts-bosskill-beach-390x844.png",
+   null
+  ]
+ ],
+ "errors": [],
+ "note": "390x844 @2x, headless Chromium, SW blocked. Game loop stopped and frames stepped by hand (1/60 s) so each effect is caught at a set point in its life; enemies frozen. groundLuminance = mean luma of the empty ground: Backyard is the darkest world (impact ring ink outline checked there). Beach kept for the impact shots only. pr10a-compare-main-vs-pr10a-backyard.png: the same script on main ca3e982 (top) vs this branch (bottom).",
+ "extra": [
+  "pr10a-contact-sheet.png",
+  "pr10a-compare-main-vs-pr10a-backyard.png"
+ ]
+}
