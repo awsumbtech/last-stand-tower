@@ -1,7 +1,7 @@
 {
  "groundLuminance": {
-  "backyard": 176.55745796819372,
-  "beach": 214.7983911318564
+  "backyard": 176.7160386994598,
+  "beach": 214.64483527800473
  },
  "shots": [
   [
@@ -73,6 +73,11 @@
    null
   ],
   [
+   "Tower aura t4 (v3), its 6 frames at 8 fps (0.75 s loop), power 24, drawn off the tower on the ground (QA hook), 2x crops (backyard)",
+   "pr10a-04y-tower-aura-t4-frames-backyard.png",
+   null
+  ],
+  [
    "Text glows: gold behind coin popups (textGlow.coin), amber behind crit numbers (textGlow.crit) (backyard)",
    "pr10a-05-text-glows-backyard-390x844.png",
    null
@@ -135,9 +140,26 @@
   ]
  ],
  "errors": [],
- "note": "390x844 @2x, headless Chromium, SW blocked. Game loop stopped and frames stepped by hand (1/60 s) so each effect is caught at a set point in its life; enemies frozen except in 07 (game runs 75 frames). groundLuminance = mean luma of the empty ground: Backyard is the darkest world (impact ring ink outline checked there). Beach kept for the impact shots only. Art: Game Art v1 + v2 (screen_burst, glow_pale, glow_yellow). pr10a-compare-main-vs-pr10a-backyard.png: the same script on main ca3e982 (top) vs this branch (bottom).",
+ "bosskillSequence": {
+  "file": "pr10a-bosskill-sequence-main-vs-pr10a.png",
+  "how": "mini-boss killed via Enemy.takeDamage; game.update -> fx.update -> renderer.draw -> fx.endFrame at 1/60 s; t = 0 is the first frame drawn after the kill",
+  "screenFlashPeakAlpha": {
+   "main": 0.1484,
+   "pr10a": 0.1484
+  },
+  "whiteOverlayPeakAlpha": {
+   "main": 0.28,
+   "pr10a": 0.28
+  },
+  "screenFlashFrames": {
+   "main": 20,
+   "pr10a": 20
+  }
+ },
+ "note": "390x844 @2x, headless Chromium, SW blocked. Game loop stopped and frames stepped by hand (1/60 s); enemies frozen except in 07. Backyard is the darkest world (groundLuminance). Beach kept for the impact shots only. Art: Game Art v1 + v2 + v3 subtle redo (rings, bolt, arc flash, overdrive, tower aura t0-t4; clean t4 of 10:35 AM ET). Compare sheet: the same script on main ca3e982 (top) vs this branch (bottom).",
  "extra": [
   "pr10a-contact-sheet.png",
-  "pr10a-compare-main-vs-pr10a-backyard.png"
+  "pr10a-compare-main-vs-pr10a-backyard.png",
+  "pr10a-bosskill-sequence-main-vs-pr10a.png"
  ]
 }
