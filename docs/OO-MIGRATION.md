@@ -312,13 +312,15 @@ Rules for every file:
 | 6 | `fx/tower_aura_t0..t4.json/.png` (5 files) | 256×256 | 6, slow loop 4 fps | Ground glow under the tower per tier: t0 pale gold, t1 gold, t2 amber, t3 deep gold / orange, t4 rainbow (gold / pink / blue / purple) | X4 TowerGroundGlow |
 | 7 | `fx/glow_<name>.png` (12 files as delivered: 10 v1 colours plus v2 `glow_pale` and `glow_yellow`) | 64×64 | 1 | Soft round bloom, same-hue core | X5 GlowSprites and every `fx.glow(hex)` |
 | 8 | `fx/impact_ring_<variant>.json/.png` (5): gold (default), red (tower hit / slam), blue (frost), green (venom), purple (epic card) | 192×192 | 6, one-shot | Expanding ring with the ink outline baked in, thinning as it grows | X6 ImpactPulses |
-| 9 | `fx/motes.json/.png` atlas | 32×32 cells | 1 each (+2-frame twinkle optional) | Round mote in 8 colours (gold, pale, pink, blue, red, purple, green, orange) plus star, snowflake, ember, venom drop | X7 motes |
-| 10 | `fx/streak_<variant>.json/.png` (4): gold, red, blue, pale | 64×16 | 3 (fade steps) | Ink-outlined speed streak, stretched along velocity | X7 streaks |
-| 11 | `fx/trail_<variant>.png` (5): base yellow, ember, frost, spark, venom | 128×24 | 1 (2 optional) | Comet tail strip, stretched behind the shot | P2 ProjectileTrails |
-| 12 | `fx/vignette_red.png` | 1024×1024 (cover-fit) | 1 | Red low-HP edge vignette, clear centre (Decision 9) | X13 vignette |
-| 13 | `fx/vignette_dark.png` | 1024×1024 (cover-fit) | 1 | Dark purple finale dim (Decision 4) | X14 finale dim |
+| 9 | `fx/motes/motes.json/.png` atlas | 32×32 cells, 8 cells in one row | 1 each | Round mote: soft-edged dot filling about 60% of the cell, core a lighter tint of the same hue (not white). Cells: pale, yellow, gold, amber, orange, pink, blue, purple (the tower-aura tier colours). Drawn at a 1-3 CSS px radius over a `glow_<colour>` bloom (#7), so it stays small | X7 motes (the `#fffdf2` white core goes) |
+| 10 | `fx/streak/streak_<variant>.json/.png` (8): pale, gold, amber, red, pink, cyan, green, soot | 64×16 | 3 (fresh, mid, fade: line width 100%, 87%, 73% of the height; fade is opacity in code) | Speed streak with the dark ink outline (`#2b1d3a`, about 1/3 of the height) baked in, head at the right end (pivot right-centre), stretched along the velocity to 4-50 CSS px, about 4-5 px thick. `soot` is dark brown (`#3a1200`, the ember char) with no outline | X7 streaks (8 variants: every colour a live impact uses) |
+| 11 | `fx/trail/trail_<variant>.json/.png` (5): base (gold `#ffcf3a`), ember (`#ff7a1a`), frost (`#7fe3ff`), spark (`#ffe14d`), venom (`#8be04a`) | 128×24 | 1 | Comet tail, head at the right end (pivot right-centre), fading to clear toward the left; soft outer band plus a lighter same-hue core about 40% of the height (today's core is white). Drawn up to 30 CSS px long and about 6 px thick, at 75% opacity | P2 ProjectileTrails |
+| 12 | `fx/vignette/vignette_red.png` | 720×1560 (the phone's shape; drawn stretched to the screen) | 1 | Red (`#ff2846`) low-HP edge vignette, clear centre: clear inside a circle 30% of the width across, then rising to about 75% opacity at the corners, about 60% at the top and bottom middles, about 15% at the side middles (today's gradient). Code pulses it with opacity (22% ± 10%), so on screen it peaks near 24% at the corners | X13 vignette (B21, Decision 9) |
+| 13 | `fx/vignette/vignette_dark.png` | 720×1560 (drawn stretched to the screen) | 1 | Dark purple (`#1e0f28`) finale dim: an even 45% opacity (edges may go to 55%, centre no lower than 40%). Code fades it in over 0.5 s | X14 finale dim (B22, Decision 4) |
 
-Text glows (X8) reuse #7 gold and amber. 37 PNGs in total (13 rows; rows 6-11 are multi-file).
+Rows 9-13 as asked of Game Art & Motion for PR 10b on Nov 16 (the "more subtlety" note applies: match the weight of what each replaces). The X13 white flash reuses #5 `screen_burst` (no new art). Crit glows and shot glows reuse #7. The star, snowflake, ember and venom-drop mote shapes first listed here are dropped: no effect draws them. Streaks use 8 variants, not the 4 first listed, because the live impacts use 8 colours (white streaks become pale); the impacts that are switched off (`FX_ROUTES` null: card picks, Workshop, unlock) are re-pointed to these 8 in data.
+
+Text glows (X8) reuse #7 gold and amber. 10a shipped 27 PNGs (rows 1-8); 10b asks for 16 more (rows 9-13: 1 atlas, 8 streaks, 5 trails, 2 vignettes).
 
 ---
 
@@ -353,7 +355,7 @@ Each PR ships on its own. Each one needs:
    - ParticleBatch motes and streaks and ProjectileTrails become `fx.json` entries.
    - The low-HP vignette (Decision 9), screen burst (Decision 12) and finale dim (Decision 4) also become entries.
    - Presets name variants, not hex (`FX_PRESETS` and `FX_THEMES` move into `fx.json`), and elements name a trail variant, not a colour. The 10a colour-to-glow table goes away.
-   - Art: motes, streaks, trails, `vignette_red`, `vignette_dark`, `screen_burst`.
+   - Art: section G rows 9-13 (asked Nov 16): the `motes` atlas, `streak_<8>`, `trail_<5>`, `vignette_red`, `vignette_dark`; the flash reuses `screen_burst` (10a). **Branch `oo-10b-fx-particles` from main `fd40843`; no PR until the art lands.**
 3. **PR 11: Asset and theme manifest foundation** (H1, H6).
    - `assets/themes/index.json` and `assets/themes/cartoon/theme.json` absorb `SPRITE_MANIFEST`, `LOOK_SHEETS`, `WORLD2_SHEETS` and `fx.json`. `ThemeSelector` reads them.
    - `sw.js` precaches what the manifests list (generalising the 10a `fx.json` read), with a CI check that every listed file exists.
