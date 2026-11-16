@@ -1,7 +1,8 @@
 // ParticleBatch: draws a particle pool in three batched passes. Pass 1 (blend): soft motes and
 // glows. Pass 2 (normal): mote cores. Pass 3: streaks, one path per fade step for the ink
 // outline and one per color x fade step, so a full burst is about a dozen stroke calls.
-// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and glow sprites.
+// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and glow images
+// (fx.json glowColors; PR 10b turns motes and streaks into fx.json entries).
 LST.ParticleBatch = class ParticleBatch {
   constructor() {
     const F = LST.ParticleBatch.FADE_STEPS;
@@ -22,10 +23,12 @@ LST.ParticleBatch = class ParticleBatch {
     for (let i = 0; i < n; i++) {
       const sh = pool.shape[i];
       if (sh === S.STREAK) { streaks++; continue; }
+      const g = fx.glow(pal[pool.color[i]]);
+      if (!g) continue; // no glow art for this colour (or not loaded yet): draw nothing
       const f = pool.life[i] / pool.maxLife[i];
       const R = sh === S.SOFT ? pool.size[i] * (0.55 + 0.45 * f) : pool.size[i] * (1.2 - 0.2 * f);
       ctx.globalAlpha = (sh === S.SOFT ? Math.min(1, (1 - f) * 6) * Math.pow(f, 0.6) * 0.85 : f) * th.glow;
-      ctx.drawImage(fx.glow(pal[pool.color[i]]), pool.x[i] - R, pool.y[i] - R, R * 2, R * 2);
+      ctx.drawImage(g, pool.x[i] - R, pool.y[i] - R, R * 2, R * 2);
     }
     ctx.globalCompositeOperation = "source-over";
     for (let i = 0; i < n; i++) {

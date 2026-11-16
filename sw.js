@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v29"; // OO UI screens (one object per screen, switched by the state objects); game.state compat removed
+const VERSION = "v30"; // PR 10a: image effects from assets/fx/fx.json (FxManifest + SpriteEffect); GlowSprites deleted
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -107,7 +107,9 @@ const PRECACHE = [
   "src/fx/TowerAura.js",
   "src/fx/ImpactSync.js",
   "src/fx/ScreenAnchors.js",
-  "src/fx/draw/GlowSprites.js",
+  "src/fx/SpriteEffect.js",
+  "src/fx/FxManifest.js",
+  "src/fx/EffectPlayer.js",
   "src/fx/draw/TowerGroundGlow.js",
   "src/fx/draw/ProjectileTrails.js",
   "src/fx/draw/ChainArcs.js",
@@ -256,13 +258,45 @@ const PRECACHE = [
   "assets/sprites/world2/seagull/seagull_a_shadow.q.png",
 ];
 
+// Data manifests whose files are precached by reading them, not listed by hand: the manifest
+// itself, every sheet JSON it lists (relative to it) and every strip image each sheet names.
+// A new fx.json entry + art is cached offline with no sw.js edit (bump VERSION to ship it).
+const MANIFESTS = ["assets/fx/fx.json"];
+
 const NETWORK_TIMEOUT_MS = 4000;
+
+// Every file one manifest names (it, its sheets' JSON, their strip images); fetch(url) -> Response.
+async function manifestFiles(url, fetchJson) {
+  const dir = (u) => u.slice(0, u.lastIndexOf("/") + 1);
+  const data = await fetchJson(url), files = [url];
+  for (const file of Object.values(data.sheets || {})) {
+    const sheetUrl = dir(url) + file, sheet = await fetchJson(sheetUrl);
+    files.push(sheetUrl);
+    // "strips" sheets name an image per strip; flat FX sheets name one image for all rows.
+    for (const strip of Object.values(sheet.strips || {})) files.push(dir(sheetUrl) + strip.image);
+    if (sheet.image) files.push(dir(sheetUrl) + sheet.image);
+  }
+  return [...new Set(files)];
+}
+
+async function precacheManifests(cache) {
+  const fetchJson = async (u) => {
+    const res = await fetch(new Request(u, { cache: "reload" }));
+    if (!res.ok) throw new Error(u + ": " + res.status);
+    return res.json();
+  };
+  for (const m of MANIFESTS) {
+    const files = await manifestFiles(m, fetchJson);
+    await cache.addAll(files.map((url) => new Request(url, { cache: "reload" })));
+  }
+}
 
 self.addEventListener("install", (event) => {
   // cache: "reload" skips the HTTP cache so we precache what's really deployed.
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
       cache.addAll(PRECACHE.map((url) => new Request(url, { cache: "reload" })))
+        .then(() => precacheManifests(cache))
     )
   );
   // First install: take over right away. Updates wait for the page's "Refresh" tap.

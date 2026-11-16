@@ -1,5 +1,6 @@
 // ProjectileTrails: comet tails for every projectile (one batched path), elemental tails, and a glow per shot.
-// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and glow sprites.
+// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and glow images
+// (fx.json glowColors; PR 10b turns the trails into fx.json entries).
 LST.ProjectileTrails = class ProjectileTrails {
   // Comet tails (two strokes for all projectiles) + additive glow per projectile.
   draw(fx, ctx, list, low) {
@@ -49,7 +50,8 @@ LST.ProjectileTrails = class ProjectileTrails {
       for (let i = 0; i < list.length; i++) {
         const p = list[i];
         const R = (p.crit ? T.critGlowRadius : T.glowRadius) * (p.tint ? 1.25 : 1);
-        ctx.drawImage(p.crit ? gc : p.tint ? fx.glow(p.tint) : g, p.x - R, p.y - R, R * 2, R * 2);
+        const img = p.crit ? gc : p.tint ? fx.glow(p.tint) : g;
+        if (img) ctx.drawImage(img, p.x - R, p.y - R, R * 2, R * 2); // no glow art for it (or not loaded yet): none
       }
     }
     ctx.restore();

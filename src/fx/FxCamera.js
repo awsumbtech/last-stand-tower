@@ -6,7 +6,7 @@ LST.FxCamera = class FxCamera {
     this.shake = 0;
     this.pulses = [];
     for (let i = 0; i < slots; i++) {
-      this.pulses.push({ rec: null, active: false, space: "world", x: 0, y: 0, t: 0, life: 0, ring: 0, bloom: 0, flash: 0, color: "#ffffff", bornFrame: -1, drawnFrame: -1 });
+      this.pulses.push({ rec: null, active: false, space: "world", x: 0, y: 0, t: 0, life: 0, ring: 0, bloom: 0, flash: 0, color: "#ffffff", impact: null, bornFrame: -1, drawnFrame: -1 });
     }
     this.next = 0;
   }

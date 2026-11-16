@@ -1,0 +1,349 @@
+{
+ "format": "lst-fx/1",
+ "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 (Nov 16 2026; PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
+ "sheets": {
+  "chain_arc_flash": "chain_arc_flash/chain_arc_flash.json",
+  "chain_bolt": "chain_bolt/chain_bolt.json",
+  "chain_node_glow": "chain_node_glow/chain_node_glow.json",
+  "glow_amber": "glow/glow_amber.json",
+  "glow_blue": "glow/glow_blue.json",
+  "glow_cyan": "glow/glow_cyan.json",
+  "glow_gold": "glow/glow_gold.json",
+  "glow_green": "glow/glow_green.json",
+  "glow_lime": "glow/glow_lime.json",
+  "glow_orange": "glow/glow_orange.json",
+  "glow_pink": "glow/glow_pink.json",
+  "glow_purple": "glow/glow_purple.json",
+  "glow_red": "glow/glow_red.json",
+  "impact_ring_blue": "impact_ring/impact_ring_blue.json",
+  "impact_ring_gold": "impact_ring/impact_ring_gold.json",
+  "impact_ring_green": "impact_ring/impact_ring_green.json",
+  "impact_ring_purple": "impact_ring/impact_ring_purple.json",
+  "impact_ring_red": "impact_ring/impact_ring_red.json",
+  "overdrive_aura": "overdrive_aura/overdrive_aura.json",
+  "tower_aura_t0": "tower_aura/tower_aura_t0.json",
+  "tower_aura_t1": "tower_aura/tower_aura_t1.json",
+  "tower_aura_t2": "tower_aura/tower_aura_t2.json",
+  "tower_aura_t3": "tower_aura/tower_aura_t3.json",
+  "tower_aura_t4": "tower_aura/tower_aura_t4.json"
+ },
+ "effects": {
+  "overdriveAura": {
+   "what": "Overdrive heat ring around the tower while Overdrive runs (was OverdriveRing: a disc of radius 1.9 x tower radius). The 256 px frame's edge sits at 1.9 x radius",
+   "sheet": "overdrive_aura",
+   "size": 1.9
+  },
+  "towerAura": {
+   "what": "Ground glow under the tower, one sheet per aura tier, bigger and stronger with tower power (was TowerGroundGlow; sizes matched to its glow by alpha-mass radius)",
+   "sheet": [
+    "tower_aura_t0",
+    "tower_aura_t1",
+    "tower_aura_t2",
+    "tower_aura_t3",
+    "tower_aura_t4"
+   ],
+   "size": {
+    "from": 2.22,
+    "to": 3.6,
+    "by": "level"
+   },
+   "alpha": {
+    "from": 0.08,
+    "to": 0.55,
+    "by": "level"
+   },
+   "alphaPulse": {
+    "amp": 0.1,
+    "speed": 2.4
+   },
+   "blend": "screen"
+  },
+  "chainBolt": {
+   "what": "Chain Spark bolt stretched along each hop; row = one of 3 jagged variants, columns = fresh / mid / fade (was ChainArcs strokes; the art's 23 px bolt band drawn about 29 px tall, like the old jag envelope)",
+   "sheet": "chain_bolt",
+   "strip": [
+    "r0",
+    "r1",
+    "r2"
+   ],
+   "fit": "segment",
+   "size": 1.25,
+   "minLength": 56,
+   "spreadAngle": 2.1,
+   "fade": {
+    "power": 1,
+    "gain": 1.4
+   }
+  },
+  "chainArcFlash": {
+   "what": "Spark ring on each struck enemy for the first 55% of the bolt's life (was the white ChainArcs rings, radius 10 to 22); last frame's ring at radius 22",
+   "sheet": "chain_arc_flash",
+   "size": 35,
+   "fade": {
+    "power": 1,
+    "until": 0.55
+   }
+  },
+  "chainNodeGlow": {
+   "what": "Soft glow under each bolt node, radius 24 like the old one; skipped in low quality",
+   "sheet": "chain_node_glow",
+   "size": 24,
+   "alpha": 0.5,
+   "fade": {
+    "power": 1
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "impactFlash": {
+   "what": "Soft screen glow on big world impacts, size x the screen's long side (was ImpactFlashes). PR 10b points it at screen_burst (Decision 12)",
+   "sheet": "glow_gold",
+   "size": 0.5,
+   "fade": {
+    "power": 2
+   },
+   "blend": "screen"
+  },
+  "impactRing.gold": {
+   "what": "Expanding gold impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "sheet": "impact_ring_gold",
+   "size": {
+    "from": 0.6,
+    "to": 1.18,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.2
+   }
+  },
+  "impactRing.red": {
+   "what": "Expanding red impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "sheet": "impact_ring_red",
+   "size": {
+    "from": 0.6,
+    "to": 1.18,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.2
+   }
+  },
+  "impactRing.blue": {
+   "what": "Expanding blue impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "sheet": "impact_ring_blue",
+   "size": {
+    "from": 0.6,
+    "to": 1.18,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.2
+   }
+  },
+  "impactRing.green": {
+   "what": "Expanding green impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "sheet": "impact_ring_green",
+   "size": {
+    "from": 0.6,
+    "to": 1.18,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.2
+   }
+  },
+  "impactRing.purple": {
+   "what": "Expanding purple impact ring over the pulse's life; its last frame's ring lands on the impact's ring radius (was ImpactPulses strokes)",
+   "sheet": "impact_ring_purple",
+   "size": {
+    "from": 0.6,
+    "to": 1.18,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.2
+   }
+  },
+  "impactBloom.gold": {
+   "what": "Soft gold bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_gold",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "impactBloom.amber": {
+   "what": "Soft amber bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_amber",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "impactBloom.pink": {
+   "what": "Soft pink bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_pink",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "impactBloom.cyan": {
+   "what": "Soft cyan bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_cyan",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "impactBloom.lime": {
+   "what": "Soft lime bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_lime",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
+  "textGlow.coin": {
+   "what": "Gold glow behind coin popups (was TextGlows)",
+   "sheet": "glow_gold",
+   "size": 22,
+   "alpha": 0.32,
+   "offset": [
+    -13,
+    0
+   ],
+   "fade": {
+    "power": 1,
+    "gain": 3
+   },
+   "blend": "screen"
+  },
+  "textGlow.crit": {
+   "what": "Amber glow behind crit numbers (was TextGlows)",
+   "sheet": "glow_amber",
+   "size": 30,
+   "alpha": 0.38,
+   "fade": {
+    "power": 1,
+    "gain": 3
+   },
+   "blend": "screen"
+  }
+ },
+ "impacts": {
+  "bossKill": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.gold"
+  },
+  "finaleWon": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.gold"
+  },
+  "tierUp": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.gold"
+  },
+  "cardPick": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.amber"
+  },
+  "cardPickEpic": {
+   "ring": "impactRing.purple",
+   "bloom": "impactBloom.pink"
+  },
+  "workshop": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.amber"
+  },
+  "unlock": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.amber"
+  },
+  "elemEmber": {
+   "ring": "impactRing.red",
+   "bloom": "impactBloom.gold"
+  },
+  "elemFrost": {
+   "ring": "impactRing.blue",
+   "bloom": "impactBloom.cyan"
+  },
+  "elemSpark": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.gold"
+  },
+  "elemVenom": {
+   "ring": "impactRing.green",
+   "bloom": "impactBloom.lime"
+  },
+  "elemShatter": {
+   "ring": "impactRing.blue",
+   "bloom": "impactBloom.cyan"
+  }
+ },
+ "glowColors": {
+  "#ffd23f": "glow_gold",
+  "#ffcf3a": "glow_gold",
+  "#ffe680": "glow_gold",
+  "#fff3a0": "glow_gold",
+  "#ffffff": "glow_gold",
+  "#ffe14d": "glow_gold",
+  "#fff6a8": "glow_gold",
+  "#ffb347": "glow_amber",
+  "#ff9a3a": "glow_amber",
+  "#ff8a3d": "glow_orange",
+  "#ff7a1a": "glow_orange",
+  "#ff6b6b": "glow_red",
+  "#ff7ac8": "glow_pink",
+  "#ff6bd6": "glow_pink",
+  "#ff9fd0": "glow_pink",
+  "#59c8ff": "glow_blue",
+  "#7fe3ff": "glow_cyan",
+  "#c8f4ff": "glow_cyan",
+  "#9fe7ff": "glow_cyan",
+  "#b06bff": "glow_purple",
+  "#8be04a": "glow_green",
+  "#b4f06a": "glow_lime",
+  "#e4ffb8": "glow_lime"
+ }
+}

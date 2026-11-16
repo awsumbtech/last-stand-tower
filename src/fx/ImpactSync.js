@@ -52,7 +52,7 @@ LST.ImpactSync = class ImpactSync {
     if (!reduced && cfg.shake) this.camera.addShake(cfg.shake);
 
     const rec = { name, frame: visualFrame, audioFrame, visualFrame, audioTime, particles: made, pulse, firstDrawFrame: -1 };
-    if (pulse) pulse.rec = rec;
+    if (pulse) { pulse.rec = rec; pulse.impact = name; } // fx.json "impacts" names its ring / bloom
     this.log.push(rec);
     if (this.log.length > 16) this.log.shift();
     return rec;
