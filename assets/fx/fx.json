@@ -1,6 +1,6 @@
 {
  "format": "lst-fx/1",
- "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 + v2 additions (screen_burst, glow_pale, glow_yellow) + v3 subtle redo (impact rings, chain bolt, arc flash, overdrive aura, tower aura t0-t4 in <effect>/v3/), Nov 16 2026 (PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
+ "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 + v2 additions (screen_burst, glow_pale, glow_yellow) + v3 subtle redo (impact rings, chain bolt, arc flash, overdrive aura, tower aura t0-t4 in <effect>/v3/), Nov 16 2026 (PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment | stretch: segment with height = size x base | fill: stretched over the caller's x, y, w, h), frame (a fixed frame of the strip), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> its ring / bloom effect ids, burst (count, speedMul), colors (particle variant names), radius (ring), bloomAlpha, flash, shake, thump, sfx, throttle. presets: emitter and drawer settings (streakBurst, aura, trail, glow, ring). themes: per art style blend, glow strength, trail opacity. Particles, trails and glows name variants, never colours: a particle of variant v draws glow.v / mote.v / streak.v, a shot trail.v (PR 10b). Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
  "sheets": {
   "chain_arc_flash": "chain_arc_flash/v3/chain_arc_flash.json",
   "chain_bolt": "chain_bolt/v3/chain_bolt.json",
@@ -28,7 +28,24 @@
   "tower_aura_t1": "tower_aura/v3/tower_aura_t1.json",
   "tower_aura_t2": "tower_aura/v3/tower_aura_t2.json",
   "tower_aura_t3": "tower_aura/v3/tower_aura_t3.json",
-  "tower_aura_t4": "tower_aura/v3/tower_aura_t4.json"
+  "tower_aura_t4": "tower_aura/v3/tower_aura_t4.json",
+  "motes": "motes/motes.json",
+  "streak_pale": "streak/streak_pale.json",
+  "streak_gold": "streak/streak_gold.json",
+  "streak_amber": "streak/streak_amber.json",
+  "streak_red": "streak/streak_red.json",
+  "streak_pink": "streak/streak_pink.json",
+  "streak_cyan": "streak/streak_cyan.json",
+  "streak_green": "streak/streak_green.json",
+  "streak_lime": "streak/streak_lime.json",
+  "streak_soot": "streak/streak_soot.json",
+  "trail_base": "trail/trail_base.json",
+  "trail_ember": "trail/trail_ember.json",
+  "trail_frost": "trail/trail_frost.json",
+  "trail_spark": "trail/trail_spark.json",
+  "trail_venom": "trail/trail_venom.json",
+  "vignette_red": "vignette/vignette_red.json",
+  "vignette_dark": "vignette/vignette_dark.json"
  },
  "effects": {
   "overdriveAura": {
@@ -287,81 +304,588 @@
    },
    "blend": "screen",
    "skipLow": true
+  },
+  "glow.amber": {
+   "what": "Soft amber bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_amber"
+  },
+  "glow.blue": {
+   "what": "Soft blue bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_blue"
+  },
+  "glow.cyan": {
+   "what": "Soft cyan bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_cyan"
+  },
+  "glow.gold": {
+   "what": "Soft gold bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_gold"
+  },
+  "glow.green": {
+   "what": "Soft green bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_green"
+  },
+  "glow.lime": {
+   "what": "Soft lime bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_lime"
+  },
+  "glow.orange": {
+   "what": "Soft orange bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_orange"
+  },
+  "glow.pale": {
+   "what": "Soft pale bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_pale"
+  },
+  "glow.pink": {
+   "what": "Soft pink bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_pink"
+  },
+  "glow.purple": {
+   "what": "Soft purple bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_purple"
+  },
+  "glow.red": {
+   "what": "Soft red bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_red"
+  },
+  "glow.yellow": {
+   "what": "Soft yellow bloom for particles and shots (ParticleBatch glows, ProjectileTrails shot glows): radius = the caller's base, opacity and blend from the caller (the FX theme); was fx.json glowColors + FxRenderer.glow",
+   "sheet": "glow_yellow"
+  },
+  "mote.pale": {
+   "what": "Small round pale mote (motes atlas cell 0) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 0,
+   "size": 1.67
+  },
+  "mote.yellow": {
+   "what": "Small round yellow mote (motes atlas cell 1) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 1,
+   "size": 1.67
+  },
+  "mote.gold": {
+   "what": "Small round gold mote (motes atlas cell 2) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 2,
+   "size": 1.67
+  },
+  "mote.amber": {
+   "what": "Small round amber mote (motes atlas cell 3) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 3,
+   "size": 1.67
+  },
+  "mote.orange": {
+   "what": "Small round orange mote (motes atlas cell 4) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 4,
+   "size": 1.67
+  },
+  "mote.pink": {
+   "what": "Small round pink mote (motes atlas cell 5) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 5,
+   "size": 1.67
+  },
+  "mote.blue": {
+   "what": "Small round blue mote (motes atlas cell 6) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 6,
+   "size": 1.67
+  },
+  "mote.purple": {
+   "what": "Small round purple mote (motes atlas cell 7) over its glow; base = the old mote core radius, so the art's dot (about 60% of the cell) lands on it. Was ParticleBatch's coloured dot with a white #fffdf2 centre",
+   "sheet": "motes",
+   "frame": 7,
+   "size": 1.67
+  },
+  "streak.pale": {
+   "what": "pale speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_pale",
+   "fit": "stretch"
+  },
+  "streak.gold": {
+   "what": "gold speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_gold",
+   "fit": "stretch"
+  },
+  "streak.amber": {
+   "what": "amber speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_amber",
+   "fit": "stretch"
+  },
+  "streak.red": {
+   "what": "red speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_red",
+   "fit": "stretch"
+  },
+  "streak.pink": {
+   "what": "pink speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_pink",
+   "fit": "stretch"
+  },
+  "streak.cyan": {
+   "what": "cyan speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_cyan",
+   "fit": "stretch"
+  },
+  "streak.green": {
+   "what": "green speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_green",
+   "fit": "stretch"
+  },
+  "streak.lime": {
+   "what": "lime speed streak (venom bursts: main's pale-lime #e4ffb8 / #b4f06a streaks) stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade, ink outline baked in (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_lime",
+   "fit": "stretch"
+  },
+  "streak.soot": {
+   "what": "soot speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
+   "sheet": "streak_soot",
+   "fit": "stretch"
+  },
+  "trail.base": {
+   "what": "Comet tail behind plain shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (gold #ffcf3a with a white core)",
+   "sheet": "trail_base",
+   "fit": "stretch"
+  },
+  "trail.ember": {
+   "what": "Comet tail behind ember shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (recoloured by the element hex)",
+   "sheet": "trail_ember",
+   "fit": "stretch"
+  },
+  "trail.frost": {
+   "what": "Comet tail behind frost shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (recoloured by the element hex)",
+   "sheet": "trail_frost",
+   "fit": "stretch"
+  },
+  "trail.spark": {
+   "what": "Comet tail behind spark shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (recoloured by the element hex)",
+   "sheet": "trail_spark",
+   "fit": "stretch"
+  },
+  "trail.venom": {
+   "what": "Comet tail behind venom shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (recoloured by the element hex)",
+   "sheet": "trail_venom",
+   "fit": "stretch"
+  },
+  "lowHpVignette": {
+   "what": "Red low-HP edge vignette over the whole screen (Decision 9; was OverlayLayer's radial gradient): stretched to the screen, opacity = the old vignette strength (the art carries the old 75% edge)",
+   "sheet": "vignette_red",
+   "fit": "fill"
+  },
+  "screenFlash": {
+   "what": "Big-hit screen flash (Decision 12; was OverlayLayer's white full-screen fill at flash x 0.28, or 0.55 with no FX): the amber screen_burst centred on the screen, half the frame = half the long side, screen blend, opacity = that same strength",
+   "sheet": "screen_burst",
+   "size": 0.5,
+   "blend": "screen"
+  },
+  "finaleDim": {
+   "what": "Finale intro dim (Decision 4; was HudCanvasLayer's rgba(30, 15, 40, 0.45) fillRect): stretched to the screen, fading in over 0.5 s like the old dim (the art carries the 45%)",
+   "sheet": "vignette_dark",
+   "fit": "fill"
   }
  },
  "impacts": {
   "bossKill": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.pale"
+   "bloom": "impactBloom.pale",
+   "space": "world",
+   "burst": {
+    "count": 64,
+    "speedMul": 1.0
+   },
+   "colors": [
+    "pale",
+    "pale",
+    "gold",
+    "red"
+   ],
+   "radius": 210,
+   "bloomAlpha": 0.5,
+   "flash": 0.16,
+   "shake": 0.55,
+   "thump": 1.0,
+   "hold": 0.06
   },
   "finaleWon": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.pale"
-  },
-  "tierUp": {
-   "ring": "impactRing.gold",
-   "bloom": "impactBloom.pale"
+   "bloom": "impactBloom.pale",
+   "space": "world",
+   "burst": {
+    "count": 96,
+    "speedMul": 1.25
+   },
+   "colors": [
+    "pale",
+    "pale",
+    "gold",
+    "pink",
+    "cyan"
+   ],
+   "radius": 320,
+   "bloomAlpha": 0.6,
+   "flash": 0.2,
+   "shake": 0.8,
+   "thump": 1.25,
+   "hold": 0.1
   },
   "cardPick": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.amber"
+   "bloom": "impactBloom.amber",
+   "space": "screen",
+   "burst": {
+    "count": 34,
+    "speedMul": 1.0
+   },
+   "colors": [
+    "gold",
+    "amber",
+    "gold"
+   ],
+   "radius": 120,
+   "bloomAlpha": 0.35,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0.45,
+   "throttle": 0.05
   },
   "cardPickEpic": {
    "ring": "impactRing.purple",
-   "bloom": "impactBloom.pink"
+   "bloom": "impactBloom.pink",
+   "space": "screen",
+   "burst": {
+    "count": 52,
+    "speedMul": 1.25
+   },
+   "colors": [
+    "pink",
+    "pink",
+    "gold",
+    "cyan"
+   ],
+   "radius": 170,
+   "bloomAlpha": 0.5,
+   "flash": 0.12,
+   "shake": 0,
+   "thump": 0.7,
+   "throttle": 0.05
   },
   "workshop": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.amber"
+   "bloom": "impactBloom.amber",
+   "space": "screen",
+   "burst": {
+    "count": 24,
+    "speedMul": 0.8
+   },
+   "colors": [
+    "gold",
+    "amber",
+    "gold"
+   ],
+   "radius": 80,
+   "bloomAlpha": 0.3,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0.35,
+   "throttle": 0.08
   },
   "unlock": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.amber"
+   "bloom": "impactBloom.amber",
+   "space": "screen",
+   "burst": {
+    "count": 40,
+    "speedMul": 1.0
+   },
+   "colors": [
+    "gold",
+    "amber",
+    "cyan"
+   ],
+   "radius": 130,
+   "bloomAlpha": 0.45,
+   "flash": 0.1,
+   "shake": 0,
+   "thump": 0.65,
+   "throttle": 0.08
+  },
+  "tierUp": {
+   "ring": "impactRing.gold",
+   "bloom": "impactBloom.pale",
+   "space": "world",
+   "burst": {
+    "count": 44,
+    "speedMul": 0.8
+   },
+   "colors": [
+    "pale",
+    "pale",
+    "gold"
+   ],
+   "radius": 140,
+   "bloomAlpha": 0.45,
+   "flash": 0.15,
+   "shake": 0.25,
+   "thump": 0.7,
+   "hold": 0
   },
   "elemEmber": {
    "ring": "impactRing.red",
-   "bloom": "impactBloom.gold"
+   "bloom": "impactBloom.gold",
+   "space": "world",
+   "burst": {
+    "count": 9,
+    "speedMul": 0.35
+   },
+   "colors": [
+    "pale",
+    "gold",
+    "soot"
+   ],
+   "radius": 34,
+   "bloomAlpha": 0.22,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0,
+   "sfx": "sizzle",
+   "throttle": 0.09
   },
   "elemFrost": {
    "ring": "impactRing.blue",
-   "bloom": "impactBloom.cyan"
+   "bloom": "impactBloom.cyan",
+   "space": "world",
+   "burst": {
+    "count": 14,
+    "speedMul": 0.4
+   },
+   "colors": [
+    "pale",
+    "cyan",
+    "cyan"
+   ],
+   "radius": 52,
+   "bloomAlpha": 0.3,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0,
+   "sfx": "frostCrack",
+   "throttle": 0.08
   },
   "elemSpark": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.pale"
+   "bloom": "impactBloom.pale",
+   "space": "world",
+   "burst": {
+    "count": 10,
+    "speedMul": 0.45
+   },
+   "colors": [
+    "pale",
+    "pale",
+    "gold"
+   ],
+   "radius": 30,
+   "bloomAlpha": 0.28,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0,
+   "sfx": "zap",
+   "throttle": 0.07
   },
   "elemVenom": {
    "ring": "impactRing.green",
-   "bloom": "impactBloom.lime"
+   "bloom": "impactBloom.lime",
+   "space": "world",
+   "burst": {
+    "count": 8,
+    "speedMul": 0.3
+   },
+   "colors": [
+    "lime",
+    "lime",
+    "green"
+   ],
+   "radius": 30,
+   "bloomAlpha": 0.2,
+   "flash": 0,
+   "shake": 0,
+   "thump": 0,
+   "sfx": "venom",
+   "throttle": 0.1
   },
   "elemShatter": {
    "ring": "impactRing.blue",
-   "bloom": "impactBloom.cyan"
+   "bloom": "impactBloom.cyan",
+   "space": "world",
+   "burst": {
+    "count": 20,
+    "speedMul": 0.6
+   },
+   "colors": [
+    "pale",
+    "cyan",
+    "amber",
+    "cyan"
+   ],
+   "radius": 70,
+   "bloomAlpha": 0.4,
+   "flash": 0,
+   "shake": 0.06,
+   "thump": 0.25,
+   "sfx": "shatter",
+   "throttle": 0.15
   }
  },
- "glowColors": {
-  "#ffd23f": "glow_gold",
-  "#ffcf3a": "glow_gold",
-  "#ffe680": "glow_yellow",
-  "#fff3a0": "glow_pale",
-  "#ffffff": "glow_pale",
-  "#ffe14d": "glow_yellow",
-  "#fff6a8": "glow_pale",
-  "#ffb347": "glow_amber",
-  "#ff9a3a": "glow_amber",
-  "#ff8a3d": "glow_orange",
-  "#ff7a1a": "glow_orange",
-  "#ff6b6b": "glow_red",
-  "#ff7ac8": "glow_pink",
-  "#ff6bd6": "glow_pink",
-  "#ff9fd0": "glow_pink",
-  "#59c8ff": "glow_blue",
-  "#7fe3ff": "glow_cyan",
-  "#c8f4ff": "glow_cyan",
-  "#9fe7ff": "glow_cyan",
-  "#b06bff": "glow_purple",
-  "#8be04a": "glow_green",
-  "#b4f06a": "glow_lime",
-  "#e4ffb8": "glow_lime"
+ "presets": {
+  "streakBurst": {
+   "what": "Radial burst; fast particles stretch along their velocity (reads as motion blur)",
+   "shape": "streak",
+   "count": 48,
+   "speed": [
+    420,
+    1050
+   ],
+   "life": [
+    0.4,
+    0.85
+   ],
+   "width": [
+    3.4,
+    6
+   ],
+   "inkWidth": 2.6,
+   "drag": 2.3,
+   "gravity": 0,
+   "stretch": 0.06,
+   "minLength": 6,
+   "jitter": 0.12,
+   "colors": [
+    "pale",
+    "pale",
+    "gold"
+   ]
+  },
+  "aura": {
+   "what": "Tower power and tier; soft motes drifting up from the tower only if idleEmission (Brian, Nov 4 2026: 'the sparkling over the turret is constant. I don't like it.')",
+   "idleEmission": false,
+   "shape": "soft",
+   "rate": [
+    4,
+    34
+   ],
+   "speed": [
+    10,
+    30
+   ],
+   "rise": [
+    45,
+    90
+   ],
+   "life": [
+    1.3,
+    2.3
+   ],
+   "size": [
+    7,
+    13
+   ],
+   "drag": 0.4,
+   "gravity": -18,
+   "spawnRadius": [
+    0.8,
+    1.45
+   ],
+   "colorsByTier": [
+    [
+     "yellow",
+     "pale"
+    ],
+    [
+     "gold",
+     "yellow"
+    ],
+    [
+     "gold",
+     "amber",
+     "yellow"
+    ],
+    [
+     "amber",
+     "gold",
+     "orange"
+    ],
+    [
+     "gold",
+     "pink",
+     "blue",
+     "purple"
+    ]
+   ],
+   "tierPower": [
+    1,
+    5,
+    11,
+    18
+   ],
+   "maxPower": 24
+  },
+  "trail": {
+   "what": "Projectile comet tail (trail.<variant>: base, or the shot's element trail) + a glow per shot",
+   "stretch": 0.075,
+   "maxLength": 72,
+   "height": 20,
+   "elementLength": 1.15,
+   "glowRadius": 19,
+   "glowAlpha": 0.75,
+   "critGlowRadius": 28,
+   "elementGlowMul": 1.25,
+   "variant": "base",
+   "glow": "gold",
+   "critGlow": "amber",
+   "elementGlows": {
+    "ember": "orange",
+    "frost": "cyan",
+    "spark": "yellow",
+    "venom": "green"
+   }
+  },
+  "glow": {
+   "what": "One-shot soft glow on a crit",
+   "shape": "glow",
+   "critRadius": 30,
+   "critLife": 0.22,
+   "critVariant": "gold"
+  },
+  "ring": {
+   "what": "How long the ring + bloom pulse of every impact lasts",
+   "life": 0.45
+  }
+ },
+ "themes": {
+  "cartoon": {
+   "what": "Lawn: screen-blended glows that don't blow the grass out to white",
+   "blend": "screen",
+   "glow": 1,
+   "trailAlpha": 0.75,
+   "bloomBlend": "screen"
+  },
+  "neon": {
+   "what": "Dark grid: classic additive neon",
+   "blend": "lighter",
+   "glow": 1.15,
+   "trailAlpha": 0.9,
+   "bloomBlend": "lighter"
+  },
+  "pixel": {
+   "what": "Pixel art: light glow",
+   "blend": "screen",
+   "glow": 0.6,
+   "trailAlpha": 0.7,
+   "bloomBlend": "screen"
+  }
  }
 }

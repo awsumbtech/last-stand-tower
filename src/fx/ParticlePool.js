@@ -25,8 +25,8 @@ LST.ParticlePool = class ParticlePool {
     this.drag = F(); this.gravity = F(); this.stretch = F(); this.minLen = F();
     this.shape = new Uint8Array(capacity);
     this.color = new Uint8Array(capacity);
-    this.palette = [];            // color id -> CSS color
-    this.paletteIds = new Map();  // CSS color -> id (filled once per color, then reused)
+    this.palette = [];            // color id -> particle variant name (fx.json: glow.<v>, mote.<v>, streak.<v>)
+    this.paletteIds = new Map();  // variant name -> id (filled once per variant, then reused)
     this.cursor = 0;
     this.dropped = 0;
     this.peak = 0;

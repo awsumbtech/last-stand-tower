@@ -1,0 +1,21 @@
+{
+ "frameW": 64,
+ "frameH": 16,
+ "count": 3,
+ "fps": 12,
+ "loop": false,
+ "frames": [
+  "fresh",
+  "mid",
+  "fade"
+ ],
+ "pivot": [
+  64,
+  8
+ ],
+ "pivotMeaning": "head at the right end; stretch along the velocity",
+ "ink": "#2b1d3a (painted, thin)",
+ "image": "streak_lime.png",
+ "version": "v1",
+ "sha256": "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb"
+}

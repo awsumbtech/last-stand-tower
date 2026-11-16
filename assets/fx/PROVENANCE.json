@@ -41,7 +41,22 @@
   },
   "rawHashes": "_src/raw/SHA256SUMS",
   "license": "Original art generated for Brian Awsumb's Last Stand Tower; no third-party or licensed art, no copyrighted references. Style reference: Brian's own enemy sprites (assets/sprites/enemies/tank, basic).",
-  "noCodeArt": "No shapes, gradients, rings, glows, tints, recolours, hue shifts or outline changes are drawn or applied by code. Code only removes the background, cuts/centres/scales frames and (chain_bolt only) applies opacity steps for fade frames."
+  "noCodeArt": "No shapes, gradients, rings, glows, tints, recolours, hue shifts or outline changes are drawn or applied by code. Code only removes the background, cuts/centres/scales frames and (chain_bolt only) applies opacity steps for fade frames.",
+  "pr10b": {
+   "delivery": "LST PR10b effects art for Tower Defense Games Dev (OO-MIGRATION section G rows 9-13), plus streak_lime for PR #11",
+   "date": "2026-11-16",
+   "tool": "Grok Bot GenerateImage (cursor namespace)",
+   "generations": {
+    "total": 37,
+    "kept": 17,
+    "rejected": 20,
+    "addedLater": "streak_lime (2026-11-16 12:33 request: venom bursts on grass; 3 generations, r1 kept)",
+    "note": "streaks needed rerolls because the generator kept painting the three widths the same; the size-chart prompt (6-7 shrinking copies, 3 bands picked) fixed it for 7 of 8. vignette_red and vignette_dark were each rerolled for opacity layout."
+   },
+   "bar": "Brian (10a): subtle, thin, soft, match the weight of what each piece replaces, no heavy dark outlines",
+   "rawHashes": "_src/raw/SHA256SUMS",
+   "license": "LICENSE.md"
+  }
  },
  "chain_arc_flash/chain_arc_flash.png": {
   "version": "v1",
@@ -1239,6 +1254,772 @@
    },
    "r0": "not used: 1293 near-white px, 692 pure white",
    "tradeOff": "r1 paints each frame as ONE saturated colour, so the rainbow shows as a slow colour cycle over time, not a wheel inside each frame. The core is the same hue as each frame, with no white. The pipeline order optimiser picked cells [0,1,2,1,0,5] = red, orange, yellow, orange, red, violet, so the green and blue cells are not used. The loop seam (0.164) is weaker than v3a (0.088)."
+  }
+ },
+ "motes/motes.png": {
+  "version": "v1",
+  "sha256": "07b735163fc58b331679e0a182d30d10f203ab63eb79f49e34abd89ebb7c7f1d",
+  "sheet": "motes/motes.json",
+  "frames": 8,
+  "frameW": 32,
+  "frameH": 32,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/motes.jpg",
+  "sourceSha256": "095a5ddd549122e82afe281b182cdc406c21e4f16851f43415017cce169ed037",
+  "sourceDraft": "motes",
+  "prompt": "Game VFX sprite atlas on a pure flat black background (#000000), no grid lines, no borders, no text. Exactly 8 soft round glowing dots in ONE horizontal row, evenly spaced, each centred in its own equal-width column (the image is split into 8 equal columns), all the same size: each dot about 60% of its column's width, perfectly round, with a soft feathered edge fading to black, and a lighter tint of the SAME hue in the centre (never white, no white hotspot). Left to right: 1 pale warm cream (#f2dcb0, centre #fbecc8), 2 lemon yellow (#ffe14d, centre #fff0a0), 3 gold (#ffcf3a, centre #ffe58a), 4 amber (#ffa62b, centre #ffc978), 5 orange (#ff7a1a, centre #ffb27a), 6 pink (#ff6fae, centre #ffb0d2), 7 sky blue (#4aa8ff, centre #a8d4ff), 8 violet purple (#a86bff, centre #d0b0ff). Subtle, soft, no outline, no rays, no sparkles, nothing else in the image.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "8 dots cut at the midpoints between dot centres; black-background noise more than 40 raw px from each dot dropped",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (dot alpha>=0.5 diameter = 60% of the 32 px cell), centred in each cell",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.15546558704453442,
+   "paintedDiameterAlpha50": [
+    124.0,
+    123.5,
+    123.5,
+    123.5,
+    124.5,
+    124.0,
+    123.5,
+    123.5
+   ]
+  },
+  "license": "original generated art"
+ },
+ "streak/streak_amber.png": {
+  "version": "v1",
+  "sha256": "478b1079fe2183e8c9c658c0735b0639ff7d516cf170288c0faadff0bf470b56",
+  "sheet": "streak/streak_amber.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_amber.jpg",
+  "sourceSha256": "4d60e24119c9b6db884f3bf1c3cf66947d069b19ab1fbff56ee951f6f2ecd018",
+  "sourceDraft": "streak_amber_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: amber orange-gold (#ffa62b) with one lighter amber stripe along the centre line (#ffc978), a single centre stripe, never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    230.0,
+    3.0,
+    132.0
+   ],
+   "paintedThicknessPx": [
+    109,
+    96,
+    87,
+    80,
+    75,
+    71
+   ],
+   "pickedBands": [
+    0,
+    1,
+    3
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.881,
+    0.734
+   ],
+   "scale": 0.12524461839530332
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_amber_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three fat, stubby teardrop-shaped speed dashes stacked one above another, all pointing right, with empty magenta space between them. Each dash: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end. Each dash is SHORT: its length is only about 4 times its thickness, like a fat bullet or comet drop. The three dashes have clearly DIFFERENT thickness, like a large, medium and small size of the same dash: TOP = large (thickest, about 1/5 of the image height), MIDDLE = medium (87% of the top one in both thickness and length), BOTTOM = small (73% of the top one in both thickness and length). All three right-aligned at the same head position. Fill: amber orange-gold (#ffa62b) with a lighter amber stripe along the centre (#ffc978), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible like a marker line but thin: about one tenth of the dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_amber_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three fat, stubby teardrop-shaped speed dashes in decreasing sizes, stacked in three rows, all pointing right and right-aligned. Each dash has a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end; its length is about 4 times its thickness. SIZES DECREASE from top to bottom so the difference is obvious at a glance: TOP dash LARGE, MIDDLE dash noticeably SMALLER (scaled to 87%), BOTTOM dash SMALLEST (scaled to 73%: clearly thinner and shorter than the top one). Think of a size chart: large, medium, small. Fill: amber orange-gold (#ffa62b) with a lighter amber stripe along the centre (#ffc978), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_cyan.png": {
+  "version": "v1",
+  "sha256": "e72f649859f989440df1a08d39b4dd85c7440338b8adc7ec46fbbfd587edcbb5",
+  "sheet": "streak/streak_cyan.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_cyan.jpg",
+  "sourceSha256": "4893c8e49d0ad03ac88aa35ab65d665ac125d934b9f22a99f2da9cd577defcdc",
+  "sourceDraft": "streak_cyan_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: bright cyan (#3fd8ff) with one lighter cyan stripe along the centre line (#a8eeff), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    253.0,
+    6.0,
+    211.0
+   ],
+   "paintedThicknessPx": [
+    86,
+    85,
+    85,
+    85,
+    85,
+    85
+   ],
+   "pickedBands": [
+    0,
+    1,
+    2
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.988,
+    0.988
+   ],
+   "scale": 0.1839080459770115
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_cyan_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three slim teardrop-shaped speed dashes stacked in three rows, all pointing right and right-aligned at the same head position. Each dash has a rounded HEAD at the RIGHT end and a body tapering smoothly to a sharp point at the LEFT end; its length is about 4.5 times its thickness. Gentle size steps from top to bottom: TOP dash full size; MIDDLE dash only slightly smaller, 87% of the top (nearly as big); BOTTOM dash 73% of the top (about three quarters, NOT half). Fill: bright cyan (#3fd8ff) with one lighter cyan stripe along the centre line (#a8eeff), a single centre stripe, not a ring, never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_cyan_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in three sizes, stacked in three rows, all pointing right and right-aligned: LARGE on top, MEDIUM in the middle (a bit smaller than large, about 87%), SMALL at the bottom (about three quarters the size of large, 73%). The size difference must be visible at a glance. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: bright cyan (#3fd8ff) with one lighter cyan stripe along the centre line (#a8eeff), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_gold.png": {
+  "version": "v1",
+  "sha256": "bb0d6d7ffa42e2d315e7b5acc0cd5e0fafec2b430f6f50a0ef5622da6a27b0e9",
+  "sheet": "streak/streak_gold.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_gold.jpg",
+  "sourceSha256": "8814543fb5d8c31411a4fcfcd4045fac697ef0bac5a5981e33c1ca560143ffa3",
+  "sourceDraft": "streak_gold_r1",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: golden yellow (#ffcf3a) with one lighter gold stripe along the centre line (#ffe58a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    247.0,
+    6.0,
+    247.0
+   ],
+   "paintedThicknessPx": [
+    81,
+    77,
+    73,
+    70,
+    65,
+    60,
+    57
+   ],
+   "pickedBands": [
+    0,
+    3,
+    5
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.864,
+    0.741
+   ],
+   "scale": 0.11786372007366483
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_gold_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three horizontal speed streaks stacked one above another with wide empty magenta space between them, each centred horizontally, all the same length (about 70% of the image width), all pointing right: the HEAD (rounded, thickest part) at the RIGHT end, tapering smoothly to a sharp point at the LEFT end, like the motion-blur dash of a fast spark. Top streak is the thickest (thickness about one quarter of its length), middle streak is 87% as thick, bottom streak 73% as thick, same length. Fill: golden yellow (#ffcf3a) with a lighter gold stripe along the centre (#ffe58a), never white. Outline: a THIN, very fine dark purple ink line (#2b1d3a), only about one tenth of the streak's thickness, even all the way around. Flat clean cartoon game style, soft and subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_green.png": {
+  "version": "v1",
+  "sha256": "49ac2d87473200d33f53a33d8fd4c158aa7d668b8760eea7c13e64382d8279ae",
+  "sheet": "streak/streak_green.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_green.jpg",
+  "sourceSha256": "d18a4cb4706185f4fb8f4c880ee6ca646c9d167f179769660166a9b4ec173749",
+  "sourceDraft": "streak_green_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: fresh leaf green (#6fd94a) with one lighter green stripe along the centre line (#b4f08f), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    240.0,
+    4.0,
+    151.0
+   ],
+   "paintedThicknessPx": [
+    103,
+    97,
+    92,
+    87,
+    84,
+    80,
+    77
+   ],
+   "pickedBands": [
+    0,
+    2,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.893,
+    0.748
+   ],
+   "scale": 0.1553398058252427
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_green_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three slim teardrop-shaped speed dashes stacked in three rows, all pointing right and right-aligned at the same head position. Each dash has a rounded HEAD at the RIGHT end and a body tapering smoothly to a sharp point at the LEFT end; its length is about 4.5 times its thickness. Gentle size steps from top to bottom: TOP dash full size; MIDDLE dash only slightly smaller, 87% of the top (nearly as big); BOTTOM dash 73% of the top (about three quarters, NOT half). Fill: fresh leaf green (#6fd94a) with one lighter green stripe along the centre line (#b4f08f), a single centre stripe, not a ring, never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_green_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in three sizes, stacked in three rows, all pointing right and right-aligned: LARGE on top, MEDIUM in the middle (a bit smaller than large, about 87%), SMALL at the bottom (about three quarters the size of large, 73%). The size difference must be visible at a glance. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: fresh leaf green (#6fd94a) with one lighter green stripe along the centre line (#b4f08f), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_lime.png": {
+  "version": "v1",
+  "sha256": "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
+  "sheet": "streak/streak_lime.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_lime.jpg",
+  "sourceSha256": "7f4837353e01ec3fdcc0de682e466953cd150ca614ee804c717ed6e0491a10e0",
+  "sourceDraft": "streak_lime_r1",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash: SEVEN copies stacked in seven rows, all pointing right and right-aligned at the same head position, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a sharp point at the LEFT end; its length about 4 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    234.0,
+    22.0,
+    144.0
+   ],
+   "paintedThicknessPx": [
+    72,
+    66,
+    63,
+    59,
+    57,
+    54,
+    49,
+    45,
+    40
+   ],
+   "pickedBands": [
+    1,
+    4,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.864,
+    0.742
+   ],
+   "scale": 0.10684474123539232
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_lime_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_lime_r2.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SEVEN copies stacked in seven rows, all pointing right, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side, short and fat: its length only about 3.5 times its thickness, a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_pale.png": {
+  "version": "v1",
+  "sha256": "57940e1f218d0ff4aa7081c7b83a0ae3934e9b8473f82492c60bf3afcb593883",
+  "sheet": "streak/streak_pale.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_pale.jpg",
+  "sourceSha256": "7871c709df40b22ff169778077fcabe004f975b6b31f1c69f6a01c335a268581",
+  "sourceDraft": "streak_pale_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: pale warm cream (#f2dcb0) with one slightly lighter cream stripe along the centre line (#f8e6c0), never white, no white highlight. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    250.0,
+    3.0,
+    162.0
+   ],
+   "paintedThicknessPx": [
+    101,
+    95,
+    89,
+    85,
+    79,
+    75,
+    69
+   ],
+   "pickedBands": [
+    0,
+    2,
+    5
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.881,
+    0.743
+   ],
+   "scale": 0.15647921760391198
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_pale_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three horizontal speed streaks stacked one above another with wide empty magenta space between them, each centred horizontally, all the same length (about 70% of the image width), all pointing right: the HEAD (rounded, thickest part) at the RIGHT end, tapering smoothly to a sharp point at the LEFT end, like the motion-blur dash of a fast spark. Top streak is the thickest (thickness about one quarter of its length), middle streak is 87% as thick, bottom streak 73% as thick, same length. Fill: pale warm cream (#f2dcb0) with a slightly lighter cream stripe along the centre (#fbecc8), never pure white. Outline: a THIN, very fine dark purple ink line (#2b1d3a), only about one tenth of the streak's thickness, even all the way around. Flat clean cartoon game style, soft and subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_pale_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three SHORT, STUBBY horizontal speed streaks stacked one above another with empty magenta space between them, all pointing right, all exactly the same length (about 60% of the image width). Each streak is a fat teardrop dash: the HEAD at the RIGHT end is a big rounded end, and the body tapers to a point at the LEFT end. Proportions are important: the top streak is short and fat, its thickness at the head is ONE QUARTER of its length (length only 4 times its thickness). The middle streak is clearly thinner: 87% of the top one's thickness. The bottom streak is clearly thinner again: 73% of the top one's thickness. Fill: pale warm cream (#f2dcb0) with a slightly lighter cream stripe along the centre (#f8e6c0), never white, no white highlight. Outline: a clearly visible but thin dark purple ink line (#2b1d3a) all around each streak, about one tenth of the streak's thickness (not a hairline, not bold). Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_pink.png": {
+  "version": "v1",
+  "sha256": "ae473d0d1502c7287db07702f36c7844136609ec0cdf22a509ca57bc5e663a5c",
+  "sheet": "streak/streak_pink.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_pink.jpg",
+  "sourceSha256": "ca7956dd1544a1c4720b3b758f61195e327397b23d2e1b696fbfe606b67d2999",
+  "sourceDraft": "streak_pink_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid pure green background (#00ff00), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: candy pink (#ff6fae) with one lighter pink stripe along the centre line (#ffb0d2), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    17.0,
+    246.0,
+    22.0
+   ],
+   "paintedThicknessPx": [
+    106,
+    102,
+    97,
+    90,
+    86,
+    81,
+    77
+   ],
+   "pickedBands": [
+    0,
+    3,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.849,
+    0.726
+   ],
+   "scale": 0.13973799126637554
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_pink_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid pure green background (#00ff00), no gradient, no shadow, no grid, no text. Three slim teardrop-shaped speed dashes stacked in three rows, all pointing right and right-aligned at the same head position. Each dash has a rounded HEAD at the RIGHT end and a body tapering smoothly to a sharp point at the LEFT end; its length is about 4.5 times its thickness. Gentle size steps from top to bottom: TOP dash full size; MIDDLE dash only slightly smaller, 87% of the top (nearly as big); BOTTOM dash 73% of the top (about three quarters, NOT half). Fill: candy pink (#ff6fae) with one lighter pink stripe along the centre line (#ffb0d2), a single centre stripe, not a ring, never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_pink_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid pure green background (#00ff00), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in three sizes, stacked in three rows, all pointing right and right-aligned: LARGE on top, MEDIUM in the middle (a bit smaller than large, about 87%), SMALL at the bottom (about three quarters the size of large, 73%). The size difference must be visible at a glance. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: candy pink (#ff6fae) with one lighter pink stripe along the centre line (#ffb0d2), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_red.png": {
+  "version": "v1",
+  "sha256": "38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428",
+  "sheet": "streak/streak_red.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_red.jpg",
+  "sourceSha256": "0de35d5f263d5307251d60ccf7ac1fd53291917b461a618ca61dd1a4d3dea718",
+  "sourceDraft": "streak_red_r2",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: warm red (#ff3b3b) with one lighter red stripe along the centre line (#ff8a80), never white or pink. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    248.0,
+    7.0,
+    220.0
+   ],
+   "paintedThicknessPx": [
+    98,
+    93,
+    89,
+    84,
+    80,
+    76,
+    73
+   ],
+   "pickedBands": [
+    0,
+    3,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.857,
+    0.745
+   ],
+   "scale": 0.16161616161616163
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_red_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. Three slim teardrop-shaped speed dashes stacked in three rows, all pointing right and right-aligned at the same head position. Each dash has a rounded HEAD at the RIGHT end and a body tapering smoothly to a sharp point at the LEFT end; its length is about 4.5 times its thickness. Gentle size steps from top to bottom: TOP dash full size; MIDDLE dash only slightly smaller, 87% of the top (nearly as big); BOTTOM dash 73% of the top (about three quarters, NOT half). Fill: warm red (#ff3b3b) with one lighter red stripe along the centre line (#ff8a80), a single centre stripe, not a ring, never white or pink. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_red_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in three sizes, stacked in three rows, all pointing right and right-aligned: LARGE on top, MEDIUM in the middle (a bit smaller than large, about 87%), SMALL at the bottom (about three quarters the size of large, 73%). The size difference must be visible at a glance. Each dash is a teardrop: a rounded HEAD at the RIGHT end, body tapering smoothly to a sharp point at the LEFT end, length about 4 times its thickness. Fill: warm red (#ff3b3b) with one lighter red stripe along the centre line (#ff8a80), never white or pink. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+  }
+ },
+ "streak/streak_soot.png": {
+  "version": "v1",
+  "sha256": "5191ea56d2c9b538df35eccf526e77d56b2374bffc023f764db5b34ea809b3a0",
+  "sheet": "streak/streak_soot.json",
+  "frames": 3,
+  "frameW": 64,
+  "frameH": 16,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/streak_soot.jpg",
+  "sourceSha256": "22c0d42f0d141685ae3f3f2b066298cbf669b8f4beee01f007d42eda6ee571cb",
+  "sourceDraft": "streak_soot_r0",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid bright cyan background (#00ffff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT soot smear dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Colour: dark burnt brown char (#3a1200) with one slightly lighter brown stripe along the centre line (#5c2a10). NO outline at all, soft clean edge. Flat clean cartoon game style, subtle, no glow, no sparkles, no smoke puffs, no extra shapes.",
+  "referenceImages": [],
+  "cleanup": [
+   "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
+   "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fresh band fitted to 64x16), head right-aligned at x=64, centred on y=8",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "flat key colour removed (keying.py)",
+   "key": [
+    10.0,
+    236.0,
+    252.0
+   ],
+   "paintedThicknessPx": [
+    93,
+    92,
+    90,
+    86,
+    83,
+    79,
+    76
+   ],
+   "pickedBands": [
+    0,
+    5,
+    6
+   ],
+   "pickedPaintedRatios": [
+    1.0,
+    0.849,
+    0.817
+   ],
+   "scale": 0.16842105263157894
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/streak_soot_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid bright cyan background (#00ffff), no gradient, no shadow, no grid, no text. A size chart of the same soot smear dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting clearly smaller from top to bottom: each dash is about 88% of the size (both length and thickness) of the dash above it, so the bottom one is only about HALF the size of the top one. Even spacing, no overlaps. Each dash is a teardrop lying on its side: a rounded HEAD at the RIGHT end, body tapering to a sharp point at the LEFT end; its length about 4 times its thickness. Colour: dark burnt brown char (#3a1200) with one slightly lighter brown stripe along the centre line (#5c2a10). NO outline at all, clean soft edge. Flat clean cartoon game style, subtle, no glow, no sparkles, no smoke puffs, no extra shapes.",
+   "_src/raw/rejected/streak_soot_r2.jpg": "Game VFX sprite sheet on a perfectly flat solid bright cyan background (#00ffff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash in SEVEN sizes, stacked in seven rows from LARGE at the top to SMALL at the bottom, all pointing right and right-aligned at the same head position. Each row is a smaller copy of the row above (about 90% of its length and thickness), so the bottom dash is visibly much smaller: about 55% of the top dash's thickness. The shrinking must be obvious at a glance, like a size chart. Each dash is a teardrop lying on its side: a rounded HEAD at the RIGHT end, body tapering to a sharp point at the LEFT end; length about 4 times its thickness. Colour: dark burnt brown char (#3a1200) with one slightly lighter brown stripe along the centre line (#5c2a10). NO outline at all, clean soft edge. Flat clean cartoon game style, subtle, no glow, no sparkles, no smoke puffs, no extra shapes."
+  }
+ },
+ "trail/trail_base.png": {
+  "version": "v1",
+  "sha256": "14944234091d439a7c442cf34e91fbd52c2d21e0240ade6a256ed8660d3961bf",
+  "sheet": "trail/trail_base.json",
+  "frames": 1,
+  "frameW": 128,
+  "frameH": 24,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/trail_base.jpg",
+  "sourceSha256": "25da3264155d78ca106e3a45802437abae7b887e07320722b7ec911dd4eb6449",
+  "sourceDraft": "trail_base",
+  "prompt": "Game VFX sprite on a pure flat black background (#000000). One horizontal comet tail of light spanning about 85% of the image width, centred vertically, its thickness at the head about one sixth of its length. The HEAD is at the RIGHT end: a softly rounded end. From the head the tail tapers and fades smoothly to nothing toward the LEFT. A soft glowing outer band of golden yellow (#ffcf3a) and, along the centre line, a lighter golden core about 40% of the band's height (#ffe9a0): a light tint of the same gold, NOT white, no white hotspot. Soft and subtle, no outline, no sparkles, no particles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fitted to 128x24), head right-aligned, centred on y=12",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.10640066500415628
+  },
+  "license": "original generated art"
+ },
+ "trail/trail_ember.png": {
+  "version": "v1",
+  "sha256": "6dbe3dba66125fa49cdf1b45e7683f8e9d9f565b8d4e351e94cb8362fb11c16a",
+  "sheet": "trail/trail_ember.json",
+  "frames": 1,
+  "frameW": 128,
+  "frameH": 24,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/trail_ember.jpg",
+  "sourceSha256": "90e29270d18cdf02e30da0b65032ebfa4de56b0ea374ed9b6b6cd8e355f7ffb2",
+  "sourceDraft": "trail_ember",
+  "prompt": "Game VFX sprite on a pure flat black background (#000000). One horizontal comet tail of light spanning about 85% of the image width, centred vertically, its thickness at the head about one sixth of its length. The HEAD is at the RIGHT end: a softly rounded end. From the head the tail tapers and fades smoothly to nothing toward the LEFT. A soft glowing outer band of ember orange (#ff7a1a) and, along the centre line, a lighter orange core about 40% of the band's height (#ffb27a): a light tint of the same orange, NOT white, NOT yellow, no white hotspot. Soft and subtle, no outline, no sparkles, no particles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fitted to 128x24), head right-aligned, centred on y=12",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.10902896081771721
+  },
+  "license": "original generated art"
+ },
+ "trail/trail_frost.png": {
+  "version": "v1",
+  "sha256": "86112c93e3674ba5a6f94d94dae7113ac74bbad8ee3607f7c04d6943705697b5",
+  "sheet": "trail/trail_frost.json",
+  "frames": 1,
+  "frameW": 128,
+  "frameH": 24,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/trail_frost.jpg",
+  "sourceSha256": "8099a704d618e408e27fdfac748c91bfc95fcc29382d71172728d832ec84b7f7",
+  "sourceDraft": "trail_frost",
+  "prompt": "Game VFX sprite on a pure flat black background (#000000). One horizontal comet tail of light spanning about 85% of the image width, centred vertically, its thickness at the head about one sixth of its length. The HEAD is at the RIGHT end: a softly rounded end. From the head the tail tapers and fades smoothly to nothing toward the LEFT. A soft glowing outer band of icy frost cyan (#7fe3ff) and, along the centre line, a thin lighter icy-cyan core line only about 40% of the band's height (#c4f3ff): a light tint of the same cyan, NOT white, no white hotspot. Soft and subtle, no outline, no sparkles, no ice crystals, no particles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fitted to 128x24), head right-aligned, centred on y=12",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.11044003451251079
+  },
+  "license": "original generated art"
+ },
+ "trail/trail_spark.png": {
+  "version": "v1",
+  "sha256": "feff29920d9e6ac4b59cfee3b1ad14d4f579f4c97ab9474d0dee3f6e6ee5fe88",
+  "sheet": "trail/trail_spark.json",
+  "frames": 1,
+  "frameW": 128,
+  "frameH": 24,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/trail_spark.jpg",
+  "sourceSha256": "7104a2761fc53858a55f5e6e15a88515b3709948c637270910642a39cd72be1d",
+  "sourceDraft": "trail_spark",
+  "prompt": "Game VFX sprite on a pure flat black background (#000000). One horizontal comet tail of light spanning about 85% of the image width, centred vertically, its thickness at the head about one sixth of its length. The HEAD is at the RIGHT end: a softly rounded end. From the head the tail tapers and fades smoothly to nothing toward the LEFT. A soft glowing outer band of electric lemon yellow (#ffe14d) and, along the centre line, a thin lighter lemon core line only about 40% of the band's height (#fff0a0): a light tint of the same yellow, NOT white, no white hotspot. Soft and subtle, no outline, no lightning, no sparkles, no particles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fitted to 128x24), head right-aligned, centred on y=12",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.1198501872659176
+  },
+  "license": "original generated art"
+ },
+ "trail/trail_venom.png": {
+  "version": "v1",
+  "sha256": "064e8d99f4373c65a909fdef968afe219e6b5017b41bf5b08629b453ce2fd939",
+  "sheet": "trail/trail_venom.json",
+  "frames": 1,
+  "frameW": 128,
+  "frameH": 24,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/trail_venom.jpg",
+  "sourceSha256": "732fb2294a754425d68509b313760488d21c60b6327bc31716cc6e7297fcd226",
+  "sourceDraft": "trail_venom",
+  "prompt": "Game VFX sprite on a pure flat black background (#000000). One horizontal comet tail of light spanning about 85% of the image width, centred vertically, its thickness at the head about one sixth of its length. The HEAD is at the RIGHT end: a softly rounded end. From the head the tail tapers and fades smoothly to nothing toward the LEFT. A soft glowing outer band of venom lime green (#8be04a) and, along the centre line, a thin lighter lime core line only about 40% of the band's height (#c8f2a0): a light tint of the same green, NOT white, no white hotspot. Soft and subtle, no outline, no drips, no bubbles, no particles, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "ONE uniform premultiplied LANCZOS scale per asset; no erosion, morphology or thinning (fitted to 128x24), head right-aligned, centred on y=12",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.1171088746569076
+  },
+  "license": "original generated art"
+ },
+ "vignette/vignette_dark.png": {
+  "version": "v1",
+  "sha256": "693e6c36929187b769358537bcd1f0bf0f8afd49cfef61fe24c14020891d6a13",
+  "sheet": "vignette/vignette_dark.json",
+  "frames": 1,
+  "frameW": 720,
+  "frameH": 1560,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/vignette_dark.jpg",
+  "sourceSha256": "15b6e6463f3a582cca3913b58f2651aefed74afcd823c07d26c8ae30e04e683d",
+  "sourceDraft": "vignette_dark_r1",
+  "prompt": "A flat sheet of pure white paper (#ffffff) covered edge to edge by one very even, translucent wash of very dark purple ink (#1e0f28) at about 45% strength, so the whole image is an almost perfectly uniform, muted medium grey-lavender tone. The tone is nearly the same everywhere: the outer edges only very slightly deeper (about 50% ink) and the middle only very slightly lighter (about 42% ink) - no strong vignette, no bright centre. Very subtle soft watercolour mottling and fine paper grain only. No shapes, no ring, no frame, no objects, no text, no white patches, no bright spots.",
+  "referenceImages": [],
+  "cleanup": [
+   "white-paper removal: alpha = (255-min(R,G,B))/255, colour un-mixed from white, hue untouched",
+   "resized from the 720x1280 raw to 720x1560 (stretched 1.22x vertically: the phone shape; the game stretches it to the screen again)",
+   "one opacity factor x0.5584 on the whole image (opacity only)",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "white-paper un-mix",
+   "resize": "stretched from the 720x1280 raw to the 720x1560 phone shape (the game stretches it to the screen anyway)",
+   "scale": [
+    1.0,
+    1.21875
+   ],
+   "opacityFactor": 0.5584,
+   "pointsBeforeFactor": {
+    "corners": [
+     0.814,
+     0.82,
+     0.818,
+     0.819
+    ],
+    "topMid": 0.814,
+    "bottomMid": 0.814,
+    "leftMid": 0.806,
+    "rightMid": 0.804,
+    "centre": 0.804,
+    "centreCircle30pctMax": 0.85,
+    "centreCircle30pctMean": 0.8059,
+    "mean": 0.806,
+    "max": 0.862
+   },
+   "points": {
+    "corners": [
+     0.455,
+     0.458,
+     0.457,
+     0.458
+    ],
+    "topMid": 0.455,
+    "bottomMid": 0.455,
+    "leftMid": 0.45,
+    "rightMid": 0.449,
+    "centre": 0.449,
+    "centreCircle30pctMax": 0.475,
+    "centreCircle30pctMean": 0.45,
+    "mean": 0.45,
+    "max": 0.481
+   }
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/vignette_dark_r0.jpg": "A flat sheet of pure white paper (#ffffff) covered edge to edge by one even, translucent wash of very dark purple ink (#1e0f28) at about 45% strength, so the whole image reads as an even, muted medium grey-lavender tone. The tone is very slightly deeper (about 55% ink) toward the outer edges and never lighter than about 40% ink in the middle. Subtle soft watercolour mottling and gentle paper grain only. No shapes, no ring, no frame, no objects, no text, no white patches, no bright spots."
+  }
+ },
+ "vignette/vignette_red.png": {
+  "version": "v1",
+  "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e",
+  "sheet": "vignette/vignette_red.json",
+  "frames": 1,
+  "frameW": 720,
+  "frameH": 1560,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/vignette_red.jpg",
+  "sourceSha256": "bc677bba59867ed5ab220d9699c4181f06d627d2b6e261fcbfd0eea34d1fdd44",
+  "sourceDraft": "vignette_red_r1",
+  "prompt": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth, soft red (#ff2846) ink-wash glow that fills all FOUR CORNERS completely: the very corner pixels are the brightest, densest red, all four corners equally strong. From each corner the red fades smoothly along the edges: along the top edge and the bottom edge it stays fairly strong across the whole width (a bit dimmer at the middle than at the corners), while along the left and right long edges it fades to only a faint dim red at the middle height. Towards the centre it fades smoothly to pure black: the whole middle of the image is completely black, a big empty black oval. Smooth soft gradient with only gentle watercolour texture, symmetrical, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+   "resized from the 720x1280 raw to 720x1560 (stretched 1.22x vertically: the phone shape; the game stretches it to the screen again)",
+   "one opacity factor x0.9058 on the whole image (opacity only)",
+   "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "resize": "stretched from the 720x1280 raw to the 720x1560 phone shape (the game stretches it to the screen anyway)",
+   "scale": [
+    1.0,
+    1.21875
+   ],
+   "opacityFactor": 0.9058,
+   "pointsBeforeFactor": {
+    "corners": [
+     0.835,
+     0.823,
+     0.818,
+     0.836
+    ],
+    "topMid": 0.309,
+    "bottomMid": 0.228,
+    "leftMid": 0.02,
+    "rightMid": 0.01,
+    "centre": 0.0,
+    "centreCircle30pctMax": 0.0,
+    "centreCircle30pctMean": 0.0,
+    "mean": 0.175,
+    "max": 0.911
+   },
+   "points": {
+    "corners": [
+     0.756,
+     0.746,
+     0.741,
+     0.757
+    ],
+    "topMid": 0.28,
+    "bottomMid": 0.207,
+    "leftMid": 0.018,
+    "rightMid": 0.009,
+    "centre": 0.0,
+    "centreCircle30pctMax": 0.0,
+    "centreCircle30pctMean": 0.0,
+    "mean": 0.159,
+    "max": 0.825
+   }
+  },
+  "license": "original generated art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/vignette_red_r0.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A soft smoky red (#ff2846) watercolour ink-wash haze hugging the outer edges of the frame: densest and brightest in the four corners, fairly strong along the top edge and the bottom edge, and only a faint thin wisp along the left and right long edges. The whole middle of the image is completely pure black: a large empty black oval covering the centre, nothing there. The red fades smoothly inward with soft smoky painterly edges, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink or pale highlights, just deep saturated red haze on black.",
+   "_src/raw/rejected/vignette_red_r2.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth soft red (#ff2846) ink-wash glow along the edges of the frame: a broad, bright red band runs along the ENTIRE TOP EDGE and the ENTIRE BOTTOM EDGE, nearly as bright in the middle of those edges as in the corners (the four corners are the brightest). Along the LEFT and RIGHT long edges there is a thin, faint, dim red glow all the way down (much weaker than the top and bottom, but still visible at the middle height). The red fades smoothly inward to pure black: the centre of the image is a large completely black empty oval. Smooth soft gradients with gentle watercolour texture, symmetrical left-right and top-bottom, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights."
   }
  }
 }

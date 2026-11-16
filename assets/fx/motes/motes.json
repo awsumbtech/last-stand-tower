@@ -1,0 +1,25 @@
+{
+ "frameW": 32,
+ "frameH": 32,
+ "count": 8,
+ "fps": null,
+ "loop": false,
+ "cells": [
+  "pale",
+  "yellow",
+  "gold",
+  "amber",
+  "orange",
+  "pink",
+  "blue",
+  "purple"
+ ],
+ "layout": "8 cells in one row, 1 frame each",
+ "anchor": [
+  16,
+  16
+ ],
+ "image": "motes.png",
+ "version": "v1",
+ "sha256": "07b735163fc58b331679e0a182d30d10f203ab63eb79f49e34abd89ebb7c7f1d"
+}

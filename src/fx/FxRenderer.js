@@ -1,5 +1,5 @@
-// FxRenderer: the effects batcher. It keeps the theme (LST.FX_THEMES: blend mode, glow strength,
-// ink outlines) and the effect manifest (FxManifest: assets/fx/fx.json and its art), counts
+// FxRenderer: the effects batcher. It keeps the theme (fx.json "themes": blend mode, glow strength,
+// trail opacity) and the effect manifest (FxManifest: assets/fx/fx.json and its art), counts
 // drawn particles for QA, and hands each kind of effect to its own drawer (src/fx/draw/*.js):
 // TowerGroundGlow, ProjectileTrails, ChainArcs, TextGlows, ParticleBatch, ImpactPulses,
 // ImpactFlashes. FxDirector calls the same methods as before.
@@ -7,7 +7,7 @@ LST.FxRenderer = class FxRenderer {
   constructor(doc, effects = LST.fxManifest) {
     this.doc = doc;
     this.effects = effects;
-    this.theme = LST.FX_THEMES.cartoon;
+    this.theme = LST.FxRenderer.NO_THEME;
     this.frame = 0;
     this.drawn = 0; // particles drawn last frame (QA)
     this.under = new LST.TowerGroundGlow();
@@ -19,10 +19,8 @@ LST.FxRenderer = class FxRenderer {
     this.flashes = new LST.ImpactFlashes();
   }
 
-  setTheme(themeId) { this.theme = LST.FX_THEMES[themeId] || LST.FX_THEMES.cartoon; }
-  // The glow image fx.json names for a preset colour (null until loaded / if unnamed). Used by
-  // the drawers PR 10b converts (ParticleBatch, ProjectileTrails).
-  glow(color) { return this.effects ? this.effects.glow(color) : null; }
+  // The fx.json theme for this art style (else cartoon's); until fx.json is in, NO_THEME (nothing draws then anyway).
+  setTheme(themeId) { const e = this.effects; this.theme = (e && (e.theme(themeId) || e.theme("cartoon"))) || LST.FxRenderer.NO_THEME; }
 
   // World layer (inside the renderer's world transform)
   drawUnder(ctx, tower, aura, time) { this.under.draw(this, ctx, tower, aura, time); }
@@ -34,3 +32,4 @@ LST.FxRenderer = class FxRenderer {
   // Screen layer
   drawFlashes(ctx, camera, r) { this.flashes.draw(this, ctx, camera, r); }
 };
+LST.FxRenderer.NO_THEME = Object.freeze({ blend: "source-over", glow: 1, trailAlpha: 1, bloomBlend: "source-over" });

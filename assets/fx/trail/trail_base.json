@@ -1,0 +1,15 @@
+{
+ "frameW": 128,
+ "frameH": 24,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "pivot": [
+  128,
+  12
+ ],
+ "pivotMeaning": "head at the right end; tail fades to clear on the left",
+ "image": "trail_base.png",
+ "version": "v1",
+ "sha256": "14944234091d439a7c442cf34e91fbd52c2d21e0240ade6a256ed8660d3961bf"
+}

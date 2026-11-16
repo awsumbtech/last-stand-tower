@@ -28,15 +28,14 @@ LST.FxDirector = class FxDirector {
     this.stats = new LST.FrameStats(600);
     this.pools = { world: new LST.ParticlePool(LST.FX_QUALITY.capWorld), screen: new LST.ParticlePool(LST.FX_QUALITY.capScreen) };
     this.camera = new LST.FxCamera(4);
-    this.aura = new LST.TowerAura(LST.FX_PRESETS.aura);
     this.renderer = new LST.FxRenderer(doc, LST.fxManifest);
+    this.aura = new LST.TowerAura(() => this.effects.preset("aura"));
     this.player = new LST.EffectPlayer(this.renderer.effects);
     this.looks = LST.LookLayer ? new LST.LookLayer(bus) : null; // status looks on enemies (src/elements/looks)
     this.overlay = new LST.FxOverlay(doc);
     this.anchors = new LST.ScreenAnchors(doc);
     this.impacts = new LST.ImpactSync({
-      audio, camera: this.camera, pools: this.pools, rng: this.rng, clock: this, quality: this.quality,
-      presets: LST.FX_PRESETS, impacts: LST.FX_IMPACTS,
+      audio, camera: this.camera, pools: this.pools, rng: this.rng, clock: this, quality: this.quality, effects: this.effects,
     });
     this.drawScreenLayer = (ctx) => { // made once, reused by FxOverlay every frame
       this.renderer.drawPulses(ctx, this.camera, "screen", this.frame, 1, this.quality.low);
@@ -102,13 +101,9 @@ LST.FxDirector = class FxDirector {
     if (e.index < 0) return; // auto-draft: the aura catches up, the next wave plays the tier-up
     const name = this.route(e.epic ? "cardTakenEpic" : "cardTaken");
     if (!name) return;
-    const card = e.card;
+    // The impact's own particle variants (fx.json); card colours are hex, and particles name variants.
     const at = this.anchors.card(e.index) || this.anchors.screenCenter();
-    const base = LST.FX_IMPACTS[name].colors;
-    const colors = card && card.color ? [card.color, base[0], base[1], card.color] : base;
-    const rar = card && LST.RARITY && LST.RARITY[card.rarity];
-    const tint = (e.epic && rar && rar.color) || (card && card.color) || base[0]; // ring: epic purple, else the card's own color
-    this.impacts.fire(name, at.x, at.y, { colors, tint });
+    this.impacts.fire(name, at.x, at.y);
   }
 
   onWaveStart() {
@@ -139,9 +134,10 @@ LST.FxDirector = class FxDirector {
   }
 
   critGlow(x, y) {
-    const pool = this.pools.world, G = LST.FX_PRESETS.glow;
+    const pool = this.pools.world, G = this.effects.preset("glow");
+    if (!G) return;
     const i = pool.spawn(false);
-    if (i >= 0) pool.set(i, x, y, 0, 0, G.critLife, G.critRadius, LST.FX_SHAPE.GLOW, pool.colorId(G.critColor), 0, 0, 0, 0);
+    if (i >= 0) pool.set(i, x, y, 0, 0, G.critLife, G.critRadius, LST.FX_SHAPE.GLOW, pool.colorId(G.critVariant), 0, 0, 0, 0);
   }
 
   // ---------- Per frame ----------

@@ -1,0 +1,15 @@
+{
+ "frameW": 128,
+ "frameH": 24,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "pivot": [
+  128,
+  12
+ ],
+ "pivotMeaning": "head at the right end; tail fades to clear on the left",
+ "image": "trail_frost.png",
+ "version": "v1",
+ "sha256": "86112c93e3674ba5a6f94d94dae7113ac74bbad8ee3607f7c04d6943705697b5"
+}
