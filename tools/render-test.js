@@ -286,11 +286,11 @@ class RenderTest {
       this.ok(tx.length === 2 && tx[0].img === "glow_gold" && near(tx[0].dx, 1 - 13 - 22) && near(tx[0].dw, 44) && tx[1].img === "glow_amber" && near(tx[1].dw, 60), `fx 10a: TextGlows plays "textGlow.<kind>": coin -> glow_gold (offset -13), crit -> glow_amber, hit -> none (no kind branch in code)`);
       // pulses: bossKill -> pale bloom + gold ring (world), elemFrost -> blue ring (screen), unknown impact -> nothing (still stamped)
       const pu = imgs("pulses").map((d) => d.img);
-      this.ok(JSON.stringify(pu) === JSON.stringify(low ? ["impact_ring_gold", "impact_ring_blue"] : ["glow_gold", "impact_ring_gold", "impact_ring_blue"]) && c.stamps.join() === "12,12,12",
-        `fx 10a: ImpactPulses plays the ring / bloom fx.json "impacts" names per impact (bossKill -> glow_gold bloom + impact_ring_gold, elemFrost -> impact_ring_blue; blooms skip low quality; an unlisted impact draws nothing) and still stamps the first drawn frame (${pu.join(", ")})`);
-      // flashes: glow_gold centred on the impact in screen px, R = 0.5 x 844, alpha 0.6 x (1 - 0.2)^2
+      this.ok(JSON.stringify(pu) === JSON.stringify(low ? ["impact_ring_gold", "impact_ring_blue"] : ["glow_pale", "impact_ring_gold", "impact_ring_blue"]) && c.stamps.join() === "12,12,12",
+        `fx 10a: ImpactPulses plays the ring / bloom fx.json "impacts" names per impact (bossKill -> glow_pale bloom + impact_ring_gold, elemFrost -> impact_ring_blue; blooms skip low quality; an unlisted impact draws nothing) and still stamps the first drawn frame (${pu.join(", ")})`);
+      // flashes: screen_burst (Decision 12) centred on the impact in screen px, R = 0.5 x 844, alpha 0.6 x (1 - 0.2)^2
       const fl = imgs("flashes"), aFl = c.flashes.find((l) => l.startsWith("ctx.globalAlpha="));
-      this.ok(fl.length === 1 && fl[0].img === "glow_gold" && near(fl[0].dx, 195 + 3 * 1.4 - 422) && near(fl[0].dw, 844) && aFl && near(Number(aFl.slice(16)), 0.6 * 0.64), `fx 10a: ImpactFlashes plays "impactFlash" (glow_gold, centred on the impact in screen px, fading with the pulse)`);
+      this.ok(fl.length === 1 && fl[0].img === "screen_burst" && near(fl[0].dx, 195 + 3 * 1.4 - 422) && near(fl[0].dw, 844) && aFl && near(Number(aFl.slice(16)), 0.6 * 0.64), `fx 10a: ImpactFlashes plays "impactFlash" (screen_burst, centred on the impact in screen px, fading with the pulse)`);
     }
     const none = this.convertedCalls(false, false), drawnNone = Object.entries(none).filter(([k]) => k !== "stamps").map(([, v]) => v).flat();
     this.ok(drawnNone.length === 0 && none.stamps.join() === "12,12,12", `fx 10a: with no art loaded the converted drawers draw nothing at all (no fallback), and pulses are still stamped (${drawnNone.length} calls)`);

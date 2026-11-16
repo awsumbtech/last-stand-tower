@@ -69,6 +69,13 @@ class FxTest {
       if (sha === j.sha256 && (!pv || !pv.sha256 || pv.sha256 === sha)) shaOk++; else this.ok(false, `art: ${png} sha256 ${sha.slice(0, 12)} != delivery ${String(j.sha256).slice(0, 12)}`);
     }
     this.ok(files === Object.keys(data.sheets).length * 2 && shaOk === Object.keys(data.sheets).length, `art: every sheet fx.json lists is a delivered JSON + PNG, byte-identical to the Game Art & Motion delivery (sha256; ${shaOk}/${Object.keys(data.sheets).length} sheets, ${files} files)`);
+    // Every PNG in assets/fx is listed in the delivery's PROVENANCE.json with the same sha256 (no unlisted art).
+    const pngs = this.walkAll("assets/fx").filter((f) => f.endsWith(".png"));
+    const unlisted = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return !pv || pv.sha256 !== crypto.createHash("sha256").update(fs.readFileSync(path.join(this.root, f))).digest("hex"); });
+    this.ok(pngs.length && !unlisted.length, `art: every PNG in assets/fx (${pngs.length}) is in PROVENANCE.json with its sha256 (unlisted or changed: ${unlisted.join(", ") || "none"})`);
+    const v2 = ["screen_burst/screen_burst.png", "glow/glow_pale.png", "glow/glow_yellow.png"];
+    this.ok(v2.every((f) => prov[f] && prov[f].version === "v2") && data.effects.impactFlash.sheet === "screen_burst" && data.glowColors["#ffffff"] === "glow_pale" && data.glowColors["#ffe14d"] === "glow_yellow",
+      "art v2: screen_burst, glow_pale, glow_yellow are delivered v2 files; impactFlash plays screen_burst (Decision 12), white / pale glows use glow_pale, yellow ones glow_yellow");
     this.ok(Object.keys(LST.FX_IMPACTS).every((n) => data.impacts[n] && data.effects[data.impacts[n].ring] && data.effects[data.impacts[n].bloom]), `fx.json: every impact (${Object.keys(LST.FX_IMPACTS).length}) names a ring and a bloom effect that exist`);
     // Colours that reach a glow image today (ParticleBatch glows / motes, ProjectileTrails glows).
     const P = LST.FX_PRESETS, elems = fs.readdirSync(path.join(this.root, "src/elements")).filter((f) => f.endsWith(".js")).map((f) => /color: "(#[0-9a-f]{6})"/i.exec(this.read("src/elements/" + f))).filter(Boolean).map((m) => m[1]);
@@ -123,6 +130,15 @@ class FxTest {
       this.ok(sb.__m.includes("assets/fx/fx.json") && files.length === want.size && files.every((f) => want.has(f) && this.exists(f)), `sw.js: the install step reads fx.json and precaches it, every sheet JSON and every PNG it names (${files.length} files, all present)`);
       this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v30"/.test(src), "sw.js: v30; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
     });
+  }
+
+  walkAll(dir) {
+    const out = [];
+    for (const e of fs.readdirSync(path.join(this.root, dir), { withFileTypes: true })) {
+      const rel = dir + "/" + e.name;
+      if (e.isDirectory()) out.push(...this.walkAll(rel)); else out.push(rel);
+    }
+    return out;
   }
 
   walk(dir) {
