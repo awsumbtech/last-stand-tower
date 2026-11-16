@@ -30,6 +30,8 @@ jobs:
           node tools/ui-test.js
           node tools/ui-chrome-scan.js
           node tools/flow-state-sweep.js
+          node tools/fx-test.js
+          node tools/fx-art-scan.js
       - name: Backyard deterministic sim (committed sim-ab hashes)
         run: node tools/sim-check.js
       - name: Install browser test dependencies
@@ -43,6 +45,8 @@ jobs:
           trap 'kill "$server" || true' EXIT
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/index.html > /dev/null && break; sleep 0.2; done
           python tools/card-layout-test.py http://127.0.0.1:8765/index.html
+      - name: FX acceptance (a new fx.json entry + art plays with no code edit)
+        run: python tools/fx-acceptance-test.py
       - name: Screen snapshots vs 2fb06e6 (git worktree)
         run: python tools/screen-snapshot-test.py
 
