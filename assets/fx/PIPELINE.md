@@ -10,3 +10,10 @@ Objects: one image-backed effect object per fx.manifest.json entry (24 sheets). 
 
 Assumed in-game draw sizes used by the preview (CSS px, portrait 0.629 px/world unit, tower radius 26): overdrive_aura 72, tower_aura 90, chain_bolt 64 long x 12, chain_arc_flash 28, chain_node_glow 14, glow 20, impact_ring 48 (largest frame).
 pngquant isn't installed in this folder's pipeline; PNGs are RGBA from Pillow (optimize). Shipped sheets total about 3.2 MB.
+
+## v2 additions (2026-11-16): screen_burst, glow_pale, glow_yellow
+- 3 GenerateImage calls, no rerolls, all painted on pure black with no outline (prompts in `_src/prompts.json`, full text in PROVENANCE.json).
+- `python3 _tools/process_v2.py`: the same black un-mix, centroid window and uniform premultiplied LANCZOS downscale as the v1 glows. screen_burst uses a wider window (1.05 x the radius where mean alpha drops below 0.5%) so the ray tips stay in. JSONs say `"version": "v2"`. v1 files are byte-identical; checked against the sha256 list in `_qa/v1_png_sha_before.txt`.
+- `python3 _tools/provenance.py` adds 3 v2 entries to fx.manifest.json and PROVENANCE.json; the v1 entries are unchanged, apart from an explicit `version: v1` key added to their PROVENANCE entries.
+- `python3 _tools/selfcheck.py` now also reports maxHlsLightness, maxMinChannel and pureWhitePx.
+- `python3 _tools/preview_v2.py` -> `preview_v2_390x844.png` (+ `_qa/preview_v2_390x844@2x.png`). v1 previews are untouched.

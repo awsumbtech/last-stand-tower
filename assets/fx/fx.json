@@ -1,6 +1,6 @@
 {
  "format": "lst-fx/1",
- "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 (Nov 16 2026; PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
+ "about": "Image effects by id (PR 10a, docs/OO-MIGRATION.md section 3). Art: Game Art & Motion PR10a effects v1 + v2 additions (screen_burst, glow_pale, glow_yellow), Nov 16 2026 (PROVENANCE.json, LICENSE.md). sheets: sheet id -> art JSON next to this file (flat FX sheet: frameW, frameH, count, fps, loop, anchor, image; grid sheets add rows x cols, one strip per row r0, r1, ...). effects: id -> settings read by the generic SpriteEffect (src/fx/SpriteEffect.js): sheet (or a list picked by variant), strip (or a list picked by pick), fit (radius | segment), size and alpha (a number or {from,to,by:level|progress,ease}), pulse / alphaPulse {amp,speed}, fade {power,gain,until}, offset [x,y], blend (canvas composite op), skipLow, on (EVENTS key: play at the event's x,y). Radius fit: size x the caller's base is drawn as half the frame width. impacts: ImpactSync impact name -> ring / bloom effect ids. glowColors: preset colour -> glow sheet, for the drawers PR 10b converts. Add an effect: add its entry and art files here; no code edit (sw.js precaches what this file lists).",
  "sheets": {
   "chain_arc_flash": "chain_arc_flash/chain_arc_flash.json",
   "chain_bolt": "chain_bolt/chain_bolt.json",
@@ -12,15 +12,18 @@
   "glow_green": "glow/glow_green.json",
   "glow_lime": "glow/glow_lime.json",
   "glow_orange": "glow/glow_orange.json",
+  "glow_pale": "glow/glow_pale.json",
   "glow_pink": "glow/glow_pink.json",
   "glow_purple": "glow/glow_purple.json",
   "glow_red": "glow/glow_red.json",
+  "glow_yellow": "glow/glow_yellow.json",
   "impact_ring_blue": "impact_ring/impact_ring_blue.json",
   "impact_ring_gold": "impact_ring/impact_ring_gold.json",
   "impact_ring_green": "impact_ring/impact_ring_green.json",
   "impact_ring_purple": "impact_ring/impact_ring_purple.json",
   "impact_ring_red": "impact_ring/impact_ring_red.json",
   "overdrive_aura": "overdrive_aura/overdrive_aura.json",
+  "screen_burst": "screen_burst/screen_burst.json",
   "tower_aura_t0": "tower_aura/tower_aura_t0.json",
   "tower_aura_t1": "tower_aura/tower_aura_t1.json",
   "tower_aura_t2": "tower_aura/tower_aura_t2.json",
@@ -96,8 +99,8 @@
    "skipLow": true
   },
   "impactFlash": {
-   "what": "Soft screen glow on big world impacts, size x the screen's long side (was ImpactFlashes). PR 10b points it at screen_burst (Decision 12)",
-   "sheet": "glow_gold",
+   "what": "Short amber screen burst on big world impacts (Decision 12; was ImpactFlashes' pale glow): centred on the impact in screen px, half the frame = half the screen's long side (the old flash's size; the art's alpha-mass radius 0.41 matches the old glow's 0.43), opacity = the impact's flash strength x (1 - life)^2 like the old flash",
+   "sheet": "screen_burst",
    "size": 0.5,
    "fade": {
     "power": 2
@@ -169,39 +172,35 @@
     "power": 1.2
    }
   },
-  "impactBloom.gold": {
-   "what": "Soft gold bloom under an impact ring; skipped in low quality",
+  "textGlow.coin": {
+   "what": "Gold glow behind coin popups (was TextGlows)",
    "sheet": "glow_gold",
-   "size": {
-    "from": 0.35,
-    "to": 0.7,
-    "by": "progress",
-    "ease": "outCubic"
-   },
+   "size": 22,
+   "alpha": 0.32,
+   "offset": [
+    -13,
+    0
+   ],
    "fade": {
-    "power": 1.6
+    "power": 1,
+    "gain": 3
    },
-   "blend": "screen",
-   "skipLow": true
+   "blend": "screen"
+  },
+  "textGlow.crit": {
+   "what": "Amber glow behind crit numbers (was TextGlows)",
+   "sheet": "glow_amber",
+   "size": 30,
+   "alpha": 0.38,
+   "fade": {
+    "power": 1,
+    "gain": 3
+   },
+   "blend": "screen"
   },
   "impactBloom.amber": {
    "what": "Soft amber bloom under an impact ring; skipped in low quality",
    "sheet": "glow_amber",
-   "size": {
-    "from": 0.35,
-    "to": 0.7,
-    "by": "progress",
-    "ease": "outCubic"
-   },
-   "fade": {
-    "power": 1.6
-   },
-   "blend": "screen",
-   "skipLow": true
-  },
-  "impactBloom.pink": {
-   "what": "Soft pink bloom under an impact ring; skipped in low quality",
-   "sheet": "glow_pink",
    "size": {
     "from": 0.35,
     "to": 0.7,
@@ -229,6 +228,21 @@
    "blend": "screen",
    "skipLow": true
   },
+  "impactBloom.gold": {
+   "what": "Soft gold bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_gold",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
+   },
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
+  },
   "impactBloom.lime": {
    "what": "Soft lime bloom under an impact ring; skipped in low quality",
    "sheet": "glow_lime",
@@ -244,45 +258,49 @@
    "blend": "screen",
    "skipLow": true
   },
-  "textGlow.coin": {
-   "what": "Gold glow behind coin popups (was TextGlows)",
-   "sheet": "glow_gold",
-   "size": 22,
-   "alpha": 0.32,
-   "offset": [
-    -13,
-    0
-   ],
-   "fade": {
-    "power": 1,
-    "gain": 3
+  "impactBloom.pale": {
+   "what": "Soft warm-cream bloom under an impact ring (boss kill, finale, tier-up, spark: their old bloom colour was pale #fff3a0 / #fff6a8); skipped in low quality",
+   "sheet": "glow_pale",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
    },
-   "blend": "screen"
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
   },
-  "textGlow.crit": {
-   "what": "Amber glow behind crit numbers (was TextGlows)",
-   "sheet": "glow_amber",
-   "size": 30,
-   "alpha": 0.38,
-   "fade": {
-    "power": 1,
-    "gain": 3
+  "impactBloom.pink": {
+   "what": "Soft pink bloom under an impact ring; skipped in low quality",
+   "sheet": "glow_pink",
+   "size": {
+    "from": 0.35,
+    "to": 0.7,
+    "by": "progress",
+    "ease": "outCubic"
    },
-   "blend": "screen"
+   "fade": {
+    "power": 1.6
+   },
+   "blend": "screen",
+   "skipLow": true
   }
  },
  "impacts": {
   "bossKill": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.gold"
+   "bloom": "impactBloom.pale"
   },
   "finaleWon": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.gold"
+   "bloom": "impactBloom.pale"
   },
   "tierUp": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.gold"
+   "bloom": "impactBloom.pale"
   },
   "cardPick": {
    "ring": "impactRing.gold",
@@ -310,7 +328,7 @@
   },
   "elemSpark": {
    "ring": "impactRing.gold",
-   "bloom": "impactBloom.gold"
+   "bloom": "impactBloom.pale"
   },
   "elemVenom": {
    "ring": "impactRing.green",
@@ -324,11 +342,11 @@
  "glowColors": {
   "#ffd23f": "glow_gold",
   "#ffcf3a": "glow_gold",
-  "#ffe680": "glow_gold",
-  "#fff3a0": "glow_gold",
-  "#ffffff": "glow_gold",
-  "#ffe14d": "glow_gold",
-  "#fff6a8": "glow_gold",
+  "#ffe680": "glow_yellow",
+  "#fff3a0": "glow_pale",
+  "#ffffff": "glow_pale",
+  "#ffe14d": "glow_yellow",
+  "#fff6a8": "glow_pale",
   "#ffb347": "glow_amber",
   "#ff9a3a": "glow_amber",
   "#ff8a3d": "glow_orange",

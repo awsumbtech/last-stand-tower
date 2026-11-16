@@ -1,20 +1,35 @@
 {
  "_about": {
-  "version": "v1",
+  "version": "v1 + v2 additions",
   "delivery": "LST PR10a effects manifest art for Tower Defense Games Dev",
   "date": "2026-11-16",
   "tool": "Grok Bot GenerateImage (cursor namespace); PixelLab not used",
   "generations": {
-   "total": 26,
-   "kept": 24,
-   "rerolls": 2,
-   "rerolled": "tower_aura_t2 (x2: first two read as gold, same hue as t1)"
+   "total": 29,
+   "v1": {
+    "total": 26,
+    "kept": 24,
+    "rerolls": 2,
+    "rerolled": "tower_aura_t2 (x2: first two read as gold, same hue as t1)"
+   },
+   "v2": {
+    "total": 3,
+    "kept": 3,
+    "rerolls": 0,
+    "files": [
+     "screen_burst",
+     "glow_pale",
+     "glow_yellow"
+    ],
+    "date": "2026-11-16"
+   }
   },
   "rawHashes": "_src/raw/SHA256SUMS",
   "license": "Original art generated for Brian Awsumb's Last Stand Tower; no third-party or licensed art, no copyrighted references. Style reference: Brian's own enemy sprites (assets/sprites/enemies/tank, basic).",
   "noCodeArt": "No shapes, gradients, rings, glows, tints, recolours, hue shifts or outline changes are drawn or applied by code. Code only removes the background, cuts/centres/scales frames and (chain_bolt only) applies opacity steps for fade frames."
  },
  "chain_arc_flash/chain_arc_flash.png": {
+  "version": "v1",
   "sha256": "10db850d744fbc9179cce8fc6b47808b7d2c381f7b3587c5f1c849202c872aa5",
   "sheet": "chain_arc_flash/chain_arc_flash.json",
   "frames": 4,
@@ -44,6 +59,7 @@
   "license": "original generated art"
  },
  "chain_bolt/chain_bolt.png": {
+  "version": "v1",
   "sha256": "21789f30b6168487196f156c474b0871845da92fff8456b19b5970819110ee11",
   "sheet": "chain_bolt/chain_bolt.json",
   "frames": 9,
@@ -87,6 +103,7 @@
   "license": "original generated art"
  },
  "chain_node_glow/chain_node_glow.png": {
+  "version": "v1",
   "sha256": "b5448b7b5b6d6de34759df1d1b3519d97c278e3161b545fb528ae708bda29dd5",
   "sheet": "chain_node_glow/chain_node_glow.json",
   "frames": 1,
@@ -113,6 +130,7 @@
   "license": "original generated art"
  },
  "glow/glow_amber.png": {
+  "version": "v1",
   "sha256": "cd3f5a3462692e109576789c5fbff0ce1f434b84cc6e1a0044f0f166edb75a92",
   "sheet": "glow/glow_amber.json",
   "frames": 1,
@@ -139,6 +157,7 @@
   "license": "original generated art"
  },
  "glow/glow_blue.png": {
+  "version": "v1",
   "sha256": "c719c7b3c3bf411bf594d13e7afe187b262bcec0d06b85353661f8e55ec3be7a",
   "sheet": "glow/glow_blue.json",
   "frames": 1,
@@ -165,6 +184,7 @@
   "license": "original generated art"
  },
  "glow/glow_cyan.png": {
+  "version": "v1",
   "sha256": "15bace5f1712f128fb46990848de7019455021478e520a2128788b22513c1bca",
   "sheet": "glow/glow_cyan.json",
   "frames": 1,
@@ -191,6 +211,7 @@
   "license": "original generated art"
  },
  "glow/glow_gold.png": {
+  "version": "v1",
   "sha256": "65f780d364dbcc59cd12613cec7bbc3d97b2b571537d43710a0cae2efa6040fc",
   "sheet": "glow/glow_gold.json",
   "frames": 1,
@@ -217,6 +238,7 @@
   "license": "original generated art"
  },
  "glow/glow_green.png": {
+  "version": "v1",
   "sha256": "8f06d47e8ac4f39865730aa513df98e754eb112c681f5a30cc07aaa9a0f25009",
   "sheet": "glow/glow_green.json",
   "frames": 1,
@@ -243,6 +265,7 @@
   "license": "original generated art"
  },
  "glow/glow_lime.png": {
+  "version": "v1",
   "sha256": "86068440427bfaa3b969c47bcf7eb46bd0a7aea8a46c0270d5b8f1c3bc84e4ec",
   "sheet": "glow/glow_lime.json",
   "frames": 1,
@@ -269,6 +292,7 @@
   "license": "original generated art"
  },
  "glow/glow_orange.png": {
+  "version": "v1",
   "sha256": "3788c438bbb2f9f6436421577c82ecc3390de08d287e5b85984272c9598d95b1",
   "sheet": "glow/glow_orange.json",
   "frames": 1,
@@ -294,7 +318,36 @@
   },
   "license": "original generated art"
  },
+ "glow/glow_pale.png": {
+  "version": "v2",
+  "sha256": "6851576fcd19c3db5c0c776f255ea42fd2fbed95c98742d9e38dd5d09099ba8d",
+  "sheet": "glow/glow_pale.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_pale.jpg",
+  "sourceSha256": "004b9b2c74b0de0841d022294aba20a4fac911d0d0cbd7fdbe6eb39a5457243c",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of warm cream, like warm candlelight on parchment (#ffe9b8), clearly warm and slightly golden-peach - NOT pure white, not cool, not grey. Its core in the middle is a denser warm cream (#ffe2a6), still visibly warm-tinted: no pure white pixels anywhere, no white hotspot. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.08792174964281789,
+   "centre": [
+    509.8478267619216,
+    506.36150809608915
+   ],
+   "windowRule": "half = 1.08 x radius where mean alpha < 0.01"
+  },
+  "license": "original generated art"
+ },
  "glow/glow_pink.png": {
+  "version": "v1",
   "sha256": "9a33a6aa4d8b7aa55dfeb57d51cd4d8aff58d6d85cf306864124f84b336a60ef",
   "sheet": "glow/glow_pink.json",
   "frames": 1,
@@ -321,6 +374,7 @@
   "license": "original generated art"
  },
  "glow/glow_purple.png": {
+  "version": "v1",
   "sha256": "6117d3137602a827dded1500e0138a8b97150f8383c354c9212f8e3512a5ec93",
   "sheet": "glow/glow_purple.json",
   "frames": 1,
@@ -347,6 +401,7 @@
   "license": "original generated art"
  },
  "glow/glow_red.png": {
+  "version": "v1",
   "sha256": "333f7fdab284c269dfb68bc0b6bae50c40dc6476543341f290cee77717559daf",
   "sheet": "glow/glow_red.json",
   "frames": 1,
@@ -372,7 +427,36 @@
   },
   "license": "original generated art"
  },
+ "glow/glow_yellow.png": {
+  "version": "v2",
+  "sha256": "0b561b8ae61343eeb79c0daa93a0e38dbc2fd23e111fa1739d86818da4c38fba",
+  "sheet": "glow/glow_yellow.json",
+  "frames": 1,
+  "frameW": 64,
+  "frameH": 64,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/glow_yellow.jpg",
+  "sourceSha256": "784f8e752cc2b798b51d724624076b91a7ce0c936577baa52293ec53efe2ec31",
+  "prompt": "Game VFX sprite: a single soft round glowing bloom of light, centered, on a pure flat black background (#000000). The bloom is a smooth soft radial glow of pure saturated LEMON yellow (#ffe81a), a clean bright lemon yellow - not gold, not orange, not amber, not greenish. Its core in the middle is a denser, more intense deep saturated lemon yellow (#ffe000) - never white: no white centre, no white highlight, no pale or pastel tones anywhere. The glow fades smoothly and evenly to completely black, reaching pure black well before the image edges; the whole glow sits inside the central 60% of the image. No outline, no ring, no rays, no lens flare, no sparkles, no stars, no texture, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the glow centroid, half-size = 1.08 x radius where mean alpha drops below 1%",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.09436187780136825,
+   "centre": [
+    507.72627076030415,
+    510.3072575066837
+   ],
+   "windowRule": "half = 1.08 x radius where mean alpha < 0.01"
+  },
+  "license": "original generated art"
+ },
  "impact_ring/impact_ring_blue.png": {
+  "version": "v1",
   "sha256": "38e6efc22cd5f84b2f74f0268c268757fc56829f57f752a00d1b1edbd25032b2",
   "sheet": "impact_ring/impact_ring_blue.json",
   "frames": 6,
@@ -403,6 +487,7 @@
   "license": "original generated art"
  },
  "impact_ring/impact_ring_gold.png": {
+  "version": "v1",
   "sha256": "2f2e2ade314fe1fc4da804bb13ac01cc9e5c7b51239ccba978e8e52f41537b63",
   "sheet": "impact_ring/impact_ring_gold.json",
   "frames": 6,
@@ -432,6 +517,7 @@
   "license": "original generated art"
  },
  "impact_ring/impact_ring_green.png": {
+  "version": "v1",
   "sha256": "310c88309c29c53a408bcd5bd2ba52afe353c1bb5ddb87576c04a95aa90b432b",
   "sheet": "impact_ring/impact_ring_green.json",
   "frames": 6,
@@ -462,6 +548,7 @@
   "license": "original generated art"
  },
  "impact_ring/impact_ring_purple.png": {
+  "version": "v1",
   "sha256": "8d80a3bdd55677c5ef34f85a2cbb9335cc47b9e8b9e0bb8a04d8aafc6e2a681c",
   "sheet": "impact_ring/impact_ring_purple.json",
   "frames": 6,
@@ -492,6 +579,7 @@
   "license": "original generated art"
  },
  "impact_ring/impact_ring_red.png": {
+  "version": "v1",
   "sha256": "79d884b77cb31ab5deda21441a952d644d554d9271830a1de71f095bd3d3eaee",
   "sheet": "impact_ring/impact_ring_red.json",
   "frames": 6,
@@ -522,6 +610,7 @@
   "license": "original generated art"
  },
  "overdrive_aura/overdrive_aura.png": {
+  "version": "v1",
   "sha256": "9cb053e48593e46bc692bc11a63ef8413b53f8c3e69e9a485686d2d0306f9e61",
   "sheet": "overdrive_aura/overdrive_aura.json",
   "frames": 6,
@@ -550,7 +639,36 @@
   },
   "license": "original generated art"
  },
+ "screen_burst/screen_burst.png": {
+  "version": "v2",
+  "sha256": "f1b5c1d6c3f64f532f745a6ece2bb4cd1071fa74a2fed84f6a7979bbc8620836",
+  "sheet": "screen_burst/screen_burst.json",
+  "frames": 1,
+  "frameW": 512,
+  "frameH": 512,
+  "tool": "Grok Bot GenerateImage (cursor namespace)",
+  "sourceImage": "_src/raw/screen_burst.jpg",
+  "sourceSha256": "442decc7abca331b097243149b668f4ecb58860ec3e16641130d5dd1e68fa04b",
+  "prompt": "Game VFX sprite: a soft painted radial light burst, centred, on a pure flat black background (#000000), for a full-screen big-hit flash. Warm saturated AMBER light (#ff9a1a) with deeper amber-orange (#e07000) toward the outside: a soft round glow in the middle with broad, soft, blurry painted rays of amber light spreading outward in all directions like a sunburst, all edges soft and feathered. The centre is a dense, intense deep amber (#ff9000) - NOT white, not yellow-white, not cream: no white or pale pixels anywhere, fully saturated amber even at the brightest point. The rays fade smoothly to pure black before reaching the image edges; nothing touches the edges. No outline, no hard shapes, no sparkles, no stars, no lens flare rings, no text, nothing else.",
+  "referenceImages": [],
+  "cleanup": [
+   "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha); hue untouched",
+   "square window centred on the burst centroid, half-size = 1.05 x radius where mean alpha drops below 0.5% (keeps the ray tips)",
+   "uniform downscale (premultiplied LANCZOS)"
+  ],
+  "processParams": {
+   "bg": "black un-mix",
+   "scale": 0.5804988662131519,
+   "centre": [
+    512.261198648794,
+    512.835223451235
+   ],
+   "windowRule": "half = 1.05 x radius where mean alpha < 0.005"
+  },
+  "license": "original generated art"
+ },
  "tower_aura/tower_aura_t0.png": {
+  "version": "v1",
   "sha256": "f62c49f84247d4fb6bd2bbe0e940940525b0aa341234f5709298fd3ba6e3d3bf",
   "sheet": "tower_aura/tower_aura_t0.json",
   "frames": 6,
@@ -575,6 +693,7 @@
   "license": "original generated art"
  },
  "tower_aura/tower_aura_t1.png": {
+  "version": "v1",
   "sha256": "a445577da66cf2cd90b0f59529b880f6b8a98862aca0edd62fbbbd98f028e722",
   "sheet": "tower_aura/tower_aura_t1.json",
   "frames": 6,
@@ -597,6 +716,7 @@
   "license": "original generated art"
  },
  "tower_aura/tower_aura_t2.png": {
+  "version": "v1",
   "sha256": "8cb13d41206ae9f00aee2b1e8481061dc75bbce677da1e2509ba29f7fd92262c",
   "sheet": "tower_aura/tower_aura_t2.json",
   "frames": 6,
@@ -623,6 +743,7 @@
   ]
  },
  "tower_aura/tower_aura_t3.png": {
+  "version": "v1",
   "sha256": "042136c8ecc87cc964e73cd72cb3dc6d1e66777589103e1c0b431e09bd9a9de7",
   "sheet": "tower_aura/tower_aura_t3.json",
   "frames": 6,
@@ -647,6 +768,7 @@
   "license": "original generated art"
  },
  "tower_aura/tower_aura_t4.png": {
+  "version": "v1",
   "sha256": "84972a3d7d128d61dd456e656ddb284f1ae4eea9cc19a5b5664c10ca2c54435e",
   "sheet": "tower_aura/tower_aura_t4.json",
   "frames": 6,

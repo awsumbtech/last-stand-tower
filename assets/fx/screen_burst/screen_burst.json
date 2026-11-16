@@ -1,0 +1,16 @@
+{
+ "frameW": 512,
+ "frameH": 512,
+ "count": 1,
+ "fps": 1,
+ "loop": false,
+ "anchor": [
+  256,
+  256
+ ],
+ "blendHint": "normal or lighter",
+ "image": "screen_burst.png",
+ "version": "v2",
+ "sha256": "f1b5c1d6c3f64f532f745a6ece2bb4cd1071fa74a2fed84f6a7979bbc8620836",
+ "anchorMeaning": "screen centre; scale to cover the screen, game fades opacity"
+}
