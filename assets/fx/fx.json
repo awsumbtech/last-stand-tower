@@ -404,47 +404,83 @@
   "streak.pale": {
    "what": "pale speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_pale",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.gold": {
    "what": "gold speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_gold",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.amber": {
    "what": "amber speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_amber",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.red": {
    "what": "red speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_red",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.pink": {
    "what": "pink speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_pink",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.cyan": {
    "what": "cyan speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_cyan",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.green": {
    "what": "green speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_green",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.lime": {
    "what": "lime speed streak (venom bursts: main's pale-lime #e4ffb8 / #b4f06a streaks) stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade, ink outline baked in (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_lime",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "streak.soot": {
    "what": "soot speed streak stretched along the particle's velocity, head on the particle; frames 0-2 = fresh / mid / fade (the old 3 width steps), ink outline baked in; height = the old stroke width + its ink edge (was ParticleBatch's stroked streak batches)",
    "sheet": "streak_soot",
-   "fit": "stretch"
+   "fit": "stretch",
+   "fade": {
+    "until": 2,
+    "power": 0
+   }
   },
   "trail.base": {
    "what": "Comet tail behind plain shots, stretched behind the shot along its velocity, head on the shot; was ProjectileTrails' stroked tails (gold #ffcf3a with a white core)",
@@ -742,7 +778,7 @@
  },
  "presets": {
   "streakBurst": {
-   "what": "Radial burst; fast particles stretch along their velocity (reads as motion blur)",
+   "what": "Radial burst; fast particles stretch along their velocity (minLength 24: late, slowed streaks stay dashes instead of flecks; main drew round-capped sticks)",
    "shape": "streak",
    "count": 48,
    "speed": [
@@ -761,7 +797,7 @@
    "drag": 2.3,
    "gravity": 0,
    "stretch": 0.06,
-   "minLength": 6,
+   "minLength": 24.0,
    "jitter": 0.12,
    "colors": [
     "pale",

@@ -247,8 +247,12 @@ class RenderTest {
       const moving = shots.filter((p) => p.vx || p.vy), lens = moving.map((p) => Math.min(T.maxLength, Math.hypot(p.vx, p.vy) * T.stretch) * (p.trail ? T.elementLength : 1));
       this.ok(JSON.stringify(trails.map((d) => d.img)) === JSON.stringify(["trail_base", "trail_base", "trail_frost", "trail_ember"]) && trails.every((d, i) => near(d.dw, lens[i]) && near(d.dh, T.height)),
         `fx 10b (${th}, low=${low}): every moving shot plays trail.<its element trail, else base> stretched behind it (lengths ${lens.map((l) => l.toFixed(1)).join(", ")}, height ${T.height}); a still shot has none`);
-      const rots = out.trails.filter((l) => l.startsWith("ctx.rotate(")).slice(0, 4).map((l) => Number(l.slice(11, -1)));
-      this.ok(rots.length === 4 && moving.every((p, i) => near(rots[i], Math.atan2(p.vy, p.vx))), `fx 10b (${th}, low=${low}): each trail is rotated to its shot's velocity`);
+      // Batched draws undo their own rotate (no per-draw save / restore): rotations come in (a, -a) pairs.
+      const allRots = out.trails.filter((l) => l.startsWith("ctx.rotate(")).map((l) => Number(l.slice(11, -1)));
+      const rots = allRots.filter((_, k) => k % 2 === 0).slice(0, 4), undone = allRots.length % 2 === 0 && allRots.every((r, k) => k % 2 === 0 || r === -allRots[k - 1]);
+      this.ok(rots.length === 4 && undone && moving.every((p, i) => near(rots[i], Math.atan2(p.vy, p.vx))), `fx 10b (${th}, low=${low}): each trail is rotated to its shot's velocity, and each rotate is undone exactly`);
+      const saves = all.filter((l) => l === "ctx.save()").length, restores = all.filter((l) => l === "ctx.restore()").length;
+      this.ok(saves === restores && saves <= 2, `fx 10b (${th}, low=${low}): no per-particle save / restore (one balanced pair per drawer pass: ${saves} / ${restores})`);
       const tA = out.trails.filter((l) => l.startsWith("ctx.globalAlpha=")).map((l) => Number(l.slice(16)));
       this.ok(tA.slice(0, 4).every((a) => near(a, Math.min(1, theme.trailAlpha))), `fx 10b (${th}, low=${low}): trails at the theme's trail opacity (${theme.trailAlpha})`);
       const wantG = low ? [] : ["glow_gold", "glow_gold", "glow_amber", "glow_cyan", "glow_orange"], wantR = [T.glowRadius, T.glowRadius, T.critGlowRadius, T.glowRadius * T.elementGlowMul, T.glowRadius * T.elementGlowMul];
@@ -265,16 +269,24 @@ class RenderTest {
       const motes = pd.filter((d) => d.img === "motes");
       this.ok(motes.every((d, k) => near(d.dw, 2 * mR(soft[k]))), `fx 10b (${th}, low=${low}): mote cores at the old core radius (max(1.2 px, 0.24 x size)) x the entry's size`);
       const streaks = pd.filter((d) => d.img.startsWith("streak_")), step = (i) => Math.min(2, ((1 - pool.life[i] / pool.maxLife[i]) * 3) | 0);
-      this.ok(streaks.length === streak.length && streaks.every((d, k) => { const i = streak[k], sp = Math.hypot(pool.vx[i], pool.vy[i]) || 1; return d.sx === Math.floor(((step(i) + 0.5) / 3) * 4) * 64 && near(d.dh, pool.size[i] + ink * 1.5) && near(d.dw, Math.max(pool.minLen[i], sp * pool.stretch[i])); }),
-        `fx 10b (${th}, low=${low}): streaks play the frame of their fade step (fresh / mid / fade: progress (step + 0.5) / 3 through the strip; the stub strip has 4 frames), stretched to the old length (max(minLen, speed x stretch)), height = width + the old ink edge (${ink} px x unit)`);
+      this.ok(streaks.length === streak.length && streaks.every((d, k) => { const i = streak[k], sp = Math.hypot(pool.vx[i], pool.vy[i]) || 1; const U = (data.effects["streak." + pal[pool.color[i]]].fade || {}).until || 1; return d.sx === Math.min(3, Math.floor(((step(i) + 0.5) / 3 / U) * 4)) * 64 && near(d.dh, pool.size[i] + ink * 1.5) && near(d.dw, Math.max(pool.minLen[i], sp * pool.stretch[i])); }),
+        `fx 10b (${th}, low=${low}): streaks play the frame of their fade step (fresh / mid / fade: progress (step + 0.5) / 3 / fade.until through the strip, fx.json holds the longer frames; the stub strip has 4 frames), stretched to the old length (max(minLen, speed x stretch)), height = width + the old ink edge (${ink} px x unit)`);
       const pA = out.pool.filter((l) => l.startsWith("ctx.globalAlpha=")).map((l) => Number(l.slice(16)));
       const wantA = [...glowOrder.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return (pool.shape[i] === S.SOFT ? Math.min(1, (1 - f) * 6) * Math.pow(f, 0.6) * 0.85 : f) * theme.glow; }),
         ...soft.map((i) => { const f = pool.life[i] / pool.maxLife[i]; return Math.min(1, (1 - f) * 6) * Math.pow(f, 0.5) * 0.95; }), ...streak.map((i) => Math.min(1, (1 - (step(i) + 0.5) / 3) * 1.8))].map((a) => Math.min(1, a)).filter((a) => a >= 0.01);
       this.ok(pA.length === wantA.length && pA.every((a, i) => near(a, wantA[i])), `fx 10b (${th}, low=${low}): every particle keeps the old opacity curve (${pA.length} draws)`);
       this.ok(fx.drawn === n, `fx 10b: the batcher still counts drawn particles for QA (${fx.drawn})`);
     }
+    { // P3: no per-particle allocation. Every draw from a drawer reuses its one args object, and ids are cached strings.
+      const { fx, pool, shots } = this.particleCalls(true, false, "cartoon"), E = fx.effects, seen = [], draw = E.draw.bind(E);
+      E.draw = (id, ctx, at) => { seen.push([id, at]); return draw(id, ctx, at); };
+      const c = new DrawRecorder().ctx("c"); fx.drawProjectiles(c, shots, false); fx.drawPool(c, pool, 1.5, false);
+      const ats = new Set(seen.map(([, at]) => at)), ids = typeof E.variantId === "function" && seen.every(([id]) => id === E.variantId(...id.split(".")));
+      this.ok(seen.length > 20 && ats.size === 2 && ids, `fx 10b: trails and particles reuse one args object per drawer and cached ids (${seen.length} draws, ${ats.size} args objects)`);
+    }
     const none = this.particleCalls(false, false, "cartoon"), drawn = [...none.out.trails, ...none.out.pool];
-    this.ok(drawn.length === 0, `fx 10b: with no art loaded, trails and particles draw nothing at all (no fallback; ${drawn.length} calls)`);
+    const real = drawn.filter((l) => l !== "ctx.save()" && l !== "ctx.restore()");
+    this.ok(real.length === 0 && drawn.filter((l) => l === "ctx.save()").length === drawn.filter((l) => l === "ctx.restore()").length, `fx 10b: with no art loaded, trails and particles draw nothing at all (no fallback; ${real.length} calls besides the drawers' balanced save / restore)`);
   }
 
   // ---------- 3. PR 10a: the converted drawers play fx.json effects ----------

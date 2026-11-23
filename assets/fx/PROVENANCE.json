@@ -47,10 +47,10 @@
    "date": "2026-11-16",
    "tool": "Grok Bot GenerateImage (cursor namespace)",
    "generations": {
-    "total": 38,
+    "total": 40,
     "kept": 17,
-    "rejected": 21,
-    "addedLater": "streak_lime (2026-11-16: 3 generations, r1 shipped as v1; 2026-11-23: one approved repaint v2 from the pale size chart as layout reference, now shipped)",
+    "rejected": 23,
+    "addedLater": "streak_lime (2026-11-16: 3 generations, r1 shipped as v1; 2026-11-23: v2 regenerated at Chief of Staff's request with streak_pale as an image reference, blocked by PR Verifier as a recolour; v3a and v3 generated from their own prompts with no reference, v3 shipped)",
     "note": "streaks needed rerolls because the generator kept painting the three widths the same; the size-chart prompt (6-7 shrinking copies, 3 bands picked) fixed it for 7 of 8. vignette_red and vignette_dark were each rerolled for opacity layout."
    },
    "bar": "Brian (10a): subtle, thin, soft, match the weight of what each piece replaces, no heavy dark outlines",
@@ -1501,20 +1501,18 @@
   }
  },
  "streak/streak_lime.png": {
-  "version": "v2",
-  "sha256": "cfcc43bb90c814d685c6affa229e9282bed5b53a4cbe56a5d0402873541358c3",
+  "version": "v3",
+  "sha256": "da9e529bf0adadb192f34928d296249c1593943bbc0f18cc384f69b15d2731b2",
   "sheet": "streak/streak_lime.json",
   "frames": 3,
   "frameW": 64,
   "frameH": 16,
   "tool": "Grok Bot GenerateImage (cursor namespace)",
   "sourceImage": "_src/raw/streak_lime.jpg",
-  "sourceSha256": "1b4858218dc8fbfd1f0ddc06aa796b31990953226ed84657c73af7d55594d384",
-  "sourceDraft": "streak_lime_v2",
-  "prompt": "Repaint the reference sprite sheet exactly: same flat solid magenta background (#ff00ff), same layout, same number of teardrop speed dashes, same positions, same sizes, same short fat proportions (each dash only about 4 times longer than it is thick), same size steps shrinking from top to bottom, same big rounded HEAD at the RIGHT end tapering to a point at the LEFT end, same thin dark purple ink outline (#2b1d3a). Change ONLY the fill colour: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white, no white highlight. Flat clean cartoon game style, subtle, no glow, no sparkles, no text, no extra shapes. [reference image: _src/raw/streak_pale.jpg, our own generated pale size chart, used for layout/proportions only]",
-  "referenceImages": [
-   "_src/raw/streak_pale.jpg (own generated pale streak size chart; layout and proportions only)"
-  ],
+  "sourceSha256": "ee346bd2706b8b6d9edc7fc6ce3571f1a976ea50c1bb42acecf08a8ca2c161c1",
+  "sourceDraft": "streak_lime_v3",
+  "prompt": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same VENOM STREAK, the wet toxic trail a venom shot leaves: SEVEN copies stacked in seven rows with empty magenta space between them, all flying right and right-aligned at the same head position, shrinking clearly from top to bottom: each copy is about 90% of the size (both length and thickness) of the copy above it, so the bottom one is only about 55-60% of the top one's size. The shrinking must be obvious at a glance. Each venom streak is SHORT and THICK: its total length only about 3.5 times its thickness. A big rounded wet blob HEAD at the RIGHT end; the body behind it is a thick gooey smear with a lumpy, uneven top and bottom edge, two or three small round drips hanging off the underside, a few small round bubbles inside the goo, and it breaks up at the LEFT end into an irregular splattered tail with a couple of separate small droplets. Colour: toxic lime green (#c8ec5a) as the main colour, a darker wet core of the same lime hue along the middle (#9cc23a), small paler lime bubbles (#e0f59a), never white, no white highlights. Outline: a thin soft dark purple ink line (#2b1d3a), about one tenth of the streak's thickness. Flat clean cartoon game style, no glow, no sparkles, no extra shapes.",
+  "referenceImages": [],
   "cleanup": [
    "flat key-colour background removed (keying.py: distance to the key colour -> soft alpha, edge colours un-mixed from the key and bled from the nearest solid pixel)",
    "the raw paints a size chart of the same dash; the three bands whose painted thickness ratios are closest to 1 : 0.87 : 0.73 are cut out as fresh / mid / fade (no width change in code)",
@@ -1524,44 +1522,57 @@
   "processParams": {
    "bg": "flat key colour removed (keying.py)",
    "key": [
-    241.0,
+    251.0,
     3.0,
-    148.0
+    239.0
    ],
    "paintedThicknessPx": [
-    101,
-    95,
-    89,
+    90,
     84,
-    79,
-    75,
-    69
+    78,
+    72,
+    68,
+    64,
+    60,
+    56
    ],
    "pickedBands": [
-    1,
-    3,
-    6
+    2,
+    4,
+    7
    ],
    "pickedPaintedRatios": [
     1.0,
-    0.884,
-    0.726
+    0.872,
+    0.718
    ],
-   "scale": 0.16580310880829016
+   "scale": 0.14479638009049775
   },
   "license": "original generated art",
   "rejectedDrafts": {
    "_src/raw/rejected/streak_lime_r0.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SIX copies stacked in six rows, all pointing right and right-aligned at the same head position, getting steadily smaller from top to bottom: each dash is about 92% of the size (both length and thickness) of the dash above it, so the bottom one is about two thirds the size of the top one. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a point at the LEFT end; it is short and fat, its length only about 3.5 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
    "_src/raw/rejected/streak_lime_r1.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same speed dash: SEVEN copies stacked in seven rows, all pointing right and right-aligned at the same head position, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a teardrop lying on its side: a big rounded HEAD at the RIGHT end, body tapering to a sharp point at the LEFT end; its length about 4 times its thickness. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
-   "_src/raw/rejected/streak_lime_r2.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SEVEN copies stacked in seven rows, all pointing right, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side, short and fat: its length only about 3.5 times its thickness, a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes."
+   "_src/raw/rejected/streak_lime_r2.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT speed dash: SEVEN copies stacked in seven rows, all pointing right, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side, short and fat: its length only about 3.5 times its thickness, a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white. Outline: a dark purple ink line (#2b1d3a) around each dash, clearly visible but thin, about one tenth of that dash's thickness. Flat clean cartoon game style, subtle, no glow, no sparkles, no extra shapes.",
+   "_src/raw/rejected/streak_lime_v2.jpg": "Repaint the reference sprite sheet exactly: same flat solid magenta background (#ff00ff), same layout, same number of teardrop speed dashes, same positions, same sizes, same short fat proportions (each dash only about 4 times longer than it is thick), same size steps shrinking from top to bottom, same big rounded HEAD at the RIGHT end tapering to a point at the LEFT end, same thin dark purple ink outline (#2b1d3a). Change ONLY the fill colour: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white, no white highlight. Flat clean cartoon game style, subtle, no glow, no sparkles, no text, no extra shapes. [reference image: _src/raw/streak_pale.jpg, our own generated pale size chart, used for layout/proportions only]",
+   "_src/raw/rejected/streak_lime_v3a.jpg": "Game VFX sprite sheet on a perfectly flat solid magenta background (#ff00ff), no gradient, no shadow, no grid, no text. A size chart of the same SHORT, FAT lime speed dash: SEVEN copies stacked in seven rows, all pointing right and right-aligned at the same head position, shrinking clearly from top to bottom: each dash is about 90% of the size (both length and thickness) of the dash above it, so the bottom dash is only about 55-60% of the top dash's size. The shrinking must be obvious at a glance, like a size chart from large to small. Even spacing, no overlaps. Each dash is a plump teardrop lying on its side, short and fat like a fat droplet of venom: its length only about 3.5 times its thickness, a big rounded HEAD at the RIGHT end and a body tapering to a point at the LEFT end. The top dash is about one eighth of the image height thick. Fill: pale yellow-green lime (#c8ec5a) with one lighter lime stripe along the centre line (#e0f59a), never white, no white highlight. Outline: a dark purple ink line (#2b1d3a) around each dash, thin, about one tenth of that dash's thickness. Flat clean cartoon game style, soft and subtle, no glow, no sparkles, no extra shapes."
   },
-  "supersedes": {
-   "file": "_src/raw/rejected/streak_lime_v1.png",
-   "sha256": "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
-   "fromRaw": "_src/raw/rejected/streak_lime_r1.jpg",
-   "why": "v1 filled only 7/6/5 px of the 16 px height (drawn ~2 px thick); Brian approved one repaint (relayed by Chief of Staff, Nov 23 8:32 AM ET) to fill 14-16 px",
-   "date": "2026-11-23"
-  }
+  "supersedes": [
+   {
+    "version": "v1",
+    "file": "_src/raw/rejected/streak_lime_v1.png",
+    "sha256": "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
+    "fromRaw": "_src/raw/rejected/streak_lime_r1.jpg",
+    "note": "v1 filled only 7/6/5 px of the 16 px frame height; v2 was regenerated at Chief of Staff's request on 2026-11-23."
+   },
+   {
+    "version": "v2",
+    "file": "_src/raw/rejected/streak_lime_v2.png",
+    "sha256": "cfcc43bb90c814d685c6affa229e9282bed5b53a4cbe56a5d0402873541358c3",
+    "fromRaw": "_src/raw/rejected/streak_lime_v2.jpg",
+    "note": "v2 was generated with streak_pale as an image reference; PR Verifier blocked it as a recolour of pale (0.983 shape overlap); v3 replaces it."
+   }
+  ],
+  "v3Note": "v3 generated from its own prompt with NO reference image (venom streak brief), like the other 8 streaks. Draft streak_lime_v3a (plain dash, also no reference) was made first and rejected: drawn ~6.4x longer than thick, so it could only fill ~10 px of 16."
  },
  "streak/streak_pale.png": {
   "version": "v1",

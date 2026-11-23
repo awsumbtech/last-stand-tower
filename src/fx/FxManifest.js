@@ -98,6 +98,11 @@ LST.FxManifest = class FxManifest {
   impact(name) { return (name && this.data.impacts[name]) || null; }
 
   preset(id) { return this.data.presets[id] || null; }
+  // "<kind>.<variant>" (e.g. "glow.gold"), built once per pair so per-particle draws make no strings.
+  variantId(kind, v) {
+    const c = this.ids || (this.ids = {}), k = c[kind] || (c[kind] = {});
+    return k[v] || (k[v] = kind + "." + v);
+  }
   theme(id) { return this.data.themes[id] || null; }
 
   triggers() {

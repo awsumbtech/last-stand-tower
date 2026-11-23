@@ -93,11 +93,17 @@ class FxTest {
     const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
     for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
     for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
-    // streak_lime v2 (Nov 23: one approved repaint, frames fill 16 / 14 / 12 px) replaces v1 in place; v1's hash is kept in its entry's "supersedes".
-    const V10b = { streak_lime: "v2" };
-    const lime = prov["streak/streak_lime.png"] || {};
-    this.ok(lime.version === "v2" && lime.supersedes && lime.supersedes.sha256 === "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
-      "art 10b: streak_lime ships v2 and its PROVENANCE entry keeps v1's sha256 (fb167b38) as history");
+    // streak_lime v3 (Nov 23, painted from its own prompt with no reference) replaces v1 (too thin) and v2 (blocked:
+    // a recolour of streak_pale); both hashes stay in its PROVENANCE entry's "supersedes" as history.
+    const V10b = { streak_lime: "v3" };
+    const lime = prov["streak/streak_lime.png"] || {}, sup = [].concat(lime.supersedes || []);
+    const hist = { v1: "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb", v2: "cfcc43bb90c814d685c6affa229e9282bed5b53a4cbe56a5d0402873541358c3" };
+    this.ok(lime.version === "v3" && lime.sha256 === "da9e529bf0adadb192f34928d296249c1593943bbc0f18cc384f69b15d2731b2" && Object.entries(hist).every(([v, h]) => sup.some((q) => q.version === v && q.sha256 === h)),
+      "art 10b: streak_lime ships v3 (da9e529b) and its PROVENANCE entry keeps v1 (fb167b38) and v2 (cfcc43bb) as history");
+    // A colour variant is its own painting, not another variant recoloured: lime's alpha mask (alpha >= 50%,
+    // whole sheet) overlaps pale's with IoU < 0.9 (v2, a pale recolour, measured 0.983).
+    const iou = FxTest.maskIoU(path.join(this.root, "assets/fx/streak/streak_lime.png"), path.join(this.root, "assets/fx/streak/streak_pale.png"));
+    this.ok(iou < 0.9, `art 10b: streak_lime is its own painting, not streak_pale recoloured (alpha >= 50% mask IoU vs pale ${iou.toFixed(3)} < 0.9)`);
     const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
       const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
       return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== (V10b[id] || "v1") || j.version !== (V10b[id] || "v1") || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
@@ -107,7 +113,7 @@ class FxTest {
     const moteBad = Object.entries(data.effects).filter(([k]) => k.startsWith("mote.")).filter(([k, e]) => e.sheet !== "motes" || e.frame !== cells.indexOf(k.slice(5)) || e.frame < 0).map(([k]) => k);
     const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
     this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
-      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v2) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
+      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v3) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
     // Venom bursts (main: pale lime #e4ffb8, lime #b4f06a, green #8be04a) play streak_lime twice and green once (Game Art streak_lime, Nov 16).
     const ven = data.impacts.elemVenom && data.impacts.elemVenom.colors;
     this.ok(String(ven) === "lime,lime,green" && data.effects["streak.lime"] && data.effects["streak.lime"].sheet === "streak_lime" && prov["streak/streak_lime.png"],
@@ -202,16 +208,39 @@ class FxTest {
     return out;
   }
 
+  // Every element's shot trail (src/elements/*.js `trail: "x"`) has presets.trail.elementGlows[x]
+  // naming an existing glow effect, and a trail.x effect. A missing entry would otherwise draw the
+  // id "glow.undefined" (nothing) without any error.
+  checkElementGlows(data) {
+    const dir = path.join(this.root, "src/elements"), T = (data.presets && data.presets.trail) || {}, G = T.elementGlows || {};
+    const trails = [...new Set(fs.readdirSync(dir).filter((f) => f.endsWith(".js")).flatMap((f) => [...this.read("src/elements/" + f).matchAll(/\btrail:\s*"(\w+)"/g)].map((m) => m[1])))].sort();
+    this.ok(trails.length >= 4, `elements: found the element shot trails (${trails.join(", ")})`);
+    for (const t of trails) {
+      this.ok(typeof G[t] === "string" && !!data.effects["glow." + G[t]], `elements: trail "${t}" has presets.trail.elementGlows.${t} naming a glow effect (${G[t] === undefined ? "missing: would draw glow.undefined" : "glow." + G[t]})`);
+      this.ok(!!data.effects["trail." + t], `elements: trail "${t}" has a trail.${t} effect`);
+    }
+  }
+
   async run() {
     const LST = this.sandbox().LST;
     this.checkFiles();
     const data = this.checkManifest(LST);
+    this.checkElementGlows(data);
     this.checkObjects(LST);
     await this.checkServiceWorker(data);
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
   }
 }
+
+// IoU of two same-size PNGs' alpha >= 50% masks (whole sheet).
+FxTest.maskIoU = (a, b) => {
+  const P = require("./fx-art-scan.js").png, A = P(fs.readFileSync(a)), B = P(fs.readFileSync(b));
+  if (A.w !== B.w || A.h !== B.h) return 0;
+  let both = 0, any = 0;
+  for (let i = 3; i < A.px.length; i += 4) { const x = A.px[i] >= 128, y = B.px[i] >= 128; if (x && y) both++; if (x || y) any++; }
+  return any ? both / any : 0;
+};
 
 module.exports = FxTest;
 if (require.main === module) new FxTest().run().then((c) => process.exit(c));

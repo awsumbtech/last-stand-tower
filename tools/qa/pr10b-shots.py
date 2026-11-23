@@ -1,8 +1,23 @@
+#!/usr/bin/env python3
 # PR 10b shots (390 x 844 @2x, Backyard), same script on main and on the PR tree. The game loop is
 # stopped and frames are stepped by hand, so each effect is caught at a set point in its life.
-import json, sys, math
+#   python3 tools/qa/pr10b-shots.py --port 8767 --tag 10b --out /tmp/shots-10b
+#   python3 tools/qa/pr10b-shots.py --port 8768 --tag main --out /tmp/shots-main   (a main worktree served on 8768)
+# Serve the tree first (e.g. python3 -m http.server 8767). Writes pr10b-<shot>-<tag>-390x844.png and
+# pr10b-shots-<tag>.json (labels, per-shot state, page errors) into --out.
+import argparse, json, os, sys, math
 from playwright.sync_api import sync_playwright
-BASE, TAG, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+ap = argparse.ArgumentParser(description="PR 10b effect shots at 390x844 @2x")
+ap.add_argument("--base", help="game URL ending in / (default http://<host>:<port>/)")
+ap.add_argument("--host", default="127.0.0.1")
+ap.add_argument("--port", type=int, default=8767)
+ap.add_argument("--tag", required=True, help="name in the file names, e.g. main or 10b")
+ap.add_argument("--out", required=True, help="output folder (created if missing)")
+A = ap.parse_args()
+BASE = A.base or "http://%s:%d/" % (A.host, A.port)
+if not BASE.endswith("/"): BASE += "/"
+TAG, OUT = A.tag, os.path.join(A.out, "")
+os.makedirs(OUT, exist_ok=True)
 errs = []; shots = []
 STEP = """(n) => { const fx = LST.fxDirector, r = game.renderer; for (let i = 0; i < n; i++) { fx.update(1/60, game, 16.7); r.draw(game, 1/60); fx.endFrame(16.7, 1); } }"""
 RUN = """(n) => { const fx = LST.fxDirector, r = game.renderer; for (let i = 0; i < n; i++) { game.update(1/60); fx.update(1/60, game, 16.7); r.draw(game, 1/60); fx.endFrame(16.7, 1); } }"""
