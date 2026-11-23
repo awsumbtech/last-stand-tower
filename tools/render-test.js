@@ -28,6 +28,7 @@ class RenderTest {
     this.fails = 0;
     this.ORDER_REV = "24349b8"; // render.js / FxRenderer.js before PR 8b
     this.STATE_REV = "738409a"; // render.js before PR 8 (state-string checks)
+    this.ALLOC_REV = "ba51277"; // FX drawers before PR 10b's no-allocation change (per-draw args, save / restore)
     this.IDS = ["menu", "playing", "paused", "celebrate", "upgrade", "gotcha", "gameover", "workshop", "victory", "cleared"];
     this.LAYERS = ["BackdropLayer", "EnemyLayer", "TowerLayer", "FxLayer", "HudCanvasLayer", "OverlayLayer"];
     this.RENDER_FILES = ["render/RenderLayer.js", "render/OverdriveRing.js", "render/BackdropLayer.js", "render/EnemyLayer.js", "render/TowerLayer.js", "render/FxLayer.js", "render/HudCanvasLayer.js", "render/OverlayLayer.js", "render/RenderPipeline.js", "render.js"];
@@ -396,11 +397,58 @@ class RenderTest {
     this.checkRenderer();
     this.checkParticles();
     this.checkConverted();
+    this.checkDrawEquivalence();
     this.checkStructure();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
   }
 }
+
+// ---------- PR 10b: the no-allocation drawers draw exactly what the old ones drew ----------
+// Trails and a 300-particle pool, 3 themes x low / high quality, on a simulated canvas that tracks the
+// transform, opacity and blend through save / restore. Every drawImage (sheet, source rect, on-screen
+// corners, opacity, blend) must match the drawers at ALLOC_REV (with this tree's fx.json for both).
+RenderTest.prototype.drawEquivalenceRun = function (fromRev) {
+  const OLD = ["sprites/SheetAnimation.js", "fx/SpriteEffect.js", "fx/FxManifest.js", "fx/draw/ProjectileTrails.js", "fx/draw/ParticleBatch.js"];
+  const files = ["config.js", "fx/FxPresets.js", "fx/ParticlePool.js", "fx/ImpactSync.js", "sprites/SheetAnimation.js", "fx/SpriteEffect.js", "fx/FxManifest.js", "fx/EffectPlayer.js", "fx/draw/TowerGroundGlow.js", "fx/draw/ProjectileTrails.js", "fx/draw/ChainArcs.js", "fx/draw/TextGlows.js", "fx/draw/ParticleBatch.js", "fx/draw/ImpactPulses.js", "fx/draw/ImpactFlashes.js", "fx/FxRenderer.js"];
+  const sb = { console, Math, window: {} }; vm.createContext(sb);
+  vm.runInContext("var window = this.window; window.LST = {}; var LST = window.LST;", sb);
+  for (const f of files) vm.runInContext(fromRev && OLD.includes(f) ? this.show(fromRev, "src/" + f) : this.read("src/" + f), sb, { filename: f });
+  const LST = sb.LST, data = JSON.parse(this.read("assets/fx/fx.json")), m = new LST.FxManifest("assets/fx/fx.json"); m.setData(data);
+  for (const id of Object.keys(data.sheets)) {
+    const j = JSON.parse(this.read("assets/fx/" + data.sheets[id]));
+    const strip = { image: { name: id }, frame: { w: j.frameW, h: j.frameH }, count: j.count, fps: j.fps || 1, loop: !!j.loop };
+    m.install(id, { strips: { main: strip }, anchor: { x: (j.anchor || j.pivot || [j.frameW / 2])[0], y: (j.anchor || j.pivot || [0, j.frameH / 2])[1] }, refBodyR: j.frameW / 2 }, { main: { name: id } });
+  }
+  const out = [];
+  let M = [1, 0, 0, 1, 0, 0], a = 1, op = "source-over"; const st = [];
+  const mul = (n) => { const [a1, b1, c1, d1, e1, f1] = M, [a2, b2, c2, d2, e2, f2] = n; M = [a1 * a2 + c1 * b2, b1 * a2 + d1 * b2, a1 * c2 + c1 * d2, b1 * c2 + d1 * d2, a1 * e2 + c1 * f2 + e1, b1 * e2 + d1 * f2 + f1]; };
+  const pt = (x, y) => [M[0] * x + M[2] * y + M[4], M[1] * x + M[3] * y + M[5]].map((v) => +v.toFixed(6));
+  const ctx = { save() { st.push([M.slice(), a, op]); }, restore() { [M, a, op] = st.pop(); },
+    translate(x, y) { mul([1, 0, 0, 1, x, y]); }, rotate(r) { const c = Math.cos(r), s = Math.sin(r); mul([c, s, -s, c, 0, 0]); },
+    set globalAlpha(v) { a = v; }, get globalAlpha() { return a; }, set globalCompositeOperation(v) { op = v; }, get globalCompositeOperation() { return op; },
+    drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh) { out.push([img.name, sx, sy, sw, sh, pt(dx, dy), pt(dx + dw, dy), pt(dx, dy + dh), +a.toFixed(9), op].join(" ")); } };
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (const th of ["cartoon", "neon", "pixel"]) for (const low of [false, true]) {
+    const fx = new LST.FxRenderer({}, m); fx.setTheme(th);
+    const shots = []; for (let i = 0; i < 40; i++) shots.push({ x: rnd() * 400, y: rnd() * 800, vx: (rnd() - 0.5) * 1400, vy: (rnd() - 0.5) * 1400, crit: rnd() < 0.2, trail: [undefined, "ember", "frost", "spark", "venom"][(rnd() * 5) | 0] });
+    fx.drawProjectiles(ctx, shots, low);
+    const pool = { count: 300, palette: ["gold", "pale", "amber", "red", "pink", "cyan", "green", "lime", "soot", "yellow", "orange", "blue", "purple"] };
+    for (const k of ["x", "y", "vx", "vy", "life", "maxLife", "size", "shape", "color", "minLen", "stretch"]) pool[k] = [];
+    for (let i = 0; i < 300; i++) { pool.x.push(rnd() * 400); pool.y.push(rnd() * 800); pool.vx.push((rnd() - 0.5) * 900); pool.vy.push((rnd() - 0.5) * 900); pool.maxLife.push(1); pool.life.push(rnd());
+      pool.size.push(2 + rnd() * 5); pool.shape.push((rnd() * 3) | 0); pool.color.push((rnd() * 13) | 0); pool.minLen.push(24); pool.stretch.push(0.06); }
+    fx.drawPool(ctx, pool, 1.5, low);
+    out.push(`theme ${th} low ${low} stack ${st.length}`);
+  }
+  return out;
+};
+
+RenderTest.prototype.checkDrawEquivalence = function () {
+  const was = this.drawEquivalenceRun(this.ALLOC_REV), now = this.drawEquivalenceRun(null);
+  const draws = now.filter((l) => !l.startsWith("theme ")).length, firstDiff = now.findIndex((l, i) => l !== was[i]);
+  this.ok(draws > 2000 && now.length === was.length && firstDiff < 0 && now.filter((l) => l.startsWith("theme ")).every((l) => l.endsWith(" stack 0")),
+    `fx 10b: trails + particles draw exactly what the drawers at ${this.ALLOC_REV} drew (${draws} drawImage calls: sheet, source rect, on-screen corners, opacity, blend; first difference: ${firstDiff < 0 ? "none" : now[firstDiff] + " vs " + was[firstDiff]}; save / restore balanced)`);
+};
 
 module.exports = RenderTest;
 if (require.main === module) process.exit(new RenderTest().run());

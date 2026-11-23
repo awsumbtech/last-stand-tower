@@ -102,7 +102,7 @@ class SystemsTest {
       this.ok(scripts.indexOf(file) < scripts.indexOf("src/game.js") || !prop, `files: ${name} loads before game.js`);
       if (prop) this.ok(this.game[prop] instanceof this.LST[name] && (this.game[prop].game || this.game[prop].world) === this.game, `files: game.${prop} is the run's ${name}`);
     }
-    this.ok(/const VERSION = "v31"/.test(sw), "files: sw.js VERSION is v31");
+    this.ok(/const VERSION = "v32"/.test(sw), "files: sw.js VERSION is v32");
     for (const [m, [prop, fn]] of Object.entries(this.HANDOFFS)) {
       const g = this.game, sys = g[prop], keep = sys[fn], seen = [];
       sys[fn] = (...a) => { seen.push(a); return "ret:" + fn; };

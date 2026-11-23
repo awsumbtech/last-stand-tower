@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v31"; // PR 10b: particles, trails, low-HP vignette, finale dim and screen flash are fx.json image effects; presets, impacts and themes in fx.json
+const VERSION = "v32"; // low-HP red edge: vignette_red v2 (side middles 0.38-0.40); streaks play all 3 frames again
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [

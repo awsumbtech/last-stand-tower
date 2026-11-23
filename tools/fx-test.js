@@ -91,19 +91,44 @@ class FxTest {
     // trails keep the head-at-right pivot; the vignettes and the dim fill the screen.
     const png = (f) => { const b = fs.readFileSync(path.join(this.root, "assets/fx", f)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
     const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
-    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
-    for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
+    const sheetsOf = (dir) => Object.keys(data.sheets).filter((id) => id.startsWith(dir + "_")).map((id) => id.slice(dir.length + 1));
+    for (const v of sheetsOf("streak")) B["streak_" + v] = ["streak", 192, 16, 3]; for (const v of sheetsOf("trail")) B["trail_" + v] = ["trail", 128, 24, 1];
     // streak_lime v3 (Nov 23, painted from its own prompt with no reference) replaces v1 (too thin) and v2 (blocked:
     // a recolour of streak_pale); both hashes stay in its PROVENANCE entry's "supersedes" as history.
-    const V10b = { streak_lime: "v3" };
+    const V10b = { streak_lime: "v3", vignette_red: "v2" };
     const lime = prov["streak/streak_lime.png"] || {}, sup = [].concat(lime.supersedes || []);
     const hist = { v1: "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb", v2: "cfcc43bb90c814d685c6affa229e9282bed5b53a4cbe56a5d0402873541358c3" };
     this.ok(lime.version === "v3" && lime.sha256 === "da9e529bf0adadb192f34928d296249c1593943bbc0f18cc384f69b15d2731b2" && Object.entries(hist).every(([v, h]) => sup.some((q) => q.version === v && q.sha256 === h)),
       "art 10b: streak_lime ships v3 (da9e529b) and its PROVENANCE entry keeps v1 (fb167b38) and v2 (cfcc43bb) as history");
-    // A colour variant is its own painting, not another variant recoloured: lime's alpha mask (alpha >= 50%,
-    // whole sheet) overlaps pale's with IoU < 0.9 (v2, a pale recolour, measured 0.983).
-    const iou = FxTest.maskIoU(path.join(this.root, "assets/fx/streak/streak_lime.png"), path.join(this.root, "assets/fx/streak/streak_pale.png"));
-    this.ok(iou < 0.9, `art 10b: streak_lime is its own painting, not streak_pale recoloured (alpha >= 50% mask IoU vs pale ${iou.toFixed(3)} < 0.9)`);
+    // vignette_red v2 (Nov 23, a new painting from its own prompt) replaces v1, whose side middles were
+    // nearly clear (0.01-0.02); v1's hash stays in its PROVENANCE entry's "supersedes" as history.
+    const vig = prov["vignette/vignette_red.png"] || {}, vsup = [].concat(vig.supersedes || []);
+    this.ok(vig.version === "v2" && vig.sha256 === "08b913350836434937d20ab521678a02d1b6293759f80fd1915125e99dde26c0" && vsup.some((q) => q.version === "v1" && q.sha256 === "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e"),
+      "art: vignette_red ships v2 (08b91335) and its PROVENANCE entry keeps v1 (92d2596f) as history");
+    // The low-HP edge reaches the sides: mean alpha of a 24 px patch on the middle of the left and right
+    // edges is at least 0.3 (v1: 0.017 / 0.010, so the edge sat only in the corners and top / bottom).
+    const vf = path.join(this.root, "assets/fx/vignette/vignette_red.png"), vw = FxTest.pngSize(vf);
+    const sideL = FxTest.patchAlpha(vf, 0, vw[1] >> 1), sideR = FxTest.patchAlpha(vf, vw[0] - 1, vw[1] >> 1);
+    this.ok(sideL >= 0.3 && sideR >= 0.3, `art: vignette_red's side middles show the edge (24 px patch alpha left ${sideL.toFixed(3)}, right ${sideR.toFixed(3)} >= 0.3)`);
+    // Every streak is its own painting, not another streak recoloured: for every pair of streak sheets the
+    // alpha >= 50% masks (whole sheet) overlap with IoU < 0.9 (lime v2, a pale recolour, measured 0.983).
+    // Two v1 pairs measure just over 0.9: separate paintings (each its own raw source, no reference image)
+    // of the same short, fat teardrop prompt on a 16 px frame, alpha differing by 0.073 / 0.078 (lime v2 vs
+    // pale: 0.017). They are listed with both files' sha256, so a changed file goes through the gate again.
+    const SV = sheetsOf("streak"), sf = (v) => path.join(this.root, "assets/fx/streak/streak_" + v + ".png");
+    const KNOWN = { "red/green": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "49ac2d87473200d33f53a33d8fd4c158aa7d668b8760eea7c13e64382d8279ae", 0.909], "red/soot": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "5191ea56d2c9b538df35eccf526e77d56b2374bffc023f764db5b34ea809b3a0", 0.904] }; // tracked debt: removal row docs/OO-MIGRATION.md#fu-streak-red-pins (repaint streak_red at the next streak art change, then delete both entries)
+    const sha = (v) => crypto.createHash("sha256").update(fs.readFileSync(sf(v))).digest("hex"), pairs = [], over = [], known = [];
+    for (let i = 0; i < SV.length; i++) for (let j = i + 1; j < SV.length; j++) {
+      const k = SV[i] + "/" + SV[j], v = FxTest.maskIoU(sf(SV[i]), sf(SV[j])), K = KNOWN[k]; pairs.push(k);
+      if (v < 0.9) continue;
+      if (FxTest.pinMatches(K, sha(SV[i]), sha(SV[j]), v)) known.push(`${k} ${v.toFixed(3)}`); else over.push(`${k} ${v.toFixed(3)}`);
+    }
+    const onDisk = fs.readdirSync(path.join(this.root, "assets/fx/streak")).filter((f) => /^streak_.*\.png$/.test(f)).map((f) => f.slice(7, -4)).sort();
+    this.ok(SV.length > 1 && String(onDisk) === String([...SV].sort()) && pairs.length === SV.length * (SV.length - 1) / 2 && !over.length, `art: every streak pair is two paintings, not a recolour (${SV.length} streak_* sheets in fx.json = the streak PNGs on disk; alpha >= 50% mask IoU < 0.9 for all ${pairs.length} pairs; at or over 0.9: ${over.join(", ") || "none"}; pinned v1 pairs: ${known.join(", ") || "none"})`);
+    // The pins only hold for these exact files and scores: a changed sha256 or IoU no longer matches, so the gate fails again.
+    const [ka, kb, kv] = KNOWN["red/green"], flip = (h) => (h[0] === "0" ? "1" : "0") + h.slice(1), pinCases = [[ka, kb, kv, true], [flip(ka), kb, kv, false], [ka, flip(kb), kv, false], [ka, kb, kv + 0.001, false], [ka, kb, 0.95, false]];
+    const pinBad = pinCases.filter(([a, b, v, want]) => FxTest.pinMatches(KNOWN["red/green"], a, b, v) !== want).length;
+    this.ok(!pinBad && !FxTest.pinMatches(undefined, ka, kb, kv), `art: a pinned streak pair stops matching when either sha256 or the IoU (3 decimals) changes (self-test, ${pinCases.length} cases + no pin; wrong: ${pinBad})`);
     const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
       const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
       return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== (V10b[id] || "v1") || j.version !== (V10b[id] || "v1") || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
@@ -113,11 +138,18 @@ class FxTest {
     const moteBad = Object.entries(data.effects).filter(([k]) => k.startsWith("mote.")).filter(([k, e]) => e.sheet !== "motes" || e.frame !== cells.indexOf(k.slice(5)) || e.frame < 0).map(([k]) => k);
     const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
     this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
-      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v3) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
+      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v3, vignette_red v2) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
     // Venom bursts (main: pale lime #e4ffb8, lime #b4f06a, green #8be04a) play streak_lime twice and green once (Game Art streak_lime, Nov 16).
     const ven = data.impacts.elemVenom && data.impacts.elemVenom.colors;
     this.ok(String(ven) === "lime,lime,green" && data.effects["streak.lime"] && data.effects["streak.lime"].sheet === "streak_lime" && prov["streak/streak_lime.png"],
       `art 10b: the venom burst plays lime, lime, green (main's pale lime, lime, green) through streak.lime / streak_lime (got ${ven})`);
+    // ParticleBatch's 3 fade steps pass p=(b+0.5)/3. Each sheet has fresh / mid / fade: none is dropped.
+    const fm = new LST.FxManifest("assets/fx/fx.json"); fm.setData(data);
+    for (const v of SV) {
+      const id = "streak." + v, e = fm.effect(id), n = JSON.parse(this.read("assets/fx/" + data.sheets[data.effects[id].sheet])).count;
+      const frames = [0, 1, 2].map((b) => e.frame({ count: n, loop: false }, {}, (b + 0.5) / 3));
+      this.ok(n === 3 && frames.join() === "0,1,2", `streak frames: ${id} plays all 3 frames once (got ${frames})`);
+    }
     const IMP = ["space", "burst", "colors", "radius", "bloomAlpha", "flash", "shake", "thump"];
     const imps = Object.entries(data.impacts), routes = Object.values(LST.FX_ROUTES).filter(Boolean);
     this.ok(imps.length >= 12 && imps.every(([, i]) => data.effects[i.ring] && data.effects[i.bloom] && IMP.every((k) => i[k] != null) && i.burst.count > 0) && routes.every((r) => data.impacts[r]),
@@ -186,7 +218,7 @@ class FxTest {
       const want = new Set(["assets/fx/fx.json"]);
       for (const rel of Object.values(data.sheets)) { const j = "assets/fx/" + rel; want.add(j); want.add(path.dirname(j) + "/" + JSON.parse(this.read(j)).image); }
       this.ok(sb.__m.includes("assets/fx/fx.json") && files.length === want.size && files.every((f) => want.has(f) && this.exists(f)), `sw.js: the install step reads fx.json and precaches it, every sheet JSON and every PNG it names (${files.length} files, all present)`);
-      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v31"/.test(src), "sw.js: v31; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
+      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v32"/.test(src), "sw.js: v32; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
     });
   }
 
@@ -234,12 +266,27 @@ class FxTest {
 }
 
 // IoU of two same-size PNGs' alpha >= 50% masks (whole sheet).
+// A known streak pair is exempt only while both files' sha256 and the IoU (to 3 decimals) equal its pin.
+FxTest.pinMatches = (K, shaA, shaB, v) => !!K && shaA === K[0] && shaB === K[1] && v.toFixed(3) === K[2].toFixed(3);
 FxTest.maskIoU = (a, b) => {
   const P = require("./fx-art-scan.js").png, A = P(fs.readFileSync(a)), B = P(fs.readFileSync(b));
   if (A.w !== B.w || A.h !== B.h) return 0;
   let both = 0, any = 0;
   for (let i = 3; i < A.px.length; i += 4) { const x = A.px[i] >= 128, y = B.px[i] >= 128; if (x && y) both++; if (x || y) any++; }
   return any ? both / any : 0;
+};
+
+// [w, h] of a PNG.
+FxTest.pngSize = (f) => { const b = fs.readFileSync(f); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+
+// Mean alpha (0..1) of the pixels within r px of (cx, cy), clipped to the image.
+FxTest.patchAlpha = (f, cx, cy, r = 24) => {
+  const A = require("./fx-art-scan.js").png(fs.readFileSync(f));
+  let s = 0, n = 0;
+  for (let y = Math.max(0, cy - r); y <= Math.min(A.h - 1, cy + r); y++) for (let x = Math.max(0, cx - r); x <= Math.min(A.w - 1, cx + r); x++) {
+    if ((x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r) { s += A.px[(y * A.w + x) * 4 + 3]; n++; }
+  }
+  return n ? s / n / 255 : 0;
 };
 
 module.exports = FxTest;
