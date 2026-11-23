@@ -84,7 +84,7 @@ class FxTest {
     // v3 subtle redo (Brian, Nov 16 10:17 AM ET): these sheets must be the v3 files, and no superseded file ships.
     const v3 = ["chain_arc_flash", "chain_bolt", "overdrive_aura", ...["gold", "red", "blue", "green", "purple"].map((c) => "impact_ring_" + c), ...[0, 1, 2, 3, 4].map((t) => "tower_aura_t" + t)];
     const notV3 = v3.filter((id) => { const j = data.sheets[id], png = j && path.dirname(j) + "/" + JSON.parse(this.read("assets/fx/" + j)).image; return !png || !prov[png] || prov[png].version !== "v3"; });
-    const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && q.supersedes.startsWith(path.relative("assets/fx", f) + " ")); });
+    const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && String(q.supersedes.file || q.supersedes).startsWith(path.relative("assets/fx", f) + " ")); });
     this.ok(!notV3.length && !superseded.length, `art v3: ${v3.length} redone sheets play the v3 files (not v3: ${notV3.join(", ") || "none"}); no superseded file ships (${superseded.join(", ") || "none"})`);
     // PR 10b art (Game Art & Motion PR10b v1, section G rows 9-13): the delivered sheets at their
     // delivered sizes; a mote's frame is its variant's cell by the atlas's own names; streaks and
@@ -93,16 +93,21 @@ class FxTest {
     const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
     for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
     for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
+    // streak_lime v2 (Nov 23: one approved repaint, frames fill 16 / 14 / 12 px) replaces v1 in place; v1's hash is kept in its entry's "supersedes".
+    const V10b = { streak_lime: "v2" };
+    const lime = prov["streak/streak_lime.png"] || {};
+    this.ok(lime.version === "v2" && lime.supersedes && lime.supersedes.sha256 === "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb",
+      "art 10b: streak_lime ships v2 and its PROVENANCE entry keeps v1's sha256 (fb167b38) as history");
     const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
       const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
-      return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== "v1" || j.version !== "v1" || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
+      return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== (V10b[id] || "v1") || j.version !== (V10b[id] || "v1") || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
         || (dir === "streak" || dir === "trail") && !(j.pivot && j.pivot[0] === j.frameW && j.pivot[1] === j.frameH / 2);
     }).map(([id]) => id);
     const cells = JSON.parse(this.read("assets/fx/motes/motes.json")).cells || [];
     const moteBad = Object.entries(data.effects).filter(([k]) => k.startsWith("mote.")).filter(([k, e]) => e.sheet !== "motes" || e.frame !== cells.indexOf(k.slice(5)) || e.frame < 0).map(([k]) => k);
     const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
     this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
-      `art 10b: ${Object.keys(B).length} delivered v1 sheets at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
+      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v2) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
     // Venom bursts (main: pale lime #e4ffb8, lime #b4f06a, green #8be04a) play streak_lime twice and green once (Game Art streak_lime, Nov 16).
     const ven = data.impacts.elemVenom && data.impacts.elemVenom.colors;
     this.ok(String(ven) === "lime,lime,green" && data.effects["streak.lime"] && data.effects["streak.lime"].sheet === "streak_lime" && prov["streak/streak_lime.png"],

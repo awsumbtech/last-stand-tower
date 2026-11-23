@@ -29,10 +29,9 @@
    "Projectile trails: plain, crit and element shots (ember / frost / spark / venom take turns), effects of hits cleared",
    "pr10b-03-trails-10b-390x844.png",
    {
-    "shots": 2,
+    "shots": 1,
     "kinds": [
-     "frost",
-     "spark"
+     "venom"
     ]
    }
   ],
@@ -67,7 +66,7 @@
    "pr10b-05-motes-t4-10b-390x844.png",
    {
     "tier": 4,
-    "particles": 60
+    "particles": 62
    }
   ],
   [
@@ -135,7 +134,7 @@
    "Trail frost: frostbite shots only, hit effects cleared",
    "pr10b-08-trail-frost-10b-390x844.png",
    {
-    "shots": 2,
+    "shots": 1,
     "kinds": [
      "frost"
     ]
