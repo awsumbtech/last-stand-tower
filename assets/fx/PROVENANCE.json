@@ -1974,71 +1974,241 @@
   }
  },
  "vignette/vignette_red.png": {
-  "version": "v1",
-  "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e",
+  "version": "v2",
+  "sha256": "08b913350836434937d20ab521678a02d1b6293759f80fd1915125e99dde26c0",
   "sheet": "vignette/vignette_red.json",
   "frames": 1,
   "frameW": 720,
   "frameH": 1560,
+  "date": "2026-11-23",
+  "timezone": "America/New_York",
+  "requestedVia": "Tower Defense Games Dev via Chief of Staff, 9:30 AM ET, 2026-11-23",
   "tool": "Grok Bot GenerateImage (cursor namespace)",
   "sourceImage": "_src/raw/vignette_red.jpg",
-  "sourceSha256": "bc677bba59867ed5ab220d9699c4181f06d627d2b6e261fcbfd0eea34d1fdd44",
+  "sourceSha256": "a3865e89f242014e3c9c9515386bcd9190e03444ac56c435e908c44e7292fbcf",
   "sourceDraft": "vignette_red_r1",
-  "prompt": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth, soft red (#ff2846) ink-wash glow that fills all FOUR CORNERS completely: the very corner pixels are the brightest, densest red, all four corners equally strong. From each corner the red fades smoothly along the edges: along the top edge and the bottom edge it stays fairly strong across the whole width (a bit dimmer at the middle than at the corners), while along the left and right long edges it fades to only a faint dim red at the middle height. Towards the centre it fades smoothly to pure black: the whole middle of the image is completely black, a big empty black oval. Smooth soft gradient with only gentle watercolour texture, symmetrical, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights.",
+  "sourceSize": [
+   720,
+   1280
+  ],
+  "prompt": "A tall portrait 9:16 abstract background painting: a soft even red vignette frame on a perfectly pure flat black field (#000000). IMPORTANT: there must be NO black letterbox, NO black margin, and NO thin black outline around the image. The deep red paint must reach the very first and last pixels of every edge — the outermost row and column on all four sides are red, not black. Paint one continuous, even, soft crimson ink-wash border (#ff2846, deep saturated red, never pink, never orange, never white) around the entire perimeter. This is a frame of even pressure, like a red fog equally present on every side. The red along the LEFT long edge and the RIGHT long edge is strong and continuous from top to bottom. At the exact middle height of the left edge and of the right edge the red is still a solid, clearly visible medium-bright crimson, nearly as strong as the red at the middle of the top and bottom edges, and only a little dimmer than the corners. Do not let the sides fade, and do not leave the mid-sides dark or thin. The red along the entire TOP edge and the entire BOTTOM edge is strong and even. The four corners are only slightly brighter and denser than the edge middles — a gentle emphasis, not a corner-only glow. Do not paint bright hotspots only in the corners. The red band is broad enough to read as a soft frame (roughly the outer 15 percent of the image on each side) and then fades very smoothly inward to pure black. The large centre is a clean empty black oval covering about the middle 60 percent of the picture, with zero red haze in that centre. Soft watercolour texture is fine if it stays even, but no blotches, no hard lines, no sharp rectangular frame, no rim, no objects, no typography, no white, no pale highlights. Left-right and top-bottom symmetry. Only deep saturated red on black.",
+  "aspectRatio": "9:16",
   "referenceImages": [],
   "cleanup": [
+   "2 px near-black letterbox crop so the painted red reaches the edge (generator artefact; no shape is drawn in code)",
    "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
-   "resized from the 720x1280 raw to 720x1560 (stretched 1.22x vertically: the phone shape; the game stretches it to the screen again)",
-   "one opacity factor x0.9058 on the whole image (opacity only)",
+   "one premultiplied LANCZOS scale from the cropped 716x1276 raw to 720x1560 (the phone shape; the game stretches it to the screen again)",
+   "one uniform opacity factor on the whole image (opacity only), set so the 24 px corner patches average 0.7",
    "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
   ],
   "processParams": {
-   "bg": "black un-mix",
-   "resize": "stretched from the 720x1280 raw to the 720x1560 phone shape (the game stretches it to the screen anyway)",
-   "scale": [
-    1.0,
-    1.21875
-   ],
-   "opacityFactor": 0.9058,
-   "pointsBeforeFactor": {
-    "corners": [
-     0.835,
-     0.823,
-     0.818,
-     0.836
+   "raw": {
+    "path": "_src/raw/vignette_red.jpg",
+    "size": [
+     720,
+     1280
     ],
-    "topMid": 0.309,
-    "bottomMid": 0.228,
-    "leftMid": 0.02,
-    "rightMid": 0.01,
-    "centre": 0.0,
-    "centreCircle30pctMax": 0.0,
-    "centreCircle30pctMean": 0.0,
-    "mean": 0.175,
-    "max": 0.911
+    "sha256": "a3865e89f242014e3c9c9515386bcd9190e03444ac56c435e908c44e7292fbcf"
+   },
+   "cropPx": 2,
+   "bg": "black un-mix",
+   "resize": "stretched from the cropped 716x1276 raw to 720x1560",
+   "scale": [
+    1.005586592178771,
+    1.2225705329153604
+   ],
+   "opacityFactor": 0.9226,
+   "pointsBeforeCropNote": "letterbox crop only",
+   "pointsBeforeFactor": {
+    "patchRadiusPx": 24,
+    "corners": {
+     "tl": 0.77,
+     "tr": 0.779,
+     "bl": 0.736,
+     "br": 0.75
+    },
+    "cornersMean": 0.759,
+    "topMid": 0.532,
+    "bottomMid": 0.485,
+    "leftMid": 0.416,
+    "rightMid": 0.432,
+    "centrePatch": 0.0,
+    "centreMiddle60Mean": 0.0006,
+    "centreMiddle60Max": 0.1043,
+    "mean": 0.209,
+    "max": 0.907
+   },
+   "pointsAfterUnmixPreResize": {
+    "patchRadiusPx": 24,
+    "corners": {
+     "tl": 0.77,
+     "tr": 0.776,
+     "bl": 0.736,
+     "br": 0.752
+    },
+    "cornersMean": 0.758,
+    "topMid": 0.53,
+    "bottomMid": 0.482,
+    "leftMid": 0.417,
+    "rightMid": 0.434,
+    "centrePatch": 0.0,
+    "centreMiddle60Mean": 0.0005,
+    "centreMiddle60Max": 0.1044,
+    "mean": 0.209,
+    "max": 0.892
    },
    "points": {
-    "corners": [
-     0.756,
-     0.746,
-     0.741,
-     0.757
+    "patchRadiusPx": 24,
+    "corners": {
+     "tl": 0.711,
+     "tr": 0.718,
+     "bl": 0.679,
+     "br": 0.692
+    },
+    "cornersMean": 0.7,
+    "topMid": 0.491,
+    "bottomMid": 0.447,
+    "leftMid": 0.384,
+    "rightMid": 0.399,
+    "centrePatch": 0.0,
+    "centreMiddle60Mean": 0.0005,
+    "centreMiddle60Max": 0.0962,
+    "mean": 0.193,
+    "max": 0.837
+   },
+   "vsTargets": {
+    "corners_about_0.7": {
+     "value": 0.7,
+     "target": 0.7,
+     "ok": true
+    },
+    "side_middles_0.35_to_0.45": {
+     "leftMid": 0.384,
+     "rightMid": 0.399,
+     "target": [
+      0.35,
+      0.45
+     ],
+     "ok": true
+    },
+    "top_bottom_middles_about_0.5": {
+     "topMid": 0.491,
+     "bottomMid": 0.447,
+     "target": 0.5,
+     "ok": false
+    },
+    "centre_clear_middle60": {
+     "mean": 0.0005,
+     "max": 0.0962,
+     "meanOk": true,
+     "maxNote": "soft falloff may touch the outer edge of the middle-60% region; the very centre must be 0",
+     "centrePatchOk": true
+    }
+   },
+   "nearWhite": {
+    "opaquePixels": 634262,
+    "rgbAllAtLeast245": 0,
+    "lowestChannelAbove235": 0,
+    "rgbMinOpaque": [
+     255,
+     0,
+     0
     ],
-    "topMid": 0.28,
-    "bottomMid": 0.207,
-    "leftMid": 0.018,
-    "rightMid": 0.009,
-    "centre": 0.0,
-    "centreCircle30pctMax": 0.0,
-    "centreCircle30pctMean": 0.0,
-    "mean": 0.159,
-    "max": 0.825
+    "rgbMaxOpaque": [
+     255,
+     83,
+     90
+    ],
+    "pass": true
+   },
+   "png": "vignette/vignette_red.png",
+   "sha256": "08b913350836434937d20ab521678a02d1b6293759f80fd1915125e99dde26c0"
+  },
+  "licence": "original generation, no third-party art",
+  "rejectedDrafts": {
+   "_src/raw/rejected/vignette_red_r0.jpg": {
+    "sha256": "c65f957fcfb68f6f41ce051cddb8a1194870f1d29685f7fcfdd30fb3fc907270",
+    "prompt": "Full-frame low-HP screen-edge vignette for a tall portrait phone game, painted on a pure flat black background (#000000) with no other colours in the centre. A continuous soft red ink-wash frame (#ff2846, deep saturated crimson) runs along ALL FOUR EDGES, including the entire left long edge and the entire right long edge from the top of the image to the bottom. The red is a broad, even painted frame, not just corner glows: the four corners are the densest, brightest red, equally strong; along the full top edge and the full bottom edge the red stays strong, and at the middle of the top and the middle of the bottom it is about three-quarters as bright as the corners; along the full LEFT edge and the full RIGHT edge there is a clearly visible, continuous medium-strength red band all the way down, about half to two-thirds as bright as the corners at mid-height. This side band must not fade out, must not be a thin wisp, and must not disappear at the middle of the long sides. The side glow is a real painted band, wide enough to read as part of the same frame as the top and bottom. The red fades smoothly inward and is completely gone in the centre: a large empty pure-black oval covers roughly the middle 60% of the image, with no red, no haze, no glow there. Soft smooth watercolour falloff with only gentle texture, no blotches, no hard lines, no sharp rim, no picture-frame border, no rectangles, no shapes, no objects, no text, no white, no pink or pale highlights, no orange, no other colours. Symmetrical left-right and top-bottom. Only deep saturated red haze on black.",
+    "reason": "After black un-mix and a uniform scale to land corners at 0.7, side middles were about 0.20 and top/bottom middles about 0.30, both clearly below target. Corners were much brighter than the edge middles, and a 3-5 px near-black letterbox sat around the raw."
    }
   },
-  "license": "original generated art",
-  "rejectedDrafts": {
-   "_src/raw/rejected/vignette_red_r0.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A soft smoky red (#ff2846) watercolour ink-wash haze hugging the outer edges of the frame: densest and brightest in the four corners, fairly strong along the top edge and the bottom edge, and only a faint thin wisp along the left and right long edges. The whole middle of the image is completely pure black: a large empty black oval covering the centre, nothing there. The red fades smoothly inward with soft smoky painterly edges, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink or pale highlights, just deep saturated red haze on black.",
-   "_src/raw/rejected/vignette_red_r2.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth soft red (#ff2846) ink-wash glow along the edges of the frame: a broad, bright red band runs along the ENTIRE TOP EDGE and the ENTIRE BOTTOM EDGE, nearly as bright in the middle of those edges as in the corners (the four corners are the brightest). Along the LEFT and RIGHT long edges there is a thin, faint, dim red glow all the way down (much weaker than the top and bottom, but still visible at the middle height). The red fades smoothly inward to pure black: the centre of the image is a large completely black empty oval. Smooth soft gradients with gentle watercolour texture, symmetrical left-right and top-bottom, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights."
-  }
+  "rerollsUsed": 1,
+  "rerollsAllowed": 2,
+  "supersedes": [
+   {
+    "version": "v1",
+    "file": "vignette/vignette_red.png (v1, shipped in SW v31)",
+    "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e",
+    "note": "v1 measured about 0.75 in the corners and 0.01-0.02 at the side middles (PR Verifier noted the weak side middles on PR #11). v2 is a new painting from its own prompt, not an edit or recolour of v1; it measures corners 0.70, side middles 0.384 / 0.399, top / bottom middles 0.491 / 0.447 and a clear centre (24 px patches).",
+    "entry": {
+     "version": "v1",
+     "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e",
+     "sheet": "vignette/vignette_red.json",
+     "frames": 1,
+     "frameW": 720,
+     "frameH": 1560,
+     "tool": "Grok Bot GenerateImage (cursor namespace)",
+     "sourceImage": "_src/raw/vignette_red.jpg",
+     "sourceSha256": "bc677bba59867ed5ab220d9699c4181f06d627d2b6e261fcbfd0eea34d1fdd44",
+     "sourceDraft": "vignette_red_r1",
+     "prompt": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth, soft red (#ff2846) ink-wash glow that fills all FOUR CORNERS completely: the very corner pixels are the brightest, densest red, all four corners equally strong. From each corner the red fades smoothly along the edges: along the top edge and the bottom edge it stays fairly strong across the whole width (a bit dimmer at the middle than at the corners), while along the left and right long edges it fades to only a faint dim red at the middle height. Towards the centre it fades smoothly to pure black: the whole middle of the image is completely black, a big empty black oval. Smooth soft gradient with only gentle watercolour texture, symmetrical, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights.",
+     "referenceImages": [],
+     "cleanup": [
+      "black-background removal: alpha = (max(R,G,B)-6)/249, colour un-mixed from black (rgb/alpha), hue untouched; pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel (edge bleed)",
+      "resized from the 720x1280 raw to 720x1560 (stretched 1.22x vertically: the phone shape; the game stretches it to the screen again)",
+      "one opacity factor x0.9058 on the whole image (opacity only)",
+      "after the final resample, pixels under alpha 0.1 take the colour of the nearest alpha>=0.1 pixel; alpha-0 pixels are rgb 0 (so no stray light pixels hide in the transparent area)"
+     ],
+     "processParams": {
+      "bg": "black un-mix",
+      "resize": "stretched from the 720x1280 raw to the 720x1560 phone shape (the game stretches it to the screen anyway)",
+      "scale": [
+       1.0,
+       1.21875
+      ],
+      "opacityFactor": 0.9058,
+      "pointsBeforeFactor": {
+       "corners": [
+        0.835,
+        0.823,
+        0.818,
+        0.836
+       ],
+       "topMid": 0.309,
+       "bottomMid": 0.228,
+       "leftMid": 0.02,
+       "rightMid": 0.01,
+       "centre": 0.0,
+       "centreCircle30pctMax": 0.0,
+       "centreCircle30pctMean": 0.0,
+       "mean": 0.175,
+       "max": 0.911
+      },
+      "points": {
+       "corners": [
+        0.756,
+        0.746,
+        0.741,
+        0.757
+       ],
+       "topMid": 0.28,
+       "bottomMid": 0.207,
+       "leftMid": 0.018,
+       "rightMid": 0.009,
+       "centre": 0.0,
+       "centreCircle30pctMax": 0.0,
+       "centreCircle30pctMean": 0.0,
+       "mean": 0.159,
+       "max": 0.825
+      }
+     },
+     "license": "original generated art",
+     "rejectedDrafts": {
+      "_src/raw/rejected/vignette_red_r0.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A soft smoky red (#ff2846) watercolour ink-wash haze hugging the outer edges of the frame: densest and brightest in the four corners, fairly strong along the top edge and the bottom edge, and only a faint thin wisp along the left and right long edges. The whole middle of the image is completely pure black: a large empty black oval covering the centre, nothing there. The red fades smoothly inward with soft smoky painterly edges, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink or pale highlights, just deep saturated red haze on black.",
+      "_src/raw/rejected/vignette_red_r2.jpg": "Full-frame screen-edge vignette for a portrait phone game, painted on a pure flat black background (#000000). A smooth soft red (#ff2846) ink-wash glow along the edges of the frame: a broad, bright red band runs along the ENTIRE TOP EDGE and the ENTIRE BOTTOM EDGE, nearly as bright in the middle of those edges as in the corners (the four corners are the brightest). Along the LEFT and RIGHT long edges there is a thin, faint, dim red glow all the way down (much weaker than the top and bottom, but still visible at the middle height). The red fades smoothly inward to pure black: the centre of the image is a large completely black empty oval. Smooth soft gradients with gentle watercolour texture, symmetrical left-right and top-bottom, no hard lines, no rim, no frame border, no shapes, no objects, no text, no white, no pink highlights."
+     }
+    }
+   }
+  ]
  }
 }

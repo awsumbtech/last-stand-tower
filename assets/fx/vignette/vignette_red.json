@@ -1,12 +1,66 @@
 {
- "frameW": 720,
- "frameH": 1560,
- "count": 1,
- "fps": null,
- "loop": false,
- "draw": "stretched to the screen",
- "pulse": "code opacity 22% +/-10%",
- "image": "vignette_red.png",
- "version": "v1",
- "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e"
+  "frameW": 720,
+  "frameH": 1560,
+  "count": 1,
+  "fps": null,
+  "loop": false,
+  "draw": "stretched to the screen",
+  "pulse": "code opacity 22% +/-10%",
+  "image": "vignette_red.png",
+  "version": "v2",
+  "sha256": "08b913350836434937d20ab521678a02d1b6293759f80fd1915125e99dde26c0",
+  "alphaSamples": {
+    "patchRadiusPx": 24,
+    "corners": {
+      "tl": 0.711,
+      "tr": 0.718,
+      "bl": 0.679,
+      "br": 0.692
+    },
+    "cornersMean": 0.7,
+    "topMid": 0.491,
+    "bottomMid": 0.447,
+    "leftMid": 0.384,
+    "rightMid": 0.399,
+    "centrePatch": 0.0,
+    "centreMiddle60Mean": 0.0005,
+    "centreMiddle60Max": 0.098,
+    "mean": 0.193,
+    "max": 0.835,
+    "onePixelEdge": {
+      "tl": 0.42,
+      "tr": 0.337,
+      "bl": 0.345,
+      "br": 0.204,
+      "topMid": 0.435,
+      "bottomMid": 0.329,
+      "leftMid": 0.329,
+      "rightMid": 0.349
+    }
+  },
+  "targets": {
+    "corners": 0.7,
+    "sideMiddles": [
+      0.35,
+      0.45
+    ],
+    "topBottomMiddles": 0.5,
+    "centreMiddle60": 0.0,
+    "sample": "mean alpha in a 24 px radius patch, same method as v1; centre region is the middle 60% of the sheet"
+  },
+  "nearWhite": {
+    "rgbAllAtLeast245": 0,
+    "lowestChannelAbove235": 0,
+    "rgbMinOpaque": [
+      255,
+      0,
+      0
+    ],
+    "rgbMaxOpaque": [
+      255,
+      83,
+      90
+    ],
+    "pass": true
+  }
 }
