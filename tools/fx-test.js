@@ -91,8 +91,8 @@ class FxTest {
     // trails keep the head-at-right pivot; the vignettes and the dim fill the screen.
     const png = (f) => { const b = fs.readFileSync(path.join(this.root, "assets/fx", f)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
     const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
-    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
-    for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
+    const sheetsOf = (dir) => Object.keys(data.sheets).filter((id) => id.startsWith(dir + "_")).map((id) => id.slice(dir.length + 1));
+    for (const v of sheetsOf("streak")) B["streak_" + v] = ["streak", 192, 16, 3]; for (const v of sheetsOf("trail")) B["trail_" + v] = ["trail", 128, 24, 1];
     // streak_lime v3 (Nov 23, painted from its own prompt with no reference) replaces v1 (too thin) and v2 (blocked:
     // a recolour of streak_pale); both hashes stay in its PROVENANCE entry's "supersedes" as history.
     const V10b = { streak_lime: "v3", vignette_red: "v2" };
@@ -115,15 +115,20 @@ class FxTest {
     // Two v1 pairs measure just over 0.9: separate paintings (each its own raw source, no reference image)
     // of the same short, fat teardrop prompt on a 16 px frame, alpha differing by 0.073 / 0.078 (lime v2 vs
     // pale: 0.017). They are listed with both files' sha256, so a changed file goes through the gate again.
-    const SV = ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"], sf = (v) => path.join(this.root, "assets/fx/streak/streak_" + v + ".png");
-    const KNOWN = { "red/green": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "49ac2d87473200d33f53a33d8fd4c158aa7d668b8760eea7c13e64382d8279ae", 0.909], "red/soot": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "5191ea56d2c9b538df35eccf526e77d56b2374bffc023f764db5b34ea809b3a0", 0.904] };
+    const SV = sheetsOf("streak"), sf = (v) => path.join(this.root, "assets/fx/streak/streak_" + v + ".png");
+    const KNOWN = { "red/green": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "49ac2d87473200d33f53a33d8fd4c158aa7d668b8760eea7c13e64382d8279ae", 0.909], "red/soot": ["38dbd19a2f817a41b4c3f11467217dda3a9f1212dd3fb05c88794cd8a4219428", "5191ea56d2c9b538df35eccf526e77d56b2374bffc023f764db5b34ea809b3a0", 0.904] }; // tracked debt: removal row docs/OO-MIGRATION.md#fu-streak-red-pins (repaint streak_red at the next streak art change, then delete both entries)
     const sha = (v) => crypto.createHash("sha256").update(fs.readFileSync(sf(v))).digest("hex"), pairs = [], over = [], known = [];
     for (let i = 0; i < SV.length; i++) for (let j = i + 1; j < SV.length; j++) {
       const k = SV[i] + "/" + SV[j], v = FxTest.maskIoU(sf(SV[i]), sf(SV[j])), K = KNOWN[k]; pairs.push(k);
       if (v < 0.9) continue;
-      if (K && sha(SV[i]) === K[0] && sha(SV[j]) === K[1] && v.toFixed(3) === K[2].toFixed(3)) known.push(`${k} ${v.toFixed(3)}`); else over.push(`${k} ${v.toFixed(3)}`);
+      if (FxTest.pinMatches(K, sha(SV[i]), sha(SV[j]), v)) known.push(`${k} ${v.toFixed(3)}`); else over.push(`${k} ${v.toFixed(3)}`);
     }
-    this.ok(pairs.length === 36 && !over.length, `art: every streak pair is two paintings, not a recolour (alpha >= 50% mask IoU < 0.9 for all ${pairs.length} pairs; at or over 0.9: ${over.join(", ") || "none"}; pinned v1 pairs: ${known.join(", ") || "none"})`);
+    const onDisk = fs.readdirSync(path.join(this.root, "assets/fx/streak")).filter((f) => /^streak_.*\.png$/.test(f)).map((f) => f.slice(7, -4)).sort();
+    this.ok(SV.length > 1 && String(onDisk) === String([...SV].sort()) && pairs.length === SV.length * (SV.length - 1) / 2 && !over.length, `art: every streak pair is two paintings, not a recolour (${SV.length} streak_* sheets in fx.json = the streak PNGs on disk; alpha >= 50% mask IoU < 0.9 for all ${pairs.length} pairs; at or over 0.9: ${over.join(", ") || "none"}; pinned v1 pairs: ${known.join(", ") || "none"})`);
+    // The pins only hold for these exact files and scores: a changed sha256 or IoU no longer matches, so the gate fails again.
+    const [ka, kb, kv] = KNOWN["red/green"], flip = (h) => (h[0] === "0" ? "1" : "0") + h.slice(1), pinCases = [[ka, kb, kv, true], [flip(ka), kb, kv, false], [ka, flip(kb), kv, false], [ka, kb, kv + 0.001, false], [ka, kb, 0.95, false]];
+    const pinBad = pinCases.filter(([a, b, v, want]) => FxTest.pinMatches(KNOWN["red/green"], a, b, v) !== want).length;
+    this.ok(!pinBad && !FxTest.pinMatches(undefined, ka, kb, kv), `art: a pinned streak pair stops matching when either sha256 or the IoU (3 decimals) changes (self-test, ${pinCases.length} cases + no pin; wrong: ${pinBad})`);
     const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
       const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
       return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== (V10b[id] || "v1") || j.version !== (V10b[id] || "v1") || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
@@ -261,6 +266,8 @@ class FxTest {
 }
 
 // IoU of two same-size PNGs' alpha >= 50% masks (whole sheet).
+// A known streak pair is exempt only while both files' sha256 and the IoU (to 3 decimals) equal its pin.
+FxTest.pinMatches = (K, shaA, shaB, v) => !!K && shaA === K[0] && shaB === K[1] && v.toFixed(3) === K[2].toFixed(3);
 FxTest.maskIoU = (a, b) => {
   const P = require("./fx-art-scan.js").png, A = P(fs.readFileSync(a)), B = P(fs.readFileSync(b));
   if (A.w !== B.w || A.h !== B.h) return 0;

@@ -363,9 +363,9 @@ Each PR ships on its own. Each one needs:
    - **Follow-up, low-HP red edge (branch `lst-lowhp-edge-v2` from `28b4b40`, SW v32):**
      - `vignette_red` v2 replaces v1. v1's side middles were 0.01-0.02. v2 is a new painting from its own prompt, measuring corners 0.70, side middles 0.38-0.40, top / bottom middles 0.49 / 0.45 and a clear centre. v1's sha256 is kept in its PROVENANCE entry's `supersedes`. fx-test requires side-middle alpha of at least 0.3.
      - Streaks play all 3 frames again: fresh, mid, fade, one per fade step. `streak.*` no longer has `fade.until` 2, which had dropped the fade frame. `streakBurst.minLength` 30 (was 24) keeps late streaks as dashes on the shorter fade frame. fx-test checks each sheet plays frames 0, 1, 2.
-     - The recolour gate covers every streak pair: alpha-mask IoU must be below 0.9. Two v1 pairs (red / green 0.909, red / soot 0.904) are separate paintings and are pinned by both files' sha256.
+     - The recolour gate covers every streak pair (the streak list comes from the `streak_*` sheets in `fx.json` and must match the PNGs on disk): alpha-mask IoU must be below 0.9. Two v1 pairs (red / green 0.909, red / soot 0.904) are separate paintings and are pinned by both files' sha256 and the IoU. Tracked removal: [follow-up row](#fu-streak-red-pins).
      - render-test checks that the trails and particles draw exactly what the drawers at `ba51277` drew (2221 draws).
-     - QA shot tools (`tools/qa/pr10b-shots.py`, `pr10b-compare.py`, `lowhp-shots.py`) have a `main()` and no top-level side effects. Shots are in `docs/qa/lowhp-v2/`.
+     - QA shot tools are small classes behind the same CLIs: `ShotRunner` (`tools/qa/pr10b-shots.py`), `CompareSheet` (`pr10b-compare.py`) and `LowHpShotRunner` (`lowhp-shots.py`), each with a `main()` and no top-level side effects. Shots are in `docs/qa/lowhp-v2/`.
      - Known look item: `streak_lime` v3 is slightly thinner (12 / 10 / 9 px); no art change.
    - Also in 10b: the screen-snapshot flake fix (`tools/screen-snapshot-test.py`): the music scheduler in `audio.js` draws `Math.random()` on a timer, and the test reseeded and ran each step in two browser calls, so a music tick could land between them in one tree and change the card deal. The reseed and the step now run in one call; a `SNAPSHOT_RACE_MS` wait before each step (default 150) keeps the race open so the check stays honest.
 3. **PR 11: Asset and theme manifest foundation** (H1, H6).
@@ -648,3 +648,9 @@ None. The only TD code is clones of last-stand-tower:
 8. **Particle colors:** particles are colored by `e.color`. Image art needs either a fixed palette of variants or neutral white art. Neutral white with a tint would break the no-tint rule, so use palette variants.
 9. **Chill as a StatusEffect (N11):** cleaner, but touches sim tick order. It needs sim proof or should be skipped.
 10. **Big Red charge:** is the existing `charge` sheet clip enough, or is a ChargeGlow overlay wanted?
+
+## 7. Follow-ups (tracked debt)
+
+| Id | Item | Removal | Where |
+|---|---|---|---|
+| <a id="fu-streak-red-pins"></a>FU-1 | Two shipped v1 streak pairs are exempt from the recolour gate (alpha-mask IoU < 0.9): red / green 0.909 and red / soot 0.904, pinned by both files' sha256 and the IoU (low-HP red edge, SW v32). | Repaint streak_red at the next streak art change, then delete both KNOWN entries (tools/fx-test.js:119). | `tools/fx-test.js:119` (`KNOWN`), listed in the PR 10b low-HP follow-up (section 3, line 366) |
