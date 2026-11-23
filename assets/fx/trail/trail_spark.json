@@ -1,0 +1,15 @@
+{
+ "frameW": 128,
+ "frameH": 24,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "pivot": [
+  128,
+  12
+ ],
+ "pivotMeaning": "head at the right end; tail fades to clear on the left",
+ "image": "trail_spark.png",
+ "version": "v1",
+ "sha256": "feff29920d9e6ac4b59cfee3b1ad14d4f579f4c97ab9474d0dee3f6e6ee5fe88"
+}

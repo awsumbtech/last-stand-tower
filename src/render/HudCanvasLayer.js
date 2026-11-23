@@ -1,15 +1,15 @@
-// HudCanvasLayer: screen-space canvas HUD. The finale intro dim, then one banner, picked by the
+// HudCanvasLayer: screen-space canvas HUD. The finale intro dim (the fx.json image effect
+// "finaleDim", vignette_dark over the screen, Decision 4; PR 10b), then one banner, picked by the
 // scene's SceneFlags: WAVE CLEAR!, VICTORY!, or during a wave the FINALE / phase / BOSS / WAVE n
 // banner.
 LST.HudCanvasLayer = class HudCanvasLayer extends LST.RenderLayer {
   get space() { return "screen"; }
-  draw(ctx, { r, scene, theme }) {
+  draw(ctx, { r, scene, theme, fx }) {
     const fin = scene.finale, flags = scene.sceneFlags; // SceneFlags (src/core/SceneFlags.js)
     if (fin && !fin.mole && !fin.won && flags.showsFinaleIntro) {
       // Finale intro: the lawn goes dark, then the banner slams in.
-      const total = LST.CONFIG.finale.introTime;
-      ctx.fillStyle = `rgba(30, 15, 40, ${0.45 * Math.min(1, (total - fin.intro) / 0.5)})`;
-      ctx.fillRect(0, 0, r.width, r.height);
+      const total = LST.CONFIG.finale.introTime, effects = (fx && fx.effects) || LST.fxManifest;
+      if (effects) effects.draw("finaleDim", ctx, { x: 0, y: 0, w: r.width, h: r.height, alpha: Math.min(1, (total - fin.intro) / 0.5) });
     }
     if (flags.banner === "celebrate") {
       theme.banner(ctx, "WAVE CLEAR!", Math.min(1, scene.celebrateTimer / 0.35), r);

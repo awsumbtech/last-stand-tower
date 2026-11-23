@@ -1,0 +1,12 @@
+{
+ "frameW": 720,
+ "frameH": 1560,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "draw": "stretched to the screen",
+ "pulse": "code opacity 22% +/-10%",
+ "image": "vignette_red.png",
+ "version": "v1",
+ "sha256": "92d2596fa5902101b2db76a0a22f77e77f3a7508d8e6b8ffb5f43e813b4a6b8e"
+}

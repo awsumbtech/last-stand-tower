@@ -1,58 +1,37 @@
-// ProjectileTrails: comet tails for every projectile (one batched path), elemental tails, and a glow per shot.
-// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and glow images
-// (fx.json glowColors; PR 10b turns the trails into fx.json entries).
+// ProjectileTrails: a comet tail behind every shot and a glow on it, as fx.json image effects.
+// The tail is "trail.<variant>" (the shot's element trail, else presets.trail.variant), stretched
+// behind the shot along its velocity with the head on the shot; the glow is "glow.<variant>"
+// (crit, element or plain glow from presets.trail), skipped in low quality. It never draws a
+// shape or tints, and draws nothing until the art is in.
+// Drawn for FxRenderer (the batcher), which passes itself as `fx` for the theme and the effects.
+// Per frame it allocates nothing: one reused draw-args object (every field set on each draw), ids
+// from FxManifest.variantId, and one save / restore around the passes (draws are "batched").
 LST.ProjectileTrails = class ProjectileTrails {
-  // Comet tails (two strokes for all projectiles) + additive glow per projectile.
+  constructor() { this.at = { x: 0, y: 0, x2: null, y2: null, base: 1, alpha: 1, blend: null, batched: true }; }
+
+  args(x, y, x2, y2, base, alpha, blend) {
+    const at = this.at; at.x = x; at.y = y; at.x2 = x2; at.y2 = y2; at.base = base; at.alpha = alpha; at.blend = blend;
+    return at;
+  }
+
   draw(fx, ctx, list, low) {
-    if (!list.length) return;
-    const T = LST.FX_PRESETS.trail, th = fx.theme;
+    const E = fx.effects, T = E && E.preset("trail"), th = fx.theme;
+    if (!list.length || !T) return;
     ctx.save();
-    ctx.lineCap = "round";
-    ctx.beginPath();
     for (let i = 0; i < list.length; i++) {
       const p = list[i];
       const sp = Math.hypot(p.vx, p.vy);
       if (!sp) continue;
-      const len = Math.min(T.maxLength, sp * T.stretch);
-      ctx.moveTo(p.x - (p.vx / sp) * len, p.y - (p.vy / sp) * len);
-      ctx.lineTo(p.x, p.y);
+      const len = Math.min(T.maxLength, sp * T.stretch) * (p.trail ? T.elementLength : 1);
+      E.draw(E.variantId("trail", p.trail || T.variant), ctx, this.args(p.x, p.y, p.x + (p.vx / sp) * len, p.y + (p.vy / sp) * len, T.height, th.trailAlpha, null));
     }
-    ctx.globalAlpha = 0.6 * th.trailAlpha;
-    ctx.strokeStyle = T.color;
-    ctx.lineWidth = T.width;
-    ctx.stroke();
-    ctx.globalAlpha = th.trailAlpha;
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = T.core;
-    ctx.stroke();
-    // Elemental shots: a colored tail over the plain one (one path per color, usually 1-4).
-    let tints = null;
-    for (const p of list) if (p.tint) (tints || (tints = {}))[p.tint] = true;
-    if (tints) for (const color in tints) {
-      ctx.beginPath();
-      for (const p of list) {
-        if (p.tint !== color) continue;
-        const sp = Math.hypot(p.vx, p.vy);
-        if (!sp) continue;
-        const len = Math.min(T.maxLength, sp * T.stretch) * 1.15;
-        ctx.moveTo(p.x - (p.vx / sp) * len, p.y - (p.vy / sp) * len);
-        ctx.lineTo(p.x, p.y);
-      }
-      ctx.globalAlpha = 0.85 * th.trailAlpha;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = T.width * 0.8;
-      ctx.stroke();
-    }
-    if (!low) {
-      ctx.globalCompositeOperation = th.blend;
-      ctx.globalAlpha = Math.min(1, T.glowAlpha * th.glow);
-      const g = fx.glow(T.color), gc = fx.glow(T.critColor);
-      for (let i = 0; i < list.length; i++) {
-        const p = list[i];
-        const R = (p.crit ? T.critGlowRadius : T.glowRadius) * (p.tint ? 1.25 : 1);
-        const img = p.crit ? gc : p.tint ? fx.glow(p.tint) : g;
-        if (img) ctx.drawImage(img, p.x - R, p.y - R, R * 2, R * 2); // no glow art for it (or not loaded yet): none
-      }
+    if (low) { ctx.restore(); return; }
+    const a = Math.min(1, T.glowAlpha * th.glow);
+    for (let i = 0; i < list.length; i++) {
+      const p = list[i];
+      const R = (p.crit ? T.critGlowRadius : T.glowRadius) * (p.trail ? T.elementGlowMul : 1);
+      const g = p.crit ? T.critGlow : p.trail ? T.elementGlows[p.trail] : T.glow;
+      E.draw(E.variantId("glow", g), ctx, this.args(p.x, p.y, null, null, R, a, th.blend));
     }
     ctx.restore();
   }

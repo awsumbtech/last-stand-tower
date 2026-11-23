@@ -1,12 +1,17 @@
 #!/usr/bin/env node
 // FX manifest test (node, no browser): node tools/fx-test.js
-// PR 10a: assets/fx/fx.json + FxManifest + SpriteEffect + EffectPlayer.
+// PR 10a: assets/fx/fx.json + FxManifest + SpriteEffect + EffectPlayer. PR 10b: particles, trails,
+// the low-HP vignette, finale dim and screen flash are fx.json effects; presets, impacts and
+// themes are fx.json data naming variants, never colours.
 //   1. Files: one class per file, loaded by index.html in order, cached by sw.js.
 //   2. fx.json: every effect the code asks for exists, every sheet it lists is a delivered art file
-//      (JSON + PNG, sha256 = the delivery's), every impact has a ring / bloom, every preset colour
-//      that reaches a glow has a glow image, and no test fixture is listed anywhere the game loads.
+//      (JSON + PNG, sha256 = the delivery's), every impact has a ring / bloom and its settings,
+//      every variant a particle, shot or glow can carry has its glow / mote / streak / trail entry,
+//      no colour hex is left in presets / impacts / themes, and no test fixture is listed anywhere
+//      the game loads.
 //   3. SpriteEffect / FxManifest / EffectPlayer driven directly: loop and one-shot frames, fades,
-//      level / progress values, grid rows, segment stretch, unknown ids, missing art.
+//      level / progress values, grid rows, segment / stretch / fill fits, fixed frames, the caller's
+//      blend, unknown ids, missing art.
 //   4. sw.js: its manifest reader lists fx.json, every sheet JSON and every PNG, and nothing in
 //      assets/fx is hand-listed in PRECACHE.
 const fs = require("fs"), path = require("path"), vm = require("vm"), crypto = require("crypto");
@@ -17,7 +22,7 @@ class FxTest {
     this.passes = 0;
     this.fails = 0;
     this.FILES = ["src/fx/SpriteEffect.js", "src/fx/FxManifest.js", "src/fx/EffectPlayer.js"];
-    this.ASKED = ["overdriveAura", "towerAura", "chainBolt", "chainArcFlash", "chainNodeGlow", "impactFlash", "textGlow.coin", "textGlow.crit"];
+    this.ASKED = ["overdriveAura", "towerAura", "chainBolt", "chainArcFlash", "chainNodeGlow", "impactFlash", "textGlow.coin", "textGlow.crit", "lowHpVignette", "screenFlash", "finaleDim"];
   }
 
   ok(c, m) { if (c) this.passes++; else { this.fails++; console.log("FAIL " + m); } }
@@ -74,19 +79,61 @@ class FxTest {
     const unlisted = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return !pv || pv.sha256 !== crypto.createHash("sha256").update(fs.readFileSync(path.join(this.root, f))).digest("hex"); });
     this.ok(pngs.length && !unlisted.length, `art: every PNG in assets/fx (${pngs.length}) is in PROVENANCE.json with its sha256 (unlisted or changed: ${unlisted.join(", ") || "none"})`);
     const v2 = ["screen_burst/screen_burst.png", "glow/glow_pale.png", "glow/glow_yellow.png"];
-    this.ok(v2.every((f) => prov[f] && prov[f].version === "v2") && data.effects.impactFlash.sheet === "screen_burst" && data.glowColors["#ffffff"] === "glow_pale" && data.glowColors["#ffe14d"] === "glow_yellow",
-      "art v2: screen_burst, glow_pale, glow_yellow are delivered v2 files; impactFlash plays screen_burst (Decision 12), white / pale glows use glow_pale, yellow ones glow_yellow");
+    this.ok(v2.every((f) => prov[f] && prov[f].version === "v2") && data.effects.impactFlash.sheet === "screen_burst" && data.effects.screenFlash.sheet === "screen_burst" && data.effects["glow.pale"].sheet === "glow_pale" && data.effects["glow.yellow"].sheet === "glow_yellow",
+      "art v2: screen_burst, glow_pale, glow_yellow are delivered v2 files; impactFlash and the X13 screenFlash play screen_burst (Decision 12); glow.pale / glow.yellow play glow_pale / glow_yellow");
     // v3 subtle redo (Brian, Nov 16 10:17 AM ET): these sheets must be the v3 files, and no superseded file ships.
     const v3 = ["chain_arc_flash", "chain_bolt", "overdrive_aura", ...["gold", "red", "blue", "green", "purple"].map((c) => "impact_ring_" + c), ...[0, 1, 2, 3, 4].map((t) => "tower_aura_t" + t)];
     const notV3 = v3.filter((id) => { const j = data.sheets[id], png = j && path.dirname(j) + "/" + JSON.parse(this.read("assets/fx/" + j)).image; return !png || !prov[png] || prov[png].version !== "v3"; });
-    const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && q.supersedes.startsWith(path.relative("assets/fx", f) + " ")); });
+    const superseded = pngs.filter((f) => { const pv = prov[path.relative("assets/fx", f)]; return pv && pv.version !== "v3" && Object.values(prov).some((q) => q && q.supersedes && String(q.supersedes.file || q.supersedes).startsWith(path.relative("assets/fx", f) + " ")); });
     this.ok(!notV3.length && !superseded.length, `art v3: ${v3.length} redone sheets play the v3 files (not v3: ${notV3.join(", ") || "none"}); no superseded file ships (${superseded.join(", ") || "none"})`);
-    this.ok(Object.keys(LST.FX_IMPACTS).every((n) => data.impacts[n] && data.effects[data.impacts[n].ring] && data.effects[data.impacts[n].bloom]), `fx.json: every impact (${Object.keys(LST.FX_IMPACTS).length}) names a ring and a bloom effect that exist`);
-    // Colours that reach a glow image today (ParticleBatch glows / motes, ProjectileTrails glows).
-    const P = LST.FX_PRESETS, elems = fs.readdirSync(path.join(this.root, "src/elements")).filter((f) => f.endsWith(".js")).map((f) => /color: "(#[0-9a-f]{6})"/i.exec(this.read("src/elements/" + f))).filter(Boolean).map((m) => m[1]);
-    const colors = [...new Set([P.trail.color, P.trail.critColor, P.glow.critColor, ...P.aura.colorsByTier.flat(), ...elems].map((c) => c.toLowerCase()))];
-    const missing = colors.filter((c) => !data.glowColors[c] || !data.sheets[data.glowColors[c]]);
-    this.ok(!missing.length, `fx.json: every preset / element colour that reaches a glow (${colors.length}) has a glow image (missing: ${missing.join(", ") || "none"})`);
+    // PR 10b art (Game Art & Motion PR10b v1, section G rows 9-13): the delivered sheets at their
+    // delivered sizes; a mote's frame is its variant's cell by the atlas's own names; streaks and
+    // trails keep the head-at-right pivot; the vignettes and the dim fill the screen.
+    const png = (f) => { const b = fs.readFileSync(path.join(this.root, "assets/fx", f)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+    const B = { motes: ["motes", 256, 32, 8], vignette_red: ["vignette", 720, 1560, 1], vignette_dark: ["vignette", 720, 1560, 1] };
+    for (const v of ["pale", "gold", "amber", "red", "pink", "cyan", "green", "lime", "soot"]) B["streak_" + v] = ["streak", 192, 16, 3];
+    for (const v of ["base", "ember", "frost", "spark", "venom"]) B["trail_" + v] = ["trail", 128, 24, 1];
+    // streak_lime v3 (Nov 23, painted from its own prompt with no reference) replaces v1 (too thin) and v2 (blocked:
+    // a recolour of streak_pale); both hashes stay in its PROVENANCE entry's "supersedes" as history.
+    const V10b = { streak_lime: "v3" };
+    const lime = prov["streak/streak_lime.png"] || {}, sup = [].concat(lime.supersedes || []);
+    const hist = { v1: "fb167b386a8188d5b3182b9bc4d0b6fb2cb84a0abd5b759dff221a94bed00acb", v2: "cfcc43bb90c814d685c6affa229e9282bed5b53a4cbe56a5d0402873541358c3" };
+    this.ok(lime.version === "v3" && lime.sha256 === "da9e529bf0adadb192f34928d296249c1593943bbc0f18cc384f69b15d2731b2" && Object.entries(hist).every(([v, h]) => sup.some((q) => q.version === v && q.sha256 === h)),
+      "art 10b: streak_lime ships v3 (da9e529b) and its PROVENANCE entry keeps v1 (fb167b38) and v2 (cfcc43bb) as history");
+    // A colour variant is its own painting, not another variant recoloured: lime's alpha mask (alpha >= 50%,
+    // whole sheet) overlaps pale's with IoU < 0.9 (v2, a pale recolour, measured 0.983).
+    const iou = FxTest.maskIoU(path.join(this.root, "assets/fx/streak/streak_lime.png"), path.join(this.root, "assets/fx/streak/streak_pale.png"));
+    this.ok(iou < 0.9, `art 10b: streak_lime is its own painting, not streak_pale recoloured (alpha >= 50% mask IoU vs pale ${iou.toFixed(3)} < 0.9)`);
+    const bad10b = Object.entries(B).filter(([id, [dir, w, h, n]]) => {
+      const rel = data.sheets[id], j = rel && JSON.parse(this.read("assets/fx/" + rel)), f = j && dir + "/" + j.image, wh = f && png(f);
+      return !j || rel !== dir + "/" + id + ".json" || !prov[f] || prov[f].version !== (V10b[id] || "v1") || j.version !== (V10b[id] || "v1") || wh[0] !== w || wh[1] !== h || j.count !== n || j.frameW * n !== w || j.frameH !== h
+        || (dir === "streak" || dir === "trail") && !(j.pivot && j.pivot[0] === j.frameW && j.pivot[1] === j.frameH / 2);
+    }).map(([id]) => id);
+    const cells = JSON.parse(this.read("assets/fx/motes/motes.json")).cells || [];
+    const moteBad = Object.entries(data.effects).filter(([k]) => k.startsWith("mote.")).filter(([k, e]) => e.sheet !== "motes" || e.frame !== cells.indexOf(k.slice(5)) || e.frame < 0).map(([k]) => k);
+    const fills = ["lowHpVignette:vignette_red", "finaleDim:vignette_dark"].filter((x) => { const [k, sh] = x.split(":"); return data.effects[k].sheet !== sh || data.effects[k].fit !== "fill"; });
+    this.ok(!bad10b.length && !moteBad.length && cells.length === 8 && !fills.length,
+      `art 10b: ${Object.keys(B).length} delivered sheets (v1; streak_lime v3) at their delivered sizes with head-right pivots (bad: ${bad10b.join(", ") || "none"}); mote.<v> plays the motes cell named v (bad: ${moteBad.join(", ") || "none"}); lowHpVignette / finaleDim fill the screen with vignette_red / vignette_dark (bad: ${fills.join(", ") || "none"})`);
+    // Venom bursts (main: pale lime #e4ffb8, lime #b4f06a, green #8be04a) play streak_lime twice and green once (Game Art streak_lime, Nov 16).
+    const ven = data.impacts.elemVenom && data.impacts.elemVenom.colors;
+    this.ok(String(ven) === "lime,lime,green" && data.effects["streak.lime"] && data.effects["streak.lime"].sheet === "streak_lime" && prov["streak/streak_lime.png"],
+      `art 10b: the venom burst plays lime, lime, green (main's pale lime, lime, green) through streak.lime / streak_lime (got ${ven})`);
+    const IMP = ["space", "burst", "colors", "radius", "bloomAlpha", "flash", "shake", "thump"];
+    const imps = Object.entries(data.impacts), routes = Object.values(LST.FX_ROUTES).filter(Boolean);
+    this.ok(imps.length >= 12 && imps.every(([, i]) => data.effects[i.ring] && data.effects[i.bloom] && IMP.every((k) => i[k] != null) && i.burst.count > 0) && routes.every((r) => data.impacts[r]),
+      `fx.json: every impact (${imps.length}) names a ring and a bloom effect that exist and has its burst, colours, radius, bloom, flash, shake and thump; every FX_ROUTES route names one (${routes.length})`);
+    // PR 10b: what a particle, shot or glow can carry is a variant name; each has its image entry.
+    const P = data.presets, want = { streak: new Set(), mote: new Set(), glow: new Set(), trail: new Set() };
+    for (const c of [...P.streakBurst.colors, ...imps.flatMap(([, i]) => i.colors)]) want.streak.add(c);
+    for (const c of P.aura.colorsByTier.flat()) { want.mote.add(c); want.glow.add(c); }
+    for (const c of [P.glow.critVariant, P.trail.glow, P.trail.critGlow, ...Object.values(P.trail.elementGlows)]) want.glow.add(c);
+    const elemTrails = fs.readdirSync(path.join(this.root, "src/elements")).filter((f) => f.endsWith(".js")).map((f) => /\btrail: "(\w+)"/.exec(this.read("src/elements/" + f))).filter(Boolean).map((m) => m[1]);
+    for (const t of [P.trail.variant, ...elemTrails, ...Object.keys(P.trail.elementGlows)]) want.trail.add(t);
+    const missing = Object.entries(want).flatMap(([k, set]) => [...set].filter((v) => !data.effects[k + "." + v]).map((v) => k + "." + v));
+    this.ok(elemTrails.length === 4 && !missing.length, `fx.json: every variant a particle, shot or glow can carry has its entry (${Object.entries(want).map(([k, v]) => v.size + " " + k).join(", ")}; element trails ${elemTrails.join(", ")}; missing: ${missing.join(", ") || "none"})`);
+    const hex = /#[0-9a-f]{3,8}\b/i, hexIn = ["presets", "impacts", "themes"].filter((k) => hex.test(JSON.stringify(data[k])));
+    this.ok(!hexIn.length && !("glowColors" in data) && !/#[0-9a-f]{6}/i.test(this.read("src/fx/FxPresets.js")) && !/LST\.(FX_PRESETS|FX_IMPACTS|FX_THEMES)\b/.test(this.walk("src").map((f) => this.read(f)).join("\n")),
+      `fx.json: presets, impacts and themes name variants, never a colour hex (hex in: ${hexIn.join(", ") || "none"}); glowColors is gone; FX_PRESETS / FX_IMPACTS / FX_THEMES are gone from src/`);
     const loaded = ["index.html", "sw.js", "assets/fx/fx.json", ...this.walk("src")].filter((f) => /fixtures\//.test(this.read(f)));
     this.ok(!loaded.length && !fs.readdirSync(path.join(this.root, "assets/fx")).some((f) => /fixture|acceptance/i.test(f)), "fixtures: no test fixture is listed by index.html, sw.js, fx.json or src/, or sits in assets/fx (" + (loaded.join(", ") || "none") + ")");
     return data;
@@ -115,6 +162,12 @@ class FxTest {
     this.ok(draw("low", { x: 0, y: 0, low: true }).r === false && draw("low", { x: 0, y: 0 }).r === true, "SpriteEffect: skipLow entries draw nothing in low quality");
     this.ok(draw("early", { x: 0, y: 0, p: 0.6 }).r === false && draw("early", { x: 0, y: 0, p: 0.2 }).img[2] === 10, "SpriteEffect: fade.until ends the effect early and spreads its frames over that part of life");
     this.ok(draw("gone", { x: 0, y: 0 }).r === false && draw("noSuchId", { x: 0, y: 0 }).r === false && draw("gone", { x: 0, y: 0 }).log.length === 0, "FxManifest: an unknown id or a sheet that is not in draws nothing and touches no canvas state");
+    // PR 10b fits: stretch (height = size x base), fill (a rectangle), a fixed atlas frame, the caller's blend.
+    m.setData({ sheets: m.data.sheets, effects: Object.assign({}, m.data.effects, { st: { sheet: "o", fit: "stretch", size: 1 }, fi: { sheet: "s", fit: "fill" }, at: { sheet: "s", frame: 3, blend: "screen" } }) });
+    const st = draw("st", { x: 0, y: 0, x2: 40, y2: 0, base: 9, p: 0.5 }), fi = draw("fi", { x: 0, y: 0, w: 390, h: 844, t: 0.25 }), atl = draw("at", { x: 0, y: 0, t: 0.25, blend: "lighter" });
+    this.ok(st.img[2] === 20 && st.img[8] === 40 && st.img[9] === 9 && st.img[7] === -4.5, `SpriteEffect: "stretch" fits the hop's length and sets the height to size x base (40 x 9 from a 10 x 20 frame)`);
+    this.ok(fi.img[6] === 0 && fi.img[7] === 0 && fi.img[8] === 390 && fi.img[9] === 844, `SpriteEffect: "fill" stretches the frame over the caller's rectangle (the screen)`);
+    this.ok(atl.img[2] === 30 && atl.log.some((l) => l[0] === "globalCompositeOperation=" && l[1] === "lighter") && draw("at", { x: 0, y: 0 }).log.some((l) => l[0] === "globalCompositeOperation=" && l[1] === "screen"), "SpriteEffect: \"frame\" draws a fixed atlas frame; the caller's blend (the FX theme) wins over the entry's");
     const p = new LST.EffectPlayer(m);
     this.ok(p.play("noSuchId", 0, 0) === null && p.play("shot", 3, 4) && p.list[0].life === 0.4, "EffectPlayer: plays any listed id by name (life = the sheet's one-shot length, 4 frames / 10 fps), refuses unknown ids");
     p.update(0.2); const c = this.ctx(); p.draw(c.ctx, false);
@@ -133,7 +186,7 @@ class FxTest {
       const want = new Set(["assets/fx/fx.json"]);
       for (const rel of Object.values(data.sheets)) { const j = "assets/fx/" + rel; want.add(j); want.add(path.dirname(j) + "/" + JSON.parse(this.read(j)).image); }
       this.ok(sb.__m.includes("assets/fx/fx.json") && files.length === want.size && files.every((f) => want.has(f) && this.exists(f)), `sw.js: the install step reads fx.json and precaches it, every sheet JSON and every PNG it names (${files.length} files, all present)`);
-      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v30"/.test(src), "sw.js: v30; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
+      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v31"/.test(src), "sw.js: v31; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
     });
   }
 
@@ -155,16 +208,39 @@ class FxTest {
     return out;
   }
 
+  // Every element's shot trail (src/elements/*.js `trail: "x"`) has presets.trail.elementGlows[x]
+  // naming an existing glow effect, and a trail.x effect. A missing entry would otherwise draw the
+  // id "glow.undefined" (nothing) without any error.
+  checkElementGlows(data) {
+    const dir = path.join(this.root, "src/elements"), T = (data.presets && data.presets.trail) || {}, G = T.elementGlows || {};
+    const trails = [...new Set(fs.readdirSync(dir).filter((f) => f.endsWith(".js")).flatMap((f) => [...this.read("src/elements/" + f).matchAll(/\btrail:\s*"(\w+)"/g)].map((m) => m[1])))].sort();
+    this.ok(trails.length >= 4, `elements: found the element shot trails (${trails.join(", ")})`);
+    for (const t of trails) {
+      this.ok(typeof G[t] === "string" && !!data.effects["glow." + G[t]], `elements: trail "${t}" has presets.trail.elementGlows.${t} naming a glow effect (${G[t] === undefined ? "missing: would draw glow.undefined" : "glow." + G[t]})`);
+      this.ok(!!data.effects["trail." + t], `elements: trail "${t}" has a trail.${t} effect`);
+    }
+  }
+
   async run() {
     const LST = this.sandbox().LST;
     this.checkFiles();
     const data = this.checkManifest(LST);
+    this.checkElementGlows(data);
     this.checkObjects(LST);
     await this.checkServiceWorker(data);
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
   }
 }
+
+// IoU of two same-size PNGs' alpha >= 50% masks (whole sheet).
+FxTest.maskIoU = (a, b) => {
+  const P = require("./fx-art-scan.js").png, A = P(fs.readFileSync(a)), B = P(fs.readFileSync(b));
+  if (A.w !== B.w || A.h !== B.h) return 0;
+  let both = 0, any = 0;
+  for (let i = 3; i < A.px.length; i += 4) { const x = A.px[i] >= 128, y = B.px[i] >= 128; if (x && y) both++; if (x || y) any++; }
+  return any ? both / any : 0;
+};
 
 module.exports = FxTest;
 if (require.main === module) new FxTest().run().then((c) => process.exit(c));

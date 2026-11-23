@@ -38,7 +38,8 @@ LST.SheetAnimation = class SheetAnimation {
 
   draw(ctx, i, x, y, bodyR) {
     if (!this.image) return false;
-    const f = Math.max(0, Math.min(this.count - 1, i | 0)), [dx, dy, dw, dh] = this.rect(x, y, bodyR);
+    const f = Math.max(0, Math.min(this.count - 1, i | 0)), k = bodyR / this.refBodyR;
+    const dx = x - this.ax * k, dy = y - this.ay * k, dw = this.fw * k, dh = this.fh * k;
     ctx.drawImage(this.image, f * this.fw, this.sy, this.fw, this.fh, dx, dy, dw, dh);
     return true;
   }

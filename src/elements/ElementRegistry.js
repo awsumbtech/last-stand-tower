@@ -39,9 +39,9 @@ LST.ElementRegistry = {
     if (game.events && LST.EVENTS.ELEMENT_HIT) game.events.emit(LST.EVENTS.ELEMENT_HIT, Object.assign({ element: el.id, color: el.color, x: e.x, y: e.y, radius: e.radius }, extra));
   },
 
-  // Shot color: owned elements take turns, so every element's glow shows up.
-  shotTint(tower, n) {
+  // Shot trail variant: owned elements take turns, so every element's image trail shows up.
+  shotTrail(tower, n) {
     const owned = this.elements.filter((el) => (tower.elements[el.id] || 0) > 0);
-    return owned.length ? owned[n % owned.length].color : null;
+    return owned.length ? owned[n % owned.length].trail : null;
   },
 };

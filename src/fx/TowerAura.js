@@ -7,9 +7,10 @@
 // a trap away before its "Gotcha!" reveal.
 
 LST.TowerAura = class TowerAura {
-  constructor(preset) {
-    this.preset = preset;
-    this.stream = new LST.Emitter.Stream(preset);
+  // presetOf() gives fx.json presets.aura (null until fx.json is in: tier 0, no motes).
+  constructor(presetOf) {
+    this.presetOf = presetOf;
+    this.stream = new LST.Emitter.Stream(null);
     this.runPower = 0;
     this.metaPower = 0;
     this.tier = 0;
@@ -39,11 +40,12 @@ LST.TowerAura = class TowerAura {
     this.refresh();
   }
 
+  get preset() { return this.presetOf(); }
   get power() { return this.runPower + this.metaPower; }
-  get intensity() { return Math.min(1, this.power / this.preset.maxPower); }
+  get intensity() { const P = this.preset; return P ? Math.min(1, this.power / P.maxPower) : 0; }
 
   refresh() {
-    const t = this.preset.tierPower;
+    const t = this.preset ? this.preset.tierPower : [];
     let tier = 0;
     while (tier < t.length && this.power >= t[tier]) tier++;
     this.tier = tier;
@@ -62,7 +64,7 @@ LST.TowerAura = class TowerAura {
   update(dt, tower, pool, rng, scale) {
     const P = this.preset;
     const k = this.intensity;
-    if (!P.idleEmission || this.power <= 0 || !tower) return; // idle motes are off by preset
+    if (!P || !P.idleEmission || this.power <= 0 || !tower) return; // idle motes are off by preset
     const rate = (P.rate[0] + (P.rate[1] - P.rate[0]) * k) * scale;
     const n = this.stream.take(dt, rate);
     if (!n) return;

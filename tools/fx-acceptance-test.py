@@ -9,6 +9,11 @@ copy differs. Then it serves the copy, opens it at 390 x 844 in headless Chromiu
 the game loads the new sheet, plays the effect by id and on a crit, draws frames of the fixture
 PNG with drawImage (frame advancing), and drops it once its life (the sheet's 4 frames / 8 fps)
 is over. The fixture is never added to the real tree.
+
+PR 10b's bar: a new particle / trail variant is data too. The same copy names a new variant
+"acceptance" (streak.acceptance and trail.acceptance entries on the fixture sheet, the plain shot
+trail set to it in presets.trail, and the boss-kill burst given it in impacts.bossKill.colors),
+and the game draws the fixture for every plain shot's trail and for the boss-kill streaks.
 """
 import functools, hashlib, http.server, json, os, shutil, sys, tempfile, threading, time
 from playwright.sync_api import sync_playwright
@@ -51,6 +56,11 @@ class FxAcceptanceTest:
         data = json.load(open(fx))
         data["sheets"][self.SHEET] = self.SHEET + ".json"
         data["effects"][self.ID] = {"what": "acceptance test effect (temp copy only)", "sheet": self.SHEET, "size": 2, "on": "CRIT"}
+        # PR 10b: a new particle / trail variant, data only
+        data["effects"]["streak.acceptance"] = {"what": "acceptance test streak (temp copy only)", "sheet": self.SHEET, "fit": "stretch"}
+        data["effects"]["trail.acceptance"] = {"what": "acceptance test trail (temp copy only)", "sheet": self.SHEET, "fit": "stretch"}
+        data["presets"]["trail"]["variant"] = "acceptance"
+        data["impacts"]["bossKill"]["colors"] = ["acceptance"] * len(data["impacts"]["bossKill"]["colors"])
         json.dump(data, open(fx, "w"), indent=1)
         for ext in (".png", ".json"):
             shutil.copy(os.path.join(self.root, "tools/fixtures/fx", self.SHEET + ext), os.path.join(dst, "assets/fx", self.SHEET + ext))
@@ -102,6 +112,17 @@ class FxAcceptanceTest:
             pg.wait_for_timeout(200)
             ev = pg.evaluate("() => ({ n: window.__spark.length, live: LST.fxDirector.player.list.filter((f) => f.id === '%s').map((f) => [Math.round(f.x - game.tower.x), Math.round(f.y - game.tower.y)]) })" % self.ID)
             self.ok(ev["n"] > 0 and ev["live"] == [[40, -60]], "played on its event: a CRIT plays it at the event's x, y (%s, %d draws)" % (ev["live"], ev["n"]))
+            # 3. PR 10b: the new variant (data only) draws the fixture as every plain shot's trail and as the boss-kill streaks
+            pg.evaluate("() => { const t = game.tower; t.elements = {}; game.enemies.slice(0, 4).forEach((e, i) => { e.x = t.x - 60 + i * 40; e.y = t.y - t.range * 0.6; e.hp = e.maxHp = 1e9; e.speed = 0; }); }")
+            pg.wait_for_function("() => game.projectiles.some((p) => !p.trail && (p.vx || p.vy))", timeout=10000)
+            pg.evaluate("() => { window.__spark.length = 0; }"); pg.wait_for_timeout(250)
+            tr = pg.evaluate("() => ({ n: window.__spark.length, shots: game.projectiles.length, variant: LST.fxManifest.preset('trail').variant })")
+            self.ok(tr["variant"] == "acceptance" and tr["n"] > 0, "new trail variant: presets.trail.variant 'acceptance' draws trail.acceptance (the fixture) behind plain shots (%d draws, %d shots)" % (tr["n"], tr["shots"]))
+            pg.evaluate("() => { game.tower.damage = 0; game.projectiles.length = 0; LST.fxDirector.pools.world.clear(); }"); pg.wait_for_timeout(200)
+            pg.evaluate("() => { window.__spark.length = 0; game.projectiles.length = 0; const t = game.tower; LST.fxDirector.impacts.fire('bossKill', t.x, t.y - 250); }")
+            pg.wait_for_timeout(120)
+            bk = pg.evaluate("() => { const P = LST.fxDirector.pools.world; return { n: window.__spark.length, streaks: [...Array(P.count).keys()].filter((i) => P.shape[i] === 0 && P.palette[P.color[i]] === 'acceptance').length }; }")
+            self.ok(bk["streaks"] > 10 and bk["n"] >= bk["streaks"], "new particle variant: impacts.bossKill.colors 'acceptance' gives the boss-kill burst streak.acceptance streaks that draw the fixture (%d streaks, %d draws)" % (bk["streaks"], bk["n"]))
             self.ok(not errors, "no page errors (%s)" % "; ".join(errors[:3]))
             browser.close()
 

@@ -2,7 +2,8 @@
 // FX art scan (node, no browser): node tools/fx-art-scan.js
 // PR 10a turned OverdriveRing, ChainArcs, ImpactFlashes, TowerGroundGlow, ImpactPulses and
 // TextGlows into assets/fx/fx.json entries drawn by one generic SpriteEffect, and deleted
-// GlowSprites. This scan fails if any of those files (or the manifest objects) draws a shape or
+// GlowSprites. PR 10b did the same for ParticleBatch (motes, glows, streaks), ProjectileTrails and
+// OverlayLayer (low-HP vignette, screen flash), and the finale dim in HudCanvasLayer. This scan fails if any of those files (or the manifest objects) draws a shape or
 // gradient, sets a colour, tints / filters an image, or branches on an effect kind, and if
 // fx.json names a colour or a tinting blend for an effect. It also proves it can see each banned
 // call by scanning a planted line for every rule, and fails on near-white pixels in any PNG under
@@ -13,7 +14,8 @@ class FxArtScan {
   constructor(root = path.join(__dirname, "..")) {
     this.root = root;
     this.FILES = ["src/render/OverdriveRing.js", "src/fx/draw/ChainArcs.js", "src/fx/draw/ImpactFlashes.js", "src/fx/draw/TowerGroundGlow.js",
-      "src/fx/draw/ImpactPulses.js", "src/fx/draw/TextGlows.js", "src/fx/SpriteEffect.js", "src/fx/FxManifest.js", "src/fx/EffectPlayer.js"];
+      "src/fx/draw/ImpactPulses.js", "src/fx/draw/TextGlows.js", "src/fx/SpriteEffect.js", "src/fx/FxManifest.js", "src/fx/EffectPlayer.js",
+      "src/fx/draw/ParticleBatch.js", "src/fx/draw/ProjectileTrails.js", "src/render/OverlayLayer.js"];
     this.RULES = [
       ["canvas shape / path call", /\.(arc|arcTo|ellipse|rect|roundRect|fill|stroke|fillRect|strokeRect|lineTo|moveTo|beginPath|closePath|bezierCurveTo|quadraticCurveTo|fillText|strokeText)\s*\(/],
       ["gradient / pattern", /create(Radial|Linear|Conic)Gradient|createPattern|addColorStop/],
@@ -51,6 +53,9 @@ class FxArtScan {
       this.ok(!hits.length, hits.join("\n     "));
       this.ok(/drawImage|effects\.draw|\.draw\(/.test(this.read(f)) || f.endsWith("EffectPlayer.js") || f.endsWith("FxManifest.js"), `${f}: draws through images / fx.json effects`);
     }
+    // 1b. HudCanvasLayer still asks the theme for its banners (PR 17), but draws no dim of its own.
+    const hud = FxArtScan.code(this.read("src/render/HudCanvasLayer.js")).join("\n");
+    this.ok(!/\b(fillRect|fillStyle|strokeStyle|createRadialGradient|createLinearGradient)\b|rgba?\(/.test(hud) && /effects\.draw\("finaleDim"/.test(hud), "src/render/HudCanvasLayer.js: the finale dim is the fx.json effect finaleDim (no fill, style or colour of its own)");
     // 2. GlowSprites is gone everywhere it was loaded or used.
     this.ok(!fs.existsSync(path.join(this.root, "src/fx/draw/GlowSprites.js")), "src/fx/draw/GlowSprites.js is deleted");
     const users = ["index.html", "styles.html", "sw.js", ...this.walk("src")].filter((f) => /GlowSprites/.test(FxArtScan.code(this.read(f)).join("\n")));
@@ -63,6 +68,8 @@ class FxArtScan {
       this.ok(["source-over", "screen", "lighter", undefined].includes(e.blend), `fx.json ${id}: blend ${e.blend} is a plain composite (source-over / screen / lighter)`);
       for (const s of [].concat(e.sheet)) this.ok(data.sheets[s], `fx.json ${id}: sheet ${s} is listed in "sheets"`);
     }
+    // 3b. PR 10b: presets, impacts and themes name particle variants, never a colour.
+    for (const k of ["presets", "impacts", "themes"]) this.ok(data[k] && !/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(JSON.stringify(data[k]).replace(/"what":"[^"]*"/g, "")), `fx.json ${k}: variant names only, no colour literal`);
     // 4. No near-white pixels in any shipped effect PNG (white is banned in effects; Decision 12).
     const white = FxArtScan.png(FxArtScan.makePng(2, 1, [255, 255, 255, 255, 255, 200, 120, 255]));
     this.ok(FxArtScan.nearWhite(white) === 1, "self-test: the PNG reader decodes a planted image and finds its one near-white pixel");

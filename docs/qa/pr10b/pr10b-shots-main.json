@@ -1,0 +1,185 @@
+{
+ "tag": "main",
+ "shots": [
+  [
+   "01a-lowhp-enter",
+   "Low-HP edge: the moment HP drops under 25% (vignette 1)",
+   "pr10b-01a-lowhp-enter-main-390x844.png",
+   null
+  ],
+  [
+   "01b-lowhp-pulse",
+   "Low-HP edge: steady pulse at its peak (0.22 + 0.10)",
+   "pr10b-01b-lowhp-pulse-main-390x844.png",
+   {
+    "time": 0.2617993877991494
+   }
+  ],
+  [
+   "02-finale-dim",
+   "Finale intro dim, 0.6 s in (dim at full), FINALE banner",
+   "pr10b-02-finale-dim-main-390x844.png",
+   {
+    "intro": 2.6,
+    "total": 3.2
+   }
+  ],
+  [
+   "03-trails",
+   "Projectile trails: plain, crit and element shots (ember / frost / spark / venom take turns), effects of hits cleared",
+   "pr10b-03-trails-main-390x844.png",
+   {
+    "shots": 3,
+    "kinds": [
+     "#ffe14d",
+     "#ff7a1a",
+     "#7fe3ff"
+    ]
+   }
+  ],
+  [
+   "04a-streaks-bosskill",
+   "Streaks: boss-kill burst at 0.1 s (pale / gold / red)",
+   "pr10b-04a-streaks-bosskill-main-390x844.png",
+   {
+    "particles": 64
+   }
+  ],
+  [
+   "04b-streaks-elements",
+   "Streaks: element bursts at 5 frames: ember (top left), frost (top right), venom (low left), shatter (low right), spark (top)",
+   "pr10b-04b-streaks-elements-main-390x844.png",
+   {
+    "particles": 61
+   }
+  ],
+  [
+   "05-motes-t0",
+   "Motes: tower idle motes at aura tier 0 (QA: idle motes switched on), plus 4 crit glows up top",
+   "pr10b-05-motes-t0-main-390x844.png",
+   {
+    "tier": 0,
+    "particles": 12
+   }
+  ],
+  [
+   "05-motes-t4",
+   "Motes: tower idle motes at aura tier 4 (QA: idle motes switched on), plus 4 crit glows up top",
+   "pr10b-05-motes-t4-main-390x844.png",
+   {
+    "tier": 4,
+    "particles": 61
+   }
+  ],
+  [
+   "06-bosskill-flash-f03",
+   "Boss-kill flash: real mini-boss kill, 3 frames after (50 ms); white X13 fill on main, amber screen_burst on 10b",
+   "pr10b-06-bosskill-flash-f03-main-390x844.png",
+   {
+    "flash": 1
+   },
+   {
+    "flash": 1
+   }
+  ],
+  [
+   "06-bosskill-flash-f12",
+   "Boss-kill flash: real mini-boss kill, 12 frames after (200 ms); white X13 fill on main, amber screen_burst on 10b",
+   "pr10b-06-bosskill-flash-f12-main-390x844.png",
+   {
+    "flash": 0.8999999999999999
+   },
+   {
+    "flash": 1
+   }
+  ],
+  [
+   "07-streaks-each-f05",
+   "Each streak variant, 5 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
+   "pr10b-07-streaks-each-f05-main-390x844.png",
+   {
+    "particles": 90
+   }
+  ],
+  [
+   "07-streaks-each-f14",
+   "Each streak variant, 14 frames: row 1 pale, gold, amber, red; row 2 pink, cyan, green, lime; row 3 soot (main: the hex each replaced)",
+   "pr10b-07-streaks-each-f14-main-390x844.png",
+   {
+    "particles": 90
+   }
+  ],
+  [
+   "08-trail-base",
+   "Trail base: plain shots only, hit effects cleared",
+   "pr10b-08-trail-base-main-390x844.png",
+   {
+    "shots": 2,
+    "kinds": [
+     "plain"
+    ]
+   }
+  ],
+  [
+   "08-trail-ember",
+   "Trail ember: ember shots only, hit effects cleared",
+   "pr10b-08-trail-ember-main-390x844.png",
+   {
+    "shots": 2,
+    "kinds": [
+     "#ff7a1a"
+    ]
+   }
+  ],
+  [
+   "08-trail-frost",
+   "Trail frost: frostbite shots only, hit effects cleared",
+   "pr10b-08-trail-frost-main-390x844.png",
+   {
+    "shots": 2,
+    "kinds": [
+     "#7fe3ff"
+    ]
+   }
+  ],
+  [
+   "08-trail-spark",
+   "Trail spark: chainSpark shots only, hit effects cleared",
+   "pr10b-08-trail-spark-main-390x844.png",
+   {
+    "shots": 2,
+    "kinds": [
+     "#ffe14d"
+    ]
+   }
+  ],
+  [
+   "08-trail-venom",
+   "Trail venom: venom shots only, hit effects cleared",
+   "pr10b-08-trail-venom-main-390x844.png",
+   {
+    "shots": 1,
+    "kinds": [
+     "#8be04a"
+    ]
+   }
+  ],
+  [
+   "09-trails-row",
+   "Trail per variant, frozen: base, ember, frost, spark, venom (left to right), flying up",
+   "pr10b-09-trails-row-main-390x844.png",
+   [
+    "plain",
+    "#ff7a1a",
+    "#7fe3ff",
+    "#ffe14d",
+    "#8be04a"
+   ],
+   {
+    "speed": 619.9999999999999,
+    "len": 30.999999999999996
+   }
+  ]
+ ],
+ "errors": []
+}

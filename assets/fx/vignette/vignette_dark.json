@@ -1,0 +1,12 @@
+{
+ "frameW": 720,
+ "frameH": 1560,
+ "count": 1,
+ "fps": null,
+ "loop": false,
+ "draw": "stretched to the screen",
+ "fadeIn": "code, 0.5 s",
+ "image": "vignette_dark.png",
+ "version": "v1",
+ "sha256": "693e6c36929187b769358537bcd1f0bf0f8afd49cfef61fe24c14020891d6a13"
+}

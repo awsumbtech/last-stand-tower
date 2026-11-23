@@ -60,7 +60,7 @@ LST.Tower = class Tower {
       p.slowTime = this.slowTime;
       p.splash = this.splash;
       p.splashRadius = this.splashRadius;
-      if (this.elements) { p.elements = this.elements; p.tint = LST.ElementRegistry.shotTint(this, this.shots = (this.shots || 0) + 1); }
+      if (this.elements) { p.elements = this.elements; p.trail = LST.ElementRegistry.shotTrail(this, this.shots = (this.shots || 0) + 1); }
       game.projectiles.push(p);
     }
     this.cooldown = 1 / (this.fireRate * (this.overdrive > 0 ? LST.CONFIG.abilities.overdrive.mult : 1));

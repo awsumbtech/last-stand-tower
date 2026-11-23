@@ -4,11 +4,16 @@
 // with drawImage and may move, scale, rotate and fade it (opacity). It never draws a shape,
 // never tints, and draws nothing until its image is in.
 //
-//   draw(ctx, at)  at = { x, y, base, t, p, level, variant, pick, alpha, low, x2, y2, index }
+//   draw(ctx, at)  at = { x, y, base, t, p, level, variant, pick, alpha, blend, low, x2, y2, index, w, h, batched }
 //     base     the caller's size unit (tower radius, ring radius, 1 for px); R = size x base
 //     t        seconds (loop frames, pulses)      p  life progress 0..1 (one-shot frames, fades)
 //     level    0..1 for "by": "level" values      variant / pick  which sheet / strip of a list
-//     alpha    the caller's strength (x the entry alpha)   x2, y2  segment end ("fit": "segment")
+//     alpha    the caller's strength (x the entry alpha)   blend  the caller's composite op (else the entry's)
+//     x2, y2   segment end ("fit": "segment" / "stretch")  w, h   the rectangle at x, y ("fit": "fill")
+//     batched  the caller wraps a whole pass in one save / restore: no per-draw save / restore (it
+//              sets blend and opacity on every draw and undoes its own segment transform)
+//   fit: radius (default), segment (art height x size), stretch (height = size x base), fill (the rectangle).
+//   frame: a fixed frame of the strip (an atlas cell), instead of playing it.
 LST.SpriteEffect = class SpriteEffect {
   constructor(id, entry, manifest) {
     this.id = id;
@@ -52,6 +57,7 @@ LST.SpriteEffect = class SpriteEffect {
   static wave(w, t) { return w ? w.amp * Math.sin((t || 0) * w.speed) : 0; }
 
   frame(anim, at, p) {
+    if (this.entry.frame != null) return this.entry.frame;
     const until = (this.entry.fade && this.entry.fade.until) || 1;
     if (anim.loop || p == null) return anim.index(at.t || 0);
     return Math.min(anim.count - 1, Math.floor((p / until) * anim.count));
@@ -66,28 +72,33 @@ LST.SpriteEffect = class SpriteEffect {
     const W = LST.SpriteEffect;
     const a = W.value(e.alpha, at, p) * (at.alpha == null ? 1 : at.alpha) * this.fade(p) * (1 + W.wave(e.alphaPulse, at.t) - (e.alphaPulse ? e.alphaPulse.amp : 0));
     if (a < 0.01) return false;
-    const i = this.frame(anim, at, p), off = e.offset || [0, 0];
-    ctx.save();
-    ctx.globalCompositeOperation = e.blend || "source-over";
+    const i = this.frame(anim, at, p), off = e.offset;
+    if (!at.batched) ctx.save();
+    ctx.globalCompositeOperation = at.blend || e.blend || "source-over";
     ctx.globalAlpha = Math.min(1, a);
-    if (e.fit === "segment") this.drawSegment(ctx, anim, i, at, p);
-    else anim.draw(ctx, i, at.x + off[0], at.y + off[1], (W.value(e.size, at, p) + W.wave(e.pulse, at.t)) * (at.base == null ? 1 : at.base));
-    ctx.restore();
+    if (e.fit === "segment" || e.fit === "stretch") this.drawSegment(ctx, anim, i, at, p);
+    else if (e.fit === "fill") ctx.drawImage(anim.image, Math.max(0, Math.min(anim.count - 1, i | 0)) * anim.fw, anim.sy, anim.fw, anim.fh, at.x, at.y, at.w, at.h);
+    else anim.draw(ctx, i, at.x + (off ? off[0] : 0), at.y + (off ? off[1] : 0), (W.value(e.size, at, p) + W.wave(e.pulse, at.t)) * (at.base == null ? 1 : at.base));
+    if (!at.batched) ctx.restore();
     return true;
   }
 
   // Stretch frame i from (x, y) to (x2, y2): the anchor sits on (x, y), length fills the hop
-  // (at least entry.minLength), height is the art's own height x size.
+  // (at least entry.minLength), height is the art's own height x size ("segment") or exactly
+  // size x base ("stretch").
   drawSegment(ctx, anim, i, at, p) {
     const e = this.entry;
     let ux = at.x2 - at.x, uy = at.y2 - at.y, L = Math.hypot(ux, uy);
     if (L > 1) { ux /= L; uy /= L; } else { const ang = (at.index || 0) * (e.spreadAngle || 0); ux = Math.cos(ang); uy = Math.sin(ang); }
     L = Math.max(L, e.minLength || 0);
-    const kx = L / anim.fw, ky = LST.SpriteEffect.value(e.size, at, p) * (at.base == null ? 1 : at.base);
+    const kx = L / anim.fw, ky = LST.SpriteEffect.value(e.size, at, p) * (at.base == null ? 1 : at.base) / (e.fit === "stretch" ? anim.fh : 1);
     const f = Math.max(0, Math.min(anim.count - 1, i | 0));
     ctx.translate(at.x, at.y);
-    ctx.rotate(Math.atan2(uy, ux));
+    const angle = Math.atan2(uy, ux);
+    ctx.rotate(angle);
     ctx.drawImage(anim.image, f * anim.fw, anim.sy, anim.fw, anim.fh, -anim.ax * kx, -anim.ay * ky, anim.fw * kx, anim.fh * ky);
+    // Batched callers own canvas state; undo only our local transform, without a state-stack copy.
+    if (at.batched) { ctx.rotate(-angle); ctx.translate(-at.x, -at.y); }
   }
 };
 
