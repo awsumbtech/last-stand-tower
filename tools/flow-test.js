@@ -33,6 +33,7 @@ class FlowTest {
     const sb = { Math, console, localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); } } };
     sb.window = sb; vm.createContext(sb);
     for (const f of FILES) vm.runInContext(this.read("src/" + f), sb, { filename: f });
+    vm.runInContext(this.read("src/core/SkipClickGuard.js"), sb, { filename: "SkipClickGuard.js" });
     vm.runInContext(this.read("src/core/InputController.js"), sb, { filename: "InputController.js" });
     const LST = sb.LST;
     LST.UI = class { show() {} updateHud() {} renderShop() {} };
@@ -54,7 +55,8 @@ class FlowTest {
       this.ok(fs.existsSync(path.join(this.root, file)) && html.includes(`src="${file}"`) && sw.includes(`"${file}"`), `flow: ${C.name} has its own file, loaded by index.html and cached by sw.js`);
       this.ok(!/\bgame\.state\b/.test(this.read(file)), `flow: ${C.name} uses game.flow (no compat state reads)`);
     }
-    this.ok(["src/core/GameState.js", "src/core/GameStateMachine.js", "src/core/InputController.js"].every((f) => html.includes(`src="${f}"`) && sw.includes(`"${f}"`)), "flow: GameState, GameStateMachine, InputController are loaded and cached");
+    this.ok(["src/core/GameState.js", "src/core/GameStateMachine.js", "src/core/SkipClickGuard.js", "src/core/InputController.js"].every((f) => html.includes(`src="${f}"`) && sw.includes(`"${f}"`)), "flow: GameState, GameStateMachine, SkipClickGuard, InputController are loaded and cached");
+    this.ok(html.indexOf("SkipClickGuard.js") < html.indexOf("InputController.js"), "flow: SkipClickGuard loads before InputController");
     this.ok(html.indexOf('src="src/core/states/ClearedState.js"') < html.indexOf('src="src/game.js"') && html.indexOf('src="src/core/GameStateMachine.js"') < html.indexOf('src="src/core/states/MenuState.js"'), "flow: script order machine -> states -> game.js");
     this.ok(game.flow.id === "menu" && game.flow.current instanceof LST.MenuState && game.flow.is("menu") && !game.flow.is("playing"), "flow: a new game starts in MenuState; flow.is(\"menu\") and flow.id read \"menu\"");
     game.flow.set("upgrade"); this.ok(game.flow.current instanceof LST.ShopState && game.flow.id === "upgrade", "flow: flow.set(\"upgrade\") enters ShopState");
@@ -151,6 +153,145 @@ class FlowTest {
     { const { g, log } = this.spyGame("playing", 0); new IC(g, {}).visibilityChanged(false); this.ok(!log.length, "input: showing the tab again does nothing"); }
   }
 
+
+  // A window stub that records capture and bubble listeners so a skip's trailing click can be dispatched.
+  fakeWin() {
+    const listeners = [];
+    return {
+      addEventListener(type, fn, opts) {
+        listeners.push({ type, fn, capture: opts === true || !!(opts && opts.capture) });
+      },
+      fire(type, e) {
+        for (const l of listeners) { if (l.type === type && l.capture) { l.fn(e); if (e._stop) return; } }
+        for (const l of listeners) { if (l.type === type && !l.capture) { l.fn(e); if (e._stop) return; } }
+      },
+    };
+  }
+  pointerEv() {
+    return {
+      target: { closest: () => null },
+      preventDefault() { this.pd = true; },
+      stopPropagation() { this._stop = true; },
+      stopImmediatePropagation() { this._stop = true; },
+    };
+  }
+
+  // Skip taps must not click through to the shop or results. These fail without SkipClickGuard.
+  checkSkipClicks() {
+    const { game, LST } = this;
+
+    { // skip-then-shop: the trailing click does not hit the shop; a second tap does
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const k = game.finishCelebration;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      const win = this.fakeWin();
+      let shopClicks = 0;
+      win.addEventListener("click", () => { shopClicks++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      this.ok(ic.pointerDown(this.pointerEv()) && game.flow.is("upgrade"), "input: a canvas tap skips the wave-clear wait and opens the shop");
+      win.fire("click", this.pointerEv());
+      this.ok(shopClicks === 0, "input: a click following a celebrate skip does not hit the shop");
+      win.fire("click", this.pointerEv());
+      this.ok(shopClicks === 1, "input: a second tap on the shop works after the skip");
+      game.finishCelebration = k;
+    }
+
+    { // skip-then-results: the trailing click does not hit Play again; a second tap does
+      game.flow.set("gameover"); game.resultsDelay = 1.1;
+      const k = game.showResults;
+      game.showResults = () => { game.resultsDelay = 0; };
+      const win = this.fakeWin();
+      let resultClicks = 0;
+      win.addEventListener("click", () => { resultClicks++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      this.ok(ic.pointerDown(this.pointerEv()) && game.resultsDelay === 0, "input: a canvas tap skips the death wait and shows the results");
+      win.fire("click", this.pointerEv());
+      this.ok(resultClicks === 0, "input: a click following a death-wait skip does not hit the results");
+      win.fire("click", this.pointerEv());
+      this.ok(resultClicks === 1, "input: a second tap on the results works after the skip");
+      game.showResults = k;
+    }
+
+    { // a tap on results after the delay works normally (guard is not armed)
+      game.flow.set("gameover"); game.resultsDelay = 0.1;
+      const k = game.showResults;
+      game.showResults = () => { game.resultsDelay = 0; };
+      const win = this.fakeWin();
+      let clicks = 0;
+      win.addEventListener("click", () => { clicks++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      game.update(0.2);
+      this.ok(game.resultsDelay === 0, "input: the death wait can end on its own");
+      win.fire("click", this.pointerEv());
+      this.ok(clicks === 1, "input: a tap on results after the delay works normally");
+      game.showResults = k;
+    }
+
+    { // a tap mid-transition (shop already open, trailing click of the skip gesture)
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const k = game.finishCelebration;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      const win = this.fakeWin();
+      let clicks = 0;
+      win.addEventListener("click", () => { clicks++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv());
+      this.ok(game.flow.is("upgrade"), "input: mid-transition the shop is already open");
+      win.fire("click", this.pointerEv());
+      this.ok(clicks === 0, "input: a tap mid-transition is swallowed");
+      game.finishCelebration = k;
+    }
+
+    { // a skip never places a tower or presses a button
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const k = game.finishCelebration;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let placed = 0, pressed = 0;
+      game.placeTower = () => { placed++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { pressed++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv());
+      win.fire("click", this.pointerEv());
+      this.ok(placed === 0 && pressed === 0, "input: a skip never places a tower or presses a button");
+      delete game.placeTower;
+      game.finishCelebration = k;
+    }
+
+    { // InputController (the real input path) skips the death wait
+      game.flow.set("gameover"); game.resultsDelay = 1.1;
+      let shown = 0;
+      const k = game.showResults;
+      game.showResults = () => { shown++; game.resultsDelay = 0; };
+      const ic = new LST.InputController(game);
+      ic.pointerDown(this.pointerEv());
+      this.ok(shown === 1 && game.resultsDelay === 0, "input: InputController skips the death wait");
+      game.showResults = k;
+    }
+
+    { // finishRun runs exactly once on the skip path
+      const g = this.game;
+      g.reset();
+      let n = 0;
+      const rec = g.runRecorder;
+      const k = rec.finishRun.bind(rec);
+      rec.finishRun = (opts) => { n++; return k(opts); };
+      g.flow.set("playing");
+      g.tower.hp = 0;
+      g.waveFlow.afterStep();
+      this.ok(g.flow.is("gameover") && n === 1, "input: falling the tower starts one finishRun");
+      const ic = new LST.InputController(g);
+      ic.pointerDown(this.pointerEv());
+      this.ok(n === 1 && g.resultsDelay === 0, "input: finishRun runs exactly once on the skip path");
+      rec.finishRun = k;
+    }
+  }
+
   // 6. no compat site left anywhere (PR 9 removed the getter / setter)
   checkSweep() {
     const { flow, stub, rows } = new FlowStateSweep(this.root).check();
@@ -167,6 +308,7 @@ class FlowTest {
     this.loadOracle();
     this.checkKeys();
     this.checkHiddenTab();
+    this.checkSkipClicks();
     this.checkSweep();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;

@@ -161,4 +161,7 @@ LST.themes.neon = {
     ctx.fillText(text, r.width / 2, r.height * 0.3);
     ctx.restore();
   },
+
+  // Outlined live text may stay in code (Decision 6 / F9).
+  skipHint(ctx, r) { LST.SkipHint.draw(ctx, r); },
 };

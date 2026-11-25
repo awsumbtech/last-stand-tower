@@ -11,19 +11,29 @@ LST.InputController = class InputController {
     this.onKeyDown = (e) => this.keyDown(e);
     this.onPointerDown = (e) => this.pointerDown(e);
     this.onVisibility = () => this.visibilityChanged(!!(this.doc && this.doc.hidden));
+    this.skipGuard = new LST.SkipClickGuard();
   }
   attach(win) {
     win.addEventListener("keydown", this.onKeyDown);
     win.addEventListener("pointerdown", this.onPointerDown);
+    this.skipGuard.attach(win);
     if (this.doc) this.doc.addEventListener("visibilitychange", this.onVisibility);
     return this;
   }
   // Skip an unskippable wait on a tap that is not already a button or a screen control.
+  // Consume the pointer and arm the one-shot click guard so the trailing click cannot
+  // hit the shop or results that just appeared.
   pointerDown(e) {
     const t = e.target;
     if (t && t.closest && t.closest("button, a, input, .card, .screen, .setting")) return false;
     const state = this.game.flow.current;
-    return !!(state && state.skipWait && state.skipWait(this.game));
+    if (state && state.skipWait && state.skipWait(this.game)) {
+      if (e && e.preventDefault) e.preventDefault();
+      if (e && e.stopPropagation) e.stopPropagation();
+      this.skipGuard.arm();
+      return true;
+    }
+    return false;
   }
   // Returns true when the key did something.
   keyDown(e) {

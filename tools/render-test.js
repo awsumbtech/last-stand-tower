@@ -393,12 +393,44 @@ class RenderTest {
     this.ok(scripts.indexOf("src/render/RenderPipeline.js") < scripts.indexOf("src/render.js") && scripts.indexOf("src/render/RenderLayer.js") < scripts.indexOf("src/render/BackdropLayer.js"), "files: RenderLayer, the layers and RenderPipeline load before render.js");
   }
 
+  // WAVE banner at 0.8s holds full opacity until the last 0.3s, then fades (same shape as WAVE CLEAR).
+  // skipHint falls back to LST.SkipHint when a theme does not define it.
+  checkWaveIntroAndSkipHint() {
+    const rec = new DrawRecorder();
+    const sb = this.sandbox(this.RENDER_FILES.map((f) => [f, this.read("src/" + f)]), rec);
+    vm.runInContext(this.read("src/themes/SkipHint.js"), sb, { filename: "SkipHint.js" });
+    const LST = sb.LST, hud = new LST.HudCanvasLayer();
+    const r = { width: 390, height: 844 };
+    const sceneAt = (waveIntro, extra = {}) => Object.assign({
+      sceneFlags: LST.SceneFlags.PLAYING, waveIntro, wave: 1, finale: null, phaseBanner: null, bossIntro: 0, skipHint: false,
+    }, extra);
+    const seen = [];
+    const theme = { banner(ctx, text, alpha) { seen.push({ text, alpha }); } };
+    for (const [wi, want] of [[0.8, 1], [0.6, 1], [0.4, 1], [0.3, 1], [0.15, 0.5], [0.05, 0.05 / 0.3]]) {
+      seen.length = 0;
+      hud.draw(rec.ctx("hud"), { r, scene: sceneAt(wi), theme, fx: null });
+      this.ok(seen.length === 1 && seen[0].text === "WAVE 1" && Math.abs(seen[0].alpha - want) < 1e-12,
+        `hud: WAVE banner alpha at waveIntro ${wi} is ${want} (held full until the last 0.3s)`);
+    }
+
+    let fallback = 0, themed = 0;
+    const keep = LST.SkipHint.draw;
+    LST.SkipHint.draw = (ctx, rect) => { fallback++; keep.call(LST.SkipHint, ctx, rect); };
+    hud.draw(rec.ctx("hud"), { r, scene: sceneAt(0, { skipHint: true }), theme, fx: null });
+    this.ok(fallback === 1, "hud: a theme without skipHint uses the SkipHint fallback");
+    const themeWith = { banner() {}, skipHint() { themed++; } };
+    hud.draw(rec.ctx("hud"), { r, scene: sceneAt(0, { skipHint: true }), theme: themeWith, fx: null });
+    this.ok(themed === 1 && fallback === 1, "hud: a theme with skipHint keeps its own draw");
+    LST.SkipHint.draw = keep;
+  }
+
   run() {
     this.checkRenderer();
     this.checkParticles();
     this.checkConverted();
     this.checkDrawEquivalence();
     this.checkStructure();
+    this.checkWaveIntroAndSkipHint();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
   }
@@ -449,6 +481,7 @@ RenderTest.prototype.checkDrawEquivalence = function () {
   this.ok(draws > 2000 && now.length === was.length && firstDiff < 0 && now.filter((l) => l.startsWith("theme ")).every((l) => l.endsWith(" stack 0")),
     `fx 10b: trails + particles draw exactly what the drawers at ${this.ALLOC_REV} drew (${draws} drawImage calls: sheet, source rect, on-screen corners, opacity, blend; first difference: ${firstDiff < 0 ? "none" : now[firstDiff] + " vs " + was[firstDiff]}; save / restore balanced)`);
 };
+
 
 module.exports = RenderTest;
 if (require.main === module) process.exit(new RenderTest().run());

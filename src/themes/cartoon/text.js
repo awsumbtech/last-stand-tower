@@ -51,10 +51,8 @@
       ctx.restore();
     },
 
-    // Same outlined live text as the wave banner (text may stay in code, Decision 6 / F9).
-    skipHint(ctx, r) {
-      textPop(ctx, "Tap to skip", r.width / 2, r.height - 168, "#fffbf1", 22);
-    },
+    // Shared outlined live text (Decision 6 / F9). Other themes use the same SkipHint fallback.
+    skipHint(ctx, r) { LST.SkipHint.draw(ctx, r); },
 
     banner(ctx, text, alpha, r) {
       // Fit long banners ("WAVE CLEAR!") on narrow phones, including the pop overshoot.
