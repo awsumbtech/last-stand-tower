@@ -167,9 +167,10 @@ class FlowTest {
       },
     };
   }
-  pointerEv() {
+  pointerEv(timeStamp) {
     return {
       target: { closest: () => null },
+      timeStamp: timeStamp == null ? 0 : timeStamp,
       preventDefault() { this.pd = true; },
       stopPropagation() { this._stop = true; },
       stopImmediatePropagation() { this._stop = true; },
@@ -289,6 +290,58 @@ class FlowTest {
       ic.pointerDown(this.pointerEv());
       this.ok(n === 1 && g.resultsDelay === 0, "input: finishRun runs exactly once on the skip path");
       rec.finishRun = k;
+    }
+
+    { // skip, no click, window passes: the next click is delivered (card taken, Next pressed)
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      this.ok(ic.pointerDown(this.pointerEv(0)) && game.flow.is("upgrade"), "input: a skip with no trailing click still opens the shop");
+      win.fire("click", this.pointerEv(LST.SkipClickGuard.windowMs));
+      this.ok(taken === 1 && next === 1, "input: after the skip window, a shop card is taken and Next is pressed");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // skip, then pointercancel: the guard disarms and the next click is delivered
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0));
+      win.fire("pointercancel", this.pointerEv(16));
+      win.fire("click", this.pointerEv(32));
+      this.ok(taken === 1 && next === 1, "input: pointercancel after a skip disarms the guard so the next click is delivered");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // skip, then a click within the window is still swallowed
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(1000));
+      win.fire("click", this.pointerEv(1000 + LST.SkipClickGuard.windowMs - 1));
+      this.ok(taken === 0 && next === 0, "input: a click within the skip window is still swallowed");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
     }
   }
 

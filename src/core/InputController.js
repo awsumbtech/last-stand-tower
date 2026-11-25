@@ -21,16 +21,14 @@ LST.InputController = class InputController {
     return this;
   }
   // Skip an unskippable wait on a tap that is not already a button or a screen control.
-  // Consume the pointer and arm the one-shot click guard so the trailing click cannot
-  // hit the shop or results that just appeared.
+  // Do not preventDefault: the trailing click must still arrive so the guard can swallow
+  // it. The guard disarms on pointercancel or once its 400 ms window has passed.
   pointerDown(e) {
     const t = e.target;
     if (t && t.closest && t.closest("button, a, input, .card, .screen, .setting")) return false;
     const state = this.game.flow.current;
     if (state && state.skipWait && state.skipWait(this.game)) {
-      if (e && e.preventDefault) e.preventDefault();
-      if (e && e.stopPropagation) e.stopPropagation();
-      this.skipGuard.arm();
+      this.skipGuard.arm(e && e.timeStamp != null ? e.timeStamp : 0);
       return true;
     }
     return false;
