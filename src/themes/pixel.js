@@ -330,5 +330,8 @@
       // Screen space here: one art pixel = r.ps CSS px.
       drawText(ctx, text, r.width / 2, r.height * 0.3, "#00f0ff", r.ps, 3);
     },
+
+    // Outlined live text may stay in code (Decision 6 / F9).
+    skipHint(ctx, r) { LST.SkipHint.draw(ctx, r); },
   };
 })();

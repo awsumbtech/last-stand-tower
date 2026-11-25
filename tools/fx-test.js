@@ -218,7 +218,7 @@ class FxTest {
       const want = new Set(["assets/fx/fx.json"]);
       for (const rel of Object.values(data.sheets)) { const j = "assets/fx/" + rel; want.add(j); want.add(path.dirname(j) + "/" + JSON.parse(this.read(j)).image); }
       this.ok(sb.__m.includes("assets/fx/fx.json") && files.length === want.size && files.every((f) => want.has(f) && this.exists(f)), `sw.js: the install step reads fx.json and precaches it, every sheet JSON and every PNG it names (${files.length} files, all present)`);
-      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v32"/.test(src), "sw.js: v32; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
+      this.ok(!sb.__p.some((u) => u.startsWith("assets/fx/")) && /precacheManifests\(cache\)/.test(src) && /const VERSION = "v33"/.test(src), "sw.js: v33; nothing in assets/fx is hand-listed in PRECACHE; install runs precacheManifests after PRECACHE");
     });
   }
 

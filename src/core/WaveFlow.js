@@ -12,7 +12,7 @@ LST.WaveFlow = class WaveFlow {
     g.spawnInterval = interval;
     g.spawnTimer = 0.3; // short breather before the first spawn
     g.waveMult = g.director.multipliers(g.wave);
-    g.waveIntro = 1.6;
+    g.waveIntro = 0.8; // title card only; enemies already spawn at 0.3s
     g.projectiles = [];
     g.hazards = [];
     g.flow.set("playing");
@@ -68,6 +68,7 @@ LST.WaveFlow = class WaveFlow {
 
   finishCelebration() {
     const g = this.game;
+    g.skipHint = false;
     if (!g.flow.is("celebrate")) return;
     if (g.gotchaQueue.length) {
       g.flow.set("gotcha");

@@ -34,7 +34,7 @@ LST.DemoScene = class DemoScene extends LST.World {
     this.bannerTimer -= dt;
     if (this.bannerTimer <= 0) {
       this.wave += 1;
-      this.waveIntro = 1.6;
+      this.waveIntro = 0.8;
       this.bannerTimer = 10;
     }
     this.spawnTimer -= dt;

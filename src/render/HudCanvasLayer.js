@@ -28,8 +28,10 @@ LST.HudCanvasLayer = class HudCanvasLayer extends LST.RenderLayer {
         if (theme.bossBanner) theme.bossBanner(ctx, scene.bossIntro, r);
         else theme.banner(ctx, "BOSS", Math.min(1, scene.bossIntro), r);
       } else if (scene.waveIntro > 0) {
-        theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), r);
+        theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro / 0.3), r); // full until the last 0.3s, then fade
       }
     }
+    const skipHint = (theme && theme.skipHint) || (LST.SkipHint && LST.SkipHint.draw);
+    if (scene.skipHint && skipHint) skipHint(ctx, r);
   }
 };

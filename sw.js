@@ -6,7 +6,7 @@
 //
 // Bump VERSION whenever you deploy changes. That installs a new worker, which
 // precaches the new files, and the page shows a "New version available" toast.
-const VERSION = "v32"; // low-HP red edge: vignette_red v2 (side middles 0.38-0.40); streaks play all 3 frames again
+const VERSION = "v33"; // skippable wave-clear and death wait; WAVE banner 0.8s
 const CACHE = `last-stand-tower-${VERSION}`;
 
 const PRECACHE = [
@@ -95,6 +95,7 @@ const PRECACHE = [
   "src/themes/cartoon/tower.js",
   "src/themes/cartoon/projectiles.js",
   "src/themes/cartoon/effects.js",
+  "src/themes/SkipHint.js",
   "src/themes/cartoon/text.js",
   "src/themes/cartoon/index.js",
   "src/themes/ThemeSelector.js",
@@ -165,6 +166,7 @@ const PRECACHE = [
   "src/core/states/WorkshopState.js",
   "src/core/states/VictoryState.js",
   "src/core/states/ClearedState.js",
+  "src/core/SkipClickGuard.js",
   "src/core/InputController.js",
   "src/abilities/Ability.js",
   "src/abilities/Shockwave.js",

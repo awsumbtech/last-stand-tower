@@ -71,6 +71,7 @@ LST.Game = class Game extends LST.World {
     this.bossWavesCleared = 0;
     this.result = null;
     this.resultsDelay = 0;
+    this.skipHint = false;
     // Bosses (Sprint 4)
     this.bossKills = 0;       // mini-bosses killed (skipped Head Start boss waves count)
     this.bossEscapes = 0;     // mini-bosses that got bored and charged

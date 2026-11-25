@@ -51,6 +51,9 @@
       ctx.restore();
     },
 
+    // Shared outlined live text (Decision 6 / F9). Other themes use the same SkipHint fallback.
+    skipHint(ctx, r) { LST.SkipHint.draw(ctx, r); },
+
     banner(ctx, text, alpha, r) {
       // Fit long banners ("WAVE CLEAR!") on narrow phones, including the pop overshoot.
       const size = Math.round(Math.min(60, r.width / 7.5, (r.width * 0.82) / (text.length * 0.62 * 1.4)));

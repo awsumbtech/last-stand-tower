@@ -102,7 +102,7 @@ class SystemsTest {
       this.ok(scripts.indexOf(file) < scripts.indexOf("src/game.js") || !prop, `files: ${name} loads before game.js`);
       if (prop) this.ok(this.game[prop] instanceof this.LST[name] && (this.game[prop].game || this.game[prop].world) === this.game, `files: game.${prop} is the run's ${name}`);
     }
-    this.ok(/const VERSION = "v32"/.test(sw), "files: sw.js VERSION is v32");
+    this.ok(/const VERSION = "v33"/.test(sw), "files: sw.js VERSION is v33");
     for (const [m, [prop, fn]] of Object.entries(this.HANDOFFS)) {
       const g = this.game, sys = g[prop], keep = sys[fn], seen = [];
       sys[fn] = (...a) => { seen.push(a); return "ret:" + fn; };
@@ -185,7 +185,7 @@ class SystemsTest {
     { const g = this.fresh(); g.flow.set("playing"); this.ok(W.selectWorld("backyard") === false, "workshop: no world pick mid-run"); g.flow.set("menu"); this.ok(W.selectWorld("backyard") === true, "workshop: world pick on the menu"); }
     { const g = this.fresh(); W.open("start"); this.ok(g.flow.is("workshop") && g.workshopFrom === "start", "workshop: open() from the menu enters WorkshopState"); W.close(); this.ok(g.flow.is("menu"), "workshop: close() goes back to the menu"); }
     { const g = this.fresh(); g.flow.set("gameover"); g.resultsDelay = 0.5; W.open("results"); this.ok(g.flow.is("gameover") && !this.shown.includes("workshop"), "workshop: can't open while the tower explodes"); }
-    { const g = this.fresh(); WF.startNextWave(); this.ok(g.flow.is("playing") && g.wave === 1 && g.spawnQueue.length > 0 && g.waveIntro === 1.6, "wave: startNextWave enters PlayingState"); g.spawnQueue = []; g.enemies = []; WF.afterStep(); this.ok(g.flow.is("celebrate") && g.celebrateTimer === 1.6, "wave: an empty field ends the wave (CelebrateState)"); }
+    { const g = this.fresh(); WF.startNextWave(); this.ok(g.flow.is("playing") && g.wave === 1 && g.spawnQueue.length > 0 && g.waveIntro === 0.8, "wave: startNextWave enters PlayingState"); g.spawnQueue = []; g.enemies = []; WF.afterStep(); this.ok(g.flow.is("celebrate") && g.celebrateTimer === 1.6, "wave: an empty field ends the wave (CelebrateState)"); }
     { const g = this.fresh(); g.gotchaQueue = ["x"]; g.flow.set("celebrate"); WF.finishCelebration(); this.ok(g.flow.is("gotcha"), "wave: a pending trap reveal goes to GotchaState"); WF.dismissGotcha(); this.ok(g.flow.is("upgrade"), "wave: dismissing the last reveal deals the shop"); }
     { const g = this.fresh(); g.flow.set("playing"); g.tower.hp = 0; WF.afterStep(); this.ok(g.flow.is("gameover"), "wave: a fallen tower is game over"); }
     { const g = this.fresh(); g.flow.set("playing"); g.togglePause(); this.ok(g.flow.is("paused") && this.shown.includes("pause"), "pause: PlayingState.pause() enters PausedState"); g.togglePause(); this.ok(g.flow.is("playing"), "pause: PausedState.resume() goes back to playing");
