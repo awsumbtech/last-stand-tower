@@ -5,7 +5,13 @@ LST.GameOverState = LST.GameStateMachine.register(class GameOverState extends LS
   static get id() { return "gameover"; }
   get screen() { return "results"; }
   closePauseMenu(game) { this.showScreen(game); }
+  skipWait(game) {
+    if (game.resultsDelay <= 0) return false;
+    game.showResults();
+    return true;
+  }
   update(game, dt) {
+    game.skipHint = game.resultsDelay > 0;
     if (game.resultsDelay > 0) {
       game.resultsDelay -= dt;
       if (game.resultsDelay <= 0) game.showResults();

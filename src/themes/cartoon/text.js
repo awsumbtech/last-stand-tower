@@ -51,6 +51,11 @@
       ctx.restore();
     },
 
+    // Same outlined live text as the wave banner (text may stay in code, Decision 6 / F9).
+    skipHint(ctx, r) {
+      textPop(ctx, "Tap to skip", r.width / 2, r.height - 168, "#fffbf1", 22);
+    },
+
     banner(ctx, text, alpha, r) {
       // Fit long banners ("WAVE CLEAR!") on narrow phones, including the pop overshoot.
       const size = Math.round(Math.min(60, r.width / 7.5, (r.width * 0.82) / (text.length * 0.62 * 1.4)));

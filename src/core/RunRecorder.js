@@ -44,6 +44,7 @@ LST.RunRecorder = class RunRecorder {
 
   showResults() {
     this.game.resultsDelay = 0;
+    this.game.skipHint = false;
     this.game.flow.current.showScreen(this.game); // GameOverState: the results
   }
 

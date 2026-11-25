@@ -31,5 +31,6 @@ LST.HudCanvasLayer = class HudCanvasLayer extends LST.RenderLayer {
         theme.banner(ctx, `WAVE ${scene.wave}`, Math.min(1, scene.waveIntro), r);
       }
     }
+    if (scene.skipHint && theme.skipHint) theme.skipHint(ctx, r);
   }
 };

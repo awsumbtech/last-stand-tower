@@ -4,7 +4,7 @@
 (function () {
   const M = LST.CartoonKit.methods;
   const ORDER = ["background", "range", "tower", "enemy", "enemyHud", "corpseLife", "corpse", "projectile",
-    "particle", "burst", "text", "confetti", "banner", "bossBanner"];
+    "particle", "burst", "text", "confetti", "banner", "bossBanner", "skipHint"];
   const theme = {
     id: "cartoon",
     name: "Cartoon",

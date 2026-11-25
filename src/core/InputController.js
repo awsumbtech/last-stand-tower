@@ -9,12 +9,21 @@ LST.InputController = class InputController {
     this.settings = settings || LST.settings;
     this.isWorkshopOpen = isWorkshopOpen || (() => !!this.doc && !this.doc.getElementById("screen-workshop").classList.contains("hidden"));
     this.onKeyDown = (e) => this.keyDown(e);
+    this.onPointerDown = (e) => this.pointerDown(e);
     this.onVisibility = () => this.visibilityChanged(!!(this.doc && this.doc.hidden));
   }
   attach(win) {
     win.addEventListener("keydown", this.onKeyDown);
+    win.addEventListener("pointerdown", this.onPointerDown);
     if (this.doc) this.doc.addEventListener("visibilitychange", this.onVisibility);
     return this;
+  }
+  // Skip an unskippable wait on a tap that is not already a button or a screen control.
+  pointerDown(e) {
+    const t = e.target;
+    if (t && t.closest && t.closest("button, a, input, .card, .screen, .setting")) return false;
+    const state = this.game.flow.current;
+    return !!(state && state.skipWait && state.skipWait(this.game));
   }
   // Returns true when the key did something.
   keyDown(e) {
