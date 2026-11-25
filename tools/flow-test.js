@@ -167,10 +167,11 @@ class FlowTest {
       },
     };
   }
-  pointerEv(timeStamp) {
+  pointerEv(timeStamp, pointerId) {
     return {
       target: { closest: () => null },
       timeStamp: timeStamp == null ? 0 : timeStamp,
+      pointerId: pointerId == null ? 1 : pointerId,
       preventDefault() { this.pd = true; },
       stopPropagation() { this._stop = true; },
       stopImmediatePropagation() { this._stop = true; },
@@ -403,6 +404,165 @@ class FlowTest {
       this.ok(taken === 1 && next === 1, "input: after a long-press skip, a tap 400 ms past pointerup is delivered");
       game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
     }
+
+    { // (1) skip with pointerup, no click, then a full later tap > 400 ms past the mark is delivered
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0, 1));
+      win.fire("pointerup", this.pointerEv(10, 1));
+      const t = 10 + LST.SkipClickGuard.windowMs + 1;
+      win.fire("pointerdown", this.pointerEv(t, 1));
+      win.fire("pointerup", this.pointerEv(t + 1, 1));
+      win.fire("click", this.pointerEv(t + 2, 1));
+      this.ok(taken === 1 && next === 1, "input: after a skip with pointerup and no click, a full later tap past 400 ms is delivered");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // (1) skip with no pointerup and no click, then a full later tap > 400 ms is delivered
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0, 1));
+      const t = LST.SkipClickGuard.windowMs + 1;
+      win.fire("pointerdown", this.pointerEv(t, 1));
+      win.fire("pointerup", this.pointerEv(t + 1, 1));
+      win.fire("click", this.pointerEv(t + 2, 1));
+      this.ok(taken === 1 && next === 1, "input: after a skip with no pointerup and no click, a full later tap past 400 ms is delivered");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // (2) a full later tap only 50 ms after a skip with no click is delivered (new pointerdown disarms)
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0, 1));
+      win.fire("pointerdown", this.pointerEv(50, 1));
+      win.fire("pointerup", this.pointerEv(51, 1));
+      win.fire("click", this.pointerEv(52, 1));
+      this.ok(taken === 1 && next === 1, "input: a full later tap 50 ms after a skip with no click is delivered");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // (3) a second pointer's pointerup does not extend the window
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0, 1));
+      win.fire("pointerup", this.pointerEv(50, 2));
+      win.fire("click", this.pointerEv(LST.SkipClickGuard.windowMs));
+      this.ok(taken === 1 && next === 1, "input: a second pointer's pointerup does not extend the skip window");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+  }
+
+  // (5) Exhaustive sequences after a skip: at most the skip's own click is swallowed,
+  // and every click after a new pointerdown is delivered.
+  checkSkipGuardProperties() {
+    const { game, LST } = this;
+    const W = LST.SkipClickGuard.windowMs;
+    const kinds = [
+      { type: "pointerdown", pointerId: 1 },
+      { type: "pointerdown", pointerId: 2 },
+      { type: "pointerup", pointerId: 1 },
+      { type: "pointerup", pointerId: 2 },
+      { type: "pointercancel", pointerId: 1 },
+      { type: "click" },
+    ];
+    const packs = [
+      [10, 20, 30, 40, 50, 60],
+      [50, 100, 400, 401, 450, 600],
+    ];
+    const kFin = game.finishCelebration;
+    game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+    const win = this.fakeWin();
+    let delivered = 0;
+    win.addEventListener("click", () => { delivered++; });
+    const ic = new LST.InputController(game);
+    ic.attach(win);
+
+    const expected = (seq, times) => {
+      let up = null, newDown = false, cancelled = false, swallows = 0, settled = false;
+      const clicks = [];
+      for (let i = 0; i < seq.length; i++) {
+        const k = seq[i], t = times[i];
+        if (k.type === "pointerdown") newDown = true;
+        else if (k.type === "pointerup" && k.pointerId === 1 && up == null && !newDown && !cancelled && !settled) up = t;
+        else if (k.type === "pointercancel" && !newDown && !settled) cancelled = true;
+        else if (k.type === "click") {
+          const mark = up != null ? up : 0;
+          const belongs = !newDown && !cancelled && !settled && (t - mark) < W;
+          if (belongs) swallows++;
+          settled = true;
+          clicks.push({ belongs, afterNewDown: newDown });
+        }
+      }
+      return { swallows, clicks };
+    };
+
+    let cases = 0, fails = 0;
+    const self = this;
+    const runOne = (seq, pack) => {
+      cases++;
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      ic.skipGuard.disarm();
+      delivered = 0;
+      ic.pointerDown(self.pointerEv(0, 1));
+      const times = pack.slice(0, seq.length);
+      const exp = expected(seq, times);
+      let ci = 0, swallowed = 0;
+      for (let i = 0; i < seq.length; i++) {
+        const k = seq[i], t = times[i];
+        if (k.type === "click") {
+          const before = delivered;
+          win.fire("click", self.pointerEv(t));
+          const wasDelivered = delivered === before + 1;
+          const want = exp.clicks[ci++];
+          if (want.belongs === wasDelivered) fails++;
+          if (!wasDelivered) swallowed++;
+          if (want.afterNewDown && !wasDelivered) fails++;
+        } else {
+          win.fire(k.type, self.pointerEv(t, k.pointerId));
+        }
+      }
+      if (swallowed > 1 || swallowed !== exp.swallows) fails++;
+    };
+    const walk = (prefix) => {
+      if (prefix.length) for (const pack of packs) runOne(prefix, pack);
+      if (prefix.length >= 6) return;
+      for (const k of kinds) { prefix.push(k); walk(prefix); prefix.pop(); }
+    };
+    walk([]);
+    this.ok(fails === 0, "input: skip guard property test (" + cases + " sequences, " + fails + " violations): at most the skip's own click is swallowed, and every click after a new pointerdown is delivered");
+    game.finishCelebration = kFin;
   }
 
   // 6. no compat site left anywhere (PR 9 removed the getter / setter)
@@ -422,6 +582,7 @@ class FlowTest {
     this.checkKeys();
     this.checkHiddenTab();
     this.checkSkipClicks();
+    this.checkSkipGuardProperties();
     this.checkSweep();
     console.log(this.fails ? `\n${this.fails} FAILED (${this.passes} passed)` : `\nALL PASS (${this.passes} passed)`);
     return this.fails ? 1 : 0;
