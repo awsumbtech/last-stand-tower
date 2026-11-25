@@ -22,7 +22,8 @@ LST.InputController = class InputController {
   }
   // Skip an unskippable wait on a tap that is not already a button or a screen control.
   // Do not preventDefault: the trailing click must still arrive so the guard can swallow
-  // it. The guard disarms on pointercancel or once its 400 ms window has passed.
+  // it. The 400 ms window restarts on the skip's pointerup; pointercancel disarms.
+  // If no pointerup comes, a click stale against the pointerdown time is delivered.
   pointerDown(e) {
     const t = e.target;
     if (t && t.closest && t.closest("button, a, input, .card, .screen, .setting")) return false;

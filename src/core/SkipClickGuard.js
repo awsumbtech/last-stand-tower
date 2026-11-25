@@ -2,9 +2,11 @@
 // click cannot land on the shop or results that just appeared. InputController
 // owns the instance, arms it after a successful skip, and attaches it in
 // capture phase ahead of ShopScreen / ResultsScreen click handlers.
-// Armed for a 400 ms window (event timeStamp, so tests are deterministic). A
-// click inside the window is swallowed; pointercancel, or a later event once
-// the window has passed, always disarms so the next real tap is delivered.
+// Armed from pointerdown; the skip's own pointerup restarts a 400 ms window
+// (event timeStamp, so tests are deterministic) instead of expiring the guard.
+// A click inside that window is swallowed; a click stale against the current
+// mark (pointerup, or pointerdown if no pointerup ever comes) is delivered.
+// pointercancel always disarms.
 LST.SkipClickGuard = class SkipClickGuard {
   static get windowMs() { return 400; }
   constructor() {
@@ -32,7 +34,8 @@ LST.SkipClickGuard = class SkipClickGuard {
     return false;
   }
   pointerEnded(e) {
-    if (this.stale(this.time(e))) this.disarm();
+    if (!this.armed) return false;
+    this.arm(this.time(e)); // restart the window; do not expire on this pointerup
     return false;
   }
   consume(e) {

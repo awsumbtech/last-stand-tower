@@ -305,7 +305,7 @@ class FlowTest {
       ic.attach(win);
       this.ok(ic.pointerDown(this.pointerEv(0)) && game.flow.is("upgrade"), "input: a skip with no trailing click still opens the shop");
       win.fire("click", this.pointerEv(LST.SkipClickGuard.windowMs));
-      this.ok(taken === 1 && next === 1, "input: after the skip window, a shop card is taken and Next is pressed");
+      this.ok(taken === 1 && next === 1, "input: if no pointerup comes, a click stale against the pointerdown time is delivered");
       game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
     }
 
@@ -341,6 +341,66 @@ class FlowTest {
       ic.pointerDown(this.pointerEv(1000));
       win.fire("click", this.pointerEv(1000 + LST.SkipClickGuard.windowMs - 1));
       this.ok(taken === 0 && next === 0, "input: a click within the skip window is still swallowed");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // (a) pointerdown at 0, pointerup at 400, click at 401 must not reach the shop
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      const w = LST.SkipClickGuard.windowMs;
+      ic.pointerDown(this.pointerEv(0));
+      win.fire("pointerup", this.pointerEv(w));
+      win.fire("click", this.pointerEv(w + 1));
+      this.ok(taken === 0 && next === 0, "input: pointerdown 0, pointerup 400, click 401 does not reach the shop");
+      // (c) a later real tap more than 400 ms past the pointerup is delivered
+      win.fire("click", this.pointerEv(w + w + 1));
+      this.ok(taken === 1 && next === 1, "input: a later tap more than 400 ms after pointerup is delivered");
+      game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
+    }
+
+    { // (a) the same long-press skip must not reach the results screen
+      game.flow.set("gameover"); game.resultsDelay = 1.1;
+      const k = game.showResults;
+      game.showResults = () => { game.resultsDelay = 0; };
+      const win = this.fakeWin();
+      let resultClicks = 0;
+      win.addEventListener("click", () => { resultClicks++; });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      const w = LST.SkipClickGuard.windowMs;
+      ic.pointerDown(this.pointerEv(0));
+      win.fire("pointerup", this.pointerEv(w));
+      win.fire("click", this.pointerEv(w + 1));
+      this.ok(game.resultsDelay === 0 && resultClicks === 0, "input: pointerdown 0, pointerup 400, click 401 does not reach the results");
+      game.showResults = k;
+    }
+
+    { // (b) hold 1500 ms, pointerup, click 1 ms later is swallowed
+      game.flow.set("celebrate"); game.celebrateTimer = 1.6;
+      const kFin = game.finishCelebration, kTake = game.takeCard, kLeave = game.leaveShop;
+      game.finishCelebration = () => { game.celebrateTimer = 0; game.flow.set("upgrade"); };
+      let taken = 0, next = 0;
+      game.takeCard = () => { taken++; };
+      game.leaveShop = () => { next++; };
+      const win = this.fakeWin();
+      win.addEventListener("click", () => { game.takeCard(); game.leaveShop(); });
+      const ic = new LST.InputController(game);
+      ic.attach(win);
+      ic.pointerDown(this.pointerEv(0));
+      win.fire("pointerup", this.pointerEv(1500));
+      win.fire("click", this.pointerEv(1501));
+      this.ok(taken === 0 && next === 0, "input: a 1500 ms hold, then click 1 ms after pointerup, is swallowed");
+      // (c)
+      win.fire("click", this.pointerEv(1500 + LST.SkipClickGuard.windowMs));
+      this.ok(taken === 1 && next === 1, "input: after a long-press skip, a tap 400 ms past pointerup is delivered");
       game.finishCelebration = kFin; game.takeCard = kTake; game.leaveShop = kLeave;
     }
   }
